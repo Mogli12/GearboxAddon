@@ -10,6 +10,7 @@ If you look at the arm rest of a modern tractor you can find many buttons. Not e
 
 I myself usually drive only with keyboard and without numeric keypad. The left hand operates the keys A, D, W and S. The transmission therefore so must be controllable in essential with the right hand.
 Anyone can easily change the key assignments in the options menu within farming simulator 2015. Here are the default settings. Most functions are preset for the keyboard. If you want to play with a steering wheel or a joystick you might have to adjust it. 
+
 ### Simple Keys 
 These are the settings without pressing any control or shift key. 
 *	You change gears with the keys [ and ‘ 
@@ -20,13 +21,15 @@ These are the settings without pressing any control or shift key.
 *	The normal cruise control is controlled via the keys 1, 2 and 3. 
 *	In addition, you can change the button 4 to a second cruise control speed. The default speed is 10 km / h. 
 *	This gearbox also has hand throttle. This in turn is also an axis, which you can assign the joystick or steering wheel itself. On the keyboard to adjust hand throttle with the keys = and - 
+
 ### With the right Shift key 
 Other features are offered in holding down the right shift key. 
 *	Switching within the second group is done with ] and \. Not every tractor has two groups. 
 *	If you press the shift key together with the spacebar, then you switch between automatic and manual clutch. This is really only useful if you have a separate clutch pedal as an input device. When you save the game with this setting is saved. 
 *	The 3 key together with the shift key (de-) activated the speed limiter. You must continue press the throttle, but you cannot drive faster than a certain speed. The speed changes with the keys 1 and 2 without Shift. 
 *	The key 4 in combination with the right shift key sets the current speed as cruise control speed. If cruise control is not on the limiter is activated automatically. 
-*	You can also turn off the transmission. Then you have again the simple transmission of Giants along with the regular motor data. When you save the game with this setting is saved. 
+*	You can also turn off the transmission. Then you have again the simple transmission of Giants along with the regular motor data. When you save the game with this setting is saved.
+ 
 ### More unassigned keys 
 There are other keys not yet assigned. 
 *	1st gear: BUTTON_9 (mrGearboxMogliGEAR1) 
