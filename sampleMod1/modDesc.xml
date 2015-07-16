@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="21">
+    <author>Mogli</author>
+    <version>1.0</version>
+    <title>
+        <en>Sample Mod</en>
+        <de>Beispiel Mod</de>
+    </title>
+    <description>
+        <en>Sample mod with GearboxAddon configuration</en>
+        <de>Beispiel mit GearboxAddon Konfiguration</de>
+    </description>
+    <iconFilename>store_buehrer6135A.png</iconFilename>
+    <multiplayer supported="true"/>
+    <storeItems>
+        <storeItem>
+            <name>
+                <de>Bührer 6135 - mit GearboxAddon Konfiguration</de>
+                <en>Buehrer 6135 - with GearboxAddon configuration</en>
+            </name>
+            <rotation>0</rotation>
+            <image active="store_buehrer6135A.png" brand="brand_buehrer.png"/>
+            <price>65000</price>
+            <dailyUpkeep>95</dailyUpkeep>
+            <xmlFilename>buehrer6135A.xml</xmlFilename>
+            <brand>Bührer</brand>
+            <category>tractors</category>
+            <specs>
+                <power>135</power>
+            </specs>
+        </storeItem>
+    </storeItems>
+</modDesc>

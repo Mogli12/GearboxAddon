@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<vehicles>
+	<gearboxMogliGlobals>
+		<!--<torqueFactor value="1.1182033096926713947990543735225 " type="float"/> -->
+		<!--<blowOffVentilVol value="0.14" type="float"/>                           -->
+		<!--<drawTargetRpm value="false" type="bool"/>                              -->
+		<!--<drawReqPower value="false" type="bool"/>                               -->
+		<!--<defaultOn value="true" type="bool"/>                                   -->
+		<!--<disableManual value="false" type="bool"/>                              -->
+		<!--<blowOffVentilRpmRatio value="0.6" type="float"/>                       -->
+		<!--<minTimeToShift value="0" type="float"/>                                -->
+		<!--<maxTimeToSkipGear value="251" type="float"/>                           -->
+		<!--<shiftEffectTime value="251" type="float"/>                             -->
+		<!--<modifySound value="true" type="bool"/>                                 -->
+		<!--<modifyVolume value="true" type="bool"/>                                -->
+		<!--<modifyTransVol value="true" type="bool"/>                              -->
+		<!--<shiftTimeMsFactor value="1" type="float"/>                             -->
+		<!--<playGrindingSound value="true" type="bool"/>                           -->
+		
+		<defaultHudMode value="2" type="int"/>
+	</gearboxMogliGlobals>                                                        
+
+	<vehicle>
+		<configFile modName="sampleMod" xmlName="buehrer6135A.xml"/>
+
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1976_D.pdf -->
+		<!-- real max speed is 25, scale up to match max speed of 40 km/h in LS15 -->
+		<gearboxMogli showHud="false" globalRatioFactor="1.6" speedLimiter="false">
+			<realEngine idleRpm="930" ratedRpm="1900">
+				<torque rpm="0" motorTorque="0"/>
+				<torque rpm="700" motorTorque="426"/>
+				<torque rpm="800" motorTorque="446"/>
+				<torque rpm="900" motorTorque="463"/>
+				<torque rpm="1000" motorTorque="478"/>
+				<torque rpm="1100" motorTorque="491"/>
+				<torque rpm="1200" motorTorque="501"/>
+				<torque rpm="1300" motorTorque="510"/>
+				<torque rpm="1400" motorTorque="515"/>
+				<torque rpm="1500" motorTorque="519"/>
+				<torque rpm="1600" motorTorque="520"/>
+				<torque rpm="1700" motorTorque="514"/>
+				<torque rpm="1800" motorTorque="507"/>
+				<torque rpm="1900" motorTorque="499"/>
+				<torque rpm="2000" motorTorque="443"/>
+				<torque rpm="2100" motorTorque="277"/>
+				<torque rpm="2200" motorTorque="0"/>
+			</realEngine>
+			<gears defaultGear="3" reverseReset="true">	
+				<gear speed="5.5"  forwardOnly="true" name="1"/>
+				<gear speed="7.9"  forwardOnly="true" name="2"/>
+				<gear speed="12.5" forwardOnly="true" name="3"/>
+				<gear speed="17.6" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="8.8"  reverseOnly="true" name="R"/>
+			</gears>
+			<!-- groups are not synchronized -->
+			<ranges shiftTimeMs="2000" doubleClutch="true">		
+				<range ratio="0.208" />
+				<range ratio="0.608"/>
+				<range ratio="1"/>
+			</ranges>			
+		</gearboxMogli>			
+	</vehicle>
+	
+</vehicles>

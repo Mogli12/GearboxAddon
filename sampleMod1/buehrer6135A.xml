@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<vehicle type="BuehrerSampleMod2">
+    <annotation>Copyright (C) GIANTS Software GmbH, All Rights Reserved.</annotation>
+    <name>
+        <en>Buehrer 6135 A</en>
+        <de>Bührer 6135 A</de>
+    </name>
+    <filename>buehrer6135A.i3d</filename>
+
+		<!-- GearboxAddon configuration -->
+		<!-- real max speed is 25, scale up to match max speed of 40 km/h in LS15 -->
+		<gearboxMogli showHud="false" globalRatioFactor="1.6" speedLimiter="false">
+			<realEngine idleRpm="930" ratedRpm="1900">
+				<torque rpm="0" motorTorque="0"/>
+				<torque rpm="700" motorTorque="426"/>
+				<torque rpm="800" motorTorque="446"/>
+				<torque rpm="900" motorTorque="463"/>
+				<torque rpm="1000" motorTorque="478"/>
+				<torque rpm="1100" motorTorque="491"/>
+				<torque rpm="1200" motorTorque="501"/>
+				<torque rpm="1300" motorTorque="510"/>
+				<torque rpm="1400" motorTorque="515"/>
+				<torque rpm="1500" motorTorque="519"/>
+				<torque rpm="1600" motorTorque="520"/>
+				<torque rpm="1700" motorTorque="514"/>
+				<torque rpm="1800" motorTorque="507"/>
+				<torque rpm="1900" motorTorque="499"/>
+				<torque rpm="2000" motorTorque="443"/>
+				<torque rpm="2100" motorTorque="277"/>
+				<torque rpm="2200" motorTorque="0"/>
+			</realEngine>
+			<gears defaultGear="3" reverseReset="true">	
+				<gear speed="5.5"  forwardOnly="true" name="1"/>
+				<gear speed="7.9"  forwardOnly="true" name="2"/>
+				<gear speed="12.5" forwardOnly="true" name="3"/>
+				<gear speed="17.6" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="8.8"  reverseOnly="true" name="R"/>
+			</gears>
+			<!-- groups are not synchronized -->
+			<ranges shiftTimeMs="2000" doubleClutch="true">		
+				<range ratio="0.208" />
+				<range ratio="0.608"/>
+				<range ratio="1"/>
+			</ranges>			
+		</gearboxMogli>			
+		<!-- GearboxAddon configuration -->
+				
+		
+    <size width="3.5" length="6"/>
+
+    <wheels autoRotateBackSpeed="2">
+        <wheel rotSpeed="1" restLoad="1.3" repr="0>0" driveNode="0>0|0" radius="0.585" initialCompression="50" suspTravel="0.15" spring="25" damper="25" mass="0.099" hasTyreTracks="true" tyreTrackAtlasIndex="0" fenderNode="0>0|2" fenderRotMin="-29" />
+        <wheel rotSpeed="1" restLoad="1.3" repr="0>1" driveNode="0>1|0" radius="0.585" initialCompression="50" suspTravel="0.15" spring="25" damper="25" mass="0.099" hasTyreTracks="true" tyreTrackAtlasIndex="0" fenderNode="0>1|2" fenderRotMax="29" />
+        <wheel rotSpeed="0" restLoad="1.0" repr="0>2" radius="0.79" initialCompression="50" suspTravel="0.09" spring="35" damper="25" mass="0.16" hasTyreTracks="true" tyreTrackAtlasIndex="0"/>
+        <wheel rotSpeed="0" restLoad="1.0" repr="0>3" radius="0.79" initialCompression="50" suspTravel="0.09" spring="35" damper="25" mass="0.16" hasTyreTracks="true" tyreTrackAtlasIndex="0"/>
+    </wheels>
+
+    <dynamicallyLoadedParts>
+        <dynamicallyLoadedPart node="0|1" linkNode="0>0|0" filename="$data/vehicles/wheels/trelleborg/trelleborgTM700_380_70R24.i3d" />
+        <dynamicallyLoadedPart node="0|0" linkNode="0>1|0" filename="$data/vehicles/wheels/trelleborg/trelleborgTM700_380_70R24.i3d" />
+        <dynamicallyLoadedPart node="0|1" linkNode="0>2"   filename="$data/vehicles/wheels/trelleborg/trelleborgTM700_520_70R34.i3d" />
+        <dynamicallyLoadedPart node="0|0" linkNode="0>3"   filename="$data/vehicles/wheels/trelleborg/trelleborgTM700_520_70R34.i3d" />
+    </dynamicallyLoadedParts>
+
+    <ackermannSteering rotSpeed="60" rotMax="35" rotCenterWheel1="2" rotCenterWheel2="3" />
+
+    <differentials>
+        <differential torqueRatio="0.5" maxSpeedRatio="1.2" wheelIndex1="0" wheelIndex2="1" /> <!-- front left-right -->
+        <differential torqueRatio="0.5" maxSpeedRatio="1.3" wheelIndex1="2" wheelIndex2="3" /> <!-- back left-right -->
+        <differential torqueRatio="0.5" maxSpeedRatio="1.1" differentialIndex1="0" differentialIndex2="1" /> <!-- front-back -->
+    </differentials>
+
+    <motor torqueScale="0.520" minRpm="1000" maxRpm="2200" maxBackwardSpeed="15" brakeForce="2.5" lowBrakeForceScale="0.5" lowBrakeForceSpeedLimit="1" minForwardGearRatio="19.7" maxForwardGearRatio="130" minBackwardGearRatio="50" maxBackwardGearRatio="130">
+			<torque normRpm="0.455" torque="0.95"/>
+			<torque normRpm="0.5" torque="0.965"/>
+			<torque normRpm="0.545" torque="0.978"/>
+			<torque normRpm="0.591" torque="0.988"/>
+			<torque normRpm="0.636" torque="0.994"/>
+			<torque normRpm="0.682" torque="0.999"/>
+			<torque normRpm="0.727" torque="1"/>
+			<torque normRpm="0.773" torque="0.976"/>
+			<torque normRpm="0.818" torque="0.95"/>
+			<torque normRpm="0.864" torque="0.923"/>
+			<torque normRpm="0.909" torque="0.893"/>
+			<torque normRpm="0.955" torque="0.862"/>
+			<torque normRpm="1" torque="0.829"/>
+    </motor>
+
+    <fuelCapacity>120</fuelCapacity>
+    <fuelUsage>13</fuelUsage>
+
+    <cameras count="2">
+        <camera1 index="4|0" rotatable="true" rotateNode="4" limit="true" useWorldXZRotation="true" rotMinX="-1.4" rotMaxX="1" transMin="4" transMax="35" >
+            <raycastNode index="0>6"/>
+            <raycastNode index="0>7"/>
+        </camera1>
+        <camera2 index="5" rotatable="true" limit="true" rotMinX="-1.1" rotMaxX="0.4" transMin="0" transMax="0" useMirror="true" isInside="true" />
+    </cameras>
+
+    <lights>
+        <light realLight="0>9" decoration="0>28" lightType="0"/>
+        <light realLight="0>10" decoration="0>29" lightType="1"/>
+    </lights>
+
+    <brakeLights>
+        <brakeLight index="0>34" />
+    </brakeLights>
+
+    <beaconLights>
+        <beaconLight index="0>30" speed="0.015" filename="$data/vehicles/shared/beaconLight02.i3d" />
+    </beaconLights>
+
+    <turnSignals>
+        <turnSignalLeft index="0>35|0" />
+        <turnSignalRight index="0>35|1" />
+    </turnSignals>
+
+    <mirrors>
+        <mirror index="0>36|0" />
+        <mirror index="0>36|1" />
+        <mirror index="0>36|2" />
+    </mirrors>
+
+    <indoorHud>
+        <fuel animName="fuelDisplay" />
+        <rpm animName="rpmDisplay" />
+    </indoorHud>
+    
+    <enterReferenceNode index="0>"/>
+    <exitPoint index="0>8"/>
+
+    <attacherJoints>
+        <attacherJoint index="0>11|0|0" rotationNode="0>11" minRot="21 0 0" minRot2="-14 0 0" maxRot="6 0 0" rotationNode2="0>11|0" maxRot2="-6 0 0" maxTransLimit="0 0.5 0" maxRotLimit="0 0 20" moveTime="2.5" ptoOutputNode="0>20" ptoFilename="$data/vehicles/shared/powerTakeoff.i3d">
+            <bottomArm rotationNode="0>12" translationNode="0>12|0" referenceNode="0>12|0|0" zScale="-1" />
+            <topArm baseNode="0>13" filename="$data/vehicles/shared/upperLink.i3d" zScale="-1" />
+        </attacherJoint>
+        <attacherJoint index="0>16|0|0" rotationNode="0>16" minRot="-50 0 0" minRot2="41 0 0" maxRot="-18 0 0" rotationNode2="16|0" maxRot2="18 0 0" maxTransLimit="0 0.4 0" maxRotLimit="0 0 20" moveTime="2.5" ptoOutputNode="0>22" ptoFilename="$data/vehicles/shared/powerTakeoff.i3d">
+            <bottomArm rotationNode="0>17" translationNode="17|0" referenceNode="17|0|0" zScale="1" />
+            <topArm baseNode="0>18" filename="$data/vehicles/shared/upperLinkSmall.i3d" zScale="1" toggleVisibility="true" />
+        </attacherJoint>
+        <!-- trailer attacher -->
+        <attacherJoint index="0>19|0" jointType="trailer" transNode="0>19" transMinYHeight="0.62" transMaxYHeight="1.1" maxRotLimit="10 80 80" minRotRotationOffset="0" allowsJointLimitMovement="false" ptoOutputNode="0>20" ptoFilename="$data/vehicles/shared/powerTakeoff.i3d"/>
+        <attacherJoint index="0>21"   jointType="trailerLow" maxRotLimit="10 50 50" minRotRotationOffset="0" allowsJointLimitMovement="false" ptoOutputNode="0>20" ptoFilename="$data/vehicles/shared/powerTakeoff.i3d"/>
+    </attacherJoints>
+
+    <attacherJointLowerCombo duration="2">
+        <attacherJoint index="2" time="0" />
+        <attacherJoint index="1" time="1" />
+        <attacherJoint index="3" time="1" />
+        <attacherJoint index="4" time="1" />
+    </attacherJointLowerCombo>
+
+    <movingTools>
+        <!-- attacher joint back bottom-->
+        <movingTool index="0>12">
+            <!-- cylinder 1 -->
+            <dependentPart index="0>14" />
+            <!-- cylinder 2 -->
+            <dependentPart index="0>15" />
+            <!-- lowerlink -->
+            <dependentPart index="0>33" />
+        </movingTool>
+
+        <!-- attacher joint front bottom-->
+        <movingTool index="0>17">
+            <!-- cylinder -->
+            <dependentPart index="0>31" />
+        </movingTool>
+    </movingTools>
+
+    <movingParts>
+        <!-- attacher joint back bottom cylinder 1 -->
+        <movingPart index="0>14" referencePoint="0>15|1" referenceFrame="0>15|1" invertZ="true">
+            <translatingPart index="0>14|0" />
+        </movingPart>
+        <!-- attacher joint back bottom cylinder 2 -->
+        <movingPart index="0>15" referencePoint="0>12|0|1" localReferencePoint="0>15|2" referenceFrame="0>" invertZ="true">
+            <dependentPart index="0>15|2" />
+        </movingPart>
+        <!-- attacher joint back bottom cylinder 2b -->
+        <movingPart index="0>15|2" referencePoint="0>12|0|1" referenceFrame="0>15|0" invertZ="true" />
+        <!-- attacher joint front bottom cylinder -->
+        <movingPart index="0>31" referencePoint="0>17|0|1" referenceFrame="0>17|0|1">
+            <dependentPart index="0>31|0" />
+        </movingPart>
+        <!-- lowerlink -->
+        <movingPart index="0>33" referencePoint="0>12|0|2" referenceFrame="0>" invertZ="true" scaleZ="true" />
+        <!-- steering -->
+        <movingPart index="0>0|1" referencePoint="0>1|1" referenceFrame="0>" scaleZ="true" playSound="false" isActiveDirty="true" />
+    </movingParts>
+
+    <steering index="0>23|0" indoorRotation="540" outdoorRotation="45" />
+
+    <animations>
+        <animation name="fuelDisplay">
+            <part node="0>36|3|1" startTime="0" endTime="1" startRot="0 0 0" endRot="0 -95 0" />
+        </animation>
+        <animation name="rpmDisplay">
+            <part node="0>36|3|0" startTime="0" endTime="1" startRot="0 0 0" endRot="0 200 0" />
+        </animation>
+    </animations>
+    
+    <characterNode index="0>24|0" cameraMinDistance="2.0" filename="$dataS2/character/player/player.i3d" characterMesh="1" characterGloves="2" characterSkin="0" spineNode="0|0" leftArmIKChainId="leftArm" rightArmIKChainId="rightArm" spineRotation="180 0 104" >
+        <ikChains>
+            <ikChain id="rightFoot" target="0>24|1" targetOffset="0 0.1 0" alignToTarget="true" isDirtyOnLoad="true" >
+                <node index="0|1" />
+                <node index="0|1|0"     minRx="0" maxRx="0" minRy="-20" maxRy="20" minRz="0"   maxRz="90" />
+                <node index="0|1|0|0"   minRx="0" maxRx="0" minRy="0"   maxRy="0"  minRz="270" maxRz="360" />
+                <node index="0|1|0|0|0" />
+            </ikChain>
+            <ikChain id="leftFoot" target="0>24|2" targetOffset="0 0.1 0" alignToTarget="true" isDirtyOnLoad="true">
+                <node index="0|2"     />
+                <node index="0|2|0"     minRx="0" maxRx="0" minRy="-20" maxRy="20" minRz="0"   maxRz="90" />
+                <node index="0|2|0|0"   minRx="0" maxRx="0" minRy="0"   maxRy="0"  minRz="270" maxRz="360" />
+                <node index="0|2|0|0|0" />
+            </ikChain>
+            <ikChain id="rightArm" target="0>23|0|0" targetOffset="0.025 0.066 0" alignToTarget="true" isDirtyOnLoad="true">
+                <node index="0|0|0|1" />
+                <node index="0|0|0|1|0"   minRx="0" maxRx="0" minRy="-40" maxRy="90" minRz="0" maxRz="90" />
+                <node index="0|0|0|1|0|0" minRx="0" maxRx="0" minRy="0" maxRy="0" minRz="7" maxRz="90" />
+                <node index="0|0|0|1|0|0|0" />
+                <rotationNode index="0|0|0|1|0|0|0|0" rotation="0 0 -60" />
+                <rotationNode index="0|0|0|1|0|0|0|0|0" rotation="0 0 -60" />
+                <rotationNode index="0|0|0|1|0|0|0|1" rotation="-90 20 -40" />
+                <rotationNode index="0|0|0|1|0|0|0|1|0" rotation="0 0 -40" />
+            </ikChain>
+            <ikChain id="leftArm" target="0>23|0|1" targetOffset="-0.025 0.066 0" alignToTarget="true" isDirtyOnLoad="true">
+                <node index="0|0|0|2" />
+                <node index="0|0|0|2|0"   minRx="0" maxRx="0" minRy="-40" maxRy="90" minRz="0" maxRz="90" />
+                <node index="0|0|0|2|0|0" minRx="0" maxRx="0" minRy="0" maxRy="0" minRz="7" maxRz="90" />
+                <node index="0|0|0|2|0|0|0" />
+                <rotationNode index="0|0|0|2|0|0|0|0" rotation="0 0 -60" />
+                <rotationNode index="0|0|0|2|0|0|0|0|0" rotation="0 0 -60" />
+                <rotationNode index="0|0|0|2|0|0|0|1" rotation="-90 20 -40" />
+                <rotationNode index="0|0|0|2|0|0|0|1|0" rotation="0 0 -40" />
+            </ikChain>
+        </ikChains>
+    </characterNode>
+
+    <aiTrafficCollisionTrigger index="0>25" />
+
+    <exhaustEffects>
+        <exhaustEffect index="0>26" filename="$data/vehicles/particleAnimations/shared/exhaust.i3d" minRpmColor="0.9 0.9 0.9 0.05" maxRpmColor="0.9 0.9 0.9 0.2" minRpmScale="0.05" maxRpmScale="0.4" forwardXRotations="-250 0 250" forwardZRotations="0 0 0" steerXRotations="0 0 0" steerZRotations="120 0 -50" />
+    </exhaustEffects>
+
+    <motorStartDuration>2500</motorStartDuration>
+    <attachSound file="$data/vehicles/shared/attach.wav" pitchOffset="1" />
+    <motorStartSound file="buehrer6135_start.wav" pitchOffset="1" volume="1.25" />
+    <motorSound file="buehrer6135_idle.wav" pitchOffset="1" pitchScale="0.02" pitchMax="1.55" volume="1.25" radius="50" innerRadius="20" />
+    <motorSoundRun file="buehrer6135_run.wav" pitchOffset="0.45" pitchScale="0.026" pitchMax="1.35" volume="1.3" />
+    <motorSoundRun2 file="$data/vehicles/shared/transmissionOld.wav" pitchOffset="0.65" volume="0.2" pitchMax="1.4" volumeMax="0.45"/> 
+    <motorStopSound file="buehrer6135_stop.wav" pitchOffset="1" volume="1.5" />
+    <compressedAirSound file="$data/vehicles/shared/brakeOld.wav" pitchOffset="1" volume="2"/>
+    <compressionSound file="$data/vehicles/shared/compressorWork.wav" pitchOffset="1" volume="1.5"/>
+
+    <honkSound file="$dataS2/sounds/horn.wav" volume="1" radius="80" innerRadius="35" />
+
+    <driveGroundParticleSystems>
+        <driveGroundParticleSystem file="$data/vehicles/particleAnimations/shared/drivingParticleSystem.i3d" wheel="1" />
+        <driveGroundParticleSystem file="$data/vehicles/particleAnimations/shared/drivingParticleSystem.i3d" wheel="2" />
+        <driveGroundParticleSystem file="$data/vehicles/particleAnimations/shared/drivingParticleSystem.i3d" wheel="3" />
+        <driveGroundParticleSystem file="$data/vehicles/particleAnimations/shared/drivingParticleSystem.i3d" wheel="4" />
+    </driveGroundParticleSystems>
+
+    <washable dirtDuration="50" washDuration="1" workMultiplier="4" />
+
+    <components count="1">
+        <component1 centerOfMass="0 0.8 0.4" solverIterationCount="10" />
+    </components>
+
+    <schemaOverlay file="$dataS2/menu/schemas/vehicleSchema.png" fileSelected="$dataS2/menu/schemas/vehicleSchemaSelected.png" width="0.5" height="0.5" attacherJointPosition="0.5 0">
+        <attacherJoint position="1 0" rotation="0" invertX="false" />
+        <attacherJoint position="0 0" rotation="0" invertX="true" />
+        <attacherJoint position="1 0" rotation="0" invertX="false" />
+        <attacherJoint position="1 0" rotation="0" invertX="false" />
+    </schemaOverlay>
+
+</vehicle>

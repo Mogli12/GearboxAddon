@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="21">
+	<author>Mogli</author>
+	<version>1.2</version>
+	<title>
+		<en>Sample Mod 2</en>
+		<de>Beispiel Mod 2</de>
+	</title>
+	<description>
+		<en>Sample mod 2 with GearboxAddon build-in</en>
+		<de>Beispiel Mod 2 mit GearboxAddon fest eingebaut</de>
+	</description>
+
+	<extraSourceFiles>
+		<sourceFile filename="scripts/mogliBase20.lua" />
+	</extraSourceFiles> 
+
+	<specializations>
+		<specialization name="gearboxMogli" className="mrGearboxMogli" filename="scripts/mrGearboxMogli.lua" /><!-- @author  mogli -->		
+		<specialization name="tempomatMogli" className="tempomatMogli" filename="scripts/tempomatMogli.lua" /><!-- @author  mogli -->		
+		<specialization name="GearboxHud" className="GearboxHud" filename="scripts/GearboxHud.lua" /><!-- @author  mogli -->		
+	</specializations>
+
+	<vehicleTypes>
+
+		<type name="BuehrerSampleMod2" className="Vehicle" filename="$dataS/scripts/vehicles/Vehicle.lua">
+			<specialization name="animatedVehicle" />
+			<specialization name="motorized" />
+			<specialization name="steerable" />
+			<specialization name="drivable" />
+			<specialization name="cylindered" />
+			<specialization name="hirable" />
+			<specialization name="aiTractor" />
+			<specialization name="bunkerSiloCompacter" />
+			<specialization name="honk" />
+			<specialization name="indoorHud" />
+			<specialization name="washable" />
+			<specialization name="mountable" />
+
+			<specialization name="gearboxMogli" />	
+			<specialization name="tempomatMogli" />	
+			<specialization name="GearboxHud" />	
+		</type>		 
+	</vehicleTypes>
+
+	<l10n>
+		<text name="mrGearboxMogliVERSION"><de>Getriebe v1.1 von Mogli</de><en>Gearbox v1.1 by mogli</en></text>
+		<text name="mrGearboxMogliSHIFTGEARUP"><de>Getriebe: Gang hoch</de><en>Gearbox: Gear up</en></text>
+		<text name="mrGearboxMogliSHIFTGEARDOWN"><de>Getriebe: Gang runter</de><en>Gearbox: Gear down</en></text>
+		<text name="mrGearboxMogliSHIFTRANGEUP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en></text>
+		<text name="mrGearboxMogliSHIFTRANGE2UP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en></text>
+		<text name="mrGearboxMogliSHIFTRANGEDOWN"><de>Getriebe: Gruppe 2 runter</de><en>Gearbox: Range 2 down</en></text>
+		<text name="mrGearboxMogliSHIFTRANGE2DOWN"><de>Getriebe: Gruppe 2 runter</de><en>Gearbox: Range 2 down</en></text>
+		<text name="mrGearboxMogliNEUTRAL"><de>Getriebe: Neutral</de><en>Gearbox: Neutral</en></text>
+		<text name="mrGearboxMogliOFF"><de>Manuelles Getriebe [aus]</de><en>manual gearbox [off]</en></text>
+		<text name="mrGearboxMogliON"><de>Manuelles Getriebe [an]</de><en>manual gearbox [on]</en></text>
+		<text name="mrGearboxMogliON_OFF"><de>Getriebe: On/Off</de><en>Gearbox: On/Off</en></text>
+		<text name="mrGearboxMogliREVERSE"><de>Getriebe: Rückwärts</de><en>Gearbox: Reverse</en></text>
+		<text name="mrGearboxMogliAUTOCLUTCH"><de>Getriebe: Autom.Kupplung</de><en>Gearbox: auto clutch</en></text>
+		<text name="mrGearboxMogliCLUTCH"><de>Getriebe: Kupplung</de><en>Gearbox: clutch</en></text>
+		<text name="mrGearboxMogliCLUTCH_1"><de>Getriebe: Kupplung öffnen</de><en>Gearbox: clutch</en></text>
+		<text name="mrGearboxMogliCLUTCH_2"><de>Getriebe: Kupplung schliessen</de><en>Gearbox: clutch</en></text>
+		<text name="mrGearboxMogliMINRPM"><de>Getriebe: Handgas</de><en>Gearbox: hand throttle</en></text>
+		<text name="mrGearboxMogliMINRPM_1"><de>Getriebe: Handgas runter</de><en>Gearbox: hand throttle</en></text>
+		<text name="mrGearboxMogliMINRPM_2"><de>Getriebe: Handgas rauf</de><en>Gearbox: hand throttle</en></text>
+		<text name="mrGearboxMogliGEAR1"><de>Getriebe: 1</de><en>Gearbox: 1</en></text>
+		<text name="mrGearboxMogliGEAR2"><de>Getriebe: 2</de><en>Gearbox: 2</en></text>
+		<text name="mrGearboxMogliGEAR3"><de>Getriebe: 3</de><en>Gearbox: 3</en></text>
+		<text name="mrGearboxMogliGEAR4"><de>Getriebe: 4</de><en>Gearbox: 4</en></text>
+		<text name="mrGearboxMogliGEAR5"><de>Getriebe: 5</de><en>Gearbox: 5</en></text>
+		<text name="mrGearboxMogliGEAR6"><de>Getriebe: 6</de><en>Gearbox: 6</en></text>
+		<text name="mrGearboxMogliGEARR"><de>Getriebe: 6</de><en>Gearbox: 6</en></text>
+		<text name="mrGearboxMogliGEARFWD"><de>Getriebe: forwärts</de><en>Gearbox: fwd</en></text>
+		<text name="mrGearboxMogliGEARBACK"><de>Getriebe: rückwärts</de><en>Gearbox: back</en></text>
+		<text name="mrGearboxMogliSPEEDLIMIT"><de>Getriebe: Begrenzer</de><en>Gearbox: limiter</en></text>
+		<text name="mrGearboxMogliSWAPSPEED"><de>Getriebe: Tempomat 2</de><en>Gearbox: limiter 2</en></text>
+		<text name="mrGearboxMogliSETSPEED"><de>Getriebe: Setze Begrenzer</de><en>Gearbox: set limit</en></text>
+		<text name="mrGearboxMogliACCTOLIMIT"><de>Getriebe: Beschleunigung</de><en>Gearbox: acceleration</en></text>
+		<text name="mrGearboxMogliDECTOLIMIT"><de>Getriebe: Bremsen</de><en>Gearbox: deceleration</en></text>
+	</l10n>
+	<inputBindings>		
+		<input name="mrGearboxMogliSHIFTGEARUP" 	  key1="KEY_leftbracket"     button="BUTTON_3" category="VEHICLE" />
+		<input name="mrGearboxMogliSHIFTGEARDOWN"   key1="KEY_quote"           button="BUTTON_4" category="VEHICLE" />
+		<input name="mrGearboxMogliSHIFTRANGEUP"    key1="KEY_rightbracket"    button=""         category="VEHICLE" />
+		<input name="mrGearboxMogliSHIFTRANGEDOWN"  key1="KEY_backslash"       button=""         category="VEHICLE" />
+		<input name="mrGearboxMogliNEUTRAL"      	  key1="KEY_semicolon"       button=""         category="VEHICLE" />
+		<input name="mrGearboxMogliON_OFF"      	  key1="KEY_rshift KEY_semicolon"       button=""         category="VEHICLE" />
+		<input name="mrGearboxMogliREVERSE" 		    key1="KEY_space"           button="BUTTON_2" category="VEHICLE" />
+		<input name="mrGearboxMogliAUTOCLUTCH" 	    key1="KEY_rshift KEY_space" button="" 			 category="VEHICLE" />
+		<input name="mrGearboxMogliSHIFTRANGE2UP"   key1="KEY_rshift KEY_rightbracket" button="" category="VEHICLE" />
+		<input name="mrGearboxMogliSHIFTRANGE2DOWN" key1="KEY_rshift KEY_backslash"    button="" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR1" key1="" key2="" mouse="" button="BUTTON_9" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR2" key1="" key2="" mouse="" button="BUTTON_10" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR3" key1="" key2="" mouse="" button="BUTTON_11" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR4" key1="" key2="" mouse="" button="BUTTON_12" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR5" key1="" key2="" mouse="" button="BUTTON_13" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEAR6" key1="" key2="" mouse="" button="BUTTON_14" device="0" category="VEHICLE" />
+    <input name="mrGearboxMogliGEARR"           button="BUTTON_15" device="0" category="VEHICLE" />
+		<input name="mrGearboxMogliGEARFWD"         category="VEHICLE" />
+		<input name="mrGearboxMogliGEARBACK"        category="VEHICLE" />
+		<input name="mrGearboxMogliSPEEDLIMIT"      key1="KEY_rshift KEY_3" button="" category="VEHICLE" />
+		<input name="mrGearboxMogliSWAPSPEED"      key1="KEY_4" button="" category="VEHICLE" />
+		<input name="mrGearboxMogliSETSPEED"      key1="KEY_rshift KEY_4" button="" category="VEHICLE" />
+		<input name="mrGearboxMogliACCTOLIMIT" 	    key1="KEY_rshift KEY_leftbracket" category="VEHICLE" />
+		<input name="mrGearboxMogliDECTOLIMIT"      key1="KEY_rshift KEY_quote" category="VEHICLE" />
+		<input name="mrGearboxMogliCONFLICT_1"      key1="KEY_lshift KEY_4" 	  category="VEHICLE" visible="false" />
+		<input name="mrGearboxMogliCONFLICT_2"      key1="KEY_lctrl KEY_4"	    category="VEHICLE" visible="false" />
+		<input name="mrGearboxMogliCONFLICT_3"      key1="KEY_lshift KEY_space" category="VEHICLE" visible="false" />
+		<input name="mrGearboxMogliCONFLICT_4"      key1="KEY_lctrl KEY_space"	category="VEHICLE" visible="false" />
+    <axis name="mrGearboxMogliCLUTCH" key1="KEY_slash"  key2="KEY_period" axis="AXIS_9"  invert="false" category="VEHICLE" visible="true" />
+    <axis name="mrGearboxMogliMINRPM" key1="KEY_equals" key2="KEY_minus"  axis="AXIS_10" invert="false" category="VEHICLE" visible="true" />
+	</inputBindings>
+	
+	<iconFilename>store_buehrer6135A.png</iconFilename>
+	<multiplayer supported="true"/>
+	<storeItems>
+		<storeItem>
+			<name>
+				<de>Bührer 6135 II - mit GearboxAddon fest eingebaut</de>
+				<en>Buehrer 6135 II - with GearboxAddon build-in</en>
+			</name>
+			<rotation>0</rotation>
+			<image active="store_buehrer6135A.png" brand="brand_buehrer.png"/>
+			<price>65000</price>
+			<dailyUpkeep>95</dailyUpkeep>
+			<xmlFilename>buehrer6135A.xml</xmlFilename>
+			<brand>Bührer</brand>
+			<category>tractors</category>
+			<specs>
+				<power>135</power>
+			</specs>
+		</storeItem>
+	</storeItems>
+</modDesc>

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<CustomShader version = "3">
+    <Parameters>
+        <Parameter name = "RDT"           target = "RDT"           type = "float4"  defaultValue = "1.0 1.0 20.0 20.0"   minValue = "0.0 0.0 0.0 0.0"          maxValue = "1.0 1.0 50.0 50.0"/>
+        <Parameter name = "offsetUV"      target = "offsetUV"      type = "float4"  defaultValue = "0 0 0 0"             minValue = "-10.0 -10.0 -10.0 -10.0"  maxValue = "10.0 10.0 10.0 10.0"/>
+        <Parameter name = "uvCenterSize"  target = "uvCenterSize"  type = "float4"  defaultValue = "0.5 0.5 1.0 1.0"     minValue = "-1.0 -1.0 0.0 0.0"        maxValue = "1.0 1.0 50.0 50.0"/>
+        <Parameter name = "colorScale"    target = "colorScale"    type = "float4"  defaultValue = "0.8 0.55 0.055 1.0"  minValue = "0.0 0.0 0.0 0.0"          maxValue = "1.0 1.0 1.0 1.0"/>
+    </Parameters>
+    <Textures>
+        <Texture name = "DirtNmap" defaultColorProfile = "linearRGB" defaultFilename = "shared/dirt_normal.png"/>
+    </Textures>
+    <Variations>
+        <Variation name = "uvScroll">
+<![CDATA[
+    #define UV_SCROLL       // Enables UV scrolling 
+]]>
+        </Variation>
+        <Variation name = "uvRotate">
+<![CDATA[
+    #define UV_ROTATE       // Enables UV rotation 
+]]>
+        </Variation>
+        <Variation name = "Decal">
+<![CDATA[
+    #define DECAL_RENDER    // Enables 2nd UV set for specular 
+]]>
+        </Variation>
+        <Variation name = "Window">
+<![CDATA[
+    #define WINDOW          // should be used with akphaBlended material
+]]>
+        </Variation>
+        <Variation name = "colorMask">
+<![CDATA[
+    #define COLOR_MASK      // Enables colorPainting by mask from glossMap.a
+]]>
+        </Variation>
+    </Variations>
+    <LodLevel startDistance = "0">
+        <CodeInjections>
+            <CodeInjection position = "MATERIALINFO">
+<![CDATA[
+    /*
+    R - NOT USED YET
+    D - Dirt Amount
+    T - Dirt Texture Tile
+    */
+    uniform float4 RDT;
+
+#if defined( UV_SCROLL ) || defined( UV_ROTATE )
+    uniform float4 offsetUV;
+#endif
+#if defined( UV_ROTATE )
+    uniform float4 uvCenterSize;
+#endif
+#if defined( COLOR_MASK )
+    uniform float4 colorScale;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position = "SAMPLERS">
+<![CDATA[
+sampler2D DirtNmap;
+]]>
+            </CodeInjection>
+            <CodeInjection position = "FS_GLOBALS">
+<![CDATA[
+    float4 gGloss;
+    float  gAO;
+    float  gDirt;
+    float  maxSpecularIntensity;
+]]>
+            </CodeInjection>
+            <CodeInjection position = "CONFIG_DEFINES">
+<![CDATA[
+#if GPU_PROFILE < GPU_PROFILE_MEDIUM
+    #if defined( REFLECTION_MAP_CUBE )
+        #undef REFLECTION_MAP_CUBE
+    #endif
+#endif
+
+#if defined( DECAL_RENDER )
+    // Remap gloss map lookups to our custom tex coord
+    #define GLOSSMAP_TEXCOORD glossMapTexCoords2
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="VS_OUTPUT">
+<![CDATA[
+#if defined( DECAL_RENDER )
+float2 glossMapTexCoords2 : TEXCOORDn;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="SAMPLERS">
+<![CDATA[
+#if defined( UV_ROTATE )
+float2 m_getUVRotationSinCos( )
+{
+    float mTime = offsetUV.z;
+    float2 mSinCos; 
+    // compute sin and cos for this angle 
+    sincos( mTime, mSinCos.x, mSinCos.y ); 
+    return mSinCos;
+}
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_SET_TEXCOORDS_VS">
+<![CDATA[
+#if defined( DECAL_RENDER )
+    // Pass second UVSet to the Pixel Shader 
+    Out.glossMapTexCoords2 = convertDefaultTexCoords(In, In.texCoords1.xy);
+#endif
+#if defined( UV_ROTATE ) && defined( ALBEDO_MAP )
+    float2 mOutgoingUV = getDefaultTexCoords(In);
+    mOutgoingUV *= uvCenterSize.zw;
+    float2 mRotationCenter = uvCenterSize.xy;
+    mRotationCenter *= uvCenterSize.zw;
+    float2 mSinCos = m_getUVRotationSinCos();
+    // move the rotation center to the origin 
+    float2 mTmpUV = mOutgoingUV - mRotationCenter; 
+    // rotate the uv 
+    mOutgoingUV.x = dot( mTmpUV, float2( mSinCos.y, - mSinCos.x ) ); 
+    mOutgoingUV.y = dot( mTmpUV, mSinCos.xy );
+    // move the uv's back to the correct place 
+    mOutgoingUV += mRotationCenter;
+    mOutgoingUV /= uvCenterSize.zw;
+    Out.defaultTexCoords = mOutgoingUV;
+#endif
+#if defined( UV_SCROLL ) && defined( ALBEDO_MAP )
+    float2 mUV = getDefaultTexCoords(In);
+    mUV.xy += offsetUV.xy;
+    Out.defaultTexCoords = mUV;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_TANGENT_VS">
+<![CDATA[
+#if defined( UV_ROTATE ) && defined( ALBEDO_MAP )
+    float2 mSinCos = m_getUVRotationSinCos();
+    
+    float3 b = cross(In.normal.xyz, In.tangent.xyz)*In.tangent.w;
+    float3 t = In.tangent.xyz;
+
+    // Rotate tangent in oposite direction than uvs to compensate changed tangent space
+    return float3(
+        t.x*mSinCos.y - b.x*mSinCos.x,
+        t.y*mSinCos.y - b.y*mSinCos.x,
+        t.z*mSinCos.y - b.z*mSinCos.x);
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_BITANGENT_VS">
+<![CDATA[
+#if defined( UV_ROTATE ) && defined( ALBEDO_MAP )
+    return cross(In.normal.xyz, getTangent(In))*In.tangent.w;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position = "START_FS">
+<![CDATA[
+ #if defined( GLOSS_MAP )
+ /*
+ glossMap.r - roughness
+ glossMap.g - ambient occlusion
+ glossMap.b - dirt mask
+ glossMap.a - color mask ( if enabled )
+ */
+    globals.gGloss = tex2D( glossMap, In.vs.GLOSSMAP_TEXCOORD).rgba;
+    globals.gAO    = globals.gGloss.g;
+    float texDirt  = 1 - globals.gGloss.b;
+    globals.gDirt  = saturate( (texDirt*1.05 - (RDT.g - 0.5)) * 2 );
+ #endif
+    globals.maxSpecularIntensity = 0.5; // iron
+]]>
+            </CodeInjection>
+            <CodeInjection position = "GET_NORMAL_FS">
+<![CDATA[
+ #if defined( NORMAL_MAP )
+    float3 mNormal   = tex2D( normalMap, In.vs.NORMALMAP_TEXCOORD ).xyz * 2.0 - 1.0;
+    float3 mDirtNmap = tex2D( DirtNmap, float2( RDT.z, RDT.w ) * In.vs.NORMALMAP_TEXCOORD ).xyz * 2.0 - 1.0;
+    return normalize( mNormal + float3(mDirtNmap.xy, 0.0) * (1 - globals.gDirt) );
+ #endif
+]]>
+            </CodeInjection>
+            <CodeInjection position = "POST_ALBEDO_FS">
+<![CDATA[
+#if defined( SPECULAR ) && defined( GLOSS_MAP )
+    #if defined( COLOR_MASK )
+        albedo.xyz = lerp( albedo.rgb, albedo.rgb * colorScale.rgb, globals.gGloss.a );
+    #endif
+    #if defined( WINDOW )
+        albedo.xyz += clamp( 0.65 *( 1-globals.gDirt ), 0.0, 1.0 );
+    #else
+        float3 mDirtColor = float3( 0.21, 0.1443, 0.0650 ); // HardCoded Dirt Color
+        albedo.xyz = lerp( mDirtColor, albedo.xyz, globals.gDirt); // DirtColor lerp
+    #endif
+    albedo.xyz *= globals.gAO; // Multiply AO for DIFFUSE
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position = "POST_GLOSS_COLOR_FS">
+<![CDATA[
+#if defined( SPECULAR ) && defined( GLOSS_MAP )
+    specularCosPower = max(cCosPower * globals.gGloss.r * globals.gDirt, 0.1);
+    glossColor.xyz = (float3)(globals.gGloss.r*globals.gDirt);
+    glossColor.xyz *= globals.maxSpecularIntensity*globals.gAO; // Multiply AO for SPECULAR
+    reflectionGlossColor = glossColor;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position = "GET_REFLECTION_COLOR_FS">
+<![CDATA[
+#if GPU_PROFILE >= GPU_PROFILE_MEDIUM
+    #if defined( REFLECTION_MAP_2D ) || defined( REFLECTION_MAP_CUBE )
+        float3 mResult = getReflectionColorTex( In, globals, normal, viewDir );
+        #if defined( WINDOW )
+            mResult *= getFresnel( facing, cReflectionCoeff , 1.0 );
+        #else
+            mResult *= globals.maxSpecularIntensity;
+            #if defined( REFLECTION_MAP_CUBE )
+                float3 mTintColorTop    = float3( 0.217, 0.612, 1.00 ); // hard-coded blue tint color
+                float3 mTintColorBottom = float3( 0.058, 0.040, 0.03 ); // hard-coded ground tint color
+                // cReflectionCoeff == refractiveIndex - comes from xml file
+                // if 1 - fresnel default
+                // if 0 - fresnel more visible
+                float mFresnelBias = cReflectionCoeff;
+                float mWorldNormalY = normal.y;
+                #if !defined(_NO_TANGENTSPACE)
+                    mWorldNormalY = In.vs.worldNormal.y;
+                #endif
+                mResult += lerp( mTintColorBottom, mTintColorTop , clamp(mWorldNormalY, 0.0, 1.0 ) ) * getFresnel( facing, mFresnelBias , 4.0 );
+            #endif
+        #endif
+    #if defined( GLOSS_MAP )
+        float mReflectionIntensityMap = 1.0;
+        float mDirt = 0.0;
+        #if defined( WINDOW )
+            mReflectionIntensityMap = 1.0;
+            mDirt = globals.gDirt;
+        #else
+            mReflectionIntensityMap = globals.gGloss.r;
+            mDirt = globals.gDirt * ( 1 - clamp( RDT.g, 0.0, 0.9 ) );
+        #endif
+        mReflectionIntensityMap *= mDirt;
+        mResult *= mReflectionIntensityMap;
+        mResult *= globals.gAO; // Multiply AO for REFLECTION
+    #endif
+        float envScale = 0.2;
+        #if ( NUM_DIRECTIONAL_LIGHTS > 0 )
+            float3 reflDir =  reflect(-viewDir.xyz, normal.xyz);
+            float directionalEnvMapBias = 0.5; // Fresnel Visisbility in Shadowed Area
+            mResult *= dot(normalize(reflDir), getLightVector(In, globals, 0)) * ( 1 - directionalEnvMapBias ) + directionalEnvMapBias;
+            envScale = diffuseColors[0].y;
+        #endif
+        mResult *= envScale;
+        mResult += oColor.xyz;  // ADD previously calculated diffuse and specular
+        res = mResult;
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="FINAL_POS_FS">
+<![CDATA[
+#if defined( ALPHA_BLENDED )
+    #if defined( WINDOW )
+        oColor.a += clamp( 0.65*(1-globals.gDirt), 0.0, 1.0 );
+    #endif
+#endif
+]]>
+            </CodeInjection>
+        </CodeInjections>
+    </LodLevel>
+</CustomShader>

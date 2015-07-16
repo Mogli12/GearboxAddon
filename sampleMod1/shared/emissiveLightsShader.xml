@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CustomShader version="3">
+    <Variations>
+        <Variation name = "STATIC_LIGHT">
+<![CDATA[
+    #define STATIC_LIGHT 
+]]>
+        </Variation>
+        <Variation name = "STATIC_TURNLIGHT">
+<![CDATA[
+    #define STATIC_TURNLIGHT 
+]]>
+        </Variation>
+        <Variation name = "BILLBOARD">
+<![CDATA[
+    #define BILLBOARD
+]]>
+        </Variation>
+        <Variation name = "BILLBOARD_TURNLIGHT">
+<![CDATA[
+    #define BILLBOARD_TURNLIGHT
+]]>
+        </Variation>
+        <Variation name = "BILLBOARD_BEACON">
+<![CDATA[
+    #define BILLBOARD_BEACON
+]]>
+        </Variation>
+        <Variation name = "BILLBOARD_360">
+<![CDATA[
+    #define BILLBOARD_360
+]]>
+        </Variation>
+    </Variations>
+    <LodLevel startDistance="0">
+        <CodeInjections>
+            <CodeInjection position="VS_OUTPUT">
+<![CDATA[
+float mFlickering : TEXCOORDn;
+]]>
+            </CodeInjection>
+            <CodeInjection position="VS_END">
+<![CDATA[
+#if defined( BILLBOARD_TURNLIGHT ) || defined( STATIC_TURNLIGHT )
+    //Out.mFlickering = 0.5 * ( cos( 12.0 * cTime_s ) + 1 );
+    // slower blinking + variation to achieve different ratio between on and off state
+    Out.mFlickering = clamp( cos( 9.0 * cTime_s ) + 0.2, 0, 1 );
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="GET_POSITION_VS">
+<![CDATA[
+#if defined( BILLBOARD ) || defined( BILLBOARD_TURNLIGHT ) || defined( BILLBOARD_BEACON ) || defined( BILLBOARD_360 )
+    float3x3 billboardMat = modelViewMatrix;
+    float3   mPosition = In.position.xyz;
+    #if defined( BILLBOARD_BEACON )
+        float3 d = normalize( modelCameraPosition.xyz );
+        mPosition *= saturate( d.z );  // scale based on cameraVector
+    #endif
+    return float4( mul( mPosition.xyz, billboardMat ), 1 );
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="VS_END">
+<![CDATA[
+#if defined( BILLBOARD ) || defined( BILLBOARD_TURNLIGHT ) || defined( BILLBOARD_BEACON ) || defined( BILLBOARD_360 )
+    // TODO
+    //Out.position.z -= 0.05;
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="POST_GLOSS_COLOR_FS">
+<![CDATA[
+#if defined( SPECULAR ) && defined( ALPHA_BLENDED )
+    #undef SPECULAR // Disable specular color for alphaBlended billboards
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="EMISSIVE_FS">
+<![CDATA[
+#if defined( ALPHA_BLENDED ) && defined( VERTEX_COLOR )
+    #if defined( STATIC_LIGHT ) || defined( STATIC_TURNLIGHT )
+        emissiveColor.rgb = 0.50 * In.vs.vertexColor.rgb;
+    #endif
+    #if defined( STATIC_TURNLIGHT )
+        emissiveColor.rgb  *= In.vs.mFlickering;
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="ALPHA_FS">
+<![CDATA[
+#if defined( ALPHA_BLENDED ) 
+    #if defined( BILLBOARD ) || defined( BILLBOARD_TURNLIGHT ) || defined( BILLBOARD_BEACON )
+        float3 d = normalize( modelCameraPosition.xyz );
+        float fadeFactor = saturate( d.z * 6 );
+        #if defined( BILLBOARD_BEACON )
+            fadeFactor = saturate( d.z );
+        #endif
+        oColor.a *= fadeFactor;
+    #endif
+    #if defined( BILLBOARD_TURNLIGHT )
+        oColor.a *= In.vs.mFlickering;
+    #endif
+#endif
+]]>
+            </CodeInjection>
+            <CodeInjection position="FINAL_POS_FS">
+<![CDATA[
+#if defined(ALPHA_BLENDED)
+    oColor.a = 0.0f; // additive blending
+#endif
+]]>
+            </CodeInjection>
+        </CodeInjections>
+    </LodLevel>
+</CustomShader>
