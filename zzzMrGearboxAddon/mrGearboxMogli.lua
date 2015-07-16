@@ -3072,6 +3072,9 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 	if self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) or self.motor ~= self.mrGbML.motor then		
 		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
 	end
+	if self.motor.updateMotorRpm == nil or self.motor.updateMotorRpm ~= mrGearboxMogliMotor.updateMotorRpm then
+		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
+	end
 	
 	if self.isReverseDriving  then
 		acc = -acc
@@ -3327,6 +3330,7 @@ setmetatable( mrGearboxMogliMotor, { __index = function (table, key) return Vehi
 -- mrGearboxMogliMotor:new
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:new( vehicle, motor )
+
 	local self = {}
 
 	setmetatable(self, mrGearboxMogliMotor_mt)

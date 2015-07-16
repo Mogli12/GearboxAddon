@@ -30,7 +30,7 @@ for _,funcName in pairs({ "delete",
 													"deleteMap" }) do
 	if  mrGearboxMogli  ~= nil and mrGearboxMogli[funcName] ~= nil and type(mrGearboxMogli[funcName])  == "function" then
 		mrGearboxMogliLoader[funcName] = function( self, ... )
-			if type(self)=="table" then
+			if type(self)=="table" and self.mrGbMLGearbox1 then
 				local state, result = nil, nil
 				if self.mrGbMLGearbox1 then
 					state, result = pcall(mrGearboxMogli[funcName], self, ...)

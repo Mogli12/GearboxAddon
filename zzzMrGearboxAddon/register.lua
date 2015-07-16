@@ -38,6 +38,10 @@ function mrGearboxMogliRegister:add()
 	local searchTable  = { "mrGearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox", "gearboxMogli" };	
 	local searchTable2 = { "tempomat", "tempomatMogli" };	
 	
+	for n,s in pairs(SpecializationUtil.specializations) do
+		print(tostring(n).." "..tostring(s.className))
+	end
+	
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
 		local modName            = string.match(k, "([^.]+)");
 		local addSpecialization  = true;
@@ -47,16 +51,18 @@ function mrGearboxMogliRegister:add()
 		for _, search in pairs(searchTable) do
 			if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
 				addSpecialization = false;
-				print(string.format("zzzMrGearboxAddon: %s already has a gearbox", modName))
+				print(string.format("zzzMrGearboxAddon: %s already has a gearbox (2)", modName))
 				break;
 			end;
 		end;
 		
-		for _, search in pairs(searchTable2) do
-			if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
-				addSpecialization2 = false;
-				print(string.format("tempomatMogli: %s already has a cruise control", modName))
-				break;
+		if addSpecialization then
+			for _, search in pairs(searchTable2) do
+				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
+					addSpecialization2 = false;
+					print(string.format("tempomatMogli: %s already has a cruise control", modName))
+					break;
+				end;
 			end;
 		end;
 		
@@ -69,30 +75,33 @@ function mrGearboxMogliRegister:add()
 			end;
 		end;
 		
-		if addSpecialization  and correctLocation then
+		if addSpecialization and correctLocation then
+			print("adding: "..tostring(modName))
+			
 			table.insert(v.specializations, SpecializationUtil.getSpecialization("mrGearboxMogliLoader"));			
-		end;
-		if addSpecialization2 and correctLocation then
-			table.insert(v.specializations, SpecializationUtil.getSpecialization("tempomatMogli"));			
+			g_i18n.globalI18N.texts["mrGearboxMogliVERSION"]      = g_i18n:getText("mrGearboxMogliVERSION"     )
+			g_i18n.globalI18N.texts["mrGearboxMogliON"]           = g_i18n:getText("mrGearboxMogliON"          )
+			g_i18n.globalI18N.texts["mrGearboxMogliOFF"]          = g_i18n:getText("mrGearboxMogliOFF"         )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_OFF"]	    = g_i18n:getText("mrGearboxMogliTEXT_OFF"	   )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_AI"]      = g_i18n:getText("mrGearboxMogliTEXT_AI"     )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_BRAKE"]   = g_i18n:getText("mrGearboxMogliTEXT_BRAKE"  )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_DC"]      = g_i18n:getText("mrGearboxMogliTEXT_DC"     )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_NEUTRAL"] = g_i18n:getText("mrGearboxMogliTEXT_NEUTRAL")
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_AUTO"]    = g_i18n:getText("mrGearboxMogliTEXT_AUTO"   )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_MANUAL"]  = g_i18n:getText("mrGearboxMogliTEXT_MANUAL" )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_NOGEAR"]  = g_i18n:getText("mrGearboxMogliTEXT_NOGEAR" )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_VARIO"]   = g_i18n:getText("mrGearboxMogliTEXT_VARIO"  )
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ALLAUTO"] = g_i18n:getText("mrGearboxMogliTEXT_ALLAUTO")
+			g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ECO"]     = g_i18n:getText("mrGearboxMogliTEXT_ECO")
+			g_i18n.globalI18N.texts["mrGearboxMogliAllAutoON"]    = g_i18n:getText("mrGearboxMogliAllAutoON"   )
+			g_i18n.globalI18N.texts["mrGearboxMogliAllAutoOFF"]   = g_i18n:getText("mrGearboxMogliAllAutoOFF"  )
+
+			if addSpecialization2 and correctLocation then
+				table.insert(v.specializations, SpecializationUtil.getSpecialization("tempomatMogli"));			
+			end;
 		end;
 	end;
 	
-	g_i18n.globalI18N.texts["mrGearboxMogliVERSION"]      = g_i18n:getText("mrGearboxMogliVERSION"     )
-	g_i18n.globalI18N.texts["mrGearboxMogliON"]           = g_i18n:getText("mrGearboxMogliON"          )
-	g_i18n.globalI18N.texts["mrGearboxMogliOFF"]          = g_i18n:getText("mrGearboxMogliOFF"         )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_OFF"]	    = g_i18n:getText("mrGearboxMogliTEXT_OFF"	   )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_AI"]      = g_i18n:getText("mrGearboxMogliTEXT_AI"     )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_BRAKE"]   = g_i18n:getText("mrGearboxMogliTEXT_BRAKE"  )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_DC"]      = g_i18n:getText("mrGearboxMogliTEXT_DC"     )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_NEUTRAL"] = g_i18n:getText("mrGearboxMogliTEXT_NEUTRAL")
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_AUTO"]    = g_i18n:getText("mrGearboxMogliTEXT_AUTO"   )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_MANUAL"]  = g_i18n:getText("mrGearboxMogliTEXT_MANUAL" )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_NOGEAR"]  = g_i18n:getText("mrGearboxMogliTEXT_NOGEAR" )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_VARIO"]   = g_i18n:getText("mrGearboxMogliTEXT_VARIO"  )
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ALLAUTO"] = g_i18n:getText("mrGearboxMogliTEXT_ALLAUTO")
-	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ECO"]     = g_i18n:getText("mrGearboxMogliTEXT_ECO")
-	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoON"]    = g_i18n:getText("mrGearboxMogliAllAutoON"   )
-	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoOFF"]   = g_i18n:getText("mrGearboxMogliAllAutoOFF"  )
 end;
 
 addModEventListener(mrGearboxMogliRegister);
