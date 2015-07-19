@@ -201,7 +201,8 @@ function mrGearboxMogli:initClient()
 
 --**********************************************************************************************************	
 -- special getter functions for motor parameters
-	self.mrGbMGetClutchPercent  = mrGearboxMogli.mrGbMGetClutchPercent 
+	self.mrGbMGetClutchPercent  = mrGearboxMogli.mrGbMGetClutchPercent
+	self.mrGbMGetOneButtonClutch= mrGearboxMogli.mrGbMGetOneButtonClutch
 	self.mrGbMGetTargetRPM      = mrGearboxMogli.mrGbMGetTargetRPM
 	self.mrGbMGetMotorLoad      = mrGearboxMogli.mrGbMGetMotorLoad 
 	self.mrGbMGetUsedPower      = mrGearboxMogli.mrGbMGetUsedPower
@@ -953,15 +954,13 @@ end
 -- mrGearboxMogli:mbIsActiveForInput
 --**********************************************************************************************************	
 function mrGearboxMogli:mbIsActiveForInput(onlyTrueIfSelected)
-  if not ( self:getIsActive() ) or g_gui.currentGui ~= nil or g_currentMission.isPlayerFrozen then
+  if not ( self.isEntered ) or g_gui.currentGui ~= nil or g_currentMission.isPlayerFrozen then
     return false
   end
   if onlyTrueIfSelected == nil or onlyTrueIfSelected then
     return self.selectedImplement == nil
-  else
-    return true
-  end
-  return false
+	end
+  return true
 end
 
 --**********************************************************************************************************	
@@ -1181,7 +1180,7 @@ function mrGearboxMogli:update(dt)
 		end
 		
 		if     mrGearboxMogli.mbIsInputPressed( "mrGearboxMogliCLUTCH_3" ) then
-			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 500
+			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
 			self:mrGbMSetManualClutch( math.max( self.mrGbMS.MinClutchPercent, self.mrGbMS.ManualClutch - dt * clutchSpeed ))
 		elseif InputBinding.mrGearboxMogliCLUTCH ~= nil then
 			local targetClutchPercent = InputBinding.getDigitalInputAxis(InputBinding.mrGearboxMogliCLUTCH)
@@ -1203,7 +1202,7 @@ function mrGearboxMogli:update(dt)
 			end
 		end
 		
-		if self.mrGbMS.ManualClutch < self.mrGbMS.MaxClutchPercent and g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
+		if self:mrGbMGetOneButtonClutch() then
 			self:mrGbMSetManualClutch( math.min( self.mrGbMS.MaxClutchPercent, self.mrGbMS.ManualClutch + dt / math.max( self.mrGbMS.ClutchShiftTime, 1 ) ))
 		end
 		
@@ -2347,6 +2346,15 @@ function mrGearboxMogli:mrGbMGetClutchPercent()
 	return self.mrGbMS.ManualClutch
 end
 
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMGetOneButtonClutch
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMGetOneButtonClutch()
+	if self.mrGbMS.ManualClutch < self.mrGbMS.MaxClutchPercent and g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
+		return true
+	end
+	return false
+end
 
 --**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMGetTargetRPM
@@ -3821,6 +3829,9 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 						and self.vehicle.driveControl.manMotorStart ~= nil then
 					self.vehicle.driveControl.manMotorStart.isMotorStarted = false
 					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+				elseif self.vehicle.setManualIgnitionMode ~= nil then
+					self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
+					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
 				else
 					self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
 				end
@@ -4667,7 +4678,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--**********************************************************************************************************		
 	-- clutch				
 	if clutchMode > 0 and not ( self.noTransmission ) then
-		if self.vehicle:mrGbMGetAutoClutch() then 
+		if self.vehicle:mrGbMGetAutoClutch() or self.vehicle:mrGbMGetOneButtonClutch() then 
 			local openRpm   = math.max( self.vehicle.mrGbMS.OpenRpm, self.stallRpm + 20 )
 			local closeRpm  = self.vehicle.mrGbMS.CloseRpm
 			local targetRpm = self.targetRpm
@@ -4718,6 +4729,10 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 				self.autoClutchPercent = math.min( self.vehicle.mrGbMS.MaxClutchPercent, self.autoClutchPercent + math.min( factor, targetClutchPercent - self.autoClutchPercent ) ) 
 			end 
+			
+			if not ( self.vehicle:mrGbMGetAutoClutch() ) then
+				self.vehicle.mrGbMS.ManualClutch = math.min( self.vehicle.mrGbMS.ManualClutch, self.autoClutchPercent )
+			end
 		else
 			self.autoClutchPercent   = self.vehicle.mrGbMS.MaxClutchPercent
 		end 					
@@ -4736,6 +4751,32 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.vehicle.mrGbML.debugTimer = math.max( g_currentMission.time + 200, self.vehicle.mrGbML.debugTimer )
 		end
 	else
+		if not ( self.noTransmission ) and self.vehicle.mrGbMS.ManualClutch > self.vehicle.mrGbMS.MinClutchPercent and self.nonClampedMotorRpm + self.nonClampedMotorRpm < self.stallRpm then
+			if self.stallWarningTimer == nil then
+				self.stallWarningTimer = g_currentMission.time
+			end
+			if      g_currentMission.time > self.stallWarningTimer + 2000 then
+				self.stallWarningTimer = nil
+				self.vehicle:mrGbMSetNeutralActive(true, false, true)
+				if      self.vehicle.dCcheckModule ~= nil
+						and self.vehicle:dCcheckModule("manMotorStart") 
+						and self.vehicle.driveControl ~= nil
+						and self.vehicle.driveControl.manMotorStart ~= nil then
+					self.vehicle.driveControl.manMotorStart.isMotorStarted = false
+					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, 0.5 * self.stallRpm ))
+				elseif self.vehicle.setManualIgnitionMode ~= nil then
+					self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
+					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, 0.5 * self.stallRpm ))
+				else
+					self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, 0.5 * self.stallRpm ))
+				end
+			elseif  g_currentMission.time > self.stallWarningTimer + 500 then
+				self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, 0.5 * self.stallRpm ))
+			end		
+		else
+			self.stallWarningTimer = nil
+		end
+		
 		self.clutchPercent = self.vehicle.mrGbMS.ManualClutch
 	end
 
