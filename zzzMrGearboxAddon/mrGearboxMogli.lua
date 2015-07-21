@@ -30,9 +30,10 @@ mrGearboxMogli.factor255            = 0.0039215686274509803921568627451
 mrGearboxMogli.rpmMinus             = 100  -- min RPM at 900 RPM
 mrGearboxMogli.rpmFadeOut           = 100  -- no torque at 2300 RPM
 mrGearboxMogli.rpmPlus              = 200  -- braking at 2350 RPM
-mrGearboxMogli.ptoRpmMinus          = 500  -- reduce PTO RPM; e.g. 1700 with PTO and 2200 rated RPM
-mrGearboxMogli.rpmMinusEco          = 0    -- reduce PTO RPM; e.g. 1700 with PTO and 2200 rated RPM
-mrGearboxMogli.autoShiftRpmPlus     = 50
+mrGearboxMogli.ptoRpmFactor         = 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
+mrGearboxMogli.ptoRpmFactorEco      = 0.5  -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
+mrGearboxMogli.rpmMinusEco          = 0    -- reduce target RPM in eco mode
+mrGearboxMogli.autoShiftPtoDiff     = 50
 mrGearboxMogli.minClutchPercent     = 1E-3
 mrGearboxMogli.maxGearRatio         = 130  -- 414  -- 0.82 km/h @900 RPM / 2.00 km/h @2200 RPM / gear ratio might be bigger, but no clutch in this case
 mrGearboxMogli.maxHydroGearRatio    = 830  -- 0.4 km/h @900 RPM / 1 km/h @2200 RPM
@@ -353,8 +354,6 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.RatedRpm                = self.motor.maxRpm	
 	self.mrGbMS.OrigMinRpm              = self.motor.minRpm
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
-	self.mrGbMS.PtoRpm                  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#ptoRpm"), self.mrGbMS.RatedRpm - mrGearboxMogli.ptoRpmMinus ) -- no automatic opening of clutch by default!!!
-	
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
 	
@@ -428,7 +427,16 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 --**************************************************************************************************	
 --**************************************************************************************************		
+	self.mrGbMS.PtoRpm                  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpm"),    
+																												self.mrGbMS.IdleRpm + 50 * math.floor( 0.5 + 0.02 * mrGearboxMogli.ptoRpmFactor * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) ) ) 
+	self.mrGbMS.PtoRpmEco               = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpmEco"),    
+																												self.mrGbMS.IdleRpm + 50 * math.floor( 0.5 + 0.02 * mrGearboxMogli.ptoRpmFactorEco * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) ) ) 
+	if self.mrGbMS.PtoRpmEco > self.mrGbMS.PtoRpm then
+		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
+	end
 	
+--**************************************************************************************************	
+--**************************************************************************************************		
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), 0 ) -- no automatic opening of clutch by default!!!
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), self.mrGbMS.IdleRpm+400 )
 	self.mrGbMS.AutoStartStop           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#autoStartStop"), true)
@@ -2746,6 +2754,11 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 	local range     = self.mrGbMS.CurrentRange
 	local oldRange  = self.mrGbMS.CurrentRange
 	local gearSpeed = self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio * self.mrGbMS.GlobalRatioFactor	
+	local maxSpeed  = self.mrGbMS.LaunchGearSpeed
+	
+	if self.mrGbML.currentGearSpeed ~= nil and self.mrGbML.currentGearSpeed < maxSpeed then
+		maxSpeed = self.mrGbML.currentGearSpeed
+	end
 	
 	if self.mrGbMS.ReverseActive then
 		gearSpeed = gearSpeed * self.mrGbMS.ReverseRatio 
@@ -2777,8 +2790,8 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 		for i,g in pairs( self.mrGbMS.Gears ) do
 			if not mrGearboxMogli.mrGbMIsNotValidEntry( self, g, i, range ) then
 				local s = gearSpeed * g.speed
-			--if s >= self.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
-				local d = math.abs( s - self.mrGbMS.LaunchGearSpeed )
+			--if s >= maxSpeed - mrGearboxMogli.eps then
+				local d = math.abs( s - maxSpeed )
 				if d < dist then
 					dist = d
 					gear = i
@@ -2792,8 +2805,8 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 		for i,r in pairs( self.mrGbMS.Ranges ) do
 			if not mrGearboxMogli.mrGbMIsNotValidEntry( self, r, gear, i ) then
 				local s = gearSpeed * r.ratio
-			--if s >= self.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
-				local d = math.abs( s - self.mrGbMS.LaunchGearSpeed )
+			--if s >= maxSpeed - mrGearboxMogli.eps then
+				local d = math.abs( s - maxSpeed )
 				if d < dist then
 					dist = d
 					range = i
@@ -2827,7 +2840,7 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 					if minS == nil or minS > s then
 						minS = s
 					end
-					local d = math.abs( s - self.mrGbMS.LaunchGearSpeed )
+					local d = math.abs( s - maxSpeed )
 					if d < dist then
 						dist  = d
 						range = i
@@ -2835,7 +2848,7 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 					end
 				end
 			end
-			if minS ~= nil and minS < self.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
+			if minS ~= nil and minS < maxSpeed - mrGearboxMogli.eps then
 				break
 			end
 		end
@@ -2863,7 +2876,7 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 					if minS == nil or minS > s then
 						minS = s
 					end
-					local d = math.abs( s - self.mrGbMS.LaunchGearSpeed )
+					local d = math.abs( s - maxSpeed )
 					if d < dist then
 						dist  = d
 						range = i
@@ -2871,7 +2884,7 @@ function mrGearboxMogli:setLaunchGear( noEventSend )
 					end
 				end
 			end
-			if minS ~= nil and minS < self.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
+			if minS ~= nil and minS < maxSpeed - mrGearboxMogli.eps then
 				break
 			end
 		end
@@ -3508,8 +3521,6 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 		--self.hydroEff:addKeyframe( { time = ktime+mrGearboxMogli.eps, v = 0 } )
 	end
 	
-	self.ptoRpm                  = vehicle.mrGbMS.PtoRpm
-	
 	mrGearboxMogliMotor.copyRuntimeValues( motor, self )
 	
 	self.minRpm                  = vehicle.mrGbMS.CurMinRpm
@@ -4056,22 +4067,19 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.ptoOn = true
 		local ptoRpm = PowerConsumer.getMaxPtoRpm( self.vehicle )
 		
-		local p0 = ptoRpm * self.original.ptoMotorRpmRatio
-		local p1 = p0
+		local p2 = Utils.clamp( ptoRpm * self.original.ptoMotorRpmRatio, self.minRequiredRpm, self.ratedRpm )
+		local p0 = self.vehicle.mrGbMS.PtoRpm
 		if self.vehicle.mrGbMS.EcoMode then
-			p1 = self.ptoRpm
+			p0 = self.vehicle.mrGbMS.PtoRpmEco
 		end
+		local p1 = p0
 		
-		self.ptoMotorRpmRatio = p1 / ptoRpm
-		
-		if p1 < p0 then
-			for i=0,4 do
-				p1 = self.ptoRpm + 0.25 * i * ( p0 - self.ptoRpm )
-				self.ptoMotorRpmRatio = p1 / ptoRpm
+		for i=0,4 do
+			p1 = p0 + 0.25 * i * ( p2 - p0 )
+			self.ptoMotorRpmRatio = p1 / ptoRpm
 				
-				if self.ptoMotorRpmRatio * self.torqueCurve:get( p1 ) > ptoTq then
-					break
-				end
+			if self.ptoMotorRpmRatio * self.torqueCurve:get( p1 ) >= ptoTq or p2 <= p0 then
+				break
 			end
 		end
 		if self.minRequiredRpm < p1 then
@@ -4248,21 +4256,21 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		if lastNoTransmission then
 			self.minThrottle  = 0.3
 			self.minThrottleS = 0.3
-		elseif self.nonClampedMotorRpm < minRpmReduced then
-			self.minThrottle  = 1
-			self.minThrottleS = 1
 		else
-			local delta       = self.nonClampedMotorRpm - self.minRequiredRpm 
-			self.minThrottle  = self.motorLoadS * ( self.minRequiredRpm - 0.7 * self.idleRpm ) / ( self.ratedRpm - 0.7 * self.idleRpm ) - Utils.clamp( 0.005 * delta, -0.1, 0.1 )
-		--if self.hydroEff == nil then
-		--	self.minThrottle= Utils.clamp( self.minThrottle, self.vehicle.mrGbMS.HandThrottle, 1 ) 
-		--end
-			self.minThrottleS = self.minThrottleS + 0.1 * ( self.minThrottle - self.minThrottleS )
-			if self.nonClampedMotorRpm < self.minRequiredRpm then
-				self.minThrottle  = math.max( 0.3, self.minThrottle )
-				self.minThrottleS = math.max( 0.3, self.minThrottleS )
+			if self.nonClampedMotorRpm <= minRpmReduced then
+				self.minThrottle  = 1
+			elseif self.nonClampedMotorRpm < self.minRequiredRpm then
+				self.minThrottle = ( self.minRequiredRpm - self.nonClampedMotorRpm ) / ( self.minRequiredRpm - minRpmReduced )
+			else
+				self.minThrottle = 0
 			end
+			self.minThrottleS = Utils.clamp( self.minThrottleS + 0.1 * ( self.minThrottle - self.minThrottleS ), 0, 1 )
 		end
+	--	if self.nonClampedMotorRpm < self.minRequiredRpm then
+	--		self.minThrottle  = math.max( 0.3, self.minThrottle )
+	--		self.minThrottleS = math.max( 0.3, self.minThrottleS )
+	--	end
+	--end
 		
 		
 		if self.vehicle.mrGbML.gearShiftingNeeded > 0 then
@@ -4433,7 +4441,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local scoreLag = nil
 					local bestGear = currentGear 
 					local lowRpm   = self.idleRpm 					
-					local downRpm  = minRpmReduced
+					local downRpm  = self.idleRpm  --minRpmReduced
 					local upRpm    = self.ratedRpm -- minRpmReduced + mrGearboxMogli.rpmReduction * ( self.ratedRpm - minRpmReduced ) --self.maxAllowedRpm
 					
 					if self.vehicle:mrGbMGetAutoClutch() and accelerationPedal > 0.5 then 
@@ -4478,9 +4486,25 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							local checkR = false
 							
 							if self.vehicle:mrGbMGetAutoShiftGears() and self.vehicle:mrGbMGetAutoShiftRange() then
-								if      i2r ~= mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
-										and i2g ~= mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r ) then
-									isValidEntry = false
+							--if      i2r ~= mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
+							--		and i2g ~= mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r ) then
+								if self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftHl + 10 then
+									-- shifting gears is more expensive => avoid paradox up/down shifts
+									local ng = mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r )
+									if     spd > self.vehicle.mrGbML.currentGearSpeed and i2g < ng then
+										isValidEntry = false
+									elseif spd < self.vehicle.mrGbML.currentGearSpeed and i2g > ng then
+										isValidEntry = false
+									end
+								--elseif self.vehicle.mrGbMS.GearTimeToShiftGear < self.vehicle.mrGbMS.GearTimeToShiftHl - 10 then
+								else
+									-- shifting ranges is more expensive => avoid up/paradox down shifts
+									local nr = mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
+									if     spd > self.vehicle.mrGbML.currentGearSpeed and i2r < nr then
+										isValidEntry = false
+									elseif spd < self.vehicle.mrGbML.currentGearSpeed and i2r > nr then
+										isValidEntry = false
+									end
 								end
 							end
 							
@@ -4557,29 +4581,45 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								tooBig   = true
 							elseif self.hydroEff ~= nil then
 								--test = rpm
-								test = self.hydroEff:get( Utils.clamp( rpm / self.targetRpm, self.vehicle.mrGbMS.HydrostaticMin, self.vehicle.mrGbMS.HydrostaticMax ) )
+								local test = self.hydroEff:get( Utils.clamp( rpm / self.targetRpm, self.vehicle.mrGbMS.HydrostaticMin, self.vehicle.mrGbMS.HydrostaticMax ) )
 								if scoreRpm == nil or scoreRpm < test then
-									scoreRpm  = test
+									scoreRpm = test
 									bestGear = i
 								end
 							else
 							-- gear is possible 
 								
+								local testLag   = 0
 								local testRpm   = mrGearboxMogli.huge
 								local testPwr   = mrGearboxMogli.huge
-								local shiftRpm  = self.targetRpm							
-								local drueckung = shiftRpm
-							--if spd <= self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
-									drueckung = drueckung - (1-mrGearboxMogli.rpmReduction) * self.ratedRpm
+								local shiftRpm 						
+								local drueckung
+								
+								if self.ptoOn then
+									drueckung = math.max( minRpmReduced       - mrGearboxMogli.autoShiftPtoDiff, self.stallRpm )
+									shiftRpm  = math.min( self.minRequiredRpm + mrGearboxMogli.autoShiftPtoDiff, self.ratedRpm )
+								else
+									drueckung = Utils.clamp( self.targetRpm - (1-mrGearboxMogli.rpmReduction) * self.ratedRpm, self.stallRpm, self.ratedRpm )
+									shiftRpm  = Utils.clamp( self.targetRpm, self.stallRpm, self.ratedRpm )
+								end
+								
+								local power = rpm * self.torqueCurve:get( math.max( self.stallRpm, rpm ))
+								
+							--if self.vehicle:mrGbMGetAutoShiftGears() and self.vehicle:mrGbMGetAutoShiftRange() then
+							--	if i == currentGear then
+							--		testLag = math.min( self.vehicle.mrGbMS.GearTimeToShiftGear, self.vehicle.mrGbMS.GearTimeToShiftHl )
+							--	else
+							--		testLag = timeToShift
+							--	end
+							--	testLag = 25 * math.floor( 0.5 + 0.04 * testLag )
 							--end
-								
-								shiftRpm  = Utils.clamp( shiftRpm,  self.stallRpm, self.ratedRpm )
-								drueckung = Utils.clamp( drueckung, self.stallRpm, self.ratedRpm )
-								
-								local power     = rpm * self.torqueCurve:get( math.max( self.stallRpm, rpm ))
+								if i ~= currentGear then
+									testLag = 25 * math.floor( 0.5 + 0.04 * timeToShift )
+								end
 								
 								if getMaxPower and spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps and currentGearPower > power + mrGearboxMogli.eps then
 									testRpm = mrGearboxMogli.huge 
+									testLag = mrGearboxMogli.huge 
 								elseif rpm < drueckung  then
 									testRpm = drueckung - rpm
 								elseif rpm > shiftRpm   then
@@ -4592,30 +4632,41 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								
 								if i ~= currentGear and power < currentPower then
 									testPwr = mrGearboxMogli.huge
+									testRpm = mrGearboxMogli.huge 
+									testLag = mrGearboxMogli.huge 
 								else
-									testPwr = math.abs( self.requestedPower - power )
+									--testPwr = math.abs( self.requestedPower - power )
+									testPwr = math.max( self.requestedPower - power, 0 )
 								end
 								
-								local testLag = 0
-								if self.vehicle:mrGbMGetAutoShiftGears() and self.vehicle:mrGbMGetAutoShiftRange() then
-									if i == currentGear then
-										testLag = math.min( self.vehicle.mrGbMS.GearTimeToShiftGear, self.vehicle.mrGbMS.GearTimeToShiftHl )
-									else
-										testLag = timeToShift
-									end
-									testLag = 25 * math.floor( 0.5 + 0.04 * testLag )
-								end
+								testLag = Utils.clamp( testLag * 0.0005, 0, 1 )
+								testRpm = Utils.clamp( 2 * testRpm / ( self.ratedRpm - self.idleRpm ), 0, 1 ) 
+								testPwr = Utils.clamp( testPwr / self.maxPower, 0, 1 )
 								
-								if     scoreRpm == nil 
-									  or scoreLag > testLag 
-										or ( scoreLag == testLag and scoreRpm > testRpm ) 
-										or ( scoreLag == testLag and scoreRpm == testRpm  and scorePwr > testPwr ) then
-									scoreRpm  = testRpm
-									scoreLag  = testLag
-									scorePwr  = testPwr
+								local test = 0
+								if i ~= currentGear then test = 0.01   end
+								if test < testLag then test = testLag end
+								if test < testRpm then test = testRpm end
+								if test < testPwr then test = testPwr end
+								
+							--print(string.format("G: %d R: %d || L: %0.3f R: %0.3f P: %0.3f => %0.3f (%0.3f)", i2g, i2r, testLag, testRpm, testPwr, test, Utils.getNoNil( scoreRpm, -1 ) ) )
+								
+								if scoreRpm == nil or scoreRpm > test then
+									scoreRpm  = test
 									bestGear  = i
 									bestSpeed = spd
-								end	
+								end								
+								
+							--if     scoreRpm == nil 
+							--	  or scoreLag > testLag 
+							--		or ( scoreLag == testLag and scoreRpm > testRpm ) 
+							--		or ( scoreLag == testLag and scoreRpm == testRpm  and scorePwr > testPwr ) then
+							--	scoreRpm  = testRpm
+							--	scoreLag  = testLag
+							--	scorePwr  = testPwr
+							--	bestGear  = i
+							--	bestSpeed = spd
+							--end	
 							end
 						end
 					end
@@ -4626,6 +4677,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						elseif tooSmall then
 							bestGear = iMax
 						end
+				--else
+				--	local i2g, i2r = mrGearboxMogliMotor.splitGear( self, bestGear )
+				--	print(string.format("G: %d R: %d || new G: %d R: %d", self.vehicle.mrGbMS.CurrentGear, self.vehicle.mrGbMS.CurrentRange, i2g, i2r ) )
 					end
 					
 					if currentGear ~= bestGear then
