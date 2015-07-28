@@ -4489,31 +4489,38 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							--if      i2r ~= mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
 							--		and i2g ~= mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r ) then
 								if self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftHl + 10 then
-									-- shifting gears is more expensive => avoid paradox up/down shifts
-									local ng = mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r )
-									if     spd > self.vehicle.mrGbML.currentGearSpeed and i2g < ng then
-										isValidEntry = false
-									elseif spd < self.vehicle.mrGbML.currentGearSpeed and i2g > ng then
-										isValidEntry = false
+									if i2r ~= self.vehicle.mrGbMS.CurrentRange then
+										-- shifting gears is more expensive => avoid paradox up/down shifts
+										local ng = mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r )
+										if     spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps and i2g < ng then
+											isValidEntry = false
+										elseif spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps and i2g > ng then
+											isValidEntry = false
+										end
 									end
 								--elseif self.vehicle.mrGbMS.GearTimeToShiftGear < self.vehicle.mrGbMS.GearTimeToShiftHl - 10 then
 								else
-									-- shifting ranges is more expensive => avoid up/paradox down shifts
-									local nr = mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
-									if     spd > self.vehicle.mrGbML.currentGearSpeed and i2r < nr then
-										isValidEntry = false
-									elseif spd < self.vehicle.mrGbML.currentGearSpeed and i2r > nr then
-										isValidEntry = false
+									if i2g ~= self.vehicle.mrGbMS.CurrentGear then
+										-- shifting ranges is more expensive => avoid up/paradox down shifts
+										local nr = mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
+										if     spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps and i2r < nr then
+											isValidEntry = false
+										elseif spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps and i2r > nr then
+											isValidEntry = false
+										end
 									end
 								end
 							end
 							
 							if      timeToShift > self.vehicle.mrGbMG.maxTimeToSkipGear
 									and bestSpeed ~= nil 
-									and bestSpeed > self.vehicle.mrGbMS.LaunchGearSpeed + mrGearboxMogli.eps
-									and math.max( i2g - self.vehicle.mrGbMS.CurrentGear, 0 ) + math.max( i2r - self.vehicle.mrGbMS.CurrentRange, 0 ) > 1 then
+									and bestSpeed > self.vehicle.mrGbMS.LaunchGearSpeed  + mrGearboxMogli.eps
+									and bestSpeed > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps 
+								--and self.nonClampedMotorRpm <= 0.5 * ( self.ratedRpm + self.maxAllowedRpm ) 
+									then
 								isValidEntry = false
 							end
+							
 							if isValidEntry then
 								local autoShiftTimeout = 2 * timeToShift
 								local downTimeout = autoShiftTimeout

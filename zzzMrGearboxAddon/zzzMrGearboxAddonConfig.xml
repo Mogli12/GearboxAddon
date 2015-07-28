@@ -1277,7 +1277,7 @@
 
 	<vehicle>
 		<!-- http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/CaseIHMagnum380CVX --> 
-		<configFile modName="LS15_CaseIHMagnum380_T131" xmlName="caseIHMagnum380.xml"/>
+		<configFile modName="LS15_CaseIHMagnum380" xmlName="caseIHMagnum380.xml" isPrefix="true"/>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIHMagnum380.xml"/>
 	
 		<!-- full powershift 19.4 with 50 km/h -->
@@ -1709,7 +1709,7 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="JohnDeere7810_FH_T131" xmlName="JohnDeere7810.xml"/>
+		<configFile modName="JohnDeere7810_" xmlName="JohnDeere7810.xml" isPrefix="true"/>
 
 		<!-- AutoPowr -->
 		<!--
@@ -1875,6 +1875,54 @@
 		</gearboxMogli>		
 	</vehicle>
 	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/massey-ferguson-7626%2D%2D2 -->
+		<configFile modName="CZMOD_MasseyFerguson_7626" xmlName="claas1.xml"/>
+		
+		<!-- http://read.uberflip.com/i/338540-mf-7600-brochure-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1520">
+			<gears shiftTimeMs="800" defaultGear="3">	
+				<gear speed="2.70"/>
+				<gear speed="10.1"/>
+				<gear speed="20.4"/>
+				<gear speed="56.8"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
+				<range ratio="0.416" name="A" />
+				<range ratio="0.495" name="B" />
+				<range ratio="0.584" name="C" />
+				<range ratio="0.703" name="D" />
+				<range ratio="0.831" name="E" />
+				<range ratio="1"     name="F" />
+			</ranges>
+			
+			<reverse resetGear="false" resetRange="false" /> 
+
+			<realEngine idleRpm="1000" ratedRpm="2250">		
+        <torque rpm="0" motorTorque="0"/>
+        <torque rpm="700" motorTorque="823"/>
+        <torque rpm="800" motorTorque="898"/>
+        <torque rpm="900" motorTorque="964"/>
+        <torque rpm="1000" motorTorque="1019"/>
+        <torque rpm="1100" motorTorque="1064"/>
+        <torque rpm="1200" motorTorque="1100"/>
+        <torque rpm="1300" motorTorque="1125"/>
+        <torque rpm="1400" motorTorque="1140"/>
+        <torque rpm="1500" motorTorque="1145"/>
+        <torque rpm="1600" motorTorque="1126"/>
+        <torque rpm="1700" motorTorque="1101"/>
+        <torque rpm="1800" motorTorque="1069"/>
+        <torque rpm="1900" motorTorque="1030"/>
+        <torque rpm="2000" motorTorque="973"/>
+        <torque rpm="2100" motorTorque="853"/>
+        <torque rpm="2200" motorTorque="640"/>
+        <torque rpm="2300" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
+
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
@@ -1958,7 +2006,7 @@
 	
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIHPuma160.xml"/>
-		<configFile modName="LS15_CasePumacvx160_v1_2" xmlName="caseIHPuma160.xml"/>
+		<configFile modName="LS15_CasePumacvx160_" xmlName="caseIHPuma160.xml" isPrefix="true"/>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
@@ -2000,12 +2048,8 @@
 		
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/case-puma-230-cvx-frontlader -->
-		<configFile modName="LS15_CasePumacvx230_T131_14" xmlName="caseIHPuma230.xml"/>
 		<!-- http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl -->
-		<configFile modName="LS15_CasePumacvx230_T131_V2" xmlName="caseIHPuma230.xml"/>
-		<configFile modName="LS15_CasePumacvx230_T131_V2BB" xmlName="caseIHPuma230.xml"/>
-		<configFile modName="LS15_CasePumacvx230_T131_V2_5" xmlName="caseIHPuma230.xml"/>
-		<configFile modName="LS15_CasePumacvx230_T131_V2_5_BB" xmlName="caseIHPuma230.xml"/>
+		<configFile modName="LS15_CasePumacvx230_T131_" xmlName="caseIHPuma230.xml" isPrefix="true"/>
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
@@ -2088,10 +2132,7 @@
 
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/case-ih-magnum-380-facelift-pack --> 
-		<configFile modName="LS15_CaseIH_newMagnum380_EU_v1_2" xmlName="caseIHMagnum380.xml"/>
-		<configFile modName="LS15_CaseIH_newMagnum380_US_Rowtrac_v1_2" xmlName="caseIHMagnum380.xml"/>
-		<configFile modName="LS15_CaseIH_newMagnum380_US_RowtracControl_v1_2" xmlName="caseIHMagnum380.xml"/>
-		<configFile modName="LS15_CaseIH_newMagnum380_US_v1_2" xmlName="caseIHMagnum380.xml"/>
+		<configFile modName="LS15_CaseIH_newMagnum380_" xmlName="caseIHMagnum380.xml" isPrefix="true"/>
 	
 		<!-- Case Magnum 380 CVT -->
 		<!-- http://assets.cnhindustrial.com/caseih/emea/EMEAASSETS/Products/Tractors/Magnum/Brochures/Magnum_new/14c0005doo_magnum_bro_low.pdf -->
@@ -2459,9 +2500,7 @@
 	
 	<vehicle>
 		<!-- http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/Fendt1050 -->
-		<configFile modName="LS15_Fendt1050_T131_v3_6" xmlName="Fendt1050.xml"/>
-		<configFile modName="LS15_Fendt1050_T131_v35" xmlName="Fendt1050.xml"/>
-		<configFile modName="LS15_Fendt1050_T131_v3_6_OFM" xmlName="Fendt1050.xml"/>
+		<configFile modName="LS15_Fendt1050_T131" xmlName="Fendt1050.xml" isPrefix="true" />
 		<configFile modName="Fendt1050" xmlName="Fendt1050.xml"/>
 		
 		<!-- MAN D2676 engine => http://www.engines.man.eu/global/en/off-road/construction-agricultural-and-special-machinery/overview/Overview.html -->

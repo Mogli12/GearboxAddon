@@ -121,13 +121,17 @@ function mrGearboxMogliLoader.initXmlFiles()
 				else
 					local modName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
 					local xmlName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#xmlName", entry.xmlName, j ))
-					if modName == nil and xmlName == nil then
+					if xmlName == nil then
 						break
-					elseif modName ~= nil and xmlName ~= nil then
+					elseif modName ~= nil then
 						entry.configFileName = modName .. "/" .. xmlName
+						entry.configModName  = string.lower( modName )
 					else
 						entry.configFileName = xmlName
 					end
+					
+					entry.configXmlName  = string.lower( xmlName )
+					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
 				end
 				
 				if      string.len( entry.configFileName )       == 9
@@ -169,13 +173,17 @@ function mrGearboxMogliLoader.initXmlFiles()
 				else
 					local modName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
 					local xmlName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#xmlName", entry.xmlName, j ))
-					if modName == nil and xmlName == nil then
+					if xmlName == nil then
 						break
-					elseif modName ~= nil and xmlName ~= nil then
+					elseif modName ~= nil then
 						entry.configFileName = modName .. "/" .. xmlName
+						entry.configModName  = string.lower( modName )
 					else
 						entry.configFileName = xmlName
 					end
+					
+					entry.configXmlName  = string.lower( xmlName )
+					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
 				end
 				if      string.len( entry.configFileName )       == 9
 						and string.sub( entry.configFileName, 1, 7 ) == "default" then
@@ -224,6 +232,30 @@ function mrGearboxMogliLoader.testXmlFile( xmlFile, xmlName, propName1, propName
 	return false
 end
 
+function mrGearboxMogliLoader.getConfigEntry( configTable, configFileName )
+	if configTable[configFileName] ~= nil then
+		return configTable[configFileName]
+	end
+	
+	for n,e in pairs( configTable ) do
+		if e.configIsPrefix and e.configModName ~= nil then
+			local l1 = string.len( e.configModName )
+			local l2 = string.len( e.configXmlName )
+			local l3 = string.len( configFileName  )
+			
+			if      l1 < l3 
+					and l2 < l3 
+					and string.sub( configFileName, 1, l1 ) == e.configModName 
+					and string.sub( configFileName, 1 + l3 - l2 ) == e.configXmlName					
+					then
+				return e
+			end
+		end
+	end
+	
+	return 
+end
+
 function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propName1, propName2 )
 	mrGearboxMogliLoader.initXmlFiles()
 	
@@ -233,7 +265,8 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	
 	-- external configuration
 	xmlFile = mrGearboxMogliLoader.xmlFileExt	
-	entry = mrGearboxMogliLoader.configExt[configFileName]
+	entry   = mrGearboxMogliLoader.getConfigEntry( mrGearboxMogliLoader.configExt, configFileName )
+	
 	if      entry ~= nil
 			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
@@ -259,7 +292,8 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	
 	-- internal configuration
 	xmlFile = mrGearboxMogliLoader.xmlFileInt
-	entry = mrGearboxMogliLoader.configInt[configFileName]
+	entry   = mrGearboxMogliLoader.getConfigEntry( mrGearboxMogliLoader.configInt, configFileName )
+
 	if      entry ~= nil
 			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
