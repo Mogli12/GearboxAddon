@@ -1709,7 +1709,7 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="JohnDeere7810_" xmlName="JohnDeere7810.xml" isPrefix="true"/>
+		<configFile modName="JohnDeere7810" xmlName="JohnDeere7810.xml" isPrefix="true"/>
 
 		<!-- AutoPowr -->
 		<!--
@@ -2085,6 +2085,53 @@
 				<torque rpm="2100" motorTorque="899"/>
 				<torque rpm="2200" motorTorque="835"/>
 				<torque rpm="2300" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+		
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/case-puma-230-cvx-frontlader -->
+		<!-- http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl -->
+		<configFile modName="LS15_CasePumacvx240_" xmlName="caseIHPuma240.xml" isPrefix="true"/>
+	
+		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+			<hydrostatic>
+        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.933333" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.066667" factor="0.96"/>
+        <efficiency ratio="1.333333" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+				<gear speed="6.25" name=""/>
+				<gear speed="12.5" name=""/>
+				<gear speed="25"   name=""/>
+				<gear speed="50"   name=""/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0"/>
+        <torque rpm="700" motorTorque="450"/>
+        <torque rpm="800" motorTorque="638"/>
+        <torque rpm="900" motorTorque="798"/>
+        <torque rpm="1000" motorTorque="928"/>
+        <torque rpm="1100" motorTorque="1030"/>
+        <torque rpm="1200" motorTorque="1102"/>
+        <torque rpm="1300" motorTorque="1146"/>
+        <torque rpm="1400" motorTorque="1160"/>
+        <torque rpm="1500" motorTorque="1160"/>
+        <torque rpm="1600" motorTorque="1141"/>
+        <torque rpm="1700" motorTorque="1098"/>
+        <torque rpm="1800" motorTorque="1051"/>
+        <torque rpm="1900" motorTorque="998"/>
+        <torque rpm="2000" motorTorque="944"/>
+        <torque rpm="2100" motorTorque="888"/>
+        <torque rpm="2200" motorTorque="830"/>
+        <torque rpm="2300" motorTorque="622"/>
+        <torque rpm="2400" motorTorque="0"/>
 			</realEngine>
 		</gearboxMogli>	
 	</vehicle>

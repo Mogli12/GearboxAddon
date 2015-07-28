@@ -38,9 +38,9 @@ function mrGearboxMogliRegister:add()
 	local searchTable  = { "mrGearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox", "gearboxMogli" };	
 	local searchTable2 = { "tempomat", "tempomatMogli" };	
 	
-	for n,s in pairs(SpecializationUtil.specializations) do
-		print(tostring(n).." "..tostring(s.className))
-	end
+	--for n,s in pairs(SpecializationUtil.specializations) do
+	--	print(tostring(n).." "..tostring(s.className))
+	--end
 	
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
 		local modName            = string.match(k, "([^.]+)");

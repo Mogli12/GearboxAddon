@@ -1633,20 +1633,20 @@ function mrGearboxMogli:updateTick(dt)
 		--		or ( self.getIsCourseplayDriving ~= nil and self:getIsCourseplayDriving() ) then
 			elseif not ( self.steeringEnabled ) then
 				self:mrGbMSetState( "AutoStartStop", true )       
-				if     self.mrGbMS.EnableAI == "A"
-						or self.mrGbMS.EnableAI == "A"
+				if     self.mrGbMS.EnableAI == "Y"
+						or ( self.mrGbMS.EnableAI == "A" and self:mrGbMGetAutomatic() )
 						or self.mrGbMS.AllAuto then
 					self:mrGbMSetState( "IsOn", true ) 
 				else
 					self:mrGbMSetState( "IsOn", false ) 	
 				end
 				
-				if self.mrGbMS.IsOn and self.mrGbMS.EnableAI ~= "Y" then				
-					if not ( self:mrGbMGetAutomatic() ) then
-						self.mrGbML.aiAutomatic = true
-						self:mrGbMSetState( "Automatic", true )
-					end
-				end
+			--if self.mrGbMS.IsOn and self.mrGbMS.EnableAI ~= "Y" then				
+			--	if not ( self:mrGbMGetAutomatic() ) then
+			--		self.mrGbML.aiAutomatic = true
+			--		self:mrGbMSetState( "Automatic", true )
+			--	end
+			--end
 								
 				if not ( self.mrGbML.aiControlled ) then
 					self.mrGbML.aiControlled = true
