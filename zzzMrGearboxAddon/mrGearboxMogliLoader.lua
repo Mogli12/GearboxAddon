@@ -217,16 +217,22 @@ function mrGearboxMogliLoader.testXMLProperty( xmlFile, name )
 	return true
 end
 
-function mrGearboxMogliLoader.testXmlFile( xmlFile, xmlName, propName1, propName2 )
-	if     ( propName1 ==nil
-			 and propName2 ==nil )
-			or ( propName1 ~=nil and propName2 ==nil 
-			 and mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName1 ) )
-			or ( propName1 ==nil and propName2 ~=nil 
-			 and mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName2 ) )
-			or ( propName1 ~=nil and propName2 ~=nil
-			 and ( mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName1 ) 
-					or mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName2 ) ) ) then
+function mrGearboxMogliLoader.testXmlFile( xmlFile, xmlName, propName1, propName2, propName3 )
+	if propName3 == nil then
+		if     ( propName1 ==nil
+				 and propName2 ==nil )
+				or ( propName1 ~=nil and propName2 ==nil 
+				 and mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName1 ) )
+				or ( propName1 ==nil and propName2 ~=nil 
+				 and mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName2 ) )
+				or ( propName1 ~=nil and propName2 ~=nil
+				 and ( mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName1 ) 
+						or mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName2 ) ) ) then
+			return true
+		end
+	elseif mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName1 )
+			or mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName2 )
+			or mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlName..propName3 ) then
 		return true
 	end
 	return false
@@ -256,7 +262,7 @@ function mrGearboxMogliLoader.getConfigEntry( configTable, configFileName )
 	return 
 end
 
-function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propName1, propName2 )
+function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propName1, propName2, propName3 )
 	mrGearboxMogliLoader.initXmlFiles()
 	
 	local xmlFile
@@ -268,7 +274,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	entry   = mrGearboxMogliLoader.getConfigEntry( mrGearboxMogliLoader.configExt, configFileName )
 	
 	if      entry ~= nil
-			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
+			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
 		if state and message then
 			print(string.format( "zzzMrGearboxAddon: %s inserted into %s (e)", tagName, self.mrGbMLConfigFileName ))
@@ -280,7 +286,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	
 	-- configuration innside the vehicle.xml
 	xmlFile = vehicleXmlFile
-	if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2 ) then
+	if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
 		if state and message then
 			print(string.format( "zzzMrGearboxAddon: %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
@@ -295,7 +301,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	entry   = mrGearboxMogliLoader.getConfigEntry( mrGearboxMogliLoader.configInt, configFileName )
 
 	if      entry ~= nil
-			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
+			and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
 		if state and message then
 			print(string.format( "zzzMrGearboxAddon: %s inserted into %s (i)", tagName, self.mrGbMLConfigFileName ))
@@ -313,7 +319,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 		xmlFile = mrGearboxMogliLoader.xmlFileExt
 		entry   = mrGearboxMogliLoader.defaultConfigE[defaultConfigName]		
 		if      entry ~= nil
-				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
+				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
 			if state and message then
 				print(string.format( "zzzMrGearboxAddon: %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
@@ -326,7 +332,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 		xmlFile = mrGearboxMogliLoader.xmlFileInt
 		entry   = mrGearboxMogliLoader.defaultConfigI[defaultConfigName]
 		if      entry ~= nil
-				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2 ) then
+				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
 			if state and message then
 				print(string.format( "zzzMrGearboxAddon: %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
@@ -343,7 +349,7 @@ end
 
 
 function mrGearboxMogliLoader:loadGearboxMogli( xmlFile )
-	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, xmlFile, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli",  ".gearboxMogli.gears.gear(0)#speed" )
+	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, xmlFile, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio" )
 end
 
 function mrGearboxMogliLoader:loadGearboxMogli2( xmlFile, baseName, xmlSource )	

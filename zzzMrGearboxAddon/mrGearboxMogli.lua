@@ -573,13 +573,34 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	local rangeGearOffset = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. ".ranges#gearOffset"), 0) 
 	local gearRangeOffset = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. ".gears#rangeOffset"), 0) 
 	local minRatio        = 0.6
-	local prevSpeed	
+	local prevSpeed, gearTireRevPerKm, gearInvRadiusAxleSpeed
 	self.mrGbMS.Gears     = {} 
 	
 	local i = 0 
 	while true do
 		local baseName = xmlString .. string.format(".gears.gear(%d)", i) 		
 		local speed    = getXMLFloat(xmlFile, baseName .. "#speed") 
+		
+		if speed==nil then
+			local invRatio = getXMLFloat(xmlFile, baseName .. "#inverseRatio") 
+			
+			if invRatio ~= nil then
+				if gearTireRevPerKm == nil then
+					local radius = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#wheelRadius" ), self.wheels[1].radius )
+					gearTireRevPerKm = 1000 / ( 2 * math.pi * radius )
+				end
+				
+				if gearInvRadiusAxleSpeed == nil then
+					gearInvRadiusAxleSpeed = getXMLFloat(xmlFile, xmlString .. ".gears#axleSpeed" )
+					if gearInvRadiusAxleSpeed == nil then
+						gearInvRadiusAxleSpeed = self.mrGbMS.RatedRpm * 60 / ( 3.6 * self.motor.maxForwardSpeed * gearTireRevPerKm )
+					end
+				end
+				
+				speed = self.mrGbMS.RatedRpm * 60 / ( gearInvRadiusAxleSpeed * gearTireRevPerKm * invRatio )
+			end
+		end
+		
 		if speed==nil then
 			break 
 		end 
@@ -1704,7 +1725,7 @@ function mrGearboxMogli:updateTick(dt)
 						self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( self.motor.clutchPercent * 200+0.5), 0, 255 ))	
 						self.mrGbMD.Load   = tonumber( Utils.clamp( math.floor( self.motor.motorLoadS*20+0.5)*5, 0, 255 ))	
 						if self.mrGbMG.drawReqPower then
-							local power = ( self.motor.motorLoad + self.motor.neededPtoTorque + self.motor.lastLostTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
+							local power = ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
 							self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * mrGearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
 						end
 					else
@@ -3872,10 +3893,10 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 
-	local pt = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
-	if pt > 0 then
-	  pt = pt / self.ptoMotorRpmRatio
-		mt = self.torqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
+	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
+	if self.neededPtoTorque > 0 then
+	  local pt = self.neededPtoTorque / self.ptoMotorRpmRatio
+		local mt = self.torqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
 		
 		if mt < pt and not ( self.noTransmission or self.noTorque ) then
 		--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastMotorRpmR))
@@ -4110,7 +4131,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 
 	local acc             = math.max( self.minThrottle, accelerationPedal )
-	local requestedTorque = self.motorLoad + self.neededPtoTorque + self.lastLostTorque
+	local requestedTorque = self.motorLoad + self.lastPtoTorque + self.lastLostTorque
 	local currentPower    = requestedTorque * math.max( self.prevNonClampedMotorRpm, self.idleRpm )
 	local requestedPower  = currentPower
 	local getMaxPower     = false
