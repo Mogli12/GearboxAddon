@@ -5048,6 +5048,9 @@ function mrGearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 			or self.indoorHud     == nil then
 		return superFunc( self, hud, value, maxValue, ... )
 	end
+	if self.motor.updateMotorRpm == nil or self.motor.updateMotorRpm ~= mrGearboxMogliMotor.updateMotorRpm then
+		return superFunc( self, hud, value, maxValue, ... )
+	end
 
 	if      self.indoorHud.rpm   ~= nil
 			and self.indoorHud.rpm   == hud then
