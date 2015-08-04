@@ -2771,4 +2771,107 @@
 		</gearboxMogli>
 	</vehicle>
 	
+
+<!-- ********** Combines ******************** -->	
+<!-- ********** Combines ******************** -->	
+<!-- ********** Combines ******************** -->	
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+			<combine defaultWidth="4.2"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
+				<gear name="I"   speed="5" />
+				<gear name="II"  speed="9"/>
+				<gear name="III" speed="20"/>
+			</gears>
+			<reverse ratio="0.8" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+			<combine defaultWidth="5.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
+				<gear name="I"   speed="5" />
+				<gear name="II"  speed="9"/>
+				<gear name="III" speed="16"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+			<combine defaultWidth="10.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
+				<gear name="I"   speed="5" />
+				<gear name="II"  speed="9"/>
+				<gear name="III" speed="16"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH9230Crawler.xml" />
+		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+			<combine defaultWidth="13.7"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="1" speed="5" />
+				<gear name="2" speed="9" />
+				<gear name="3" speed="20"/>
+				<gear name="4" speed="30"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	
 </vehicles>

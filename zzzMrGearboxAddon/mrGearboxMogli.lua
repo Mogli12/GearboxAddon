@@ -426,6 +426,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end
 	
 --**************************************************************************************************	
+-- PTO RPM
 --**************************************************************************************************		
 	self.mrGbMS.PtoRpm                  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpm"),    
 																												self.mrGbMS.IdleRpm + 50 * math.floor( 0.5 + 0.02 * mrGearboxMogli.ptoRpmFactor * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) ) ) 
@@ -434,6 +435,45 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	if self.mrGbMS.PtoRpmEco > self.mrGbMS.PtoRpm then
 		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
 	end
+	
+--**************************************************************************************************	
+-- combine
+--**************************************************************************************************		
+	if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
+		self.mrGbMS.IsCombine                    = true
+		
+		local width = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
+		
+		if width == nil then
+			if     self.combineSize <= 1 then
+				width = 3
+			elseif self.combineSize == 2 then
+				width = 6
+			else
+				width = 12
+			end
+		end		
+		
+		-- m^2/s @ 10 km/h
+    local sqm = 10 * width / 3.6 
+		
+		-- 90% of rated power in kW
+		local pwr = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#availableThreshingPower"),
+		                            0.8 * self.motor.torqueCurve:get( self.mrGbMS.RatedRpm ) * self.mrGbMS.RatedRpm * mrGearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor ) )
+		
+		du0 = 6 + width
+		dp0 = 0.94 * 0.6 * pwr
+		dpi = 0.94 * 0.4 * pwr / sqm
+		dc0 = 0.06 * 0.6 * pwr
+		dci = 0.06 * 0.4 * pwr / sqm
+			
+		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.6 * self.mrGbMS.RatedRpm )
+		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 )
+		self.mrGbMS.ThreshingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumption")   , dp0 )
+		self.mrGbMS.ThreshingPowerConsumptionInc = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumptionInc"), dpi ) * g_currentMission:getFruitPixelsToSqm()
+		self.mrGbMS.ChopperPowerConsumption      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#chopperPowerConsumption")     , dc0 )
+		self.mrGbMS.ChopperPowerConsumptionInc   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#chopperPowerConsumptionInc")  , dci ) * g_currentMission:getFruitPixelsToSqm()
+  end
 	
 --**************************************************************************************************	
 --**************************************************************************************************		
@@ -1747,6 +1787,9 @@ function mrGearboxMogli:updateTick(dt)
 					else
 						local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
 						self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+						if self.isFuelFilling then
+							fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
+						end
 						self.mrGbMD.Fuel              = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
 					end
 					
@@ -3893,35 +3936,88 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 
+	local pt = 0
 	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
 	if self.neededPtoTorque > 0 then
-	  local pt = self.neededPtoTorque / self.ptoMotorRpmRatio
-		local mt = self.torqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
+	  pt = self.neededPtoTorque / self.ptoMotorRpmRatio
+	end
+	
+	if self.vehicle.mrGbMS.IsCombine then
+		local combinePower    = 0
+		local combinePowerInc = 0
+	
+		if self.vehicle.pipeIsUnloading then
+			combinePower = combinePower + self.vehicle.mrGbMS.UnloadingPowerConsumption
+		end
 		
-		if mt < pt and not ( self.noTransmission or self.noTorque ) then
-		--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastMotorRpmR))
-			if self.ptoWarningTimer == nil then
-				self.ptoWarningTimer = g_currentMission.time
+		if self.vehicle:getIsTurnedOn() then
+			local sqm = Utils.getNoNil( self.vehicle.lastCuttersArea, 0 ) * 1000 / self.tickDt
+			if self.combineAverageArea == nil then
+				self.combineAverageArea = sqm
+			else
+				self.combineAverageArea = self.combineAverageArea + 0.03 * ( sqm - self.combineAverageArea )
 			end
-			if      g_currentMission.time > self.ptoWarningTimer + 10000 then
-				self.ptoWarningTimer = nil
-				self.vehicle:mrGbMSetNeutralActive(true, false, true)
-				if      self.vehicle.dCcheckModule ~= nil
-						and self.vehicle:dCcheckModule("manMotorStart") 
-						and self.vehicle.driveControl ~= nil
-						and self.vehicle.driveControl.manMotorStart ~= nil then
-					self.vehicle.driveControl.manMotorStart.isMotorStarted = false
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-				elseif self.vehicle.setManualIgnitionMode ~= nil then
-					self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-				else
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+			
+			combinePower    = combinePower    + self.vehicle.mrGbMS.ThreshingPowerConsumption
+			combinePowerInc = combinePowerInc + self.vehicle.mrGbMS.ThreshingPowerConsumptionInc
+		
+			if not ( self.vehicle.isStrawEnabled ) then
+				combinePower    = combinePower    + self.vehicle.mrGbMS.ChopperPowerConsumption
+				combinePowerInc = combinePowerInc + self.vehicle.mrGbMS.ChopperPowerConsumptionInc
+			end
+		else
+			self.combineAverageArea = nil
+		end
+		
+		
+		if self.combineAverageArea ~= nil and self.combineAverageArea > 0 and combinePowerInc > 0 then
+			combinePower = combinePower + combinePowerInc * self.combineAverageArea
+		end
+		
+		local tmp = combinePower
+
+		combinePower = combinePower * 1.36 * self.vehicle.mrGbMG.torqueFactor / mrGearboxMogli.powerFactor0
+			
+		if combinePower > 0.9 * self.maxPower then
+			print(string.format("Too much power needed: %3.0f%%", 100 * combinePower / self.maxPower ))
+			combinePower = 0.9 * self.maxPower 
+		end
+		
+		pt = pt + ( combinePower / rpm )
+		
+	--print(string.format("%0.3f m2 / %s / %s => %3.0f kW @ %4.0f U/min => %3.0f Nm (%3.0f Nm)", Utils.getNoNil( self.combineAverageArea, -1 ), tostring(self.vehicle:getIsTurnedOn()), tostring(self.vehicle.isStrawEnabled), tmp, rpm, pt * 1000, self.lastMotorTorque * 1000 ))		
+	end
+	
+	if pt > 0 then
+		if not ( self.noTransmission or self.noTorque or self.vehicle.mrGbMS.HydrostaticLaunch ) then
+			local mt = self.torqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
+			if mt < pt then
+			--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastMotorRpmR))
+				if self.ptoWarningTimer == nil then
+					self.ptoWarningTimer = g_currentMission.time
 				end
-			elseif  g_currentMission.time > self.ptoWarningTimer + 2000 then
-				self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-			end			
-		elseif self.ptoWarningTimer ~= nil then
+				if      g_currentMission.time > self.ptoWarningTimer + 10000 then
+					self.ptoWarningTimer = nil
+					self.vehicle:mrGbMSetNeutralActive(true, false, true)
+					if      self.vehicle.dCcheckModule ~= nil
+							and self.vehicle:dCcheckModule("manMotorStart") 
+							and self.vehicle.driveControl ~= nil
+							and self.vehicle.driveControl.manMotorStart ~= nil then
+						self.vehicle.driveControl.manMotorStart.isMotorStarted = false
+						self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+					elseif self.vehicle.setManualIgnitionMode ~= nil then
+						self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
+						self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+					else
+						self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+					end
+				elseif  g_currentMission.time > self.ptoWarningTimer + 2000 then
+					self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+				end			
+			elseif self.ptoWarningTimer ~= nil then
+				self.ptoWarningTimer = nil
+			end
+		else
 			self.ptoWarningTimer = nil
 		end
 		
@@ -4083,7 +4179,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.minRequiredRpm = self.minRequiredRpm + self.vehicle.mrGbMS.HandThrottle * ( self.ratedRpm - self.minRequiredRpm - 100 )
 	end
 	
-	local ptoTq = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle)
+	local ptoTq = self.neededPtoTorque --PowerConsumer.getTotalConsumedPtoTorque(self.vehicle)
 	if ptoTq > 0 then
 		self.ptoOn = true
 		local ptoRpm = PowerConsumer.getMaxPtoRpm( self.vehicle )
@@ -4135,6 +4231,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local currentPower    = requestedTorque * math.max( self.prevNonClampedMotorRpm, self.idleRpm )
 	local requestedPower  = currentPower
 	local getMaxPower     = false
+	
+	if self.vehicle.mrGbMS.IsCombine and self.vehicle:getIsTurnedOn() then
+		self.ptoOn          = true
+		self.minRequiredRpm = Utils.clamp( self.rpmPowerCurve:get( math.max( currentPower, 1.111 * self.lastPtoTorque ) * math.max( self.prevNonClampedMotorRpm, self.idleRpm ) ), self.vehicle.mrGbMS.ThreshingMinRpm, self.ratedRpm )
+	end
+	
 	--if self.motorLoad + mrGearboxMogli.eps >= self.lastTransTorque then -- + 0.01 * self.maxPower
 	--requestedPower      = math.max( requestedPower,  accelerationPedal * self.maxPower )
 	--local rp = self.maxPower * 0.5 * ( acc + Utils.clamp( ( lastMaxPossibleRpm - self.nonClampedMotorRpm ) / Utils.clamp( self.maxRpmIncrease, 1, 100 ), 0, 1 ) )
