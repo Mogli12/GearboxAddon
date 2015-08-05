@@ -352,6 +352,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 	self.mrGbMS.IdleRpm	                = self.motor.minRpm
 	self.mrGbMS.RatedRpm                = self.motor.maxRpm	
+	self.mrGbMS.StallRpm                = math.max( self.mrGbMS.IdleRpm  - mrGearboxMogli.rpmMinus, 0 )
 	self.mrGbMS.OrigMinRpm              = self.motor.minRpm
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
@@ -410,6 +411,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	if torqueI > 0 then
 		self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#idleRpm"), 800);
 		self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#ratedRpm"), 2100);
+		self.mrGbMS.StallRpm  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#stallRpm"), math.max( self.mrGbMS.IdleRpm  - mrGearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 	end
 	
 	if self.mrGbMG.modifySound then
@@ -455,17 +457,20 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end		
 		
 		-- m^2/s @ 10 km/h
-    local sqm = 10 * width / 3.6 
+		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), 10 )
+    local sqm   = speed * width / 3.6 
 		
 		-- 90% of rated power in kW
 		local pwr = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#availableThreshingPower"),
 		                            0.8 * self.motor.torqueCurve:get( self.mrGbMS.RatedRpm ) * self.mrGbMS.RatedRpm * mrGearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor ) )
 		
+		local dynamicRatio = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#dynamicRatio"), 0.4 )
+		
 		du0 = 6 + width
-		dp0 = 0.94 * 0.6 * pwr
-		dpi = 0.94 * 0.4 * pwr / sqm
-		dc0 = 0.06 * 0.6 * pwr
-		dci = 0.06 * 0.4 * pwr / sqm
+		dp0 = 0.94 * ( 1 - dynamicRatio ) * pwr
+		dpi = 0.94 * dynamicRatio * pwr / sqm
+		dc0 = 0.06 * ( 1 - dynamicRatio ) * pwr
+		dci = 0.06 * dynamicRatio * pwr / sqm
 			
 		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.6 * self.mrGbMS.RatedRpm )
 		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 )
@@ -3482,6 +3487,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	
 	self.idleRpm          = vehicle.mrGbMS.IdleRpm
 	self.ratedRpm         = vehicle.mrGbMS.RatedRpm
+	self.stallRpm       	= vehicle.mrGbMS.StallRpm
 	self.torqueCurve      = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
 	
 	if vehicle.mrGbMS.Engine.maxTorque > 0 then
@@ -3492,7 +3498,6 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 		
 		self.maxTorqueRpm   = vehicle.mrGbMS.Engine.maxTorqueRpm
 		self.maxMotorTorque = vehicle.mrGbMS.Engine.maxTorque
-		self.stallRpm       = math.max( self.idleRpm  - mrGearboxMogli.rpmMinus, vehicle.mrGbMS.Engine.minRpm )
 		self.maxAllowedRpm  = vehicle.mrGbMS.Engine.maxRpm
 		
 		local tvMax2 = 0
@@ -3538,7 +3543,6 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 		end
 		self.maxTorqueRpm   = tvMax	
 		self.maxMotorTorque = self.torqueCurve:getMaximum()
-		self.stallRpm       = math.max( self.idleRpm  - mrGearboxMogli.rpmMinus, 0 )
 		self.maxAllowedRpm  = self.ratedRpm + mrGearboxMogli.rpmPlus
 	end
 	
@@ -3976,12 +3980,12 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		
 		local tmp = combinePower
 
-		combinePower = combinePower * 1.36 * self.vehicle.mrGbMG.torqueFactor / mrGearboxMogli.powerFactor0
+		combinePower = math.min( combinePower * 1.36 * self.vehicle.mrGbMG.torqueFactor / mrGearboxMogli.powerFactor0, self.maxPower )
 			
-		if combinePower > 0.9 * self.maxPower then
-			print(string.format("Too much power needed: %3.0f%%", 100 * combinePower / self.maxPower ))
-			combinePower = 0.9 * self.maxPower 
-		end
+	--if combinePower > 0.9 * self.maxPower then
+	--	print(string.format("Too much power needed: %3.0f%%", 100 * combinePower / self.maxPower ))
+	--	combinePower = 0.9 * self.maxPower 
+	--end
 		
 		pt = pt + ( combinePower / rpm )
 		
@@ -4021,7 +4025,10 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.ptoWarningTimer = nil
 		end
 		
-		self.lastPtoTorque = math.min( pt, 0.9*torque )
+		if not ( self.vehicle.mrGbMS.IsCombine ) then
+			self.lastPtoTorque = math.min( pt, 0.9*torque )
+		end
+		
 		torque             = torque - self.lastPtoTorque
 	elseif self.ptoWarningTimer ~= nil then
 		self.ptoWarningTimer = nil
