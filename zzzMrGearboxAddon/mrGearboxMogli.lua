@@ -3987,7 +3987,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	--	combinePower = 0.9 * self.maxPower 
 	--end
 		
-		pt = pt + ( combinePower / rpm )
+		pt = pt + ( combinePower / rpm ), torque
 		
 	--print(string.format("%0.3f m2 / %s / %s => %3.0f kW @ %4.0f U/min => %3.0f Nm (%3.0f Nm)", Utils.getNoNil( self.combineAverageArea, -1 ), tostring(self.vehicle:getIsTurnedOn()), tostring(self.vehicle.isStrawEnabled), tmp, rpm, pt * 1000, self.lastMotorTorque * 1000 ))		
 	end
@@ -4025,7 +4025,9 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.ptoWarningTimer = nil
 		end
 		
-		if not ( self.vehicle.mrGbMS.IsCombine ) then
+		if self.vehicle.mrGbMS.IsCombine then
+			self.lastPtoTorque = math.min( pt, torque )
+		else
 			self.lastPtoTorque = math.min( pt, 0.9*torque )
 		end
 		

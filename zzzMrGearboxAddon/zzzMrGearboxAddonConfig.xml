@@ -2873,5 +2873,51 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+	<vehicle>
+		<configFile modName="FS15_claasLexion550" xmlName="Lexion550.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+			<combine defaultWidth="6.6"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<configFile modName="FS15_claasLexion550" xmlName="Lexion560.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+			<combine defaultWidth="7.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
 	
 </vehicles>
