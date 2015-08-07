@@ -4277,12 +4277,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		motorLoad = 0
 	elseif self.vehicle.mrGbML.gearShiftingNeeded > 0   then
 		motorLoad = self.motorLoadS
-	elseif lastNoTransmission or lastNoTorque           then
-		motorLoad = acc
+	--elseif lastNoTransmission or lastNoTorque           then
+	--	motorLoad = acc
 	--elseif self.lastMotorTorque <  mrGearboxMogli.eps   then
 	--	motorLoad = acc
 	else
 		motorLoad = Utils.clamp( requestedTorque / self.lastMotorTorque, 0, 1 )
+	end
+	
+	if lastNoTransmission or lastNoTorque then
+		motorLoad = math.max( motorLoad, acc )
 	end
 
 	if self.requestedPower1 == nil then
