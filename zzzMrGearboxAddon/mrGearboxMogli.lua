@@ -3908,38 +3908,6 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
-	if     self.noTorque 
-			or self.noTransmission then
-		torque         = 0
-		self.torqueS   = nil
-	else
-		torque         = torque * acc
-		if      self.vehicle.mrGbMS.LimitRpmMode ~= "M"
-				and self.vehicle.mrGbMS.LimitRpmMode ~= "TM" then
-			if self.torqueS == nil or mrGearboxMogli.smoothTorque > 0.999 then
-				self.torqueS = torque 
-			else
-				self.torqueS = self.torqueS + mrGearboxMogli.smoothTorque * ( torque - self.torqueS )
-				torque       = math.min( torque, self.torqueS )	
-			end
-		end
-	end
-	
-	if limitRpm then
-		local maxRpm = self.maxAllowedRpm
-		local rpmFadeOutRange = self.rpmFadeOutRange * mrGearboxMogliMotor.getMogliGearRatio( self )
-		local fadeStartRpm = maxRpm - rpmFadeOutRange
-
-		if fadeStartRpm < self.nonClampedMotorRpm then
-			if maxRpm < self.nonClampedMotorRpm then
-				brakePedal = math.min((self.nonClampedMotorRpm - maxRpm)/rpmFadeOutRange, 1)
-				torque = 0
-			else
-				torque = torque*math.max((fadeStartRpm - self.nonClampedMotorRpm)/rpmFadeOutRange, 0)
-			end
-		end
-	end
-
 	local pt = 0
 	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
 	if self.neededPtoTorque > 0 then
@@ -3987,7 +3955,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	--	combinePower = 0.9 * self.maxPower 
 	--end
 		
-		pt = pt + ( combinePower / rpm ), torque
+		pt = pt + ( combinePower / rpm )
 		
 	--print(string.format("%0.3f m2 / %s / %s => %3.0f kW @ %4.0f U/min => %3.0f Nm (%3.0f Nm)", Utils.getNoNil( self.combineAverageArea, -1 ), tostring(self.vehicle:getIsTurnedOn()), tostring(self.vehicle.isStrawEnabled), tmp, rpm, pt * 1000, self.lastMotorTorque * 1000 ))		
 	end
@@ -4036,9 +4004,43 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.ptoWarningTimer = nil
 	end
 	
+
+	if     self.noTorque 
+			or self.noTransmission then
+		torque         = 0
+		self.torqueS   = nil
+	else
+		torque         = torque * acc
+		if      self.vehicle.mrGbMS.LimitRpmMode ~= "M"
+				and self.vehicle.mrGbMS.LimitRpmMode ~= "TM" then
+			if self.torqueS == nil or mrGearboxMogli.smoothTorque > 0.999 then
+				self.torqueS = torque 
+			else
+				self.torqueS = self.torqueS + mrGearboxMogli.smoothTorque * ( torque - self.torqueS )
+				torque       = math.min( torque, self.torqueS )	
+			end
+		end
+	end
+	
+	if limitRpm then
+		local maxRpm = self.maxAllowedRpm
+		local rpmFadeOutRange = self.rpmFadeOutRange * mrGearboxMogliMotor.getMogliGearRatio( self )
+		local fadeStartRpm = maxRpm - rpmFadeOutRange
+
+		if fadeStartRpm < self.nonClampedMotorRpm then
+			if maxRpm < self.nonClampedMotorRpm then
+				brakePedal = math.min((self.nonClampedMotorRpm - maxRpm)/rpmFadeOutRange, 1)
+				torque = 0
+			else
+				torque = torque*math.max((fadeStartRpm - self.nonClampedMotorRpm)/rpmFadeOutRange, 0)
+			end
+		end
+	end
+
+
 	if torque < 0 then
 		self.lastLostTorque = torque 
-	else
+	elseif torque > 0 then
 		local e = 0.94
 		if     self.hydroEff ~= nil   then
 			e = self.hydroEff:get( self.hydrostaticFactor )
