@@ -1,4 +1,4 @@
-# AutoCombine for Farminug Simulator 2015
+# GearboxAddOn for Farminug Simulator 2015
 
 ## Description
 This is the continuation of the mod MoreRealistic GearboxAddon for FS13. In FS15 it works even without MoreRealistic. 
