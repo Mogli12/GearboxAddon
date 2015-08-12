@@ -46,6 +46,7 @@ mrGearboxMogli.smoothRpm            = 0.05
 mrGearboxMogli.smoothPossible       = 0.05
 mrGearboxMogli.smoothSpeed          = 0.2
 mrGearboxMogli.smoothLastSpeed      = 0.02
+mrGearboxMogli.smoothCombineArea    = 0.02
 mrGearboxMogli.smoothTorque         = 0.125 -- careful if used together with limitRpmIncrease="M"!
 mrGearboxMogli.smoothHydro          = 0.5
 mrGearboxMogli.smoothClutch         = 1
@@ -438,13 +439,17 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
 	end
 	
+	self.mrGbMS.MaxPtoTorqueRatio       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatio" ), 0.8 ) 
+	self.mrGbMS.MaxPtoTorqueRatioInc    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatioInc" ), ( 1-self.mrGbMS.MaxPtoTorqueRatio ) * 0.1 ) 
+	
 --**************************************************************************************************	
 -- combine
 --**************************************************************************************************		
 	if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
 		self.mrGbMS.IsCombine                    = true
 		
-		local width = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
+		local width  = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
+		local factor = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultLiterPerSqm"), 1.2 )
 		
 		if width == nil then
 			if     self.combineSize <= 1 then
@@ -458,7 +463,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		
 		-- m^2/s @ 10 km/h
 		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), 10 )
-    local sqm   = speed * width / 3.6 
+    local sqm   = factor * speed * width / 3.6 
 		
 		-- 90% of rated power in kW
 		local pwr = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#availableThreshingPower"),
@@ -3924,10 +3929,22 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		
 		if self.vehicle:getIsTurnedOn() then
 			local sqm = Utils.getNoNil( self.vehicle.lastCuttersArea, 0 ) * 1000 / self.tickDt
-			if self.combineAverageArea == nil then
+			
+			local fruitType= FruitUtil.FRUITTYPE_UNKNOWN  
+			if self.vehicle.lastCuttersFruitType ~= nil then
+				fruitType = self.vehicle.lastCuttersFruitType
+			end			
+			if      fruitType ~= FruitUtil.FRUITTYPE_UNKNOWN 
+					and FruitUtil.fruitIndexToDesc[fruitType]             ~= nil
+					and FruitUtil.fruitIndexToDesc[fruitType].literPerSqm ~= nil then
+				sqm = sqm * FruitUtil.fruitIndexToDesc[fruitType].literPerSqm
+			end
+			
+			if     self.combineAverageArea == nil
+					or ( sqm > 0 and self.combineAverageArea <= 0 ) then
 				self.combineAverageArea = sqm
 			else
-				self.combineAverageArea = self.combineAverageArea + 0.03 * ( sqm - self.combineAverageArea )
+				self.combineAverageArea = self.combineAverageArea + mrGearboxMogli.smoothCombineArea * ( sqm - self.combineAverageArea )
 			end
 			
 			combinePower    = combinePower    + self.vehicle.mrGbMS.ThreshingPowerConsumption
@@ -3993,12 +4010,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.ptoWarningTimer = nil
 		end
 		
-		if self.vehicle.mrGbMS.IsCombine then
-			self.lastPtoTorque = math.min( pt, torque )
-		else
-			self.lastPtoTorque = math.min( pt, 0.9*torque )
-		end
-		
+		self.lastPtoTorque = math.min( pt, math.min( 1, self.vehicle.mrGbMS.MaxPtoTorqueRatio + math.abs( self.vehicle.lastSpeedReal*3600 ) * self.vehicle.mrGbMS.MaxPtoTorqueRatioInc ) * torque )		
 		torque             = torque - self.lastPtoTorque
 	elseif self.ptoWarningTimer ~= nil then
 		self.ptoWarningTimer = nil

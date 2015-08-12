@@ -2851,7 +2851,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH9230Crawler.xml" />
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
 			<combine defaultWidth="13.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2865,18 +2865,108 @@
 			</hydrostatic>
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
 				<gear name="1" speed="5" />
-				<gear name="2" speed="9" />
-				<gear name="3" speed="20"/>
-				<gear name="4" speed="30"/>
+				<gear name="2" speed="10" />
+				<gear name="3" speed="22"/>
+				<gear name="4" speed="45"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
 	</vehicle> 
 	
 	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+			<combine defaultWidth="10.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="1000"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="17.5" />
+				<gear name="street" speed="35"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="1000" ratedRpm="2000">
+        <torque rpm="0" motorTorque="0"/><!-- 1800: 1078 | 2000: 1043 | 1700..1700: 4280 | 0.95 | 0.5 -->
+        <torque rpm="700" motorTorque="3843"/>
+        <torque rpm="800" motorTorque="3926"/>
+        <torque rpm="900" motorTorque="4000"/>
+        <torque rpm="1000" motorTorque="4066"/>
+        <torque rpm="1100" motorTorque="4123"/>
+        <torque rpm="1200" motorTorque="4171"/>
+        <torque rpm="1300" motorTorque="4210"/>
+        <torque rpm="1400" motorTorque="4241"/>
+        <torque rpm="1500" motorTorque="4263"/>
+        <torque rpm="1600" motorTorque="4276"/>
+        <torque rpm="1700" motorTorque="4280"/>
+        <torque rpm="1800" motorTorque="4205"/>
+        <torque rpm="1900" motorTorque="3952"/>
+        <torque rpm="2000" motorTorque="3662"/>
+        <torque rpm="2100" motorTorque="2747"/>
+        <torque rpm="2200" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+
+	<!-- http://www.agriculture.newholland.com/Germany/de/Products/Forage/Documents/FR_123001_DOO.pdf -->
+	<vehicle>
+		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
+		
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+			<combine defaultWidth="9.0" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="780"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="1" speed="5" />
+				<gear name="2" speed="10" />
+				<gear name="3" speed="22"/>
+				<gear name="4" speed="44.5"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<realEngine idleRpm="1000" ratedRpm="2100">
+        <torque rpm="0" motorTorque="0"/><!-- 1800: 824 | 2000: 824 | 1500..1500: 3584 | 0.95 | 0.5 -->
+        <torque rpm="700" motorTorque="3125"/>
+        <torque rpm="800" motorTorque="3233"/>
+        <torque rpm="900" motorTorque="3326"/>
+        <torque rpm="1000" motorTorque="3405"/>
+        <torque rpm="1100" motorTorque="3469"/>
+        <torque rpm="1200" motorTorque="3519"/>
+        <torque rpm="1300" motorTorque="3555"/>
+        <torque rpm="1400" motorTorque="3577"/>
+        <torque rpm="1500" motorTorque="3584"/>
+        <torque rpm="1600" motorTorque="3502"/>
+        <torque rpm="1700" motorTorque="3379"/>
+        <torque rpm="1800" motorTorque="3215"/>
+        <torque rpm="1900" motorTorque="3045"/>
+        <torque rpm="2000" motorTorque="2893"/>
+        <torque rpm="2100" motorTorque="2572"/>
+        <torque rpm="2200" motorTorque="1607"/>
+        <torque rpm="2300" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+		
+	<vehicle>
 		<configFile modName="FS15_claasLexion550" xmlName="Lexion550.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2899,7 +2989,7 @@
 	<vehicle>
 		<configFile modName="FS15_claasLexion550" xmlName="Lexion560.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
 			<combine defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2919,5 +3009,48 @@
 		</gearboxMogli>
 	</vehicle> 
 	
-	
+	<vehicle>
+		<configFile modName="MB3D_ClaasJaguar870" isPrefix="true" xmlName="Jaguar870.xml" />
+		
+		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+			<combine defaultWidth="7.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="570"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="1000" ratedRpm="2000">
+        <torque rpm="0" motorTorque="0"/><!-- 1600: 590 | 1800: 598 | 1080..1080: 2700 | 0.99 | 0 -->
+        <torque rpm="700" motorTorque="2091"/>
+        <torque rpm="800" motorTorque="2369"/>
+        <torque rpm="900" motorTorque="2563"/>
+        <torque rpm="1000" motorTorque="2673"/>
+        <torque rpm="1100" motorTorque="2700"/>
+        <torque rpm="1200" motorTorque="2694"/>
+        <torque rpm="1300" motorTorque="2680"/>
+        <torque rpm="1400" motorTorque="2658"/>
+        <torque rpm="1500" motorTorque="2628"/>
+        <torque rpm="1600" motorTorque="2589"/>
+        <torque rpm="1700" motorTorque="2460"/><!-- manualData: 2460-->
+        <torque rpm="1800" motorTorque="2333"/>
+        <torque rpm="1900" motorTorque="2187"/>
+        <torque rpm="2000" motorTorque="2000"/><!-- manualData: 2000-->
+        <torque rpm="2100" motorTorque="1021"/>
+        <torque rpm="2200" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+
 </vehicles>
