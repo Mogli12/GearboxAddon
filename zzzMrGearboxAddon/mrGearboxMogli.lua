@@ -636,7 +636,21 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			
 			if invRatio ~= nil then
 				if gearTireRevPerKm == nil then
-					local radius = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#wheelRadius" ), self.wheels[1].radius )
+					local radius = getXMLFloat(xmlFile, xmlString .. ".gears#wheelRadius" )
+					if radius == nil then
+						local w = getXMLFloat(xmlFile, xmlString .. ".gears#tireWidth" )
+						local r = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#tireRatio" ), 0.8 )
+						local d = getXMLFloat(xmlFile, xmlString .. ".gears#rimDiameter" )
+						if w ~= nil and d ~= nil then
+							-- w is in mm
+							-- r is in %
+							-- d is in inch
+							radius = w * r * 0.00001 + 0.0127 * d
+						end
+					end
+					if radius == nil then
+						radius = self.wheels[1].radius
+					end
 					gearTireRevPerKm = 1000 / ( 2 * math.pi * radius )
 				end
 				

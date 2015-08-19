@@ -897,6 +897,56 @@
 		</gearboxMogli>
 	</vehicle>
 	
+	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/scania-r730-streamline -->
+		<configFile modName="Scania_R730" isPrefix="true" xmlName="scaniaR730.xml"/>
+		<configFile modName="scaniaR730" isPrefix="true" xmlName="scaniaR730.xml"/>
+		
+		<gearboxMogli maxForwardSpeed="90">
+			<gears axleSpeed="3.57" tireWidth="315" tireRatio="80" rimDiameter="22.5" defaultGear="7" automatic="true">
+				<gear name="L1" forwardOnly="true" inverseRatio="13.28"/>
+				<gear name="R1" reverseOnly="true" inverseRatio="11.95"/>
+				<gear name="L2" forwardOnly="true" inverseRatio="10.63"/>
+				<gear name="R2" reverseOnly="true" inverseRatio="9.56"/>
+				<gear name="1"  forwardOnly="true" inverseRatio="9.16"/>
+				<gear name="2"  forwardOnly="true" inverseRatio="7.33"/>
+				<gear name="3"  forwardOnly="true" inverseRatio="5.82"/>
+				<gear name="4"  forwardOnly="true" inverseRatio="4.66"/>
+				<gear name="5"  forwardOnly="true" inverseRatio="3.75"/>
+				<gear name="6"  forwardOnly="true" inverseRatio="3.00"/>
+				<gear name="7"  forwardOnly="true" inverseRatio="2.44"/>
+				<gear name="8"  forwardOnly="true" inverseRatio="1.96"/>
+				<gear name="9"  forwardOnly="true" inverseRatio="1.55"/>
+				<gear name="10" forwardOnly="true" inverseRatio="1.24"/>
+				<gear name="11" forwardOnly="true" inverseRatio="1"/>
+				<gear name="12" forwardOnly="true" inverseRatio="0.80"/>
+			</gears>
+		
+			<realEngine idleRpm="800" ratedRpm="1900">
+        <torque rpm="0" motorTorque="0"/><!-- 1900: 730 | 1900: 730 | 1000..1400: 3500 | 0.99 | 1.3 -->
+        <torque rpm="700" motorTorque="3185"/>
+        <torque rpm="800" motorTorque="3360"/>
+        <torque rpm="900" motorTorque="3465"/>
+        <torque rpm="1000" motorTorque="3500"/>
+        <torque rpm="1100" motorTorque="3500"/>
+        <torque rpm="1200" motorTorque="3500"/>
+        <torque rpm="1300" motorTorque="3500"/>
+        <torque rpm="1400" motorTorque="3500"/>
+        <torque rpm="1500" motorTorque="3301"/>
+        <torque rpm="1600" motorTorque="3121"/>
+        <torque rpm="1700" motorTorque="2961"/>
+        <torque rpm="1800" motorTorque="2820"/>
+        <torque rpm="1900" motorTorque="2698"/>
+        <torque rpm="2000" motorTorque="2529"/>
+        <torque rpm="2100" motorTorque="2023"/>
+        <torque rpm="2200" motorTorque="1180"/>
+        <torque rpm="2300" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/unimog-u400-wb -->
 		<!-- http://www.mercedes-benz.de/content/media_library/hq/hq_mpc_reference_site/unimog/System_Unimog/Applications/brochures/unimog_systemunimog_applications_basicbrochure_u300-u500_01_2400_de_DE_05-2007_pdf.object-Single-MEDIA.download.tmp/Users/han/Desktop/broschuren_de/unimog_brochures_ugn_basic_de.pdf -->
@@ -1658,62 +1708,6 @@
 				<gear speed="107"  name="8L" forwardOnly="true"/>
 				<gear speed="126"  name="8H"  forwardOnly="true"/>
 			</gears>
-		</gearboxMogli>		
-	</vehicle>
-
-	<vehicle>
-		<!-- http://www.modhoster.de/mods/peterbilt-387%2D%2D5 -->
-		<configFile modName="n/a" xmlName="peter387.xml" />
-		
-		<!-- Cummins ISX 600 -->
-		<gearboxMogli speedLimiter="false" swapGearRangeKeys="true">
-			<!-- http://cumminsengines.com/uploads/docs/4103999.pdf -->
-			<realEngine idleRpm="1000" ratedRpm="2100">
-        <torque rpm="0" motorTorque="0"/>
-        <torque rpm="700" motorTorque="-695"/>
-        <torque rpm="800" motorTorque="556"/>
-        <torque rpm="900" motorTorque="1528"/>
-        <torque rpm="1000" motorTorque="2223"/>
-        <torque rpm="1100" motorTorque="2640"/>
-        <torque rpm="1200" motorTorque="2779"/>
-        <torque rpm="1300" motorTorque="2710"/>
-        <torque rpm="1400" motorTorque="2636"/>
-        <torque rpm="1500" motorTorque="2558"/>
-        <torque rpm="1600" motorTorque="2476"/>
-        <torque rpm="1700" motorTorque="2390"/>
-        <torque rpm="1800" motorTorque="2300"/>
-        <torque rpm="1900" motorTorque="2205"/>
-        <torque rpm="2000" motorTorque="2107"/>
-        <torque rpm="2100" motorTorque="2006"/>
-        <torque rpm="2200" motorTorque="1505"/>
-        <torque rpm="2300" motorTorque="0"/>
-			</realEngine> 
-			
-			<!-- http://www.eaton.com/ecm/idcplg?IdcService=GET_FILE&allowInterrupt=1&RevisionSelectionMethod=LatestReleased&noSaveAs=0&Rendition=Primary&dDocName=RR_RRSL-0001 -->
-			<!-- eaton fuller ultrashift plus VHP, axle ratio 3.55, with tire 275/80 R 22.5 -->
-			<!-- http://www.roadranger.com/ecm/groups/public/@pub/@eaton/@roadranger/documents/content/ct_062746.swf -->
-			<gears>	
-				<gear speed="110" name=""/> <!-- 68.8 mph -->
-			</gears>
-			
-			<ranges defaultRange="4" automatic="true" shiftTimeMs="600">
-				<range name="R1" reverseOnly="true" ratio="0.0664"/>  <!-- 15.06 -->
-				<range name="1"  forwardOnly="true" ratio="0.08137"/> <!-- 12.29 -->
-				<range name="R2" reverseOnly="true" ratio="0.07782"/> <!-- 12.85 -->
-				<range name="2"  forwardOnly="true" ratio="0.11751"/> <!--  8.51 -->
-				<range name="3"  forwardOnly="true" ratio="0.16529"/> <!--  6.05 -->
-				<range name="4"  forwardOnly="true" ratio="0.22831"/> <!--  4.38 -->
-				<range name="R3" reverseOnly="true" ratio="0.24814"/> <!--  4.03 -->
-				<range name="5"  forwardOnly="true" ratio="0.3125"/>  <!--  3.2  -->
-				<range name="6"  forwardOnly="true" ratio="0.43668"/> <!--  2.29 -->
-				<range name="7"  forwardOnly="true" ratio="0.51282"/> <!--  1.95 -->
-				<range name="8"  forwardOnly="true" ratio="0.61728"/> <!--  1.62 -->
-				<range name="9"  forwardOnly="true" ratio="0.72464"/> <!--  1.38 -->
-				<range name="10" forwardOnly="true" ratio="0.8547"/>  <!--  1.17 -->
-				<range name="11" forwardOnly="true" ratio="1"/>       <!--  1    -->
-				<range name="12" forwardOnly="true" ratio="1.16279"/> <!--  0.86 -->
-				<range name="13" forwardOnly="true" ratio="1.36986"/> <!--  0.73 -->
-			</ranges>
 		</gearboxMogli>		
 	</vehicle>
 
@@ -2778,7 +2772,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
 			<combine defaultWidth="4.2"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2802,8 +2796,33 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
 			<combine defaultWidth="5.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
+				<gear name="I"   speed="5" />
+				<gear name="II"  speed="9"/>
+				<gear name="III" speed="16"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+	
+	<!-- http://fs-uk.com/mods/view/36571/case-ih-ct5060 -->
+	<vehicle>
+		<configFile modName="CaseIH_CT5060" xmlName="CaseIH_CT5060.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+			<combine defaultWidth="6.7"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -2826,7 +2845,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
 			<combine defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
