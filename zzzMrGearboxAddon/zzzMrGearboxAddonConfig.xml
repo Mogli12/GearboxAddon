@@ -597,9 +597,9 @@
 		<!-- ??? -->
 		<configFile modName="DeutzFahr120MK3" xmlName="DeutzFahr120MK3.xml" />
 		<!-- https://www.facebook.com/ModdinggemeinschaftLs13 / http://uploaded.net/file/e9vdghz1 -->
-		<configFile modName="DeutzFahr120MK3_V2" xmlName="DeutzMK3.xml" />
+		<configFile modName="DeutzFahr120MK3_V2" xmlName="DeutzMK3.xml" isPrefix="true"/>
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-agrotron120mk3.pdf -->
-		<gearboxMogli   swapGearRangeKeys="true">
+		<gearboxMogli swapGearRangeKeys="true">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
 				<torque rpm="900" motorTorque="440"/>
 				<torque rpm="1000" motorTorque="457"/>
@@ -626,7 +626,7 @@
 				<gear speed="50.00" name="H"/>
 			</gears>
 
-			<ranges defaultRange="4" gearOffset="2" shiftTimeMs="800">
+			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.1096" name="1" />
 				<range ratio="0.1972" name="2" />
 				<range ratio="0.3164" name="3" />
@@ -672,7 +672,7 @@
 				<gear speed="50.9" name="P4"/>
 			</gears>
 			
-			<ranges defaultRange="2" gearOffset="2" shiftTimeMs="800" clutchRatio="0.7">
+			<ranges defaultRange="2" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.2"   name="1"/>
 				<range ratio="0.342" name="2"/>
 				<range ratio="0.585" name="3"/>

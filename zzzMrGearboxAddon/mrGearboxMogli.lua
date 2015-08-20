@@ -620,7 +620,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	local reverseMaxGear  = getXMLInt(xmlFile, xmlString .. ".reverse#maxGear")
 	local reverseMinRange = getXMLInt(xmlFile, xmlString .. ".reverse#minRange")
 	local reverseMaxRange = getXMLInt(xmlFile, xmlString .. ".reverse#maxRange")
-	local rangeGearOffset = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. ".ranges#gearOffset"), 0) 
+	local rangeGearOffset = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. ".ranges(0)#gearOffset"), 1) 
 	local gearRangeOffset = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. ".gears#rangeOffset"), 0) 
 	local minRatio        = 0.6
 	local prevSpeed, gearTireRevPerKm, gearInvRadiusAxleSpeed
@@ -1436,29 +1436,29 @@ function mrGearboxMogli:update(dt)
 			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2-1) 
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliSHIFTRANGEUP" ) then -- high/low range shift
 			if self.mrGbMS.SwapGearRangeKeys then
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1) 
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) 
 			else
-				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1)                                        
+				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true)                                        
 			end 
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliSHIFTRANGEDOWN" ) then -- high/low range shift
 			if self.mrGbMS.SwapGearRangeKeys then
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1) 	
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) 	
 			else
-				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1) 
+				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1, false, true) 
 			end 
 		elseif not ( self.mrGbMS.DisableManual ) and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliSHIFTGEARUP" ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
 			if self.mrGbMS.SwapGearRangeKeys then
-				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1)                                        
+				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true)                                        
 			else
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1) 
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) 
 			end 
 		elseif not ( self.mrGbMS.DisableManual ) and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliSHIFTGEARDOWN" ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
 			if self.mrGbMS.SwapGearRangeKeys then
-				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1) 
+				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1, false, true) 
 			else
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1) 	
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) 	
 			end 
 		elseif mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliGEARFWD" )  then 
 		--self:setCruiseControlState(0) 
@@ -1524,9 +1524,9 @@ function mrGearboxMogli:update(dt)
 						end
 						
 						if self.mrGbMS.SwapGearRangeKeys then
-							self:mrGbMSetCurrentRange(math.abs(gear))
+							self:mrGbMSetCurrentRange(math.abs(gear), false, true)
 						else
-							self:mrGbMSetCurrentGear(math.abs(gear))
+							self:mrGbMSetCurrentGear(math.abs(gear), false, true)
 						end
 					end
 				elseif self.mrGbMS.G27Mode < 1 then
@@ -2345,17 +2345,17 @@ end
 --**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMSetCurrentGear
 --**********************************************************************************************************	
-function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend )
+function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend ) then
 		return 
 	end
 
 	local newGear  = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears, self.mrGbMS.CurrentGear, new, "gear" )
 	local newRange = self.mrGbMS.CurrentRange
-	if self:mrGbMGetAutomatic() then
-		newRange = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, "range" )
-	else
+	if manual then
 		newRange = mrGearboxMogli.mrGbMGetRangeForNewGear( self, newGear )
+	else
+		newRange = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, "range" )
 	end
 	
 	if newGear ~= self.mrGbMS.CurrentGear then
@@ -2381,17 +2381,17 @@ end
 --**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMSetCurrentRange
 --**********************************************************************************************************	
-function mrGearboxMogli:mrGbMSetCurrentRange(new, noEventSend)
+function mrGearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend ) then
 		return 
 	end
 
 	local newRange = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, new, "range" )
 	local newGear  = self.mrGbMS.CurrentGear
-	if self:mrGbMGetAutomatic() then
-		newGear = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears, self.mrGbMS.CurrentGear, newGear, "gear" )
-	else
+	if manual then
 		newGear = mrGearboxMogli.mrGbMGetGearForNewRange( self, newRange )
+	else
+		newGear = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears, self.mrGbMS.CurrentGear, newGear, "gear" )
 	end
 	
 	if newRange ~= self.mrGbMS.CurrentRange then
