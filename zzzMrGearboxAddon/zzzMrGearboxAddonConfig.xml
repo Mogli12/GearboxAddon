@@ -976,6 +976,117 @@
 	</vehicle>
 		
 	<vehicle>
+		<configFile modName="MBtrac1600" isPrefix="true" xmlName="xml/MBTrac1600.xml"/>
+
+		<gearboxMogli runPitchMax="1.1" speedLimiter="false" autoStartStop="false">
+
+			<gears defaultGear="4" shiftTimeMs="800">
+				<gear speed="6.3" />
+				<gear speed="8.7" />
+				<gear speed="11.9" />
+				<gear speed="16.2" />
+				<gear speed="22.8" />
+				<gear speed="31.67" />
+				<gear speed="41.8" />
+				<gear speed="50.67" />	
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true" gearOffset="3">
+				<range ratio="0.375" name="L" />
+				<range ratio="1"   name="H" />
+			</ranges>
+
+			<reverse ratio="1.03" shiftTimeMs="1200"/>
+			
+			<blowOffVentilSound volume="2"/>
+			
+			<realEngine idleRpm="1000" ratedRpm="2400">
+        <torque rpm="0" motorTorque="0"/><!-- 2400: 156 | 2400: 156 | 1500..1600: 530 | 0.94 | 0 -->
+        <torque rpm="700" motorTorque="449"/>
+        <torque rpm="800" motorTorque="468"/>
+        <torque rpm="900" motorTorque="484"/>
+        <torque rpm="1000" motorTorque="498"/>
+        <torque rpm="1100" motorTorque="510"/>
+        <torque rpm="1200" motorTorque="519"/>
+        <torque rpm="1300" motorTorque="525"/>
+        <torque rpm="1400" motorTorque="529"/>
+        <torque rpm="1500" motorTorque="530"/>
+        <torque rpm="1600" motorTorque="530"/>
+        <torque rpm="1700" motorTorque="529"/>
+        <torque rpm="1800" motorTorque="525"/>
+        <torque rpm="1900" motorTorque="520"/>
+        <torque rpm="2000" motorTorque="512"/>
+        <torque rpm="2100" motorTorque="501"/>
+        <torque rpm="2200" motorTorque="489"/>
+        <torque rpm="2300" motorTorque="474"/>
+        <torque rpm="2400" motorTorque="456"/>
+        <torque rpm="2500" motorTorque="406"/>
+        <torque rpm="2600" motorTorque="254"/>
+        <torque rpm="2700" motorTorque="0"/>
+			</realEngine>
+
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800.xml"/>
+		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800fl.xml"/>
+		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800hl.xml"/>
+		<configFile modName="MBtrac1800" isPrefix="true" xmlName="xml/MBTrac1800.xml"/>
+
+		<gearboxMogli runPitchMax="1.2" speedLimiter="false" autoStartStop="false">
+
+			<gears defaultGear="4" shiftTimeMs="800">
+				<gear speed="6.3" />
+				<gear speed="8.7" />
+				<gear speed="11.9" />
+				<gear speed="16.2" />
+				<gear speed="22.8" />
+				<gear speed="31.67" />
+				<gear speed="41.8" />
+				<gear speed="50.67" />	
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true" gearOffset="3">
+				<range ratio="0.375" name="L" />
+				<range ratio="1"   name="H" />
+			</ranges>
+
+			<reverse ratio="1.03" shiftTimeMs="1200"/>
+			
+			<blowOffVentilSound volume="2"/>
+			
+			<!-- Unimog U2400 engine => rated RPM is 2600 in real; keep 2400 for transmission speed -->
+			<realEngine idleRpm="1000" ratedRpm="2400">
+        <torque rpm="0" motorTorque="0"/><!-- 2600: 240 | 2600: 250 | 1250..1500: 860 | 0.84 | 0.5 -->
+        <torque rpm="700" motorTorque="194"/>
+        <torque rpm="800" motorTorque="414"/>
+        <torque rpm="900" motorTorque="590"/>
+        <torque rpm="1000" motorTorque="722"/>
+        <torque rpm="1100" motorTorque="810"/>
+        <torque rpm="1200" motorTorque="854"/>
+        <torque rpm="1300" motorTorque="860"/>
+        <torque rpm="1400" motorTorque="860"/>
+        <torque rpm="1500" motorTorque="860"/>
+        <torque rpm="1600" motorTorque="849"/>
+        <torque rpm="1700" motorTorque="837"/>
+        <torque rpm="1800" motorTorque="823"/>
+        <torque rpm="1900" motorTorque="807"/>
+        <torque rpm="2000" motorTorque="790"/>
+        <torque rpm="2100" motorTorque="771"/>
+        <torque rpm="2200" motorTorque="750"/>
+        <torque rpm="2300" motorTorque="727"/>
+        <torque rpm="2400" motorTorque="702"/>
+        <torque rpm="2500" motorTorque="676"/>
+        <torque rpm="2600" motorTorque="648"/>
+        <torque rpm="2700" motorTorque="506"/>
+        <torque rpm="2800" motorTorque="0"/>
+			</realEngine>
+
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
 		<!-- http://www.modhoster.de/mods/volkswagen-transporter-t2b-pritsche-plane-1972 -->
 		<configFile modName="VWTransporter1972" xmlName="vwt2bpritsche.xml"/>
 		<!-- http://www.modhoster.de/mods/volkswagen-kaefer-1966 -->
