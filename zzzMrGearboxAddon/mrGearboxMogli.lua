@@ -2255,23 +2255,38 @@ function mrGearboxMogli:mrGbMIsNotValidEntry( entry, cg, c1, c2 )
 		end
 	end
 	
-	if entry.minGear   ~= nil and Utils.getNoNil( cg, self.mrGbMS.CurrentGear )   < entry.minGear   then
-		return true
-	end
-	if entry.maxGear   ~= nil and Utils.getNoNil( cg, self.mrGbMS.CurrentGear )   > entry.maxGear   then
-		return true
-	end
-	if entry.maxRange  ~= nil and Utils.getNoNil( c1, self.mrGbMS.CurrentRange )  < entry.minRange then
-		return true
-	end 
-	if entry.maxRange  ~= nil and Utils.getNoNil( c1, self.mrGbMS.CurrentRange )  > entry.maxRange  then
-		return true
-	end
-	if entry.maxRange2 ~= nil and Utils.getNoNil( c2, self.mrGbMS.CurrentRange2 ) < entry.minRange2 then
-		return true
-	end
-	if entry.maxRange2 ~= nil and Utils.getNoNil( c2, self.mrGbMS.CurrentRange2 ) > entry.maxRange2 then
-		return true
+	local cg0 = Utils.getNoNil( cg, self.mrGbMS.CurrentGear )
+	local cr1 = Utils.getNoNil( c1, self.mrGbMS.CurrentRange )
+	local cr2 = Utils.getNoNil( c2, self.mrGbMS.CurrentRange2 )
+	
+	for i=1,3 do
+		local check
+		if     i == 1 then
+			check = self.mrGbMS.Gears[cg0]
+		elseif i == 2 then
+			check = self.mrGbMS.Ranges[cr1]
+		else --if i == 3 then
+			check = self.mrGbMS.Ranges2[cr2]
+		end
+			
+		if check.minGear   ~= nil and cg0 < check.minGear   then
+			return true
+		end
+		if check.maxGear   ~= nil and cg0 > check.maxGear   then
+			return true
+		end
+		if check.maxRange  ~= nil and cr1 < check.minRange then
+			return true
+		end 
+		if check.maxRange  ~= nil and cr1 > check.maxRange  then
+			return true
+		end
+		if check.maxRange2 ~= nil and cr2 < check.minRange2 then
+			return true
+		end
+		if check.maxRange2 ~= nil and cr2 > check.maxRange2 then
+			return true
+		end	
 	end
 	
 	return false
@@ -2285,28 +2300,35 @@ function mrGearboxMogli:mrGbMGetNewEntry( entries, current, index, name )
 	local new = Utils.clamp( index, 1, table.getn( entries ) )
 	local cg  = self.mrGbMS.CurrentGear
 	local cr  = self.mrGbMS.CurrentRange
+	local c2  = self.mrGbMS.CurrentRange2
 	
-	if name == "gear" then cg = new	elseif name == "range" then cr = new end
+	if     name == "gear"  then
+		cg = new	
+	elseif name == "range" then
+		cr = new 
+	elseif name == "range2" then
+		c2 = new 
+	end
 
 	if new > current then
 		while new < table.getn( entries ) 
-			and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr ) do
+			and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr, c2 ) do
 			new = new + 1
 			if name == "gear" then cg = new	elseif name == "range" then cr = new end
 		end
 	end
 	while new > 1
-		and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr ) do
+		and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr, c2 ) do
 		new = new -1
 		if name == "gear" then cg = new	elseif name == "range" then cr = new end
 	end
 	while new < table.getn( entries ) 
-		and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr ) do
+		and mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr, c2 ) do
 		new = new + 1
 		if name == "gear" then cg = new	elseif name == "range" then cr = new end
 	end
 		
-	if mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr ) then
+	if mrGearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr, c2 ) then
 		print(string.format("no %s found: %d", name, index))
 	end
 	
@@ -2361,6 +2383,7 @@ function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 	if newGear ~= self.mrGbMS.CurrentGear then
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
 		self:mrGbMSetState( "CurrentRange", newRange, noEventSend ) 
+		self:mrGbMSetState( "CurrentRange2", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
 	end
 end 
 
@@ -2397,6 +2420,7 @@ function mrGearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 	if newRange ~= self.mrGbMS.CurrentRange then
 		self:mrGbMSetState( "CurrentRange", newRange, noEventSend ) 
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
+		self:mrGbMSetState( "CurrentRange2", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
 	end
 end
 
@@ -2412,6 +2436,8 @@ function mrGearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 	
 	if newRange2 ~= self.mrGbMS.CurrentRange2 then
 		self:mrGbMSetState( "CurrentRange2", newRange2, noEventSend ) 
+		self:mrGbMSetState( "CurrentRange", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, self.mrGbMS.CurrentRange, newRange, "range" ), noEventSend ) 
+		self:mrGbMSetState( "CurrentGear",  mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,  self.mrGbMS.CurrentGear,  newGear,  self.mrGbMS.CurrentGear, newGear, "gear" ),  noEventSend ) 		
 	end
 end
 
@@ -3874,6 +3900,26 @@ function mrGearboxMogliMotor:increaseHyroLaunchRpm()
 end
 
 --**********************************************************************************************************	
+-- mrGearboxMogliMotor:motorStall
+--**********************************************************************************************************	
+function mrGearboxMogliMotor:motorStall( warningText1, warningText2 )
+	self.vehicle:mrGbMSetNeutralActive(true, false, true)
+	if      self.vehicle.dCcheckModule ~= nil
+			and self.vehicle:dCcheckModule("manMotorStart") 
+			and self.vehicle.driveControl ~= nil
+			and self.vehicle.driveControl.manMotorStart ~= nil then
+		self.vehicle.driveControl.manMotorStart.isMotorStarted = false;
+		driveControlInputEvent.sendEvent(self.vehicle)
+		self.vehicle:mrGbMSetState( "WarningText", warningText1 )
+	elseif self.vehicle.setManualIgnitionMode ~= nil then
+		self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
+		self.vehicle:mrGbMSetState( "WarningText", warningText1 )
+	else
+		self.vehicle:mrGbMSetState( "WarningText", warningText2 )
+	end
+end
+
+--**********************************************************************************************************	
 -- mrGearboxMogliMotor:getTorque
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
@@ -4001,19 +4047,9 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 				end
 				if      g_currentMission.time > self.ptoWarningTimer + 10000 then
 					self.ptoWarningTimer = nil
-					self.vehicle:mrGbMSetNeutralActive(true, false, true)
-					if      self.vehicle.dCcheckModule ~= nil
-							and self.vehicle:dCcheckModule("manMotorStart") 
-							and self.vehicle.driveControl ~= nil
-							and self.vehicle.driveControl.manMotorStart ~= nil then
-						self.vehicle.driveControl.manMotorStart.isMotorStarted = false
-						self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-					elseif self.vehicle.setManualIgnitionMode ~= nil then
-						self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
-						self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-					else
-						self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
-					end
+					
+					mrGearboxMogliMotor.motorStall( self, string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ), 
+																								string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ) )
 				elseif  g_currentMission.time > self.ptoWarningTimer + 2000 then
 					self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
 				end			
@@ -4346,6 +4382,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			and ( self.vehicle.isAITractorActivated or self.vehicle.isAIThreshing )
 			and ( self.turnStage == nil or self.turnStage <= 0 ) then
 		targetRpm = self.maxTorqueRpm -- 0.5 * ( self.idleRpm + self.ratedRpm )
+	end
+	if targetRpm < self.vehicle.mrGbMS.OpenRpm then
+		targetRpm = self.vehicle.mrGbMS.OpenRpm
 	end
 	if self.vehicle.mrGbMS.EcoMode then
 		targetRpm = math.min( targetRpm, self.maxPowerRpm - mrGearboxMogli.rpmMinusEco )
@@ -5034,19 +5073,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			end
 			if      g_currentMission.time > self.stallWarningTimer + mrGearboxMogliGlobals.stallMotorOffTime then
 				self.stallWarningTimer = nil
-				self.vehicle:mrGbMSetNeutralActive(true, false, true)
-				if      self.vehicle.dCcheckModule ~= nil
-						and self.vehicle:dCcheckModule("manMotorStart") 
-						and self.vehicle.driveControl ~= nil
-						and self.vehicle.driveControl.manMotorStart ~= nil then
-					self.vehicle.driveControl.manMotorStart.isMotorStarted = false
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
-				elseif self.vehicle.setManualIgnitionMode ~= nil then
-					self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
-				else
-					self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
-				end
+				mrGearboxMogliMotor.motorStall( self, string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ),
+  																						string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ) )
 			elseif  g_currentMission.time > self.stallWarningTimer + mrGearboxMogliGlobals.stallWarningTime then
 				self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
 			end		
