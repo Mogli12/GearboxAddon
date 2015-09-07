@@ -7,7 +7,7 @@
 --
 --***************************************************************
 
-local tempomatMogliVersion=1.192
+local tempomatMogliVersion=1.300
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version < tempomatMogliVersion then
@@ -27,14 +27,15 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:load(xmlFile) 
 		-- state
 		self.tempomatMogli = {}
-		tempomatMogli.registerState( self, "SpeedLimit2",   10 )
+		tempomatMogli.registerState( self, "SpeedLimit2", 10 )
+		tempomatMogli.registerState( self, "KeepSpeed",   false )
 	
 		self.tempomatMogliSetSpeedLimit  = tempomatMogli.tempomatMogliSetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit  = tempomatMogli.tempomatMogliGetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit2 = tempomatMogli.tempomatMogliGetSpeedLimit2
 		self.tempomatMogliSwapSpeedLimit = tempomatMogli.tempomatMogliSwapSpeedLimit 
 	end	
-		
+	
 	--**********************************************************************************************************	
 	-- tempomatMogli:update
 	--**********************************************************************************************************	
@@ -52,8 +53,42 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			elseif tempomatMogli.mbHasInputEvent( "mrGearboxMogliSWAPSPEED" ) then -- speed limiter
 				self:tempomatMogliSwapSpeedLimit()
 			end
+			tempomatMogli.mbSetState( self, "KeepSpeed", tempomatMogli.mbIsInputPressed( "mrGearboxMogliKEEPSPEED" ) )		
+		else
+			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
 		end
 	end
+	
+	--**********************************************************************************************************	
+	-- tempomatMogli:newUpdateVehiclePhysics
+	--**********************************************************************************************************	
+	function tempomatMogli:newUpdateVehiclePhysics( superFunc, ... )
+		if self.tempomatMogli == nil then
+			return superFunc( self, ... )
+		end
+		
+		local tempState = self.cruiseControl.state
+		local tempSpeed = self.cruiseControl.speed
+		
+		if self.tempomatMogli.KeepSpeed then
+			if self.tempomatMogli.keepSpeedLimit == nil then
+				self.tempomatMogli.keepSpeedLimit = math.max( 2, self.lastSpeedReal*3600 )
+			end
+			self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_ACTIVE
+			self.cruiseControl.speed = self.tempomatMogli.keepSpeedLimit
+		elseif self.tempomatMogli.keepSpeedLimit ~= nil then
+			self.tempomatMogli.keepSpeedLimit = nil		
+		end
+		
+		superFunc( self, ... )
+		
+		self.cruiseControl.state = tempState
+		self.cruiseControl.speed = tempSpeed
+		
+		return 
+	end
+	
+	Drivable.updateVehiclePhysics = Utils.overwrittenFunction( Drivable.updateVehiclePhysics, tempomatMogli.newUpdateVehiclePhysics )
 	
 	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSetSpeedLimit

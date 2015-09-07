@@ -2805,77 +2805,20 @@
 <!-- ********** Default configuration ******************** -->	
 <!-- ********** Default configuration ******************** -->	
 	<vehicle>
-		<configFile xmlName="default50"/>
-		<configFile xmlName="default55"/>
-		<configFile xmlName="default60"/>
+		<configFile xmlName="default"/>
 
 		<gearboxMogli>
 			<hydrostatic>
-        <efficiency ratio="0.0172" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
+        <efficiency ratio="0.0001" factor="0.9"/> 
+        <efficiency ratio="1" factor="1"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
+			<gears>	
+				<gear speed="60" name=""/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>	
 	</vehicle>
 
-	<vehicle>
-		<configFile xmlName="default45"/>
-		
-		<gearboxMogli swapGearRangeKeys="true">
-			<blowOffVentilSound volume="0"/>
-
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
-				<gear speed="29.15" name="S"/>
-				<gear speed="34.95" name="L"/>
-				<gear speed="41.83" name="M"/>
-				<gear speed="50.00" name="H"/>
-			</gears>
-
-			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
-				<range ratio="0.1096" name="1" />
-				<range ratio="0.1972" name="2" />
-				<range ratio="0.3164" name="3" />
-				<range ratio="0.4766" name="4" />
-				<range ratio="0.6554" name="5" />
-				<range ratio="1"      name="6" />
-			</ranges>
-
-			<reverse ratio="1" shiftTimeMs="500" clutchRatio="1" resetRange="false" resetGear="false"/>
-		</gearboxMogli>		
-	</vehicle>
-	
-	<vehicle>
-		<configFile xmlName="default40"/>
-		
-		<gearboxMogli>
-			<blowOffVentilSound volume="0"/>
-			
-			<gears defaultGear="3">
-				<gear speed="10.125"  />
-				<gear speed="14.46"  />
-				<gear speed="20.72"/>
-				<gear speed="28.96"/>
-				<gear speed="40.28"/>
-			</gears>
-
-			<ranges defaultRange="3">
-				<range ratio="0.029" name="L"/>
-				<range ratio="0.182" name="M"/>
-				<range ratio="1"     name="H"/>
-			</ranges>
-		</gearboxMogli>
-	</vehicle>
-	
 
 <!-- ********** Combines ******************** -->	
 <!-- ********** Combines ******************** -->	
@@ -3232,4 +3175,117 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+	<vehicle>
+		<configFile modName="ClaasLexion400" xmlName="claasLexion430.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+			<combine defaultWidth="6.0" availableThreshingPower="200"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0"/><!-- 2200: 240 | 2200: 240 | 1600..1600: 960 | 0.93 | 0.9 -->
+        <torque rpm="700" motorTorque="849"/>
+        <torque rpm="800" motorTorque="872"/>
+        <torque rpm="900" motorTorque="893"/>
+        <torque rpm="1000" motorTorque="911"/>
+        <torque rpm="1100" motorTorque="926"/>
+        <torque rpm="1200" motorTorque="938"/>
+        <torque rpm="1300" motorTorque="948"/>
+        <torque rpm="1400" motorTorque="955"/>
+        <torque rpm="1500" motorTorque="959"/>
+        <torque rpm="1600" motorTorque="960"/>
+        <torque rpm="1700" motorTorque="930"/>
+        <torque rpm="1800" motorTorque="900"/>
+        <torque rpm="1900" motorTorque="868"/>
+        <torque rpm="2000" motorTorque="835"/>
+        <torque rpm="2100" motorTorque="801"/>
+        <torque rpm="2200" motorTorque="766"/>
+        <torque rpm="2300" motorTorque="681"/>
+        <torque rpm="2400" motorTorque="426"/>
+        <torque rpm="2500" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="ClaasLexion400" xmlName="claasLexion460.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+			<combine defaultWidth="7.5" availableThreshingPower="240"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0"/><!-- 2200: 300 | 2200: 300 | 1600..1600: 1200 | 0.93 | 0.9 -->
+        <torque rpm="700" motorTorque="1061"/>
+        <torque rpm="800" motorTorque="1090"/>
+        <torque rpm="900" motorTorque="1116"/>
+        <torque rpm="1000" motorTorque="1138"/>
+        <torque rpm="1100" motorTorque="1157"/>
+        <torque rpm="1200" motorTorque="1173"/>
+        <torque rpm="1300" motorTorque="1185"/>
+        <torque rpm="1400" motorTorque="1193"/>
+        <torque rpm="1500" motorTorque="1198"/>
+        <torque rpm="1600" motorTorque="1200"/>
+        <torque rpm="1700" motorTorque="1163"/>
+        <torque rpm="1800" motorTorque="1125"/>
+        <torque rpm="1900" motorTorque="1085"/>
+        <torque rpm="2000" motorTorque="1044"/>
+        <torque rpm="2100" motorTorque="1001"/>
+        <torque rpm="2200" motorTorque="958"/>
+        <torque rpm="2300" motorTorque="851"/>
+        <torque rpm="2400" motorTorque="532"/>
+        <torque rpm="2500" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+
+	<vehicle>
+		<configFile modName="KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+			<combine defaultWidth="7.5" defaultSpeed="10" dynamicRatio="0.7"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="17.5" />
+				<gear name="street" speed="35"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		</gearboxMogli>
+	</vehicle> 
+
 </vehicles>

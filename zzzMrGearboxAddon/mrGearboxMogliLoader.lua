@@ -27,6 +27,7 @@ for _,funcName in pairs({ "delete",
 													"loadFromAttributesAndNodes",
 													"onLeave",
 													"onEnter",
+													"addCutterArea",
 													"deleteMap" }) do
 	if  mrGearboxMogli  ~= nil and mrGearboxMogli[funcName] ~= nil and type(mrGearboxMogli[funcName])  == "function" then
 		mrGearboxMogliLoader[funcName] = function( self, ... )
@@ -134,7 +135,8 @@ function mrGearboxMogliLoader.initXmlFiles()
 					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
 				end
 				
-				if      string.len( entry.configFileName )       == 9
+				if      ( string.len( entry.configFileName )     == 7 
+							 or string.len( entry.configFileName )     == 9 )
 						and string.sub( entry.configFileName, 1, 7 ) == "default" then
 					mrGearboxMogliLoader.defaultConfigI[entry.configFileName] = entry
 				elseif entry.configFileName ~= nil then
@@ -313,8 +315,9 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	
 	-- default config 
 	if SpecializationUtil.hasSpecialization(AITractor, self.specializations) then
-		local speed = 5 * math.floor( self.motor.maxForwardSpeed * 0.72 )
-		local defaultConfigName = string.format( "default%2d", speed )
+	--local speed = 5 * math.floor( self.motor.maxForwardSpeed * 0.72 )
+	--local defaultConfigName = string.format( "default%2d", speed )
+		local defaultConfigName = "default"
 		
 		xmlFile = mrGearboxMogliLoader.xmlFileExt
 		entry   = mrGearboxMogliLoader.defaultConfigE[defaultConfigName]		
