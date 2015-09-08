@@ -135,12 +135,13 @@ function mrGearboxMogliLoader.initXmlFiles()
 					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
 				end
 				
-				if      ( string.len( entry.configFileName )     == 7 
-							 or string.len( entry.configFileName )     == 9 )
+				if      string.len( entry.configFileName ) >= 7 
+						and string.len( entry.configFileName ) <= 9
 						and string.sub( entry.configFileName, 1, 7 ) == "default" then
+				--print(string.format( "zzzMrGearboxAddon: found default configuration (%s)", entry.configFileName ))				
 					mrGearboxMogliLoader.defaultConfigI[entry.configFileName] = entry
 				elseif entry.configFileName ~= nil then
-					--print(string.format( "zzzMrGearboxAddon: found configuration for %s", entry.configFileName ))				
+				--print(string.format( "zzzMrGearboxAddon: found configuration for %s", entry.configFileName ))				
 					entry.configFileName = string.lower( entry.configFileName )
 					mrGearboxMogliLoader.configInt[entry.configFileName] = entry
 				end
@@ -314,16 +315,20 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 	end
 	
 	-- default config 
-	if SpecializationUtil.hasSpecialization(AITractor, self.specializations) then
+	if     SpecializationUtil.hasSpecialization(AITractor, self.specializations)
+			or ( SpecializationUtil.hasSpecialization(Steerable, self.specializations)
+			 and not SpecializationUtil.hasSpecialization(Combine, self.specializations) ) then
 	--local speed = 5 * math.floor( self.motor.maxForwardSpeed * 0.72 )
 	--local defaultConfigName = string.format( "default%2d", speed )
 		local defaultConfigName = "default"
+		
+		print("zzzMrGearboxAddon: looking for default configuration ("..defaultConfigName..")")
 		
 		xmlFile = mrGearboxMogliLoader.xmlFileExt
 		entry   = mrGearboxMogliLoader.defaultConfigE[defaultConfigName]		
 		if      entry ~= nil
 				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
-			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
+			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
 			if state and message then
 				print(string.format( "zzzMrGearboxAddon: %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
 				return true
@@ -352,7 +357,7 @@ end
 
 
 function mrGearboxMogliLoader:loadGearboxMogli( xmlFile )
-	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, xmlFile, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio" )
+	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, xmlFile, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio", ".gearboxMogli.hydrostatic.efficiency#ratio" )
 end
 
 function mrGearboxMogliLoader:loadGearboxMogli2( xmlFile, baseName, xmlSource )	

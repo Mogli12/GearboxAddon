@@ -2807,14 +2807,13 @@
 	<vehicle>
 		<configFile xmlName="default"/>
 
-		<gearboxMogli>
+		<gearboxMogli disableManual="true" speedLimiter="true" autoStartStop="true" enableAI="true">
 			<hydrostatic>
         <efficiency ratio="0.0001" factor="0.9"/> 
-        <efficiency ratio="1" factor="1"/>
+        <efficiency ratio="0.8" factor="1"/>
+        <efficiency ratio="1" factor="0.9"/>
 			</hydrostatic>
-			<gears>	
-				<gear speed="60" name=""/>
-			</gears>
+			<gears/>	
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>	
 	</vehicle>

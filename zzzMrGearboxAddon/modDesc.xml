@@ -83,7 +83,7 @@
 		<input name="mrGearboxMogliAllAuto"      	  key1="KEY_comma" 					     category="VEHICLE" />
 		<input name="mrGearboxMogliREVERSE" 		    key1="KEY_space"           button="BUTTON_2" category="VEHICLE" />
 		<input name="mrGearboxMogliECO" 	    			key1="KEY_rshift KEY_space"  			 category="VEHICLE" />
-		<input name="mrGearboxMogliKEEPSPEED" 	 		key1="KEY_ralt"  			 category="VEHICLE" />
+		<input name="mrGearboxMogliKEEPSPEED" 	 		key1="KEY_delete" category="VEHICLE" />
 		<input name="mrGearboxMogliAUTOCLUTCH2"     key1="KEY_rshift KEY_period"  		 category="VEHICLE" />
 		<input name="mrGearboxMogliSHIFTRANGE2UP"   key1="KEY_rshift KEY_rightbracket"  category="VEHICLE" />
 		<input name="mrGearboxMogliSHIFTRANGE2DOWN" key1="KEY_rshift KEY_backslash"     category="VEHICLE" />

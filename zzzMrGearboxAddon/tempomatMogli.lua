@@ -62,15 +62,15 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	--**********************************************************************************************************	
 	-- tempomatMogli:newUpdateVehiclePhysics
 	--**********************************************************************************************************	
-	function tempomatMogli:newUpdateVehiclePhysics( superFunc, ... )
+	function tempomatMogli:newUpdateVehiclePhysics( superFunc, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		if self.tempomatMogli == nil then
-			return superFunc( self, ... )
+			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		end
 		
 		local tempState = self.cruiseControl.state
 		local tempSpeed = self.cruiseControl.speed
 		
-		if self.tempomatMogli.KeepSpeed then
+		if self.tempomatMogli.KeepSpeed and math.abs( axisForward ) < 0.1 then
 			if self.tempomatMogli.keepSpeedLimit == nil then
 				self.tempomatMogli.keepSpeedLimit = math.max( 2, self.lastSpeedReal*3600 )
 			end
@@ -80,7 +80,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			self.tempomatMogli.keepSpeedLimit = nil		
 		end
 		
-		superFunc( self, ... )
+		superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		
 		self.cruiseControl.state = tempState
 		self.cruiseControl.speed = tempSpeed
