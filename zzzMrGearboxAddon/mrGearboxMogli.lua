@@ -560,7 +560,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.RealMotorBrakeFx        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#motorBrakeFx"), self.motor.lowBrakeForceScale ) --0.1 )
 	self.mrGbMS.GlobalRatioFactor       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#globalRatioFactor"), 1.025 )
 
-	local revUpMs                       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  1600 ) 
+	local revUpMs                       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  4000 ) 
 	local revDownMs                     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revDownMs"),0.5*revUpMs ) 
 	self.mrGbMS.RpmIncFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / revUpMs
 	self.mrGbMS.RpmDecFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / revDownMs
@@ -572,12 +572,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 	self.mrGbMS.IdlePitchFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idlePitchFactor"), -1 )
 	self.mrGbMS.IdlePitchMax            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idlePitchMax"), -1 )
-	self.mrGbMS.IdleVolumeFactor        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactor"), 0.8 )
-	self.mrGbMS.IdleVolumeFactorInc     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactorInc"), 1.2 )
+	self.mrGbMS.IdleVolumeFactor        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactor"), 0.5 )
+	self.mrGbMS.IdleVolumeFactorInc     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactorInc"), 1.5 )
 	self.mrGbMS.RunPitchFactor          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runPitchFactor"), -1 )
 	self.mrGbMS.RunPitchMax             = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runPitchMax"), -1 )
-	self.mrGbMS.RunVolumeFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactor"), 0.8 )	
-	self.mrGbMS.RunVolumeFactorInc      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactorInc"), 1.2 )	
+	self.mrGbMS.RunVolumeFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactor"), 0.5 )	
+	self.mrGbMS.RunVolumeFactorInc      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactorInc"), 1.5 )	
 	self.mrGbMS.Run2PitchEffect         = getXMLFloat(xmlFile, xmlString .. "#run2PitchEffect" )
 		
 	if xmlSource == "vehicle" then
@@ -966,6 +966,9 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	else
 		self.mrGbMS.EnableAI = "N"
 	end	
+	
+	self.mrGbMS.MaxAIGear   = getXMLInt(xmlFile, xmlString .. "#maxAIGear")
+	self.mrGbMS.MaxAIRange  = getXMLInt(xmlFile, xmlString .. "#maxAIRange")
 
 	local defaultLimitRpmMode = mrGearboxMogli.limitRpmMode
 	if defaultLimitRpmMode ~= "M" then
@@ -1731,32 +1734,44 @@ function mrGearboxMogli:updateTick(dt)
 						or ( self.mrGbMS.EnableAI == "A" and self:mrGbMGetAutomatic() )
 						or self.mrGbMS.AllAuto then
 					self:mrGbMSetState( "IsOn", true ) 
+				
+				--if self.mrGbMS.IsOn and self.mrGbMS.EnableAI ~= "Y" then				
+				--	if not ( self:mrGbMGetAutomatic() ) then
+				--		self.mrGbML.aiAutomatic = true
+				--		self:mrGbMSetState( "Automatic", true )
+				--	end
+				--end
+								
+					if not ( self.mrGbML.aiControlled ) then
+						self.mrGbML.aiControlled = true
+						self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear ) 
+						self:mrGbMSetState( "DefaultRange", self.mrGbMS.CurrentRange ) 
+						self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2 ) 
+						
+						if self:mrGbMGetAutomatic() then
+							mrGearboxMogli.setLaunchGear( self )
+						else
+							if self.mrGbMS.MaxAIRange ~= nil and self.mrGbMS.MaxAIRange < self.mrGbMS.CurrentRange then
+								self:mrGbMSetCurrentRange( self.mrGbMS.MaxAIRange ) 	
+							end
+							if self.mrGbMS.MaxAIGear  ~= nil and self.mrGbMS.MaxAIGear  < self.mrGbMS.CurrentGear  then
+								self:mrGbMSetCurrentGear( self.mrGbMS.MaxAIGear ) 	
+							end
+						end
+						
+					elseif self.mrGbML.gearShiftingNeeded == 0 then
+						if self.mrGbMS.ReverseActive then
+							self.mrGbML.aiGearR  = self.mrGbMS.CurrentGear
+							self.mrGbML.aiRangeR = self.mrGbMS.CurrentGear
+						else
+							self.mrGbML.aiGearF  = self.mrGbMS.CurrentGear
+							self.mrGbML.aiRangeF = self.mrGbMS.CurrentGear
+						end
+					end
 				else
 					self:mrGbMSetState( "IsOn", false ) 	
 				end
-				
-			--if self.mrGbMS.IsOn and self.mrGbMS.EnableAI ~= "Y" then				
-			--	if not ( self:mrGbMGetAutomatic() ) then
-			--		self.mrGbML.aiAutomatic = true
-			--		self:mrGbMSetState( "Automatic", true )
-			--	end
-			--end
-								
-				if not ( self.mrGbML.aiControlled ) then
-					self.mrGbML.aiControlled = true
-					self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear ) 
-					self:mrGbMSetState( "DefaultRange", self.mrGbMS.CurrentRange ) 
-					self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2 ) 
-					mrGearboxMogli.setLaunchGear( self )
-				elseif self.mrGbML.gearShiftingNeeded == 0 then
-					if self.mrGbMS.ReverseActive then
-						self.mrGbML.aiGearR  = self.mrGbMS.CurrentGear
-						self.mrGbML.aiRangeR = self.mrGbMS.CurrentGear
-					else
-						self.mrGbML.aiGearF  = self.mrGbMS.CurrentGear
-						self.mrGbML.aiRangeF = self.mrGbMS.CurrentGear
-					end
-				end
+
 			elseif self.mrGbML.aiControlled then
 				self.mrGbML.aiControlled = false
 				self:mrGbMSetState( "AutoStartStop", self.mrGbMS.AutoStartStopBackup )

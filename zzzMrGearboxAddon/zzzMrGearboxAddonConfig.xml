@@ -2825,7 +2825,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="4.2"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2849,7 +2849,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="5.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2874,7 +2874,7 @@
 	<vehicle>
 		<configFile modName="CaseIH_CT5060" xmlName="CaseIH_CT5060.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="6.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2898,7 +2898,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2923,7 +2923,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH9230Crawler.xml" />
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
 		
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="13.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2948,7 +2948,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="10.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="1000"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2992,7 +2992,7 @@
 	<vehicle>
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="9.0" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="780"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3038,7 +3038,7 @@
 	<vehicle>
 		<configFile modName="FS15_claasLexion550" xmlName="Lexion550.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3061,7 +3061,7 @@
 	<vehicle>
 		<configFile modName="FS15_claasLexion550" xmlName="Lexion560.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3085,7 +3085,7 @@
 		<configFile modName="MB3D_ClaasJaguar870" isPrefix="true" xmlName="Jaguar870.xml" />
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="570"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3130,7 +3130,7 @@
 		<!-- http://www.modhoster.de/mods/new-holland-tf78%2D%2D7 -->
 		<configFile modName="FS15_NewHollandTF78" xmlName="NHTF78.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3176,7 +3176,7 @@
 	
 	<vehicle>
 		<configFile modName="ClaasLexion400" xmlName="claasLexion430.xml"/>
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="6.0" availableThreshingPower="200"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3221,7 +3221,7 @@
 	
 	<vehicle>
 		<configFile modName="ClaasLexion400" xmlName="claasLexion460.xml"/>
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5" availableThreshingPower="240"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3267,7 +3267,7 @@
 	<vehicle>
 		<configFile modName="KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5" defaultSpeed="10" dynamicRatio="0.7"/>
 			<blowOffVentilSound volume="0"/>
 			
