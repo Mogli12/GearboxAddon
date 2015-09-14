@@ -2837,10 +2837,11 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
-				<gear name="I"   speed="5" />
-				<gear name="II"  speed="9"/>
-				<gear name="III" speed="20"/>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
+				<gear name="I"   speed="5"  forwardOnly="true"/>
+				<gear name="II"  speed="9"  forwardOnly="true"/>
+				<gear name="III" speed="20" forwardOnly="true"/>
+				<gear name="R"   speed="12" reverseOnly="true"/>
 			</gears>
 			<reverse ratio="0.8" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -2861,10 +2862,11 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
-				<gear name="I"   speed="5" />
-				<gear name="II"  speed="9"/>
-				<gear name="III" speed="16"/>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
+				<gear name="I"   speed="5"  forwardOnly="true"/>
+				<gear name="II"  speed="9"  forwardOnly="true"/>
+				<gear name="III" speed="16" forwardOnly="true"/>
+				<gear name="R"   speed="12" reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -2886,10 +2888,11 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1500">
-				<gear name="I"   speed="5" />
-				<gear name="II"  speed="9"/>
-				<gear name="III" speed="16"/>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
+				<gear name="I"   speed="5"  forwardOnly="true"/>
+				<gear name="II"  speed="9"  forwardOnly="true"/>
+				<gear name="III" speed="16" forwardOnly="true"/>
+				<gear name="R"   speed="12" reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -2935,11 +2938,12 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
-				<gear name="1" speed="5" />
-				<gear name="2" speed="10" />
-				<gear name="3" speed="22"/>
-				<gear name="4" speed="45"/>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2" reverseReset="true">	
+				<gear name="1" speed="5"    forwardOnly="true"/>
+				<gear name="2" speed="10"   forwardOnly="true"/>
+				<gear name="3" speed="22"   forwardOnly="true"/>
+				<gear name="4" speed="44.5" forwardOnly="true"/>
+				<gear name="R" speed="10"   reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -3004,11 +3008,12 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
-				<gear name="1" speed="5" />
-				<gear name="2" speed="10" />
-				<gear name="3" speed="22"/>
-				<gear name="4" speed="44.5"/>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2" reverseReset="true">	
+				<gear name="1" speed="5"    forwardOnly="true"/>
+				<gear name="2" speed="10"   forwardOnly="true"/>
+				<gear name="3" speed="22"   forwardOnly="true"/>
+				<gear name="4" speed="44.5" forwardOnly="true"/>
+				<gear name="R" speed="10"   reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		
@@ -3086,7 +3091,7 @@
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="570"/>
+			<combine defaultWidth="7.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="570" minRpm="1750" maxRpm="1850"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3142,11 +3147,12 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="3" reverseReset="false" shiftTimeMs="1500">
-				<gear name="I"   speed="5" />
-				<gear name="II"  speed="8"/>
-				<gear name="III" speed="13"/>
-				<gear name="IV"  speed="20"/>
+			<gears defaultGear="3" reverseReset="true" shiftTimeMs="1500">
+				<gear name="I"   speed="5"  forwardOnly="true"/>
+				<gear name="II"  speed="8"  forwardOnly="true"/>
+				<gear name="III" speed="13" forwardOnly="true"/>
+				<gear name="IV"  speed="20" forwardOnly="true"/>
+				<gear name="R"   speed="13" reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
