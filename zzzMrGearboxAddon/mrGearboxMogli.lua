@@ -267,6 +267,20 @@ function mrGearboxMogli:initClient()
 	self.mrGbML.currentCuttersArea   = 0
 	self.mrGbML.lastCuttersArea      = 0
 	
+	if mrGearboxMogli.ovArrowUpWhite == nil then
+		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth;
+		local h = w * g_screenAspectRatio;
+		local x = g_currentMission.speedHud.x - w * 0.25
+		local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
+		
+		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename("arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename("arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownWhite = Overlay:new("ovArrowDownWhite", Utils.getFilename("arrow_down_white.dds", mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename("arrow_down_gray.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename("hand_brake_up.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename("hand_brake_down.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+	end
+	
 	self.mrGbMD.Rpm        = 0 
 	self.mrGbMD.lastRpm    = 0 
 	self.mrGbMD.Clutch     = 0 
@@ -1259,6 +1273,9 @@ function mrGearboxMogli:update(dt)
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_VARIO", "CVT" )
 		elseif self.mrGbMS.AllAuto then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_ALLAUTO", "all auto" )
+			if not ( self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftGears ) then
+				text2 = "A"
+			end
 		elseif self:mrGbMGetAutomatic() then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_AUTO", "auto" )
 		elseif self.mrGbMS.G27Mode == 1 then
@@ -1736,9 +1753,23 @@ function mrGearboxMogli:update(dt)
 	self.mrGbML.currentCuttersArea = 0
 end 
 
-
+--**********************************************************************************************************	
+-- mrGearboxMogli:addCutterArea
+--**********************************************************************************************************	
 function mrGearboxMogli:addCutterArea( cutter, area, realArea, inputFruitType, fruitType )
 	self.mrGbML.currentCuttersArea = self.mrGbML.currentCuttersArea + area
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:setIsReverseDriving
+--**********************************************************************************************************	
+function mrGearboxMogli:setIsReverseDriving( isReverseDriving, noEventSend )
+	if      self.isServer 
+			and self.mrGbMS ~= nil
+			and self.mrGbMS.IsOn
+			then
+		self:mrGbMSetReverseActive( not self.mrGbMS.ReverseActive ) 
+	end
 end
 
 --**********************************************************************************************************	
@@ -2155,26 +2186,54 @@ function mrGearboxMogli:draw()
 			
 		setTextAlignment(RenderText.ALIGN_LEFT) 
 		setTextBold(false)
+		
+		local revShow = self.mrGbMS.ReverseActive
+		if self.isReverseDriving then
+			revShow = not revShow
+		end
 			
-		if     self.mrGbMS.NeutralActive then
-			if self:mrGbMGetAutomatic() then
-				text = "P"
+		if not ( self:mrGbMGetNeutralActive() ) then
+			if revShow then
+				mrGearboxMogli.ovArrowDownWhite:render()
 			else
-				text = "N"
+				mrGearboxMogli.ovArrowUpWhite:render()
 			end
-		elseif self.mrGbMS.ReverseActive then
-			text = "R"
+		elseif self:mrGbMGetAutoStartStop() then
+			if revShow then
+				mrGearboxMogli.ovArrowDownGray:render()
+			else
+				mrGearboxMogli.ovArrowUpGray:render()
+			end
 		else
-			text = "F"
+			if revShow then
+				mrGearboxMogli.ovHandBrakeDown:render()
+			else
+				mrGearboxMogli.ovHandBrakeUp:render()
+			end
 		end
 		
-		local w = math.floor(0.0095 * g_screenWidth) / g_screenWidth
-		local x = g_currentMission.speedHud.x - 0.25*w
-		local t = g_currentMission.speedUnitTextSize*2
-		local d = 0.25*t
-    local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - d
-		setTextAlignment(RenderText.ALIGN_LEFT) 
-		renderText( x, y, t, text )
+		--if     self.mrGbMS.NeutralActive then
+		--	if self:mrGbMGetAutomatic() then
+		--		text = "P"
+		--	else
+		--		text = "N"
+		--	end
+		--	if self.mrGbMS.ReverseActive then
+		--		text = text .. "R"
+		--	end
+		--elseif self.mrGbMS.ReverseActive then
+		--	text = "R"
+		--else
+		--	text = "F"
+		--end
+		--
+		--local w = math.floor(0.0095 * g_screenWidth) / g_screenWidth
+		--local x = g_currentMission.speedHud.x - 0.25*w
+		--local t = g_currentMission.speedUnitTextSize*2
+		--local d = 0.25*t
+    --local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - d
+		--setTextAlignment(RenderText.ALIGN_LEFT) 
+		--renderText( x, y, t, text )
 			
 	else
 		if InputBinding.mrGearboxMogliON_OFF ~= nil then

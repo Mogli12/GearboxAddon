@@ -69,7 +69,7 @@
 		<text name="mrGearboxMogliTEXT_MANUAL"> <de>Manuell</de>    <en>manual</en></text>
 		<text name="mrGearboxMogliTEXT_NOGEAR"> <de>Kein Gang</de>  <en>no gear</en></text>
 		<text name="mrGearboxMogliTEXT_VARIO">  <de>Stufenlos</de>  <en>CVT</en></text>
-		<text name="mrGearboxMogliTEXT_ALLAUTO"><de>All Auto</de>   <en>all auto</en></text>
+		<text name="mrGearboxMogliTEXT_ALLAUTO"><de>Vereinfacht</de><en>simple</en></text>
 		<text name="mrGearboxMogliTEXT_ECO">    <de>Eco</de>   			<en>eco</en></text>
 	</l10n>
 	<inputBindings>		

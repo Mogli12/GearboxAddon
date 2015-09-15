@@ -28,7 +28,8 @@ for _,funcName in pairs({ "delete",
 													"onLeave",
 													"onEnter",
 													"addCutterArea",
-													"deleteMap" }) do
+													"deleteMap",
+													"setIsReverseDriving" }) do
 	if  mrGearboxMogli  ~= nil and mrGearboxMogli[funcName] ~= nil and type(mrGearboxMogli[funcName])  == "function" then
 		mrGearboxMogliLoader[funcName] = function( self, ... )
 			if type(self)=="table" and self.mrGbMLGearbox1 then
