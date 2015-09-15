@@ -378,6 +378,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
+	self.mrGbMS.MinTragetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.8 * self.mrGbMS.IdleRpm + 0.2 * self.mrGbMS.RatedRpm )
 	
 --**************************************************************************************************	
 --**************************************************************************************************	
@@ -470,14 +471,17 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
 	end
 	
-	self.mrGbMS.MaxPtoTorqueRatio       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatio" ), 0.8 ) 
-	self.mrGbMS.MaxPtoTorqueRatioInc    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatioInc" ), ( 1-self.mrGbMS.MaxPtoTorqueRatio ) * 0.1 ) 
+	local maxPtoTorqueRatio = 0.8
+	local maxPtoTorqueSpeed = 7
 	
 --**************************************************************************************************	
 -- combine
 --**************************************************************************************************		
 	if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
 		self.mrGbMS.IsCombine                    = true
+		
+		maxPtoTorqueRatio = 0.9
+		maxPtoTorqueSpeed = 3
 		
 		local width  = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
 		local factor = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultLiterPerSqm"), 1.2 )
@@ -517,6 +521,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.ChopperPowerConsumptionInc   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#chopperPowerConsumptionInc")  , dci ) * g_currentMission:getFruitPixelsToSqm()
   end
 	
+--**************************************************************************************************	
+-- reduce PTO torque at low speed
+--**************************************************************************************************		
+	self.mrGbMS.MaxPtoTorqueRatio       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatio" ), maxPtoTorqueRatio ) 
+	self.mrGbMS.MaxPtoTorqueRatioInc    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#maxPtoTorqueRatioInc" ), ( 1-self.mrGbMS.MaxPtoTorqueRatio ) / maxPtoTorqueSpeed ) 
+
 --**************************************************************************************************	
 --**************************************************************************************************		
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), 0 ) -- no automatic opening of clutch by default!!!
@@ -1780,7 +1790,10 @@ function mrGearboxMogli:onLeave()
 		return
 	end
 
-	if self.steeringEnabled and self.mrGbMS.IsOn and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
+	if      self.steeringEnabled 
+			and self.mrGbMS.IsOn 
+			and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_OFF
+			and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 		self:mrGbMSetNeutralActive( true, false, true )
 	end
 end
@@ -4547,7 +4560,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.targetRpm1 = self.targetRpm1 + mrGearboxMogli.smooth1 * ( targetRpm - self.targetRpm1 )		
 		self.targetRpm2 = self.targetRpm2 + mrGearboxMogli.smooth2 * ( targetRpm - self.targetRpm2 )		
 		self.targetRpm  = math.max( self.targetRpm1, self.targetRpm2 )		
-  end			
+  end		
+	
+	if self.targetRpm < self.vehicle.mrGbMS.MinTragetRpm then
+		self.targetRpm = self.vehicle.mrGbMS.MinTragetRpm
+	end
 	
 	-- clutch calculations...
 	local clutchMode = 0 -- no clutch calculation

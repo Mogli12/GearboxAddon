@@ -88,8 +88,23 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		return 
 	end
 	
-	Drivable.updateVehiclePhysics = Utils.overwrittenFunction( Drivable.updateVehiclePhysics, tempomatMogli.newUpdateVehiclePhysics )
+	function tempomatMogli:newDrivableOnLeave( superFunc )
+		local oldFunc
+		
+		if not ( self.deactivateOnLeave ) and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then
+			oldFunc = self.setCruiseControlState
+			self.setCruiseControlState = function (self, state, noEventSend) end
+		end
+		
+		superFunc( self )
+		
+		if oldFunc ~= nil then
+			self.setCruiseControlState = oldFunc
+		end
+	end
 	
+	Drivable.updateVehiclePhysics = Utils.overwrittenFunction( Drivable.updateVehiclePhysics, tempomatMogli.newUpdateVehiclePhysics )
+	Drivable.onLeave              = Utils.overwrittenFunction( Drivable.onLeave,              tempomatMogli.newDrivableOnLeave )  
 	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSetSpeedLimit
 	--**********************************************************************************************************	
