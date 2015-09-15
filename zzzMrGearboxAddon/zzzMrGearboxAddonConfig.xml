@@ -2136,6 +2136,52 @@
 		</gearboxMogli>			
 	</vehicle>
 
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-axion-850%2D%2D88 -->
+		<configFile modName="CZMOD_CLAAS_Axion_850" xmlName="claas1.xml"/>
+
+		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
+		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1524">>
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="3" reverseReset="false" automatic="true">	
+				<gear speed="22.5"/>
+				<gear speed="27"/>
+				<gear speed="32"/>
+				<gear speed="38.5"/>
+				<gear speed="48"/>
+				<gear speed="55"/>
+			</gears>
+			<ranges shiftTimeMs="600" clutchRatio="0.7" defaultRange="3" reverseReset="false" automatic="true">	
+				<range ratio="0.073" name="A" upGearOffset="-5" downGearOffset="0"/>
+				<range ratio="0.2"   name="B" upGearOffset="-3" downGearOffset="5"/>
+				<range ratio="0.381" name="C" upGearOffset="-5" downGearOffset="3"/>
+				<range ratio="1"     name="D" upGearOffset="0"  downGearOffset="5"/>
+			</ranges>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="800" ratedRpm="2150">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="220"/><!-- 1800: 264 | 2150: 250 | 1400..1400: 1132 | 0.75 | 0 -->
+        <torque rpm="700" motorTorque="747" fuelUsageRatio="220"/>
+        <torque rpm="800" motorTorque="849" fuelUsageRatio="220"/>
+        <torque rpm="900" motorTorque="935" fuelUsageRatio="218"/>
+        <torque rpm="1000" motorTorque="1006" fuelUsageRatio="216"/>
+        <torque rpm="1100" motorTorque="1061" fuelUsageRatio="214"/>
+        <torque rpm="1200" motorTorque="1101" fuelUsageRatio="213"/>
+        <torque rpm="1300" motorTorque="1124" fuelUsageRatio="212"/>
+        <torque rpm="1400" motorTorque="1132" fuelUsageRatio="212"/>
+        <torque rpm="1500" motorTorque="1126" fuelUsageRatio="212"/>
+        <torque rpm="1600" motorTorque="1106" fuelUsageRatio="213"/>
+        <torque rpm="1700" motorTorque="1075" fuelUsageRatio="214"/>
+        <torque rpm="1800" motorTorque="1030" fuelUsageRatio="216"/>
+        <torque rpm="1900" motorTorque="971" fuelUsageRatio="218"/>
+        <torque rpm="2000" motorTorque="911" fuelUsageRatio="221"/>
+        <torque rpm="2100" motorTorque="848" fuelUsageRatio="224"/>
+        <torque rpm="2200" motorTorque="765" fuelUsageRatio="230"/>
+        <torque rpm="2300" motorTorque="357" fuelUsageRatio="321"/>
+        <torque rpm="2400" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>			
+		</gearboxMogli>	
+	</vehicle>
+	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
