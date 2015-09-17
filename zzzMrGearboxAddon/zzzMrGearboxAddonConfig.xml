@@ -2731,7 +2731,7 @@
 			</hydrostatic>
 		
 			<gears defaultGear="2" reverseReset="true" clutchRatio="1" shiftTimeMs="1000">	
-				<gear name="heavy duty" speed="29" />
+				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
 			<reverse ratio="0.714" shiftTimeMs="0" />
@@ -2774,7 +2774,7 @@
 			</hydrostatic>
 		
 			<gears defaultGear="2" reverseReset="true" clutchRatio="1" shiftTimeMs="1000">	
-				<gear name="heavy duty" speed="29" />
+				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
 			<reverse ratio="0.714" shiftTimeMs="0" />
@@ -2820,7 +2820,7 @@
 			</hydrostatic>
 		
 			<gears defaultGear="2" reverseReset="true" clutchRatio="1" shiftTimeMs="1000">	
-				<gear name="heavy duty" speed="29" />
+				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
 			<reverse ratio="0.714" shiftTimeMs="0" />
@@ -2856,9 +2856,13 @@
 		
 		<!-- MAN D2676 engine => http://www.engines.man.eu/global/en/off-road/construction-agricultural-and-special-machinery/overview/Overview.html -->
 		<!-- http://youtu.be/FOg5EbLVqDU -->
+		<!-- http://www.deag.ch/assets/contentfiles/downloads/man-uebers-Fahrzeug.pdf -->
+		<!-- https://youtu.be/ojRzfKwCxTY -->
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpm="1577">
+			<blowOffVentilSound volume="0"/>
+			
 			<hydrostatic>
-        <efficiency ratio="0.003276" factor="0.7"/> 0.05 km/h @ 1000 rpm
+        <efficiency ratio="0.004945" factor="0.7"/> 0.05 km/h @ 800 rpm
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -2866,27 +2870,30 @@
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears defaultGear="2" reverseReset="true" clutchRatio="1" shiftTimeMs="1000">	
-				<gear name="heavy duty" speed="29" />
-				<gear name="transport"  speed="50"/>
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+				<gear name="" speed="22.75"/>
+				<gear name="" speed="53"/>
 			</gears>
 			<reverse ratio="0.714" shiftTimeMs="0" />
 
-			<realEngine idleRpm="1000" ratedRpm="1900">		
-				<torque rpm="900" motorTorque="2375"/>
-				<torque rpm="1000" motorTorque="2500"/>
-				<torque rpm="1100" motorTorque="2500"/>
-				<torque rpm="1200" motorTorque="2500"/>
-				<torque rpm="1300" motorTorque="2500"/>
-				<torque rpm="1400" motorTorque="2438"/>
-				<torque rpm="1500" motorTorque="2314"/>
-				<torque rpm="1600" motorTorque="2190"/>
-				<torque rpm="1700" motorTorque="2065"/>
-				<torque rpm="1800" motorTorque="1951"/>
-				<torque rpm="1900" motorTorque="1848"/>
-				<torque rpm="2000" motorTorque="1643"/>
-				<torque rpm="2100" motorTorque="1027"/>
-				<torque rpm="2200" motorTorque="0"/>
+			<realEngine idleRpm="800" ratedRpm="1800">		
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="204"/><!-- 1800: 500 | 1800: 500 | 1100..1400: 2400 | 0.75 | 1 -->
+        <torque rpm="700" motorTorque="1333" fuelUsageRatio="204"/>
+        <torque rpm="800" motorTorque="1800" fuelUsageRatio="204"/>
+        <torque rpm="900" motorTorque="2133" fuelUsageRatio="200"/>
+        <torque rpm="1000" motorTorque="2333" fuelUsageRatio="197"/>
+        <torque rpm="1100" motorTorque="2400" fuelUsageRatio="195"/>
+        <torque rpm="1200" motorTorque="2400" fuelUsageRatio="194"/>
+        <torque rpm="1300" motorTorque="2400" fuelUsageRatio="194"/>
+        <torque rpm="1400" motorTorque="2400" fuelUsageRatio="196"/>
+        <torque rpm="1500" motorTorque="2288" fuelUsageRatio="198"/>
+        <torque rpm="1600" motorTorque="2175" fuelUsageRatio="203"/>
+        <torque rpm="1700" motorTorque="2063" fuelUsageRatio="208"/>
+        <torque rpm="1800" motorTorque="1951" fuelUsageRatio="215"/>
+        <torque rpm="1900" motorTorque="1791" fuelUsageRatio="233"/>
+        <torque rpm="2000" motorTorque="1314" fuelUsageRatio="285"/>
+        <torque rpm="2100" motorTorque="517" fuelUsageRatio="373"/>
+        <torque rpm="2200" motorTorque="0" fuelUsageRatio="0"/>
 			</realEngine>
 		</gearboxMogli>			
 	</vehicle>	
