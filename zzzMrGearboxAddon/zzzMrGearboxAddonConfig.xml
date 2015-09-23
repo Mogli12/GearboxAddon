@@ -2182,6 +2182,65 @@
 		</gearboxMogli>	
 	</vehicle>
 	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/john-deere-4755%2D%2D3 -->
+		<configFile modName="JohnDeere4755" xmlName="JD_4755.xml"/>
+
+		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
+		<gearboxMogli autoStartStop="true" speedLimiter="false" ptoRpm="2205" ptoRpmEco="2205">>
+		
+			<!-- http://www.tractordata.com/farm-tractors/000/1/4/145-john-deere-4755-transmission.html -->
+			<!-- John Deere Power Shift 15/4 -->
+			<gears shiftTimeMs="200" clutchRatio="1" defaultGear="14">	
+				<gear speed="2.3"  name="1"  forwardOnly="true"/>
+				<gear speed="3.2"  name="R1" reverseOnly="true"/>
+				<gear speed="3.3"  name="2"  forwardOnly="true"/>
+				<gear speed="3.9"  name="3"  forwardOnly="true"/>
+				<gear speed="4.5"  name="R2" reverseOnly="true"/>
+				<gear speed="5.0"  name="4"  forwardOnly="true"/>
+				<gear speed="5.7"  name="5"  forwardOnly="true"/>
+				<gear speed="6.5"  name="6"  forwardOnly="true"/>
+				<gear speed="6.9"  name="R3" reverseOnly="true"/>
+				<gear speed="7.5"  name="7"  forwardOnly="true"/>
+				<gear speed="8.6"  name="8"  forwardOnly="true"/>
+				<gear speed="9.9"  name="9"  forwardOnly="true"/>
+				<gear speed="10.3" name="R4" reverseOnly="true"/>
+				<gear speed="11.2" name="10" forwardOnly="true"/>
+				<gear speed="12.9" name="11" forwardOnly="true"/>
+				<gear speed="14.5" name="12" forwardOnly="true"/>
+				<gear speed="17.9" name="13" forwardOnly="true"/>
+				<gear speed="25.0" name="14" forwardOnly="true"/>
+				<gear speed="31.0" name="15" forwardOnly="true"/>
+			</gears>
+
+			<reverse ratio="1"/>
+			
+			<!-- http://www.dlg-test.de/tests/johndeere-4755.pdf -->
+			<realEngine idleRpm="900" ratedRpm="2200" ptoRpm="2205">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="260"/><!-- 2050: 192.159090909091 | 2200: 190 | 1200..1200: 820 | 0.83 | 0.6 -->
+        <torque rpm="700" motorTorque="0" fuelUsageRatio="260"/>
+        <torque rpm="800" motorTorque="262" fuelUsageRatio="260"/>
+        <torque rpm="900" motorTorque="506" fuelUsageRatio="260"/>
+        <torque rpm="1000" motorTorque="681" fuelUsageRatio="260"/>
+        <torque rpm="1100" motorTorque="785" fuelUsageRatio="244"/>
+        <torque rpm="1200" motorTorque="820" fuelUsageRatio="231"/>
+        <torque rpm="1300" motorTorque="808" fuelUsageRatio="222"/>
+        <torque rpm="1400" motorTorque="794" fuelUsageRatio="217"/>
+        <torque rpm="1500" motorTorque="778" fuelUsageRatio="215"/>
+        <torque rpm="1600" motorTorque="760" fuelUsageRatio="215"/>
+        <torque rpm="1700" motorTorque="741" fuelUsageRatio="216"/>
+        <torque rpm="1800" motorTorque="719" fuelUsageRatio="218"/>
+        <torque rpm="1900" motorTorque="696" fuelUsageRatio="220"/>
+        <torque rpm="2000" motorTorque="671" fuelUsageRatio="223"/>
+        <torque rpm="2100" motorTorque="642" fuelUsageRatio="227"/>
+        <torque rpm="2200" motorTorque="606" fuelUsageRatio="231"/>
+        <torque rpm="2300" motorTorque="539" fuelUsageRatio="257"/>
+        <torque rpm="2400" motorTorque="337" fuelUsageRatio="334"/>
+        <torque rpm="2500" motorTorque="0" fuelUsageRatio="462"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
@@ -2923,12 +2982,13 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
-			<combine defaultWidth="4.2"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
+			<combine defaultWidth="4.2" defaultSpeed="3"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+			<hydrostatic minMaxTimeMs="200" startFactor="0.1">
+        <!--efficiency ratio="0.00719" factor="0.7"/--> 
+        <efficiency ratio="0" factor="0.7"/> 
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -2938,8 +2998,8 @@
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
-				<gear name="III" speed="20" forwardOnly="true"/>
 				<gear name="R"   speed="12" reverseOnly="true"/>
+				<gear name="III" speed="20" forwardOnly="true"/>
 			</gears>
 			<reverse ratio="0.8" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -2948,8 +3008,8 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
-			<combine defaultWidth="5.5"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
+			<combine defaultWidth="5.5" defaultSpeed="4"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -2963,8 +3023,8 @@
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
-				<gear name="III" speed="16" forwardOnly="true"/>
 				<gear name="R"   speed="12" reverseOnly="true"/>
+				<gear name="III" speed="16" forwardOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -2974,7 +3034,7 @@
 	<vehicle>
 		<configFile modName="CaseIH_CT5060" xmlName="CaseIH_CT5060.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
 			<combine defaultWidth="6.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -2989,8 +3049,8 @@
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
-				<gear name="III" speed="16" forwardOnly="true"/>
 				<gear name="R"   speed="12" reverseOnly="true"/>
+				<gear name="III" speed="16" forwardOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -3024,7 +3084,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH9230Crawler.xml" />
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
 		
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
 			<combine defaultWidth="13.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3039,9 +3099,9 @@
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2" reverseReset="true">	
 				<gear name="1" speed="5"    forwardOnly="true"/>
 				<gear name="2" speed="10"   forwardOnly="true"/>
+				<gear name="R" speed="10"   reverseOnly="true"/>
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
-				<gear name="R" speed="10"   reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		</gearboxMogli>
@@ -3051,7 +3111,7 @@
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="10.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="1000"/>
+			<combine defaultWidth="10.5" defaultSpeed="8" availableThreshingPower="1000"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3094,8 +3154,8 @@
 	<vehicle>
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
-			<combine defaultWidth="9.0" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="780"/>
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
+			<combine defaultWidth="9.0" defaultSpeed="8" availableThreshingPower="780"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3109,9 +3169,9 @@
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2" reverseReset="true">	
 				<gear name="1" speed="5"    forwardOnly="true"/>
 				<gear name="2" speed="10"   forwardOnly="true"/>
+				<gear name="R" speed="10"   reverseOnly="true"/>
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
-				<gear name="R" speed="10"   reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 		
@@ -3189,7 +3249,7 @@
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" defaultSpeed="12" dynamicRatio="0.7" availableThreshingPower="570" minRpm="1600" maxRpm="1800"/>
+			<combine defaultWidth="7.5" defaultSpeed="8" availableThreshingPower="570" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3233,7 +3293,7 @@
 		<!-- http://www.modhoster.de/mods/new-holland-tf78%2D%2D7 -->
 		<configFile modName="FS15_NewHollandTF78" xmlName="NHTF78.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -3248,9 +3308,9 @@
 			<gears defaultGear="3" reverseReset="true" shiftTimeMs="1500">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="8"  forwardOnly="true"/>
+				<gear name="R"   speed="13" reverseOnly="true"/>
 				<gear name="III" speed="13" forwardOnly="true"/>
 				<gear name="IV"  speed="20" forwardOnly="true"/>
-				<gear name="R"   speed="13" reverseOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
@@ -3372,7 +3432,7 @@
 		<configFile modName="KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" defaultSpeed="10" dynamicRatio="0.7"/>
+			<combine defaultWidth="7.5" defaultSpeed="8"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
