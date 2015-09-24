@@ -3430,6 +3430,7 @@
 
 	<vehicle>
 		<configFile modName="KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
+		<configFile modName="CZMOD_KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5" defaultSpeed="8"/>

@@ -67,8 +67,13 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		end
 		
+		local tempARBS  = self.autoRotateBackSpeed
 		local tempState = self.cruiseControl.state
 		local tempSpeed = self.cruiseControl.speed
+		
+		if self.tempomatMogli.KeepSpeed then
+			self.autoRotateBackSpeed = 0.5 * self.autoRotateBackSpeed
+		end
 		
 		if self.tempomatMogli.KeepSpeed and math.abs( axisForward ) < 0.1 then
 			if self.tempomatMogli.keepSpeedLimit == nil then
@@ -82,6 +87,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		
 		superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		
+		self.autoRotateBackSpeed = tempARBS
 		self.cruiseControl.state = tempState
 		self.cruiseControl.speed = tempSpeed
 		
