@@ -68,6 +68,7 @@ mrGearboxMogli.superFastDownShift   = false
 mrGearboxMogli.resetSoundTime       = 400
 mrGearboxMogli.ptoSpeedLimitMin     = 4 / 3.6
 mrGearboxMogli.ptoSpeedLimitIni     = 1 / 3.6
+mrGearboxMogli.ptoSpeedLimitOff     = 2 / 3.6
 mrGearboxMogli.ptoSpeedLimitDec     = 0.001 * 0.5 / 3.6
 mrGearboxMogli.ptoSpeedLimitInc     = 0.001 * 0.5 / 3.6
 
@@ -4352,7 +4353,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.lastPtoTorque = pt
 			if self.ptoSpeedLimit ~= nil then
 				self.ptoSpeedLimit = self.ptoSpeedLimit + self.tickDt * mrGearboxMogli.ptoSpeedLimitInc
-				if self.ptoSpeedLimit > 27.7778 then
+				if self.ptoSpeedLimit > self.vehicle.lastSpeedReal*1000 + mrGearboxMogli.ptoSpeedLimitOff then
 					self.ptoSpeedLimit = nil
 				end
 			end
