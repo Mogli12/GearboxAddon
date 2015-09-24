@@ -67,7 +67,8 @@ mrGearboxMogli.rpmIncPerGearSpeed   = false
 mrGearboxMogli.superFastDownShift   = false
 mrGearboxMogli.resetSoundTime       = 400
 mrGearboxMogli.ptoSpeedLimitMin     = 4 / 3.6
-mrGearboxMogli.ptoSpeedLimitDec     = -0.5 / 3.6
+mrGearboxMogli.ptoSpeedLimitIni     = 1 / 3.6
+mrGearboxMogli.ptoSpeedLimitDec     = 0.001 * 0.5 / 3.6
 mrGearboxMogli.ptoSpeedLimitInc     = 0.001 * 0.5 / 3.6
 
 mrGearboxMogliGlobals                       = {}
@@ -500,9 +501,9 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		
 		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), 5 )
 		
-		if type(self.acSetState) == "function" then
-			self:acSetState( "speed", 1.5 * speed )
-		end
+		--if type(self.acSetState) == "function" then
+		--	self:acSetState( "speed", 1.5 * speed )
+		--end
 		
 		-- m^2/s @ 5 km/h
     local sqm   = factor * speed * width / 3.6 
@@ -4341,11 +4342,11 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			-- accelerate smoothly
 			if      self.hydroEff ~= nil 
 					and ( not ( self.vehicle.steeringEnabled ) or self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF ) then
-				local limitMin = mrGearboxMogli.ptoSpeedLimitMin
 				if self.ptoSpeedLimit ~= nil then
-					limitMin = math.min( limitMin, self.ptoSpeedLimit + self.tickDt * mrGearboxMogli.ptoSpeedLimitInc )
+					self.ptoSpeedLimit = math.max( self.ptoSpeedLimit - self.tickDt * mrGearboxMogli.ptoSpeedLimitDec, mrGearboxMogli.ptoSpeedLimitMin )
+				else		
+					self.ptoSpeedLimit = math.max( self.vehicle.lastSpeedReal*1000 - mrGearboxMogli.ptoSpeedLimitIni, mrGearboxMogli.ptoSpeedLimitMin )
 				end
-				self.ptoSpeedLimit = Utils.clamp( self.vehicle.lastSpeedReal*1000 - mrGearboxMogli.ptoSpeedLimitDec, limitMin, 27.7778 )
 			end
 		else
 			self.lastPtoTorque = pt
