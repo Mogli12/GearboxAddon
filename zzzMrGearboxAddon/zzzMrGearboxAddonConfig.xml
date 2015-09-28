@@ -308,13 +308,13 @@
 				<torque rpm="2400" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="2" shiftTimeMs="800" rangeOffset="1">
-				<gear speed="10.0"/>
-				<gear speed="13.5"/>
-				<gear speed="17.0"/>
-				<gear speed="25.0"/>
-				<gear speed="30.0"/>
-				<gear speed="40.0"/>
+			<gears defaultGear="2" shiftTimeMs="800">
+				<gear speed="10.0" upRangeOffset="-1" downRangeOffset="0" />
+				<gear speed="13.5" upRangeOffset="-1" downRangeOffset="0" />
+				<gear speed="17.0" upRangeOffset="-1" downRangeOffset="0" />
+				<gear speed="25.0" upRangeOffset="-1" downRangeOffset="0" />
+				<gear speed="30.0" upRangeOffset="-1" downRangeOffset="0" />
+				<gear speed="40.0" upRangeOffset="-1" downRangeOffset="0" />
 			</gears>
 
 			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1">

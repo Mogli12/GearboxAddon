@@ -59,7 +59,7 @@ mrGearboxMogli.accDeadZone          = 0.15
 mrGearboxMogli.blowOffVentilTime0   = 1000
 mrGearboxMogli.blowOffVentilTime1   = 1000
 mrGearboxMogli.blowOffVentilTime2   = 100
-mrGearboxMogli.limitRpmMode         = "TM" -- "M" -- "H"uge/"T"orque/"M"axPossible/"TM" see smoothTorque
+mrGearboxMogli.limitRpmMode         = "M" -- "M" -- "H"uge/"T"orque/"M"axPossible/"TM" see smoothTorque
 mrGearboxMogli.resetSoundRPM        = false
 mrGearboxMogli.debugGearShift       = false
 mrGearboxMogli.globalsLoaded        = false
@@ -2681,8 +2681,8 @@ function mrGearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 	
 	if newRange2 ~= self.mrGbMS.CurrentRange2 then
 		self:mrGbMSetState( "CurrentRange2", newRange2, noEventSend ) 
-		self:mrGbMSetState( "CurrentRange", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, self.mrGbMS.CurrentRange, newRange, "range" ), noEventSend ) 
-		self:mrGbMSetState( "CurrentGear",  mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,  self.mrGbMS.CurrentGear,  newGear,  self.mrGbMS.CurrentGear, newGear, "gear" ),  noEventSend ) 		
+		self:mrGbMSetState( "CurrentRange", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, self.mrGbMS.CurrentRange, "range" ), noEventSend ) 
+		self:mrGbMSetState( "CurrentGear",  mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,  self.mrGbMS.CurrentGear,  self.mrGbMS.CurrentGear,  "gear" ),  noEventSend ) 		
 	end
 end
 
