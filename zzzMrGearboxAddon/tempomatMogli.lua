@@ -71,9 +71,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		local tempState = self.cruiseControl.state
 		local tempSpeed = self.cruiseControl.speed
 		
-		if self.tempomatMogli.KeepSpeed then
-			self.autoRotateBackSpeed = 0.5 * self.autoRotateBackSpeed
-		end
+	--if self.tempomatMogli.KeepSpeed then
+	--	self.autoRotateBackSpeed = 0.5 * self.autoRotateBackSpeed
+	--end
 		
 		if self.tempomatMogli.KeepSpeed and math.abs( axisForward ) < 0.1 then
 			if self.tempomatMogli.keepSpeedLimit == nil then

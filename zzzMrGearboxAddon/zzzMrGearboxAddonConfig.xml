@@ -2365,6 +2365,52 @@
 	</vehicle>
 		
 	<vehicle>
+		<configFile modName="LS15_CasePuma165CVX_" xmlName="caseIHPuma165.xml" isPrefix="true"/>
+	
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" globalRatioFactor="0.8636"> <!-- 1900 / 2200 = 0.86363636 --> 
+			<hydrostatic>
+        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.933333" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.066667" factor="0.96"/>
+        <efficiency ratio="1.333333" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+				<gear speed="6.25" name=""/>
+				<gear speed="12.5" name=""/>
+				<gear speed="25"   name=""/>
+				<gear speed="50"   name=""/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="900" ratedRpm="1900">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="212"/><!-- 1900: 210 | 2200: 190 | 1500..1500: 875 | 0.8 | 0.1 -->
+        <torque rpm="700" motorTorque="427" fuelUsageRatio="212"/>
+        <torque rpm="800" motorTorque="532" fuelUsageRatio="212"/>
+        <torque rpm="900" motorTorque="623" fuelUsageRatio="212"/>
+        <torque rpm="1000" motorTorque="700" fuelUsageRatio="212"/>
+        <torque rpm="1100" motorTorque="763" fuelUsageRatio="211"/>
+        <torque rpm="1200" motorTorque="812" fuelUsageRatio="209"/>
+        <torque rpm="1300" motorTorque="847" fuelUsageRatio="209"/>
+        <torque rpm="1400" motorTorque="868" fuelUsageRatio="208"/>
+        <torque rpm="1500" motorTorque="875" fuelUsageRatio="208"/>
+        <torque rpm="1600" motorTorque="867" fuelUsageRatio="208"/>
+        <torque rpm="1700" motorTorque="848" fuelUsageRatio="209"/>
+        <torque rpm="1800" motorTorque="818" fuelUsageRatio="211"/>
+        <torque rpm="1900" motorTorque="776" fuelUsageRatio="214"/>
+        <torque rpm="2000" motorTorque="730" fuelUsageRatio="217"/>
+        <torque rpm="2100" motorTorque="672" fuelUsageRatio="221"/>
+        <torque rpm="2200" motorTorque="606" fuelUsageRatio="226"/>
+        <torque rpm="2300" motorTorque="539" fuelUsageRatio="251"/>
+        <torque rpm="2400" motorTorque="337" fuelUsageRatio="326"/>
+        <torque rpm="2500" motorTorque="0" fuelUsageRatio="452"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+		
+	<vehicle>
 		<!-- http://www.modhoster.de/mods/case-puma-230-cvx-frontlader -->
 		<!-- http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl -->
 		<configFile modName="LS15_CasePumacvx230_T131_" xmlName="caseIHPuma230.xml" isPrefix="true"/>
@@ -2983,7 +3029,7 @@
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
-			<combine defaultWidth="4.2" defaultSpeed="3"/>
+			<combine defaultWidth="4.2" defaultSpeed="5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic minMaxTimeMs="200" startFactor="0.1">
@@ -3009,7 +3055,7 @@
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
-			<combine defaultWidth="5.5" defaultSpeed="4"/>
+			<combine defaultWidth="5.5" defaultSpeed="6"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3111,7 +3157,7 @@
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="10.5" defaultSpeed="8" availableThreshingPower="1000"/>
+			<combine defaultWidth="10.5" defaultSpeed="8"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3155,7 +3201,7 @@
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
 		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
-			<combine defaultWidth="9.0" defaultSpeed="8" availableThreshingPower="780"/>
+			<combine defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3249,7 +3295,7 @@
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" defaultSpeed="8" availableThreshingPower="570" minRpm="1600" maxRpm="1800"/>
+			<combine defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3433,7 +3479,7 @@
 		<configFile modName="CZMOD_KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" defaultSpeed="8"/>
+			<combine defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3452,4 +3498,183 @@
 		</gearboxMogli>
 	</vehicle> 
 
+	
+	<vehicle>
+		<configFile modName="Claas_Lexion600_Pack" xmlName="claasLexion600.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="10.5" minRpm="1600" maxRpm="1800"/> 
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
+			<realEngine idleRpm="800" ratedRpm="1800">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="200"/><!-- 1800: 556 | 1900: 535 | 900..1300: 2600 | 0.9 | 0.3 -->
+        <torque rpm="700" motorTorque="1560" fuelUsageRatio="200"/>
+        <torque rpm="800" motorTorque="2340" fuelUsageRatio="200"/>
+        <torque rpm="900" motorTorque="2600" fuelUsageRatio="195"/>
+        <torque rpm="1000" motorTorque="2600" fuelUsageRatio="191"/>
+        <torque rpm="1100" motorTorque="2600" fuelUsageRatio="188"/>
+        <torque rpm="1200" motorTorque="2600" fuelUsageRatio="187"/>
+        <torque rpm="1300" motorTorque="2600" fuelUsageRatio="186"/>
+        <torque rpm="1400" motorTorque="2562" fuelUsageRatio="187"/>
+        <torque rpm="1500" motorTorque="2500" fuelUsageRatio="188"/>
+        <torque rpm="1600" motorTorque="2414" fuelUsageRatio="191"/>
+        <torque rpm="1700" motorTorque="2303" fuelUsageRatio="195"/>
+        <torque rpm="1800" motorTorque="2169" fuelUsageRatio="200"/>
+        <torque rpm="1900" motorTorque="1977" fuelUsageRatio="206"/>
+        <torque rpm="2000" motorTorque="1750" fuelUsageRatio="223"/><!-- manualData: 1750-->
+        <torque rpm="2100" motorTorque="1332" fuelUsageRatio="273"/>
+        <torque rpm="2200" motorTorque="525" fuelUsageRatio="357"/>
+        <torque rpm="2300" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="lexion750" xmlName="Lexion750.xml" />
+		<configFile modName="lexion750" xmlName="Lexion750TT.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="9" minRpm="1600" maxRpm="1800"/> 
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
+			<realEngine idleRpm="800" ratedRpm="1800">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="200"/><!-- 1800: 435 | 1800: 435 | 900..1385: 2100 | 0.83 | 1 -->
+        <torque rpm="700" motorTorque="672" fuelUsageRatio="200"/>
+        <torque rpm="800" motorTorque="1743" fuelUsageRatio="200"/>
+        <torque rpm="900" motorTorque="2100" fuelUsageRatio="196"/>
+        <torque rpm="1000" motorTorque="2100" fuelUsageRatio="192"/>
+        <torque rpm="1100" motorTorque="2100" fuelUsageRatio="190"/>
+        <torque rpm="1200" motorTorque="2100" fuelUsageRatio="188"/>
+        <torque rpm="1300" motorTorque="2100" fuelUsageRatio="188"/>
+        <torque rpm="1400" motorTorque="2085" fuelUsageRatio="189"/>
+        <torque rpm="1500" motorTorque="1988" fuelUsageRatio="191"/>
+        <torque rpm="1600" motorTorque="1891" fuelUsageRatio="194"/>
+        <torque rpm="1700" motorTorque="1794" fuelUsageRatio="199"/>
+        <torque rpm="1800" motorTorque="1697" fuelUsageRatio="205"/>
+        <torque rpm="1900" motorTorque="1550" fuelUsageRatio="228"/><!-- manualData: 1550-->
+        <torque rpm="2000" motorTorque="1400" fuelUsageRatio="296"/><!-- manualData: 1400-->
+        <torque rpm="2100" motorTorque="0" fuelUsageRatio="410"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="lexion770" xmlName="Lexion770TT.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="12" minRpm="1600" maxRpm="1800"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
+			<realEngine idleRpm="800" ratedRpm="1800">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="200"/><!-- 1500: 580 | 1700: 580 | 900..1300: 2800 | 0.9 | 0.3 -->
+        <torque rpm="700" motorTorque="1680" fuelUsageRatio="200"/>
+        <torque rpm="800" motorTorque="2520" fuelUsageRatio="200"/>
+        <torque rpm="900" motorTorque="2800" fuelUsageRatio="193"/>
+        <torque rpm="1000" motorTorque="2800" fuelUsageRatio="188"/>
+        <torque rpm="1100" motorTorque="2800" fuelUsageRatio="185"/>
+        <torque rpm="1200" motorTorque="2800" fuelUsageRatio="184"/>
+        <torque rpm="1300" motorTorque="2800" fuelUsageRatio="184"/>
+        <torque rpm="1400" motorTorque="2772" fuelUsageRatio="186"/>
+        <torque rpm="1500" motorTorque="2715" fuelUsageRatio="188"/>
+        <torque rpm="1600" motorTorque="2568" fuelUsageRatio="191"/><!-- manualData: 2568-->
+        <torque rpm="1700" motorTorque="2396" fuelUsageRatio="195"/>
+        <torque rpm="1800" motorTorque="2200" fuelUsageRatio="205"/><!-- manualData: 2200-->
+        <torque rpm="1900" motorTorque="1923" fuelUsageRatio="234"/>
+        <torque rpm="2000" motorTorque="1331" fuelUsageRatio="282"/>
+        <torque rpm="2100" motorTorque="503" fuelUsageRatio="349"/>
+        <torque rpm="2200" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="lexion780" xmlName="Lexion780.xml" />
+		<configFile modName="lexion780" xmlName="Lexion780TT.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="13.5" minRpm="1600" maxRpm="1800"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
+			<realEngine idleRpm="800" ratedRpm="1800">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="200"/><!-- 1500: 626 | 1700: 626 | 900..1300: 3000 | 0.9 | 0.3 -->
+        <torque rpm="700" motorTorque="1800" fuelUsageRatio="200"/>
+        <torque rpm="800" motorTorque="2700" fuelUsageRatio="200"/>
+        <torque rpm="900" motorTorque="3000" fuelUsageRatio="193"/>
+        <torque rpm="1000" motorTorque="3000" fuelUsageRatio="188"/>
+        <torque rpm="1100" motorTorque="3000" fuelUsageRatio="185"/>
+        <torque rpm="1200" motorTorque="3000" fuelUsageRatio="184"/>
+        <torque rpm="1300" motorTorque="3000" fuelUsageRatio="184"/>
+        <torque rpm="1400" motorTorque="2977" fuelUsageRatio="186"/>
+        <torque rpm="1500" motorTorque="2931" fuelUsageRatio="188"/>
+        <torque rpm="1600" motorTorque="2747" fuelUsageRatio="191"/>
+        <torque rpm="1700" motorTorque="2586" fuelUsageRatio="195"/>
+        <torque rpm="1800" motorTorque="2400" fuelUsageRatio="205"/><!-- manualData: 2400-->
+        <torque rpm="1900" motorTorque="2075" fuelUsageRatio="234"/>
+        <torque rpm="2000" motorTorque="1437" fuelUsageRatio="282"/>
+        <torque rpm="2100" motorTorque="543" fuelUsageRatio="349"/>
+        <torque rpm="2200" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
 </vehicles>
