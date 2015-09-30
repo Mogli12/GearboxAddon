@@ -3587,4 +3587,96 @@
 		</gearboxMogli>
 	</vehicle>
 	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-lexion-400-pack -->
+		<configFile modName="ClaasLexion400" xmlName="claasLexion430.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="6.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0"/><!-- 2200: 240 | 2200: 240 | 1600..1600: 960 | 0.93 | 0.9 -->
+        <torque rpm="700" motorTorque="849"/>
+        <torque rpm="800" motorTorque="872"/>
+        <torque rpm="900" motorTorque="893"/>
+        <torque rpm="1000" motorTorque="911"/>
+        <torque rpm="1100" motorTorque="926"/>
+        <torque rpm="1200" motorTorque="938"/>
+        <torque rpm="1300" motorTorque="948"/>
+        <torque rpm="1400" motorTorque="955"/>
+        <torque rpm="1500" motorTorque="959"/>
+        <torque rpm="1600" motorTorque="960"/>
+        <torque rpm="1700" motorTorque="930"/>
+        <torque rpm="1800" motorTorque="900"/>
+        <torque rpm="1900" motorTorque="868"/>
+        <torque rpm="2000" motorTorque="835"/>
+        <torque rpm="2100" motorTorque="801"/>
+        <torque rpm="2200" motorTorque="766"/>
+        <torque rpm="2300" motorTorque="681"/>
+        <torque rpm="2400" motorTorque="426"/>
+        <torque rpm="2500" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-lexion-400-pack -->
+		<configFile modName="ClaasLexion400" xmlName="claasLexion460.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="7.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="22.8"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0"/><!-- 2200: 300 | 2200: 300 | 1600..1600: 1200 | 0.93 | 0.9 -->
+        <torque rpm="700" motorTorque="1061"/>
+        <torque rpm="800" motorTorque="1090"/>
+        <torque rpm="900" motorTorque="1116"/>
+        <torque rpm="1000" motorTorque="1138"/>
+        <torque rpm="1100" motorTorque="1157"/>
+        <torque rpm="1200" motorTorque="1173"/>
+        <torque rpm="1300" motorTorque="1185"/>
+        <torque rpm="1400" motorTorque="1193"/>
+        <torque rpm="1500" motorTorque="1198"/>
+        <torque rpm="1600" motorTorque="1200"/>
+        <torque rpm="1700" motorTorque="1163"/>
+        <torque rpm="1800" motorTorque="1125"/>
+        <torque rpm="1900" motorTorque="1085"/>
+        <torque rpm="2000" motorTorque="1044"/>
+        <torque rpm="2100" motorTorque="1001"/>
+        <torque rpm="2200" motorTorque="958"/>
+        <torque rpm="2300" motorTorque="851"/>
+        <torque rpm="2400" motorTorque="532"/>
+        <torque rpm="2500" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>	
+	
 </vehicles>

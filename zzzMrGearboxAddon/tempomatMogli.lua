@@ -67,29 +67,32 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		end
 		
-		local tempARBS  = self.autoRotateBackSpeed
-		local tempState = self.cruiseControl.state
-		local tempSpeed = self.cruiseControl.speed
+		local tempState   = self.cruiseControl.state
+		local tempSpeed1 = self.motor.speedLimit
+		local tempSpeed2 = self.cruiseControl.speed
 		
-	--if self.tempomatMogli.KeepSpeed then
-	--	self.autoRotateBackSpeed = 0.5 * self.autoRotateBackSpeed
-	--end
-		
-		if self.tempomatMogli.KeepSpeed and math.abs( axisForward ) < 0.1 then
-			if self.tempomatMogli.keepSpeedLimit == nil then
-				self.tempomatMogli.keepSpeedLimit = math.max( 2, self.lastSpeedReal*3600 )
+		if     self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE 
+				or ( self.movingDirection   <= 0 
+				 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) ) then
+			self.tempomatMogli.keepSpeedLimit = nil		
+		elseif self.tempomatMogli.KeepSpeed then
+			if     self.tempomatMogli.keepSpeedLimit == nil 
+					or math.abs( axisForward )           >  0.3 then
+				self.tempomatMogli.keepSpeedLimit = math.max( 2, self.lastSpeedReal*3600 - axisForward * dt * 5 * math.max( 0.001, self.lastSpeedReal - 0.002 ) )
 			end
 			self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_ACTIVE
+			self.motor.speedLimit    = self.tempomatMogli.keepSpeedLimit
 			self.cruiseControl.speed = self.tempomatMogli.keepSpeedLimit
+			axisForward              = 0
 		elseif self.tempomatMogli.keepSpeedLimit ~= nil then
 			self.tempomatMogli.keepSpeedLimit = nil		
 		end
 		
 		superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		
-		self.autoRotateBackSpeed = tempARBS
 		self.cruiseControl.state = tempState
-		self.cruiseControl.speed = tempSpeed
+		self.motor.speedLimit    = tempSpeed1
+		self.cruiseControl.speed = tempSpeed2
 		
 		return 
 	end
