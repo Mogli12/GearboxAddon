@@ -36,12 +36,10 @@ mrGearboxMogli.rpmMinusEco          = 0    -- reduce target RPM in eco mode
 mrGearboxMogli.autoShiftPtoDiff     = 50
 mrGearboxMogli.minClutchPercent     = 1E-3
 mrGearboxMogli.maxGearRatio         = 130  -- 414  -- 0.82 km/h @900 RPM / 2.00 km/h @2200 RPM / gear ratio might be bigger, but no clutch in this case
-mrGearboxMogli.maxHydroGearRatio    = 830  -- 0.4 km/h @900 RPM / 1 km/h @2200 RPM
+mrGearboxMogli.maxHydroGearRatio    = 1660 -- 0.2 km/h @900 RPM / 0.5 km/h @2200 RPM
 mrGearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 mrGearboxMogli.rpmReduction         = 0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 mrGearboxMogli.maxPowerLimit        = 0.99 -- 99% max power is equal to max power
-mrGearboxMogli.smooth1              = 0.020 --0.05
-mrGearboxMogli.smooth2              = 0.005 --0.025
 mrGearboxMogli.smoothRpm            = 0.05
 mrGearboxMogli.smoothPossible       = 0.05
 mrGearboxMogli.smoothSpeed          = 0.2
@@ -104,6 +102,8 @@ mrGearboxMogliGlobals.stallMotorOffTime     = 1000
 mrGearboxMogliGlobals.realFuelUsage         = true
 mrGearboxMogliGlobals.debugPrint            = false
 mrGearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
+mrGearboxMogliGlobals.smoothTargetFast      = 0.05 --0.05
+mrGearboxMogliGlobals.smoothTargetSlow      = 0.01 --0.025
 
 --setSamplePitch( mrGearboxMogli.BOVSample, 0.85 )
 
@@ -4762,7 +4762,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.targetRpmC == nil or self.targetRpmC < targetRpmC then
 				self.targetRpmC   = targetRpmC 
 			else
-				self.targetRpmC   = self.targetRpmC + mrGearboxMogli.smooth1 * ( targetRpmC - self.targetRpmC )		
+				self.targetRpmC   = self.targetRpmC + self.vehicle.mrGbMG.smoothTargetFast * ( targetRpmC - self.targetRpmC )		
 			end
 			self.minRequiredRpm = self.targetRpmC
 		else
@@ -4819,8 +4819,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	  self.requestedPower2 = requestedPower
 	  self.requestedPower  = requestedPower
 	else
-		self.requestedPower1 = self.requestedPower1 + mrGearboxMogli.smooth1 * ( requestedPower - self.requestedPower1 )
-		self.requestedPower2 = self.requestedPower2 + mrGearboxMogli.smooth2 * ( requestedPower - self.requestedPower2 )
+		self.requestedPower1 = self.requestedPower1 + self.vehicle.mrGbMG.smoothTargetFast * ( requestedPower - self.requestedPower1 )
+		self.requestedPower2 = self.requestedPower2 + self.vehicle.mrGbMG.smoothTargetSlow * ( requestedPower - self.requestedPower2 )
 		self.requestedPower  = math.max( self.requestedPower1, self.requestedPower2 )
 	end
 	
@@ -4829,8 +4829,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.motorLoadS2     = motorLoad
 		self.motorLoadS	     = motorLoad
 	else
-		self.motorLoadS1     = self.motorLoadS1 + mrGearboxMogli.smooth1 * ( motorLoad - self.motorLoadS1 )		
-		self.motorLoadS2     = self.motorLoadS2 + mrGearboxMogli.smooth2 * ( motorLoad - self.motorLoadS2 )		
+		self.motorLoadS1     = self.motorLoadS1 + self.vehicle.mrGbMG.smoothTargetFast * ( motorLoad - self.motorLoadS1 )		
+		self.motorLoadS2     = self.motorLoadS2 + self.vehicle.mrGbMG.smoothTargetSlow * ( motorLoad - self.motorLoadS2 )		
 		self.motorLoadS	     = math.max( self.motorLoadS1, self.motorLoadS2 )		
   end		
 	
@@ -4864,8 +4864,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.targetRpm2 = targetRpm 
 		self.targetRpm  = targetRpm 
 	else
-		self.targetRpm1 = self.targetRpm1 + mrGearboxMogli.smooth1 * ( targetRpm - self.targetRpm1 )		
-		self.targetRpm2 = self.targetRpm2 + mrGearboxMogli.smooth2 * ( targetRpm - self.targetRpm2 )		
+		self.targetRpm1 = self.targetRpm1 + self.vehicle.mrGbMG.smoothTargetFast * ( targetRpm - self.targetRpm1 )		
+		self.targetRpm2 = self.targetRpm2 + self.vehicle.mrGbMG.smoothTargetSlow * ( targetRpm - self.targetRpm2 )		
 		self.targetRpm  = math.max( self.targetRpm1, self.targetRpm2 )		
   end		
 	
@@ -5387,11 +5387,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.vehicle.mrGbMS.AutoShiftUpRpm ~= nil and self.vehicle.mrGbMS.AutoShiftUpRpm < m then
 				m = self.vehicle.mrGbMS.AutoShiftUpRpm 
 			end
-			m = math.min(m,self.targetRpm + mrGearboxMogli.hydroEffDiff)
+			m = math.min(m,self.targetRpm) + mrGearboxMogli.hydroEffDiff
 			
 			if self.ptoOn then
-				local t0 = math.max( minRpmReduced, t - mrGearboxMogli.hydroPtoDiff )
-				local t1 = math.min( m, t + mrGearboxMogli.hydroPtoDiff )
+				local t0 = math.max( minRpmReduced, t ) - mrGearboxMogli.hydroPtoDiff
+				local t1 = math.min( m, t ) + mrGearboxMogli.hydroPtoDiff
 				if t0 < t1 then
 				-- full throttle => reduce target rpm for acceleration
 					t = t1 + accelerationPedal * ( t0 - t1 )

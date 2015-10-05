@@ -2327,7 +2327,7 @@
 		<configFile modName="LS15_CasePumacvx160_" xmlName="caseIHPuma160.xml" isPrefix="true"/>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
 			<hydrostatic>
         <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
         <efficiency ratio="0.666667" factor="0.88"/>
@@ -2368,7 +2368,7 @@
 		<configFile modName="LS15_CasePuma165CVX_" xmlName="caseIHPuma165.xml" isPrefix="true"/>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" globalRatioFactor="0.8636"> <!-- 1900 / 2200 = 0.86363636 --> 
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1850" ptoRpmEco="1600" globalRatioFactor="0.8636"> <!-- 1900 / 2200 = 0.86363636 --> 
 			<hydrostatic>
         <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
         <efficiency ratio="0.666667" factor="0.88"/>
@@ -2416,7 +2416,7 @@
 		<configFile modName="LS15_CasePumacvx230_T131_" xmlName="caseIHPuma230.xml" isPrefix="true"/>
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
 			<hydrostatic>
         <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
         <efficiency ratio="0.666667" factor="0.88"/>
@@ -2459,7 +2459,7 @@
 		<configFile modName="LS15_CasePumacvx240_" xmlName="caseIHPuma240.xml" isPrefix="true"/>
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
 			<hydrostatic>
         <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
         <efficiency ratio="0.666667" factor="0.88"/>
@@ -3011,6 +3011,7 @@
 		<configFile xmlName="default"/>
 
 		<gearboxMogli disableManual="true" speedLimiter="true" autoStartStop="true" enableAI="true">
+			<blowOffVentilSound volume="0"/>
 			<hydrostatic>
         <efficiency ratio="0.0001" factor="0.9"/> 
         <efficiency ratio="0.8" factor="1"/>
