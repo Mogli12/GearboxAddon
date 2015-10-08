@@ -104,6 +104,7 @@ mrGearboxMogliGlobals.debugPrint            = false
 mrGearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 mrGearboxMogliGlobals.smoothTargetFast      = 0.05 --0.05
 mrGearboxMogliGlobals.smoothTargetSlow      = 0.01 --0.025
+mrGearboxMogliGlobals.ddsDirectory          = "dds/"
 
 --setSamplePitch( mrGearboxMogli.BOVSample, 0.85 )
 
@@ -285,12 +286,12 @@ function mrGearboxMogli:initClient()
 		local x = g_currentMission.speedHud.x - w * 0.25
 		local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
 		
-		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename("arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename("arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowDownWhite = Overlay:new("ovArrowDownWhite", Utils.getFilename("arrow_down_white.dds", mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename("arrow_down_gray.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename("hand_brake_up.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename("hand_brake_down.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownWhite = Overlay:new("ovArrowDownWhite", Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_down_white.dds", mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_down_gray.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."hand_brake_up.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."hand_brake_down.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
 	end
 	
 	self.mrGbMD.Rpm        = 0 
@@ -346,6 +347,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		if self.mrGbMG.hudWidth + self.mrGbMG.hudPositionX > 1 then
 			self.mrGbMG.hudPositionX = 1 - self.mrGbMG.hudWidth
 		end
+		mrGearboxMogli.noInputWarning = true
 	else
 		if not( mrGearboxMogli.globalsLoaded ) then
 			mrGearboxMogli.globalsLoaded = true
@@ -1139,6 +1141,18 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.CurrentRange2 = self.mrGbMS.DefaultRange2
 	self.mrGbMS.ManualClutch  = self.mrGbMS.MaxClutchPercent
 -- set the default values for SERVER		
+--**********************************************************************************************************		
+
+
+--**********************************************************************************************************		
+-- Try to initialize motor during load
+--**********************************************************************************************************		
+	if self.motor ~= nil and self.motor.minRpm ~= nil and self.motor.minRpm > 0 then
+		self.mrGbML.motor = mrGearboxMogliMotor:new( self, self.motor )			
+		if self.mrGbML.motor ~= nil then
+			self.mrGbMB.motor = self.motor	
+		end
+	end
 --**********************************************************************************************************		
 end
 		

@@ -14,7 +14,7 @@
 		</de>
 	</description>
 	<multiplayer supported="true"/>   
-	<iconFilename>store.dds</iconFilename>
+	<iconFilename>dds/store.dds</iconFilename>
 	<version>1.2.99.5</version>
 	<l10n>
 		<text name="mrGearboxMogliVERSION">
