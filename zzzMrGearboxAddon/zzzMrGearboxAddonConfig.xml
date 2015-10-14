@@ -3158,7 +3158,7 @@
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="10.5"/>
+			<combine defaultLiterPerSqm="4.3" defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3202,7 +3202,7 @@
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
 		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
-			<combine defaultWidth="9.0"/>
+			<combine defaultLiterPerSqm="4.3" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3296,7 +3296,7 @@
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
+			<combine defaultLiterPerSqm="4.3" defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3390,7 +3390,7 @@
 		<configFile modName="CZMOD_KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5"/>
+			<combine defaultLiterPerSqm="4.3" defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
