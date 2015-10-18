@@ -58,7 +58,7 @@ mrGearboxMogli.blowOffVentilTime0   = 1000
 mrGearboxMogli.blowOffVentilTime1   = 1000
 mrGearboxMogli.blowOffVentilTime2   = 100
 mrGearboxMogli.limitRpmMode         = "M" -- "M" -- "H"uge/"T"orque/"M"axPossible/"TM" see smoothTorque
-mrGearboxMogli.resetSoundRPM        = false
+mrGearboxMogli.resetSoundRPM        = true
 mrGearboxMogli.debugGearShift       = false
 mrGearboxMogli.globalsLoaded        = false
 mrGearboxMogli.rpmIncPerGearSpeed   = false
@@ -606,11 +606,11 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
 	
 	self.mrGbMS.GearTimeToShiftGear     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#shiftTimeMs"),      750 )
-	self.mrGbMS.GearShiftEffectGear     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#shiftEffect"),     self.mrGbMS.GearTimeToShiftGear < self.mrGbMG.shiftEffectTime + 1 )
+	self.mrGbMS.GearShiftEffectGear     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#shiftEffect"),     self.mrGbMS.GearTimeToShiftGear < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftTimeMs"),  900 ) 
-	self.mrGbMS.GearShiftEffectHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftEffect"), self.mrGbMS.GearTimeToShiftHl < self.mrGbMG.shiftEffectTime + 1 )
+	self.mrGbMS.GearShiftEffectHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftEffect"), self.mrGbMS.GearTimeToShiftHl < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftRanges2  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#shiftTimeMs"), 1200 ) 
-	self.mrGbMS.GearShiftEffectRanges2  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#shiftEffect"), self.mrGbMS.GearTimeToShiftRanges2 < self.mrGbMG.shiftEffectTime + 1 )
+	self.mrGbMS.GearShiftEffectRanges2  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#shiftEffect"), self.mrGbMS.GearTimeToShiftRanges2 < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftReverse  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#shiftTimeMs"),    700 ) 
 
 	self.mrGbMS.GearTimeToShiftGear     = self.mrGbMS.GearTimeToShiftGear    * self.mrGbMG.shiftTimeMsFactor
@@ -1686,45 +1686,65 @@ function mrGearboxMogli:update(dt)
 			end
 		end
 				
+--**********************************************************************************************************			
 		-- sound tuning => Motorized.lua 
-		if self.mrGbMS.ResetSoundRPM >= 0 then
+
+		if self.mrGbML.soundRpm == nil then
+			self.mrGbML.soundRpm = self.motor.lastMotorRpm 
+		else
+			local tmpRpm = 0.5 * ( self.motor.minRpm + self.motor.maxRpm )
+			local factor = 1
+			local delta  = self.motor.lastMotorRpm
+			
+			if     self.motor.lastMotorRpm < self.motor.minRpm then
+				factor = 0.03
+			elseif self.motor.lastMotorRpm < tmpRpm then
+				factor = Utils.clamp( ( self.motor.lastMotorRpm - self.motor.minRpm ) / ( tmpRpm - self.motor.minRpm ), 0.03, factor )
+			end
+			
+			self.mrGbML.soundRpm = self.mrGbML.soundRpm + Utils.clamp( factor * ( delta - self.mrGbML.soundRpm ), -dt * self.mrGbMS.RpmDecFactor, dt * self.mrGbMS.RpmIncFactor )
+		end
+		
+		if self.mrGbMS.ResetSoundRPM >= 0 and mrGearboxMogli.resetSoundTime > 0 then
 			if self.mrGbML.resetSoundTimer < 0 then
 				self.mrGbML.resetSoundTimer = g_currentMission.time + mrGearboxMogli.resetSoundTime
 			end
-			self.lastRoundPerMinute   = self.mrGbMS.ResetSoundRPM
-			if g_currentMission.time > self.mrGbML.resetSoundTimer then
+			local factor = 0
+			
+			if     g_currentMission.time > self.mrGbML.resetSoundTimer then
 				self.mrGbML.resetSoundTimer = -1
 				self.mrGbMS.ResetSoundRPM   = -1 
+				factor = 0
+			else	
+				factor = ( self.mrGbML.resetSoundTimer - g_currentMission.time ) / mrGearboxMogli.resetSoundTime
 			end
-		elseif not ( self.mrGbMS.Hydrostatic ) then
-			local tmpRpm = 0.5 * ( self.motor.minRpm + self.motor.maxRpm )
-			if     self.motor.lastMotorRpm < self.motor.minRpm then
-				self.lastRoundPerMinute = 0
-			elseif self.motor.lastMotorRpm < tmpRpm then
-				factor = ( self.motor.lastMotorRpm - self.motor.minRpm ) / ( tmpRpm - self.motor.minRpm )
-				self.lastRoundPerMinute = self.lastRoundPerMinute + factor * ( self.motor.lastMotorRpm - self.motor.minRpm - self.lastRoundPerMinute )
-			else
-				self.lastRoundPerMinute = self.motor.lastMotorRpm - self.motor.minRpm
-			end
+			
+			self.mrGbML.soundRpm = self.mrGbML.soundRpm + factor * math.min( self.mrGbMS.ResetSoundRPM - self.mrGbML.soundRpm, 0 )
 		end
+		
+		self.lastRoundPerMinute = Utils.clamp( self.mrGbML.soundRpm, self.motor.minRpm, self.motor.maxRpm ) - self.motor.minRpm
+		
+--**********************************************************************************************************			
 		
 		if self:getIsActiveForSound() and ( self.mrGbMB.soundPitchScale ~= nil or self.mrGbMB.soundRunPitchScale ~= nil ) then			
 			if self.mrGbMG.modifySound then		
-				local newRpmRange = self.motor.maxRpm  - self.motor.minRpm
+			--local newRpmRange = self.motor.maxRpm  - self.motor.minRpm
+				local newRpmRange = self.mrGbMS.RatedRpm   - self.mrGbMS.IdleRpm
 				local oldRpmRange = self.mrGbMS.OrigMaxRpm - self.mrGbMS.OrigMinRpm
-				local rpmFactor   = self.mrGbMS.OrigMaxRpm / self.motor.maxRpm		
+			--local rpmFactor   = self.mrGbMS.OrigMaxRpm / self.motor.maxRpm		
+				local rpmFactor   = self.mrGbMS.OrigMaxRpm / self.mrGbMS.RatedRpm		
 				local newRpsRange = newRpmRange / 60
 				local oldRpsRange = oldRpmRange / 60
 			
 				if self.mrGbMS.IdlePitchFactor < 0 and self.mrGbMS.IdlePitchMax < 0 then 
-					self.motorSoundPitchMax     = math.min( self.mrGbMB.soundPitchMax, self.sampleMotor.pitchOffset + self.mrGbMB.soundPitchScale * oldRpsRange ) * rpmFactor
+					self.motorSoundPitchMax     = math.min( self.mrGbMB.soundPitchMax, self.mrGbMB.soundPitchOffset + self.mrGbMB.soundPitchScale * oldRpsRange ) * rpmFactor
 				else
 					if self.mrGbMS.IdlePitchFactor > 0 then
 						self.motorSoundPitchScale = self.mrGbMB.soundPitchScale * self.mrGbMS.IdlePitchFactor * newRpmRange / oldRpmRange
 					end
 					
 					if     self.mrGbMS.IdlePitchMax < 0 then 
-						self.motorSoundPitchMax   = self.sampleMotor.pitchOffset + self.motorSoundPitchScale * newRpsRange
+						self.motorSoundPitchMax   = self.mrGbMB.soundPitchOffset + self.motorSoundPitchScale * newRpsRange
 					else
 						if self.mrGbMS.IdlePitchMax > 0 then 
 							self.motorSoundPitchMax = self.mrGbMS.IdlePitchMax * rpmFactor
@@ -1734,18 +1754,19 @@ function mrGearboxMogli:update(dt)
 					end 
 				end 
 				if self.mrGbMS.IdlePitchFactor < 0 then
-					self.motorSoundPitchScale   = ( self.motorSoundPitchMax - self.sampleMotor.pitchOffset ) / newRpsRange
+					self.motorSoundPitchScale   = ( self.motorSoundPitchMax - self.mrGbMB.soundPitchOffset ) / newRpsRange
 				end
+				self.sampleMotor.pitchOffset  = self.mrGbMB.soundPitchOffset - ( self.mrGbMS.IdleRpm - self.mrGbMS.StallRpm ) / 60 * self.motorSoundPitchScale
 				
 				if self.mrGbMS.RunPitchFactor < 0 and self.mrGbMS.RunPitchMax < 0 then 
-					self.motorSoundRunPitchMax     = math.min( self.mrGbMB.soundRunPitchMax, self.sampleMotorRun.pitchOffset + self.mrGbMB.soundRunPitchScale * oldRpsRange ) * rpmFactor
+					self.motorSoundRunPitchMax     = math.min( self.mrGbMB.soundRunPitchMax, self.mrGbMB.soundRunPitchOffset + self.mrGbMB.soundRunPitchScale * oldRpsRange ) * rpmFactor
 				else
 					if self.mrGbMS.RunPitchFactor > 0 then
 						self.motorSoundRunPitchScale = self.mrGbMB.soundRunPitchScale * self.mrGbMS.RunPitchFactor * newRpmRange / oldRpmRange
 					end
 					
 					if     self.mrGbMS.RunPitchMax < 0 then 
-						self.motorSoundRunPitchMax   = self.sampleMotorRun.pitchOffset + self.motorSoundRunPitchScale * newRpsRange
+						self.motorSoundRunPitchMax   = self.mrGbMB.soundRunPitchOffset + self.motorSoundRunPitchScale * newRpsRange
 					else
 						if self.mrGbMS.RunPitchMax > 0 then 
 							self.motorSoundRunPitchMax = self.mrGbMS.RunPitchMax * rpmFactor
@@ -1756,8 +1777,9 @@ function mrGearboxMogli:update(dt)
 					end 
 				end 
 				if self.mrGbMS.RunPitchFactor < 0 then
-					self.motorSoundRunPitchScale   = ( self.motorSoundRunPitchMax - self.sampleMotorRun.pitchOffset ) / newRpsRange
+					self.motorSoundRunPitchScale   = ( self.motorSoundRunPitchMax - self.mrGbMB.soundRunPitchOffset ) / newRpsRange
 				end		
+				self.sampleMotorRun.pitchOffset  = self.mrGbMB.soundRunPitchOffset - ( self.mrGbMS.IdleRpm - self.mrGbMS.StallRpm ) / 60 * self.motorSoundRunPitchScale
 			end
 			
 			if self.mrGbMG.modifyTransVol then
@@ -3262,7 +3284,7 @@ function mrGearboxMogli:mrGbMDoGearShift(increaseOnly)
 						and self.mrGbMS.OrigMinRpm < self.mrGbML.afterShiftRpm and self.mrGbML.afterShiftRpm < self.mrGbMS.OrigMaxRpm 
 					--and self.mrGbML.motor.autoClutchPercent > 0.9 * self.mrGbMS.MaxClutchPercent 
 						then
-					self:mrGbMSetState( "ResetSoundRPM", self.mrGbML.afterShiftRpm - self.mrGbMS.OrigMinRpm ) --Utils.clamp( self.mrGbML.afterShiftRpm - self.mrGbML.motor.stallRpm, 0, 0.6 * ( self.mrGbML.motor.maxAllowedRpm - self.mrGbML.motor.stallRpm ) ) )
+					self:mrGbMSetState( "ResetSoundRPM", self.mrGbML.afterShiftRpm ) --Utils.clamp( self.mrGbML.afterShiftRpm - self.mrGbML.motor.stallRpm, 0, 0.6 * ( self.mrGbML.motor.maxAllowedRpm - self.mrGbML.motor.stallRpm ) ) )
 				end
 			else
 				self.mrGbML.afterShiftRpm = nil
