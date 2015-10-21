@@ -2328,21 +2328,21 @@
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
-			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
-			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+      <hydrostatic>
+        <efficiency ratio="0.020202" factor="0.6"/> <!-- 0.05 .. 0.9 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.65 .. 28.7 -->
+        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.23 .. 38.7 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.48 .. 43 -->
+        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.72 .. 47.3 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.3 .. 57.3 -->
+      </hydrostatic>
+      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+        <gear speed="5.5" name=""/> <!-- 0.05 1.65 4 7-->
+        <gear speed="11" name=""/> <!-- 0.1 3.3 7 15-->
+        <gear speed="22" name=""/> <!-- 0.2 6.6 15 29-->
+        <gear speed="43" name=""/> <!-- 0.39 12.9 29 57-->
+      </gears>
+      <reverse ratio="1" shiftTimeMs="0" />
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
 				<torque rpm="900" motorTorque="519"/>
@@ -2368,24 +2368,24 @@
 		<configFile modName="LS15_CasePuma165CVX_" xmlName="caseIHPuma165.xml" isPrefix="true"/>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1850" ptoRpmEco="1600" globalRatioFactor="0.8636"> <!-- 1900 / 2200 = 0.86363636 --> 
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600" soundMaxRpm="2000"> <!-- 1900 / 2200 = 0.86363636 --> 
 			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
+        <efficiency ratio="0.02037" factor="0.6"/> <!-- 0.05 .. 1 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.64 .. 31.3 -->
+        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.21 .. 42.3 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.45 .. 47 -->
+        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.7 .. 51.7 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.27 .. 62.7 -->
 			</hydrostatic>
 			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
+        <gear speed="6" name=""/> <!-- 0.05 4 8-->
+        <gear speed="12" name=""/> <!-- 0.1 8 16-->
+        <gear speed="24" name=""/> <!-- 0.2 16 32-->
+        <gear speed="47" name=""/> <!-- 0.39 31 63-->
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
-			<realEngine idleRpm="900" ratedRpm="1900">
+			<realEngine idleRpm="900" ratedRpm="2200">
         <torque rpm="0" motorTorque="0" fuelUsageRatio="212"/><!-- 1900: 210 | 2200: 190 | 1500..1500: 875 | 0.8 | 0.1 -->
         <torque rpm="700" motorTorque="427" fuelUsageRatio="212"/>
         <torque rpm="800" motorTorque="532" fuelUsageRatio="212"/>
@@ -2418,18 +2418,18 @@
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
 			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
+        <efficiency ratio="0.018519" factor="0.6"/> <!-- 0.05 .. 0.9 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.8 .. 32 -->
+        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.43 .. 43.2 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.7 .. 48 -->
+        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.97 .. 52.8 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.6 .. 64 -->
 			</hydrostatic>
 			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
+				<gear speed="6"  name=""/>
+				<gear speed="12" name=""/>
+				<gear speed="24" name=""/>
+				<gear speed="48" name=""/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
@@ -2461,22 +2461,22 @@
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
 			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
+        <efficiency ratio="0.018803" factor="0.6"/> <!-- 0.05 .. 1 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.77 .. 35.3 -->
+        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.39 .. 47.7 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.66 .. 53 -->
+        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.92 .. 58.3 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.55 .. 70.7 -->
 			</hydrostatic>
 			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
+				<gear speed="6.5" name=""/>
+				<gear speed="13"  name=""/>
+				<gear speed="26"  name=""/>
+				<gear speed="53"  name=""/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
-			<realEngine idleRpm="1000" ratedRpm="2200">
+			<realEngine idleRpm="900" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/>
         <torque rpm="700" motorTorque="450"/>
         <torque rpm="800" motorTorque="638"/>
