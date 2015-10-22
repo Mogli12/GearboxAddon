@@ -199,9 +199,9 @@
 		<configFile modName="MB3D_JohnDeere6810" xmlName="JohnDeere6810FL.xml" />
 
 		<!-- http://manuals.deere.com/omview/OMAL152891_29/?tM= -->
-		<gearboxMogli transmissionEfficiency="0.96" runPitchMax="0.9" idlePitchMax="1.15">
+		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200">
 
-			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="1" automatic="true" swapGearRangeKeys="true">	
+			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="1" automatic="true">	
 				<gear speed="22.2" name="1" />
 				<gear speed="26.8" name="2" />
 				<gear speed="32.1" name="3" />
@@ -383,7 +383,7 @@
 		<configFile modName="LS15DeutzAgroStarReihe_PumaFBM" xmlName="deutzAgroStar681.xml"/>
 
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
-		<gearboxMogli autoStartStop="false" runPitchFactor="1.2">
+		<gearboxMogli autoStartStop="false" soundMaxRpm="1900">
 			<realEngine idleRpm="1000" ratedRpm="2350" >
         <torque rpm="0" motorTorque="0"/>
         <torque rpm="700" motorTorque="674"/>
@@ -978,7 +978,7 @@
 	<vehicle>
 		<configFile modName="MBtrac1600" isPrefix="true" xmlName="xml/MBTrac1600.xml"/>
 
-		<gearboxMogli runPitchMax="1.1" speedLimiter="false" autoStartStop="false">
+		<gearboxMogli soundMaxRpm="2000" speedLimiter="false" autoStartStop="false">
 
 			<gears defaultGear="4" shiftTimeMs="800">
 				<gear speed="6.3" />
@@ -1034,7 +1034,7 @@
 		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800hl.xml"/>
 		<configFile modName="MBtrac1800" isPrefix="true" xmlName="xml/MBTrac1800.xml"/>
 
-		<gearboxMogli runPitchMax="1.2" speedLimiter="false" autoStartStop="false">
+		<gearboxMogli soundMaxRpm="1200" speedLimiter="false" autoStartStop="false">
 
 			<gears defaultGear="4" shiftTimeMs="800">
 				<gear speed="6.3" />
@@ -1918,6 +1918,54 @@
 				<torque rpm="2500" motorTorque="724"/>
 				<torque rpm="2600" motorTorque="0"/>
 			</realEngine> 
+		</gearboxMogli>		
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="Fiat_126p" xmlName="Fiat_126p.xml" />
+		
+		<!-- http://www.fiat-126.org/Technik-luft.html#Fiat126-Lufti-1 -->
+		<gearboxMogli speedLimiter="false" clutchOpenRpm="1200" clutchCloseRpm="2500" autoStartStop="false">
+			<realEngine idleRpm="1000" ratedRpm="4500">
+        <torque rpm="0" motorTorque="0" fuelUsageRatio="260"/><!-- 4500: 24 | 4500: 24 | 3000..3000: 42 | 0.8 | 0.5 -->
+        <torque rpm="700" motorTorque="31" fuelUsageRatio="260"/>
+        <torque rpm="800" motorTorque="32" fuelUsageRatio="260"/>
+        <torque rpm="1000" motorTorque="34" fuelUsageRatio="260"/>
+        <torque rpm="1300" motorTorque="36" fuelUsageRatio="237"/>
+        <torque rpm="1400" motorTorque="37" fuelUsageRatio="231"/>
+        <torque rpm="1600" motorTorque="38" fuelUsageRatio="222"/>
+        <torque rpm="1800" motorTorque="39" fuelUsageRatio="217"/>
+        <torque rpm="2000" motorTorque="40" fuelUsageRatio="215"/>
+        <torque rpm="2200" motorTorque="41" fuelUsageRatio="215"/>
+        <torque rpm="2600" motorTorque="42" fuelUsageRatio="216"/>
+        <torque rpm="3200" motorTorque="42" fuelUsageRatio="219"/>
+        <torque rpm="3300" motorTorque="41" fuelUsageRatio="219"/>
+        <torque rpm="3500" motorTorque="41" fuelUsageRatio="221"/>
+        <torque rpm="3600" motorTorque="41" fuelUsageRatio="222"/>
+        <torque rpm="3700" motorTorque="40" fuelUsageRatio="222"/>
+        <torque rpm="3900" motorTorque="40" fuelUsageRatio="224"/>
+        <torque rpm="4000" motorTorque="39" fuelUsageRatio="225"/>
+        <torque rpm="4200" motorTorque="39" fuelUsageRatio="227"/>
+        <torque rpm="4300" motorTorque="38" fuelUsageRatio="229"/>
+        <torque rpm="4400" motorTorque="38" fuelUsageRatio="230"/>
+        <torque rpm="4500" motorTorque="37" fuelUsageRatio="231"/>
+        <torque rpm="4600" motorTorque="37" fuelUsageRatio="235"/>
+        <torque rpm="4700" motorTorque="35" fuelUsageRatio="245"/>
+        <torque rpm="4800" motorTorque="32" fuelUsageRatio="263"/>
+        <torque rpm="4900" motorTorque="28" fuelUsageRatio="289"/>
+        <torque rpm="5000" motorTorque="23" fuelUsageRatio="321"/>
+        <torque rpm="5100" motorTorque="16" fuelUsageRatio="361"/>
+        <torque rpm="5200" motorTorque="9" fuelUsageRatio="408"/>
+        <torque rpm="5300" motorTorque="0" fuelUsageRatio="462"/>
+			</realEngine> 
+			
+			<gears tireWidth="135" tireRatio="80" rimDiameter="12" axleSpeed="4.333" defaultGear="1">
+				<gear name="1" forwardOnly="true" inverseRatio="3.250"/>
+				<gear name="2" forwardOnly="true" inverseRatio="2.067"/>
+				<gear name="3" forwardOnly="true" inverseRatio="1.300"/>
+				<gear name="4" forwardOnly="true" inverseRatio="0.872"/>
+				<gear name="R" reverseOnly="true" inverseRatio="4.024"/>
+			</gears>
 		</gearboxMogli>		
 	</vehicle>
 	

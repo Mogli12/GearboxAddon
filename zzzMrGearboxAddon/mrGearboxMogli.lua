@@ -78,6 +78,7 @@ mrGearboxMogliGlobals.blowOffVentilVol      = 0.14
 mrGearboxMogliGlobals.drawTargetRpm         = false 
 mrGearboxMogliGlobals.drawReqPower          = false
 mrGearboxMogliGlobals.defaultOn             = true
+mrGearboxMogliGlobals.noDisable             = false
 mrGearboxMogliGlobals.disableManual         = false
 mrGearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 mrGearboxMogliGlobals.minTimeToShift			  = 0  -- ms
@@ -394,7 +395,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 --**************************************************************************************************	
 	self.mrGbMS.ConfigVersion           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#version" ),1.4)
-	self.mrGbMS.DefaultOn               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#defaultOn" ),self.mrGbMG.defaultOn)
+	self.mrGbMS.NoDisable               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#noDisable" ),self.mrGbMG.noDisable)
+	if self.mrGbMS.NoDisable then
+		self.mrGbMS.DefaultOn             = true
+	else
+		self.mrGbMS.DefaultOn             = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#defaultOn" ),self.mrGbMG.defaultOn )
+	end
 	self.mrGbMS.showHud                 = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#showHud" ),true)
 	self.mrGbMS.drawTargetRpm           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#drawTargetRpm" ),self.mrGbMG.drawTargetRpm)
 	self.mrGbMS.SwapGearRangeKeys       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#swapGearRangeKeys" ),false)
@@ -742,7 +748,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 					local radius = getXMLFloat(xmlFile, xmlString .. ".gears#wheelRadius" )
 					if radius == nil then
 						local w = getXMLFloat(xmlFile, xmlString .. ".gears#tireWidth" )
-						local r = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#tireRatio" ), 0.8 )
+						local r = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#tireRatio" ), 80 )
 						local d = getXMLFloat(xmlFile, xmlString .. ".gears#rimDiameter" )
 						if w ~= nil and d ~= nil then
 							-- w is in mm
@@ -1222,7 +1228,9 @@ end
 function mrGearboxMogli:update(dt)
 	
 	local processInput = true
-	if mrGearboxMogli.mbIsActiveForInput(self, false) and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliON_OFF" ) then
+	if     self.mrGbMS.NoDisable then
+		self:mrGbMSetIsOnOff( true ) 
+	elseif mrGearboxMogli.mbIsActiveForInput(self, false) and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliON_OFF" ) then
 		if      self.isMotorStarted
 				and self.mrGbMS.IsOnOff
 				and ( ( self.dCcheckModule ~= nil
@@ -2411,7 +2419,7 @@ function mrGearboxMogli:draw()
 			
 			drawY = drawY - 0.75*deltaY renderText(ovRight, drawY, 0.5*deltaY, mrGearboxMogli.getText( "mrGearboxMogliVERSION", "Gearbox by mogli" ) )  		          
 
-			if InputBinding.mrGearboxMogliON_OFF ~= nil then
+			if InputBinding.mrGearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
 				g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliON", "Gearbox [on]"),  InputBinding.mrGearboxMogliON_OFF);		
 			end
 			if not ( self.mrGbMS.Hydrostatic ) and InputBinding.mrGearboxMogliAllAuto ~= nil then
@@ -2505,7 +2513,7 @@ function mrGearboxMogli:draw()
 		--renderText( x, y, t, text )
 			
 	else
-		if InputBinding.mrGearboxMogliON_OFF ~= nil then
+		if InputBinding.mrGearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
 			g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliOFF", "Gearbox [off]"), InputBinding.mrGearboxMogliON_OFF);		
 		end
 	end
