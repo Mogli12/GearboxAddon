@@ -456,6 +456,22 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.Engine.maxTorque = torque;
 		end;
 		
+		local ecoTorque = getXMLFloat(xmlFile, key.."#motorTorqueEco");
+		if ecoTorque == nil then
+			ecoTorque = getXMLFloat(xmlFile, key.."#ptoTorqueEco");
+			if ecoTorque ~= nil then
+				ecoTorque = ecoTorque / self.mrGbMS.TransmissionEfficiency
+			end
+		end		
+		if ecoTorque ~= nil then
+			ecoTorque = ecoTorque * torqueF 
+			
+			if self.mrGbMS.Engine.ecoTorqueValues == nil then
+				self.mrGbMS.Engine.ecoTorqueValues = {}
+			end
+			table.insert( self.mrGbMS.Engine.ecoTorqueValues, {v=ecoTorque, time = rpm} )
+		end
+		
 		local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio");
 		if fuelUsageRatio ~= nil then
 			if self.mrGbMS.Engine.fuelUsageValues == nil then
@@ -4083,7 +4099,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 				self.torqueCurve:addKeyframe( {v=kv, time=kt} )				
 			end
 		end		
-
+		
 		if vMax > 0 then
 			self.torqueCurve:addKeyframe( {v=0.9*vMax, time=tMax + 25} )
 			self.torqueCurve:addKeyframe( {v=0.5*vMax, time=tMax + 50} )
@@ -4096,6 +4112,26 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 		self.maxAllowedRpm  = self.ratedRpm + mrGearboxMogli.rpmPlus
 	end
 
+	self.ecoTorqueCurve   = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
+	if vehicle.mrGbMS.Engine.ecoTorqueValues ~= nil then
+		for _,k in pairs(vehicle.mrGbMS.Engine.ecoTorqueValues) do
+			self.ecoTorqueCurve:addKeyframe( k )	
+		end
+	else
+		for _,k in pairs(self.torqueCurve.keyframes) do
+			local torque = k.v
+			if k.time > self.maxTorqueRpm then
+				-- no Boost => only 90% of max power above max torque RPM
+				if k.time >= self.ratedRpm then
+					torque = math.min( torque, 0.9 * self.torqueCurve:get( self.ratedRpm ) )
+				else
+					torque = torque * ( 0.9 + 0.1 * ( self.ratedRpm - k.time ) / ( self.ratedRpm - self.maxTorqueRpm ) )
+				end
+			end
+			self.ecoTorqueCurve:addKeyframe( {v=torque, time=k.time} )
+		end
+	end
+	
 	self.fuelCurve = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
 	if vehicle.mrGbMS.Engine.fuelUsageValues == nil then		
 		self.fuelCurve:addKeyframe( { v = 1.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.stallRpm } )
@@ -4468,8 +4504,13 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and acc   < 1 then
 		limit               = self.minRequiredRpm + acc * ( self.maxAllowedRpm - self.minRequiredRpm )	
 	end
+	local currentTorqueCurve = self.torqueCurve
+	if self.vehicle.mrGbMS.EcoMode then
+		currentTorqueCurve = self.ecoTorqueCurve
+	end
+	
 	if self.nonClampedMotorRpm <= limit then
-		torque         	   =	self.torqueCurve:get( rpm )
+		torque         	   =	currentTorqueCurve:get( rpm )
 	end
 	
 	if      ( self.vehicle.mrGbMS.LimitRpmMode == "T" or self.vehicle.mrGbMS.LimitRpmMode == "TM" )
@@ -4491,15 +4532,6 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 
 	self.lastMotorTorque  = torque
-		
-	if self.vehicle.mrGbMS.EcoMode and rpm > self.maxTorqueRpm then
-		-- no Boost => only 90% of max power above max torque RPM
-		if rpm >= self.ratedRpm then
-			torque = math.min( torque, 0.9 * self.torqueCurve:get( self.ratedRpm ) )
-		else
-			torque = torque * ( 0.9 + 0.1 * ( self.ratedRpm - rpm ) / ( self.ratedRpm - self.maxTorqueRpm ) )
-		end
-	end
 	
 	local pt = 0
 	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
@@ -4537,7 +4569,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	if pt > 0 then
 		if not ( self.noTransmission or self.noTorque or self.vehicle.mrGbMS.HydrostaticLaunch ) then
-			local mt = self.torqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
+			local mt = currentTorqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
 			if mt < pt then
 			--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastMotorRpmR))
 				if self.ptoWarningTimer == nil then
@@ -4787,6 +4819,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					
 --**********************************************************************************************************	
 	-- current RPM and power
+
+	local currentTorqueCurve = self.torqueCurve
+	if self.vehicle.mrGbMS.EcoMode then
+		currentTorqueCurve = self.ecoTorqueCurve
+	end
+
 	self.minRequiredRpm = self.idleRpm
 	
 	lastPtoOn  = self.ptoOn
@@ -4813,7 +4851,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			p1 = p0 + 0.25 * i * ( p2 - p0 )
 			self.ptoMotorRpmRatio = p1 / ptoRpm
 				
-			if self.ptoMotorRpmRatio * self.torqueCurve:get( p1 ) >= ptoTq or p2 <= p0 then
+			if self.ptoMotorRpmRatio * currentTorqueCurve:get( p1 ) >= ptoTq or p2 <= p0 then
 				break
 			end
 		end
@@ -5228,7 +5266,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 					
 					local currentGearPower = self.absWheelSpeedRpm * gearRatio
-					currentGearPower = currentGearPower * self.torqueCurve:get( math.max( self.stallRpm, currentGearPower ))
+					currentGearPower = currentGearPower * currentTorqueCurve:get( math.max( self.stallRpm, currentGearPower ))
 
 					local bestSpeed   = nil
 					local minSpeed    = nil
@@ -5377,7 +5415,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 									shiftRpm  = Utils.clamp( self.targetRpm, self.stallRpm, self.ratedRpm )
 								end
 								
-								local power = rpm * self.torqueCurve:get( math.max( self.stallRpm, rpm ))
+								local power = rpm * currentTorqueCurve:get( math.max( self.stallRpm, rpm ))
 								
 							--if self.vehicle:mrGbMGetAutoShiftGears() and self.vehicle:mrGbMGetAutoShiftRange() then
 							--	if i == currentGear then
@@ -5538,7 +5576,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			else
 				for t = math.max(self.idleRpm,self.targetRpm-mrGearboxMogli.hydroEffDiff), m, 10 do
 					local h2 = Utils.clamp( w / t, hMin, self.vehicle.mrGbMS.HydrostaticMax )  
-					local e2 = math.min( self.hydroEff:get( h2 ) * t * self.torqueCurve:get( t ), requestedPower * self.vehicle.mrGbMS.TransmissionEfficiency )
+					local e2 = math.min( self.hydroEff:get( h2 ) * t * currentTorqueCurve:get( t ), requestedPower * self.vehicle.mrGbMS.TransmissionEfficiency )
 					if e2 > e + mrGearboxMogli.eps then
 						e = e2
 						h = h2

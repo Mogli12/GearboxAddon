@@ -2434,26 +2434,28 @@
 			<reverse ratio="1" shiftTimeMs="0" />
 			
 			<realEngine idleRpm="900" ratedRpm="2200">
-        <torque rpm="0" motorTorque="0" fuelUsageRatio="212"/><!-- 1900: 210 | 2200: 190 | 1500..1500: 875 | 0.8 | 0.1 -->
-        <torque rpm="700" motorTorque="427" fuelUsageRatio="212"/>
-        <torque rpm="800" motorTorque="532" fuelUsageRatio="212"/>
-        <torque rpm="900" motorTorque="623" fuelUsageRatio="212"/>
-        <torque rpm="1000" motorTorque="700" fuelUsageRatio="212"/>
-        <torque rpm="1100" motorTorque="763" fuelUsageRatio="211"/>
-        <torque rpm="1200" motorTorque="812" fuelUsageRatio="209"/>
-        <torque rpm="1300" motorTorque="847" fuelUsageRatio="209"/>
-        <torque rpm="1400" motorTorque="868" fuelUsageRatio="208"/>
-        <torque rpm="1500" motorTorque="875" fuelUsageRatio="208"/>
-        <torque rpm="1600" motorTorque="867" fuelUsageRatio="208"/>
-        <torque rpm="1700" motorTorque="848" fuelUsageRatio="209"/>
-        <torque rpm="1800" motorTorque="818" fuelUsageRatio="211"/>
-        <torque rpm="1900" motorTorque="776" fuelUsageRatio="214"/>
-        <torque rpm="2000" motorTorque="730" fuelUsageRatio="217"/>
-        <torque rpm="2100" motorTorque="672" fuelUsageRatio="221"/>
-        <torque rpm="2200" motorTorque="606" fuelUsageRatio="226"/>
-        <torque rpm="2300" motorTorque="539" fuelUsageRatio="251"/>
-        <torque rpm="2400" motorTorque="337" fuelUsageRatio="326"/>
-        <torque rpm="2500" motorTorque="0" fuelUsageRatio="452"/>
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="302"/><!-- 1800: 210(178.5) | 2200: 190(161.5) | 1500..1500: 875(787.5) | 85 | 0.5 -->
+        <torque rpm="100" motorTorque="157" motorTorqueEco="141" fuelUsageRatio="290"/>
+        <torque rpm="400" motorTorque="478" motorTorqueEco="431" fuelUsageRatio="257"/>
+        <torque rpm="700" motorTorque="656" motorTorqueEco="591" fuelUsageRatio="232"/>
+        <torque rpm="800" motorTorque="701" motorTorqueEco="631" fuelUsageRatio="225"/>
+        <torque rpm="900" motorTorque="744" motorTorqueEco="669" fuelUsageRatio="219"/>
+        <torque rpm="1000" motorTorque="784" motorTorqueEco="705" fuelUsageRatio="214"/>
+        <torque rpm="1100" motorTorque="817" motorTorqueEco="735" fuelUsageRatio="210"/>
+        <torque rpm="1200" motorTorque="842" motorTorqueEco="758" fuelUsageRatio="207"/>
+        <torque rpm="1300" motorTorque="860" motorTorqueEco="774" fuelUsageRatio="205"/>
+        <torque rpm="1400" motorTorque="871" motorTorqueEco="784" fuelUsageRatio="204"/>
+        <torque rpm="1500" motorTorque="875" motorTorqueEco="788" fuelUsageRatio="203"/>
+        <torque rpm="1600" motorTorque="863" motorTorqueEco="767" fuelUsageRatio="204"/>
+        <torque rpm="1700" motorTorque="844" motorTorqueEco="737" fuelUsageRatio="205"/>
+        <torque rpm="1800" motorTorque="819" motorTorqueEco="696" fuelUsageRatio="208"/>
+        <torque rpm="1900" motorTorque="772" motorTorqueEco="656" fuelUsageRatio="211"/>
+        <torque rpm="2000" motorTorque="720" motorTorqueEco="612" fuelUsageRatio="215"/>
+        <torque rpm="2100" motorTorque="665" motorTorqueEco="565" fuelUsageRatio="220"/>
+        <torque rpm="2200" motorTorque="606" motorTorqueEco="515" fuelUsageRatio="226"/>
+        <torque rpm="2300" motorTorque="539" motorTorqueEco="458" fuelUsageRatio="251"/>
+        <torque rpm="2400" motorTorque="337" motorTorqueEco="286" fuelUsageRatio="326"/>
+        <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="452"/>
 			</realEngine>
 		</gearboxMogli>	
 	</vehicle>
@@ -3224,23 +3226,30 @@
 			<reverse ratio="1" shiftTimeMs="0" />
 			
 			<realEngine idleRpm="1000" ratedRpm="2000">
-        <torque rpm="0" motorTorque="0"/><!-- 1800: 1078 | 2000: 1043 | 1700..1700: 4280 | 0.95 | 0.5 -->
-        <torque rpm="700" motorTorque="3843"/>
-        <torque rpm="800" motorTorque="3926"/>
-        <torque rpm="900" motorTorque="4000"/>
-        <torque rpm="1000" motorTorque="4066"/>
-        <torque rpm="1100" motorTorque="4123"/>
-        <torque rpm="1200" motorTorque="4171"/>
-        <torque rpm="1300" motorTorque="4210"/>
-        <torque rpm="1400" motorTorque="4241"/>
-        <torque rpm="1500" motorTorque="4263"/>
-        <torque rpm="1600" motorTorque="4276"/>
-        <torque rpm="1700" motorTorque="4280"/>
-        <torque rpm="1800" motorTorque="4205"/>
-        <torque rpm="1900" motorTorque="3952"/>
-        <torque rpm="2000" motorTorque="3662"/>
-        <torque rpm="2100" motorTorque="2747"/>
-        <torque rpm="2200" motorTorque="0"/>
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="422"/><!-- 1800: 1078 | 2000: 1043 | 1700..1700: 4280 | 0.9 | 0.5 -->
+        <torque rpm="100" motorTorque="903" motorTorqueEco="527" fuelUsageRatio="395"/>
+        <torque rpm="200" motorTorque="1685" motorTorqueEco="984" fuelUsageRatio="370"/>
+        <torque rpm="300" motorTorque="2347" motorTorqueEco="1371" fuelUsageRatio="347"/>
+        <torque rpm="400" motorTorque="2889" motorTorqueEco="1688" fuelUsageRatio="326"/>
+        <torque rpm="500" motorTorque="3310" motorTorqueEco="1934" fuelUsageRatio="307"/>
+        <torque rpm="600" motorTorque="3611" motorTorqueEco="2109" fuelUsageRatio="289"/>
+        <torque rpm="700" motorTorque="3752" motorTorqueEco="2191" fuelUsageRatio="274"/>
+        <torque rpm="800" motorTorque="3852" motorTorqueEco="2250" fuelUsageRatio="260"/>
+        <torque rpm="900" motorTorque="3942" motorTorqueEco="2302" fuelUsageRatio="248"/>
+        <torque rpm="1000" motorTorque="4021" motorTorqueEco="2349" fuelUsageRatio="238"/>
+        <torque rpm="1100" motorTorque="4090" motorTorqueEco="2389" fuelUsageRatio="230"/>
+        <torque rpm="1200" motorTorque="4148" motorTorqueEco="2423" fuelUsageRatio="223"/>
+        <torque rpm="1300" motorTorque="4195" motorTorqueEco="2451" fuelUsageRatio="219"/>
+        <torque rpm="1400" motorTorque="4232" motorTorqueEco="2472" fuelUsageRatio="216"/>
+        <torque rpm="1500" motorTorque="4259" motorTorqueEco="2488" fuelUsageRatio="215"/>
+        <torque rpm="1600" motorTorque="4275" motorTorqueEco="2497" fuelUsageRatio="216"/>
+        <torque rpm="1700" motorTorque="4280" motorTorqueEco="2500" fuelUsageRatio="218"/>
+        <torque rpm="1800" motorTorque="4205" motorTorqueEco="2485" fuelUsageRatio="221"/>
+        <torque rpm="1900" motorTorque="3952" motorTorqueEco="2320" fuelUsageRatio="225"/>
+        <torque rpm="2000" motorTorque="3662" motorTorqueEco="2107" fuelUsageRatio="231"/>
+        <torque rpm="2100" motorTorque="3255" motorTorqueEco="1873" fuelUsageRatio="257"/>
+        <torque rpm="2200" motorTorque="2034" motorTorqueEco="1170" fuelUsageRatio="334"/>
+        <torque rpm="2300" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="462"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
