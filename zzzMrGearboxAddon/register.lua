@@ -5,6 +5,7 @@ mrGearboxMogliRegister.g_currentModDirectory = g_currentModDirectory;
 
 if SpecializationUtil.specializations["mrGearboxMogliLoader"] == nil then
 	SpecializationUtil.registerSpecialization("mrGearboxMogliLoader", "mrGearboxMogliLoader", g_currentModDirectory.."mrGearboxMogliLoader.lua")
+	SpecializationUtil.registerSpecialization("mrGearboxMogli", "mrGearboxMogli", g_currentModDirectory.."mrGearboxMogli.lua")
 	SpecializationUtil.registerSpecialization("tempomatMogli", "tempomatMogli", g_currentModDirectory.."tempomatMogli.lua")
 	mrGearboxMogliRegister.isLoaded = false;
 end;
@@ -37,6 +38,7 @@ function mrGearboxMogliRegister:add()
 
 	local searchTable  = { "mrGearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox", "gearboxMogli" };	
 	local searchTable2 = { "tempomat", "tempomatMogli" };	
+	local replObj      = SpecializationUtil.getSpecialization("mrGearboxMogli")
 	
 	--for n,s in pairs(SpecializationUtil.specializations) do
 	--	print(tostring(n).." "..tostring(s.className))
@@ -48,11 +50,33 @@ function mrGearboxMogliRegister:add()
 		local addSpecialization2 = true;
 		local correctLocation    = false;
 		
-		for _, search in pairs(searchTable) do
-			if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
-				addSpecialization = false;
-				print(string.format("zzzMrGearboxAddon: %s already has a gearbox (2)", modName))
-				break;
+		if modName ~= nil and modName ~= "" and modName.mrGearboxMogli ~= nil then
+			addSpecialization = false;
+			
+		else
+			for _, search in pairs(searchTable) do
+				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
+					addSpecialization = false;
+					print(string.format("zzzMrGearboxAddon: %s already has a gearbox (2)", modName))
+					
+					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
+					
+					if     obj == nil then
+						print("zzzMrGearboxAddon: obj is nil")
+					elseif obj.version ~= nil and obj.version >= replObj.version then
+						print("zzzMrGearboxAddon: obj.version >= replObj.version")
+					else
+				--if obj ~= nil and obj.version ~= nil and obj.version < replObj.version then
+						for i,o in pairs(v.specializations) do
+							if o == obj then
+								v.specializations[i] = replObj 
+								print(string.format("zzzMrGearboxAddon: !!!updating gearbox in %s!!!", modName))
+							end
+						end
+					end
+					
+					break;
+				end;
 			end;
 		end;
 		

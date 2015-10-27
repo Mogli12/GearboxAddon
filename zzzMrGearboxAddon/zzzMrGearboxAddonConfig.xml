@@ -3208,7 +3208,7 @@
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBigX1100.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultLiterPerSqm="4.3" defaultWidth="10.5"/>
+			<combine defaultFruit="chaff" defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3225,31 +3225,27 @@
 			</gears>
 			<reverse ratio="1" shiftTimeMs="0" />
 			
-			<realEngine idleRpm="1000" ratedRpm="2000">
-        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="422"/><!-- 1800: 1078 | 2000: 1043 | 1700..1700: 4280 | 0.9 | 0.5 -->
-        <torque rpm="100" motorTorque="903" motorTorqueEco="527" fuelUsageRatio="395"/>
-        <torque rpm="200" motorTorque="1685" motorTorqueEco="984" fuelUsageRatio="370"/>
-        <torque rpm="300" motorTorque="2347" motorTorqueEco="1371" fuelUsageRatio="347"/>
-        <torque rpm="400" motorTorque="2889" motorTorqueEco="1688" fuelUsageRatio="326"/>
-        <torque rpm="500" motorTorque="3310" motorTorqueEco="1934" fuelUsageRatio="307"/>
-        <torque rpm="600" motorTorque="3611" motorTorqueEco="2109" fuelUsageRatio="289"/>
-        <torque rpm="700" motorTorque="3752" motorTorqueEco="2191" fuelUsageRatio="274"/>
-        <torque rpm="800" motorTorque="3852" motorTorqueEco="2250" fuelUsageRatio="260"/>
-        <torque rpm="900" motorTorque="3942" motorTorqueEco="2302" fuelUsageRatio="248"/>
-        <torque rpm="1000" motorTorque="4021" motorTorqueEco="2349" fuelUsageRatio="238"/>
-        <torque rpm="1100" motorTorque="4090" motorTorqueEco="2389" fuelUsageRatio="230"/>
-        <torque rpm="1200" motorTorque="4148" motorTorqueEco="2423" fuelUsageRatio="223"/>
-        <torque rpm="1300" motorTorque="4195" motorTorqueEco="2451" fuelUsageRatio="219"/>
-        <torque rpm="1400" motorTorque="4232" motorTorqueEco="2472" fuelUsageRatio="216"/>
-        <torque rpm="1500" motorTorque="4259" motorTorqueEco="2488" fuelUsageRatio="215"/>
-        <torque rpm="1600" motorTorque="4275" motorTorqueEco="2497" fuelUsageRatio="216"/>
-        <torque rpm="1700" motorTorque="4280" motorTorqueEco="2500" fuelUsageRatio="218"/>
-        <torque rpm="1800" motorTorque="4205" motorTorqueEco="2485" fuelUsageRatio="221"/>
-        <torque rpm="1900" motorTorque="3952" motorTorqueEco="2320" fuelUsageRatio="225"/>
-        <torque rpm="2000" motorTorque="3662" motorTorqueEco="2107" fuelUsageRatio="231"/>
-        <torque rpm="2100" motorTorque="3255" motorTorqueEco="1873" fuelUsageRatio="257"/>
-        <torque rpm="2200" motorTorque="2034" motorTorqueEco="1170" fuelUsageRatio="334"/>
-        <torque rpm="2300" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="462"/>
+			<realEngine idleRpm="800" ratedRpm="2000">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="326"/><!-- 1800: 1078(640.332) | 2000: 1048(576.4) | 1700..1700: 4280(2636.48) | 97 | 0.5 -->
+        <torque rpm="100" motorTorque="1336" motorTorqueEco="823" fuelUsageRatio="308"/>
+        <torque rpm="400" motorTorque="3563" motorTorqueEco="2195" fuelUsageRatio="266"/>
+        <torque rpm="700" motorTorque="4117" motorTorqueEco="2536" fuelUsageRatio="238"/>
+        <torque rpm="800" motorTorque="4152" motorTorqueEco="2557" fuelUsageRatio="233"/>
+        <torque rpm="900" motorTorque="4179" motorTorqueEco="2574" fuelUsageRatio="228"/>
+        <torque rpm="1000" motorTorque="4202" motorTorqueEco="2589" fuelUsageRatio="226"/>
+        <torque rpm="1100" motorTorque="4223" motorTorqueEco="2601" fuelUsageRatio="225"/>
+        <torque rpm="1200" motorTorque="4240" motorTorqueEco="2612" fuelUsageRatio="225"/>
+        <torque rpm="1300" motorTorque="4255" motorTorqueEco="2621" fuelUsageRatio="226"/>
+        <torque rpm="1400" motorTorque="4266" motorTorqueEco="2628" fuelUsageRatio="228"/>
+        <torque rpm="1500" motorTorque="4274" motorTorqueEco="2633" fuelUsageRatio="230"/>
+        <torque rpm="1600" motorTorque="4278" motorTorqueEco="2636" fuelUsageRatio="233"/>
+        <torque rpm="1700" motorTorque="4280" motorTorqueEco="2636" fuelUsageRatio="236"/>
+        <torque rpm="1800" motorTorque="4205" motorTorqueEco="2490" fuelUsageRatio="240"/>
+        <torque rpm="1900" motorTorque="3956" motorTorqueEco="2300" fuelUsageRatio="245"/>
+        <torque rpm="2000" motorTorque="3680" motorTorqueEco="2060" fuelUsageRatio="250"/>
+        <torque rpm="2100" motorTorque="3271" motorTorqueEco="1799" fuelUsageRatio="278"/>
+        <torque rpm="2200" motorTorque="2044" motorTorqueEco="1124" fuelUsageRatio="361"/>
+        <torque rpm="2300" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="500"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
@@ -3259,7 +3255,7 @@
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
 		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
-			<combine defaultLiterPerSqm="4.3" defaultWidth="9.0"/>
+			<combine defaultFruit="chaff" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3353,7 +3349,7 @@
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultLiterPerSqm="4.3" defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
+			<combine defaultFruit="chaff" defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -3447,7 +3443,7 @@
 		<configFile modName="CZMOD_KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
-			<combine defaultLiterPerSqm="4.3" defaultWidth="7.5"/>
+			<combine defaultFruit="chaff" defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
