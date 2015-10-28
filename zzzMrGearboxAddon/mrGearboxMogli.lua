@@ -290,12 +290,12 @@ function mrGearboxMogli:initClient()
 		local x = g_currentMission.speedHud.x - w * 0.25
 		local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
 		
-		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowDownWhite = Overlay:new("ovArrowDownWhite", Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_down_white.dds", mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."arrow_down_gray.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."hand_brake_up.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
-		mrGearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename(mrGearboxMogliGlobals.ddsDirectory.."hand_brake_down.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownWhite = Overlay:new("ovArrowDownWhite", Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_down_white.dds", mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_down_gray.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_up.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
+		mrGearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_down.dds",  mrGearboxMogli.baseDirectory), x, y, w, h)
 	end
 	
 	self.mrGbMD.Rpm        = 0 

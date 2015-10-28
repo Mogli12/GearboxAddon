@@ -3733,4 +3733,53 @@
 		</gearboxMogli>
 	</vehicle>	
 	
+	<vehicle>
+		<configFile modName="ClassDominator" xmlName="dominator.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false">
+			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2100" threshingSoundOffset="1" threshingSoundScale="0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
+				<gear name="I"   speed="4"  forwardOnly="true"/>
+				<gear name="II"  speed="8"  forwardOnly="true"/>
+				<gear name="R"   speed="8"  reverseOnly="true"/>
+				<gear name="III" speed="16" forwardOnly="true"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="1500" />
+			
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="302"/><!-- 2200: 162(130.41) | 2200: 162(130.41) | 1400..1400: 662(622.28) | 97 | 0.5 -->
+        <torque rpm="100" motorTorque="178" motorTorqueEco="168" fuelUsageRatio="287"/>
+        <torque rpm="400" motorTorque="506" motorTorqueEco="475" fuelUsageRatio="249"/>
+        <torque rpm="700" motorTorque="620" motorTorqueEco="583" fuelUsageRatio="223"/>
+        <torque rpm="800" motorTorque="633" motorTorqueEco="595" fuelUsageRatio="217"/>
+        <torque rpm="900" motorTorque="642" motorTorqueEco="604" fuelUsageRatio="212"/>
+        <torque rpm="1000" motorTorque="649" motorTorqueEco="610" fuelUsageRatio="208"/>
+        <torque rpm="1100" motorTorque="655" motorTorqueEco="616" fuelUsageRatio="206"/>
+        <torque rpm="1200" motorTorque="659" motorTorqueEco="619" fuelUsageRatio="205"/>
+        <torque rpm="1300" motorTorque="661" motorTorqueEco="622" fuelUsageRatio="205"/>
+        <torque rpm="1400" motorTorque="662" motorTorqueEco="622" fuelUsageRatio="206"/>
+        <torque rpm="1500" motorTorque="652" motorTorqueEco="608" fuelUsageRatio="207"/>
+        <torque rpm="1600" motorTorque="639" motorTorqueEco="590" fuelUsageRatio="209"/>
+        <torque rpm="1700" motorTorque="625" motorTorqueEco="569" fuelUsageRatio="211"/>
+        <torque rpm="1800" motorTorque="608" motorTorqueEco="545" fuelUsageRatio="213"/>
+        <torque rpm="1900" motorTorque="588" motorTorqueEco="518" fuelUsageRatio="216"/>
+        <torque rpm="2000" motorTorque="567" motorTorqueEco="487" fuelUsageRatio="220"/>
+        <torque rpm="2100" motorTorque="543" motorTorqueEco="453" fuelUsageRatio="224"/>
+        <torque rpm="2200" motorTorque="517" motorTorqueEco="416" fuelUsageRatio="228"/>
+        <torque rpm="2300" motorTorque="460" motorTorqueEco="370" fuelUsageRatio="253"/>
+        <torque rpm="2400" motorTorque="287" motorTorqueEco="231" fuelUsageRatio="329"/>
+        <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="456"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+	
 </vehicles>
