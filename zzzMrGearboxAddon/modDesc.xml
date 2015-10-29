@@ -106,8 +106,8 @@
 		<input name="mrGearboxMogliCONFLICT_3"      key1="KEY_lshift KEY_space" category="VEHICLE" visible="false" />
 		<input name="mrGearboxMogliCONFLICT_4"      key1="KEY_lctrl KEY_space"	category="VEHICLE" visible="false" />
     <input name="mrGearboxMogliCLUTCH_3"				key1="KEY_period"            category="VEHICLE" />
-    <axis name="mrGearboxMogliCLUTCH" axis="AXIS_9"  invert="false" category="VEHICLE" visible="true" />
-    <axis name="mrGearboxMogliMINRPM" key1="KEY_equals" key2="KEY_minus"  axis="AXIS_10" invert="false" category="VEHICLE" visible="true" />
+    <axis name="mrGearboxMogliCLUTCH" axis="AXIS_6" device="0" invert="false" category="VEHICLE" visible="true" />
+    <axis name="mrGearboxMogliMINRPM" key1="KEY_equals" key2="KEY_minus"  axis="AXIS_8" device="0" invert="false" category="VEHICLE" visible="true" />
 	</inputBindings>
 
 	<extraSourceFiles>

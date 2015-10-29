@@ -68,7 +68,8 @@ mrGearboxMogli.ptoSpeedLimitMin     = 4 / 3.6  -- minimal speed limit
 mrGearboxMogli.ptoSpeedLimitIni     = 0 / 3.6  -- initial offset for ptoSpeedLimit 
 mrGearboxMogli.ptoSpeedLimitOff     = 1 / 3.6  -- turn off ptoSpeedLimit 
 mrGearboxMogli.ptoSpeedLimitDec     = 0 / 3600 -- brake 
-mrGearboxMogli.ptoSpeedLimitInc     = 1.5 / 3600 -- accelerate by 1 km/h per second 
+mrGearboxMogli.ptoSpeedLimitInc     = 2 / 3600 -- accelerate by 2 km/h per second 
+mrGearboxMogli.ptoSpeedLimitRatio   = 0.15
 mrGearboxMogli.combineDefaultSpeed  = 7 -- km/h
 mrGearboxMogli.combineUseRealArea   = true
 
@@ -532,8 +533,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
 	end
 	
-	local maxPtoTorqueRatio = 0.25
-	local maxPtoTorqueSpeed = 30
+	local maxPtoTorqueRatio = 0.2
+	local maxPtoTorqueSpeed = 20
 
 	self.mrGbMS.PtoSpeedLimit	          = Utils.getNoNil( getXMLBool(xmlFile, xmlString .. "#ptoSpeedLimit"), self.mrGbMG.ptoSpeedLimit )
 	
@@ -595,7 +596,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			sqm = sqm * 2
 		end
 		
-		maxPtoTorqueSpeed = 3 * speed 
+		maxPtoTorqueSpeed = 2 * speed 
 		
 		-- 90% of rated power in kW
 		local pwr   = getXMLFloat(xmlFile, xmlString .. ".combine#availableThreshingPower")
@@ -656,19 +657,25 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			dci = dpi * 0.06/0.94
 		end
 		
+		if math.abs( mrGearboxMogli.combineDefaultSpeed - speed ) > 0.1 then
+			dp0 = dp0 * mrGearboxMogli.combineDefaultSpeed / speed 
+			dc0 = dc0 * mrGearboxMogli.combineDefaultSpeed / speed 
+		end
+		
 		if self.mrGbMG.debugPrint then
 			print(string.format("pwr: %4.3f sqm: %3.0f du0: %4.3f dp0: %4.3f dpi: %3.3f dc0: %4.3f dci: %3.3f || %4.3f   %4.3f ||", pwr, sqm, du0, dp0, dpi, dc0, dci, pwr/width, dp0/width ))
 		end			
 			
-		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.5 * ( self.mrGbMS.IdleRpm + self.mrGbMS.RatedRpm ) )
+		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.4 * self.mrGbMS.IdleRpm + 0.6 * self.mrGbMS.RatedRpm )
 		self.mrGbMS.ThreshingMaxRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm")                      , self.mrGbMS.RatedRpm )
 		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 ) * f
+		
 		self.mrGbMS.ThreshingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumption")   , dp0 ) * f
 		self.mrGbMS.ThreshingPowerConsumptionInc = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumptionInc"), dpi ) * f
 		self.mrGbMS.ChopperPowerConsumption      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#chopperPowerConsumption")     , dc0 ) * f
 		self.mrGbMS.ChopperPowerConsumptionInc   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#chopperPowerConsumptionInc")  , dci ) * f
 		
-		self.mrGbMS.ThreshingReductionFactor     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#powerReductionFactor")        , 1 ) 
+		self.mrGbMS.ThreshingReductionFactor     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#powerReductionFactor")        , 0 ) 
 		self.mrGbMS.ThreshingSoundOffset         = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingSoundOffset")        , 0.95 ) 
 		self.mrGbMS.ThreshingSoundScale          = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingSoundScale")         , 0.1 ) 
   end
@@ -2017,7 +2024,8 @@ function mrGearboxMogli:update(dt)
 	end
 	
 --**********************************************************************************************************			
-
+-- area per second calculation for combines 
+--**********************************************************************************************************			
 	if self.mrGbML.strawDisableTime ~= nil and self.mrGbML.strawDisableTime > g_currentMission.time then 
 		local timeUntilDisable = self.mrGbML.strawDisableTime - g_currentMission.time
 		local numToDrop
@@ -4705,42 +4713,20 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 				or torque < 1e-4 then
 			self.lastPtoTorque = 0
 			self.ptoSpeedLimit = nil
-		elseif torque < self.motorLoad + pt then
+		elseif  torque < self.motorLoad + pt then
 			if 0 <= maxPtoTorqueRatio and maxPtoTorqueRatio < 1 then
 				local m = math.min( ( 1 - maxPtoTorqueRatio ), self.motorLoad / torque )
 				self.lastPtoTorque = math.min( pt, ( 1 - m ) * torque )
 			else
 				self.lastPtoTorque = torque
 			end
-			-- accelerate smoothly
-		--if      self.hydroEff ~= nil 
-		--		and mrGearboxMogli.ptoSpeedLimitDec > 0 
-			if      self.vehicle.mrGbMS.PtoSpeedLimit
-					and ( not ( self.vehicle.steeringEnabled ) or self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF )
-					and self.vehicle.lastSpeedReal*1000 > mrGearboxMogli.ptoSpeedLimitMin then
-				if self.ptoSpeedLimit ~= nil then
-					self.ptoSpeedLimit = math.max( self.ptoSpeedLimit - self.tickDt * mrGearboxMogli.ptoSpeedLimitDec, mrGearboxMogli.ptoSpeedLimitMin )
-				else		
-					self.ptoSpeedLimit = math.max( self.vehicle.lastSpeedReal*1000 - mrGearboxMogli.ptoSpeedLimitIni, mrGearboxMogli.ptoSpeedLimitMin )
-				end
-			else
-				self.ptoSpeedLimit   = nil
-			end
 		else
 			self.lastPtoTorque = pt
-			if self.ptoSpeedLimit ~= nil then
-				self.ptoSpeedLimit = self.ptoSpeedLimit + self.tickDt * mrGearboxMogli.ptoSpeedLimitInc
-				if self.ptoSpeedLimit > self.vehicle.lastSpeedReal*1000 + mrGearboxMogli.ptoSpeedLimitOff then
-					self.ptoSpeedLimit = nil
-				end
-			end
 		end
 		
 		if self.lastPtoTorque < pt then
 			self.lastMissingTorque = self.lastMissingTorque + pt - self.lastPtoTorque
 		end
-		
-		--self.lastPtoTorque = math.min( pt, maxPtoTorqueRatio * torque )		
 		torque             = torque - self.lastPtoTorque
 	else
 		if self.ptoWarningTimer ~= nil then
@@ -4807,6 +4793,26 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	torque = torque - self.lastLostTorque	
 	
 	self.lastTransTorque = torque
+	
+	if      self.lastMissingTorque > mrGearboxMogli.ptoSpeedLimitRatio * self.lastMotorTorque 
+			and self.vehicle.mrGbMS.PtoSpeedLimit 
+			and ( not ( self.vehicle.steeringEnabled ) or self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF )
+			and self.vehicle.lastSpeedReal*1000 > mrGearboxMogli.ptoSpeedLimitMin then
+		if self.ptoSpeedLimit ~= nil then
+			self.ptoSpeedLimit = math.max( self.ptoSpeedLimit - self.tickDt * mrGearboxMogli.ptoSpeedLimitDec, mrGearboxMogli.ptoSpeedLimitMin )
+		else		
+			self.ptoSpeedLimit = math.max( self.vehicle.lastSpeedReal*1000 - mrGearboxMogli.ptoSpeedLimitIni, mrGearboxMogli.ptoSpeedLimitMin )
+		end
+	elseif self.ptoSpeedLimit ~= nil then
+		if mrGearboxMogli.ptoSpeedLimitInc > 0 then
+			self.ptoSpeedLimit = self.ptoSpeedLimit + self.tickDt * mrGearboxMogli.ptoSpeedLimitInc
+			if self.ptoSpeedLimit > self.vehicle.lastSpeedReal*1000 + mrGearboxMogli.ptoSpeedLimitOff then
+				self.ptoSpeedLimit = nil
+			end
+		else
+			self.ptoSpeedLimit = nil
+		end
+	end
 	
 	return torque, brakePedal
 end
