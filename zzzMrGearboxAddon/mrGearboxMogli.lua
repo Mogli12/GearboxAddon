@@ -4316,6 +4316,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	self.rpmFadeOutRange         = motor.rpmFadeOutRange
 	self.clutchRpm               = 0
 	self.motorLoad               = 0
+	self.targetRpm               = self.idleRpm
 	self.requiredWheelTorque     = 0
 
 	self.maxForwardSpeed         = motor.maxForwardSpeed 
@@ -4610,7 +4611,10 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 	local torque          = 0
 	local limit           = self.maxAllowedRpm
-	if      self.vehicle.steeringEnabled 
+	if     self.noTransmission 
+			or self.noTorque then
+		limit               = self.maxPossibleRpm
+	elseif  self.vehicle.steeringEnabled 
 			and limit > self.minRequiredRpm 
 			and acc   < 1 then
 		limit               = self.minRequiredRpm + acc * ( self.maxAllowedRpm - self.minRequiredRpm )	
@@ -4707,15 +4711,18 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 		
 		local maxPtoTorqueRatio = math.min( 1, self.vehicle.mrGbMS.MaxPtoTorqueRatio + math.abs( self.vehicle.lastSpeedReal*3600 ) * self.vehicle.mrGbMS.MaxPtoTorqueRatioInc )
+		local lastDriveTorque   = self.motorLoad
 		
-		if     self.noTransmission 
-				or self.noTorque
-				or torque < 1e-4 then
+		if     torque < 1e-4 then
 			self.lastPtoTorque = 0
 			self.ptoSpeedLimit = nil
-		elseif  torque < self.motorLoad + pt then
+		elseif self.noTransmission 
+				or self.noTorque then
+			self.lastPtoTorque = math.min( torque, pt )
+			self.ptoSpeedLimit = nil
+		elseif  torque < lastDriveTorque + pt then
 			if 0 <= maxPtoTorqueRatio and maxPtoTorqueRatio < 1 then
-				local m = math.min( ( 1 - maxPtoTorqueRatio ), self.motorLoad / torque )
+				local m = math.min( ( 1 - maxPtoTorqueRatio ), lastDriveTorque / torque )
 				self.lastPtoTorque = math.min( pt, ( 1 - m ) * torque )
 			else
 				self.lastPtoTorque = torque
@@ -4794,7 +4801,10 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	self.lastTransTorque = torque
 	
-	if      self.lastMissingTorque > mrGearboxMogli.ptoSpeedLimitRatio * self.lastMotorTorque 
+	if     self.noTransmission 
+			or self.noTorque then
+		self.ptoSpeedLimit = nil
+	elseif  self.lastMissingTorque > mrGearboxMogli.ptoSpeedLimitRatio * self.lastMotorTorque 
 			and self.vehicle.mrGbMS.PtoSpeedLimit 
 			and ( not ( self.vehicle.steeringEnabled ) or self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF )
 			and self.vehicle.lastSpeedReal*1000 > mrGearboxMogli.ptoSpeedLimitMin then

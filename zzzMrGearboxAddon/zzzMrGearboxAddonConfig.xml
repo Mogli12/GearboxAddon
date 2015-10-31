@@ -3781,5 +3781,97 @@
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
+
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-mega-208-218-pack -->
+		<configFile modName="ClaasMega218" xmlName="ClaasMega208.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="6.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8" />
+				<gear name="street" speed="16"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
+        <torque rpm="100" motorTorque="194" motorTorqueEco="194" fuelUsageRatio="251"/>
+        <torque rpm="400" motorTorque="399" motorTorqueEco="399" fuelUsageRatio="228"/>
+        <torque rpm="700" motorTorque="827" motorTorqueEco="827" fuelUsageRatio="210"/>
+        <torque rpm="800" motorTorque="951" motorTorqueEco="951" fuelUsageRatio="206"/>
+        <torque rpm="900" motorTorque="1038" motorTorqueEco="1038" fuelUsageRatio="203"/>
+        <torque rpm="1000" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="200"/>
+        <torque rpm="1100" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="198"/>
+        <torque rpm="1200" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="197"/>
+        <torque rpm="1300" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="196"/>
+        <torque rpm="1400" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="196"/>
+        <torque rpm="1500" motorTorque="1050" motorTorqueEco="1050" fuelUsageRatio="197"/><!-- manualData: 1050-->
+        <torque rpm="1600" motorTorque="1010" motorTorqueEco="1010" fuelUsageRatio="199"/><!-- manualData: 1010-->
+        <torque rpm="1700" motorTorque="960" motorTorqueEco="960" fuelUsageRatio="201"/><!-- manualData: 960-->
+        <torque rpm="1800" motorTorque="910" motorTorqueEco="910" fuelUsageRatio="204"/><!-- manualData: 910-->
+        <torque rpm="1900" motorTorque="865" motorTorqueEco="865" fuelUsageRatio="208"/>
+        <torque rpm="2000" motorTorque="822" motorTorqueEco="822" fuelUsageRatio="213"/>
+        <torque rpm="2100" motorTorque="786" motorTorqueEco="786" fuelUsageRatio="218"/>
+        <torque rpm="2200" motorTorque="716" motorTorqueEco="716" fuelUsageRatio="242"/>
+        <torque rpm="2300" motorTorque="464" motorTorqueEco="464" fuelUsageRatio="315"/>
+        <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="436"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-mega-208-218-pack -->
+		<configFile modName="ClaasMega218" xmlName="ClaasMega218.xml"/>
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="6.6"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="8.6" />
+				<gear name="street" speed="17.2"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 270(230.604545454545) | 2100: 271(218.155) | 1000..1550: 1173(1102.62) | 97 | 1 | 300 | 2.2 -->
+        <torque rpm="100" motorTorque="212" motorTorqueEco="200" fuelUsageRatio="251"/>
+        <torque rpm="400" motorTorque="437" motorTorqueEco="411" fuelUsageRatio="228"/>
+        <torque rpm="700" motorTorque="906" motorTorqueEco="852" fuelUsageRatio="210"/>
+        <torque rpm="800" motorTorque="1042" motorTorqueEco="980" fuelUsageRatio="206"/>
+        <torque rpm="900" motorTorque="1138" motorTorqueEco="1070" fuelUsageRatio="203"/>
+        <torque rpm="1000" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="200"/>
+        <torque rpm="1100" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="198"/>
+        <torque rpm="1200" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="197"/>
+        <torque rpm="1300" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="196"/>
+        <torque rpm="1400" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="196"/>
+        <torque rpm="1500" motorTorque="1173" motorTorqueEco="1103" fuelUsageRatio="197"/>
+        <torque rpm="1600" motorTorque="1148" motorTorqueEco="1067" fuelUsageRatio="199"/>
+        <torque rpm="1700" motorTorque="1098" motorTorqueEco="995" fuelUsageRatio="201"/>
+        <torque rpm="1800" motorTorque="1048" motorTorqueEco="924" fuelUsageRatio="204"/>
+        <torque rpm="1900" motorTorque="998" motorTorqueEco="852" fuelUsageRatio="208"/>
+        <torque rpm="2000" motorTorque="949" motorTorqueEco="799" fuelUsageRatio="213"/>
+        <torque rpm="2100" motorTorque="906" motorTorqueEco="729" fuelUsageRatio="218"/>
+        <torque rpm="2200" motorTorque="825" motorTorqueEco="664" fuelUsageRatio="242"/>
+        <torque rpm="2300" motorTorque="535" motorTorqueEco="431" fuelUsageRatio="315"/>
+        <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="436"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
 	
 </vehicles>
