@@ -27,7 +27,7 @@ mrGearboxMogli.eps                  = 1E-6
 mrGearboxMogli.factor30pi           = 9.5492965855137201461330258023509
 mrGearboxMogli.factorpi30           = 0.10471975511965977461542144610932
 mrGearboxMogli.factor255            = 0.0039215686274509803921568627451
-mrGearboxMogli.rpmMinus             = 100  -- min RPM at 900 RPM
+mrGearboxMogli.rpmMinus             = 500 -- 100  -- min RPM at 900 RPM
 mrGearboxMogli.rpmFadeOut           = 100  -- no torque at 2300 RPM
 mrGearboxMogli.rpmPlus              = 200  -- braking at 2350 RPM
 mrGearboxMogli.ptoRpmFactor         = 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
@@ -109,6 +109,11 @@ mrGearboxMogliGlobals.smoothTargetSlow      = 0.01 --0.025
 mrGearboxMogliGlobals.ddsDirectory          = "dds/"
 mrGearboxMogliGlobals.initMotorOnLoad       = true
 mrGearboxMogliGlobals.ptoSpeedLimit         = true
+mrGearboxMogliGlobals.clutchFrom            = 0.2
+mrGearboxMogliGlobals.clutchTo              = 0.7
+mrGearboxMogliGlobals.clutchExp             = 2
+mrGearboxMogliGlobals.clutchFactor          = 2
+
 
 --setSamplePitch( mrGearboxMogli.BOVSample, 0.85 )
 
@@ -4055,8 +4060,19 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		local ratio       = self.motor:getGearRatio()		
 		local ratioFactor = mrGearboxMogliMotor.getGearRatioFactor( self.motor )
 		local maxRotSpeed = maxRpm * mrGearboxMogli.factorpi30 * ratioFactor
-
-		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, self.motor.maxClutchTorque * math.min( 1, self.motor.clutchPercent * 10 ))
+		local c           = 0
+		
+		if     self.motor.clutchPercent > self.mrGbMG.clutchTo   then
+			c = self.mrGbMG.clutchFactor
+		elseif self.motor.clutchPercent > self.mrGbMG.clutchFrom then
+			c = self.mrGbMG.clutchFactor * ( ( self.motor.clutchPercent - self.mrGbMG.clutchFrom ) / ( self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom ) ) ^ self.mrGbMG.clutchExp
+		else 
+			c = 0
+		end
+		
+		c = c * self.motor.maxMotorTorque 
+		
+		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c ) --self.motor.maxClutchTorque )
 		
 		if self.mrGbML.debugTimer ~= nil and g_currentMission.time < self.mrGbML.debugTimer then
 			print(string.format("%4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %2.2f km/h %2.2f km/h, %3.1f, %3.1f, %3.1f, %3.0f%%, %d",
