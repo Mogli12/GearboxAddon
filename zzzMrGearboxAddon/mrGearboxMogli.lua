@@ -109,9 +109,9 @@ mrGearboxMogliGlobals.smoothTargetSlow      = 0.01 --0.025
 mrGearboxMogliGlobals.ddsDirectory          = "dds/"
 mrGearboxMogliGlobals.initMotorOnLoad       = true
 mrGearboxMogliGlobals.ptoSpeedLimit         = true
-mrGearboxMogliGlobals.clutchFrom            = 0.2
+mrGearboxMogliGlobals.clutchFrom            = 0.0
 mrGearboxMogliGlobals.clutchTo              = 0.7
-mrGearboxMogliGlobals.clutchExp             = 2
+mrGearboxMogliGlobals.clutchExp             = 3
 mrGearboxMogliGlobals.clutchFactor          = 2
 
 
