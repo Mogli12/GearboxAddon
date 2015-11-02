@@ -4062,17 +4062,19 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		local maxRotSpeed = maxRpm * mrGearboxMogli.factorpi30 * ratioFactor
 		local c           = 0
 		
-		if     self.motor.clutchPercent > self.mrGbMG.clutchTo   then
-			c = self.mrGbMG.clutchFactor
-		elseif self.motor.clutchPercent > self.mrGbMG.clutchFrom then
-			c = self.mrGbMG.clutchFactor * ( ( self.motor.clutchPercent - self.mrGbMG.clutchFrom ) / ( self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom ) ) ^ self.mrGbMG.clutchExp
-		else 
+		if     self.motor.clutchPercent <= self.mrGbMG.clutchFrom   then
 			c = 0
+	--elseif self.motor.clutchPercent > self.mrGbMG.clutchTo      then
+	--	c = self.mrGbMG.clutchFactor
+		elseif self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom < 0.01 then
+			c = mrGearboxMogli.huge
+		else
+			c = self.mrGbMG.clutchFactor * ( ( self.motor.clutchPercent - self.mrGbMG.clutchFrom ) / ( self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom ) ) ^ self.mrGbMG.clutchExp
 		end
 		
-		c = c * self.motor.maxMotorTorque 
+		c = math.min( self.motor.maxClutchTorque, c * self.motor.maxMotorTorque )
 		
-		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c ) --self.motor.maxClutchTorque )
+		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c )
 		
 		if self.mrGbML.debugTimer ~= nil and g_currentMission.time < self.mrGbML.debugTimer then
 			print(string.format("%4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %2.2f km/h %2.2f km/h, %3.1f, %3.1f, %3.1f, %3.0f%%, %d",
