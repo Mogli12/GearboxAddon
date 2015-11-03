@@ -2047,75 +2047,75 @@ function mrGearboxMogli:update(dt)
     self.mrGbML.realAreaPerSecond   = 0
 	end
 
+	if      self.steeringEnabled 
+			and self.isServer 
+			and not ( self.isEntered or self.isControlled ) then
 	
 --**********************************************************************************************************			
 -- drive control parallel mode
 --**********************************************************************************************************			
-	if      self.isServer 
-			and self.dCcheckModule                  ~= nil
-			and self.driveControl                   ~= nil
-	    and self:dCcheckModule("cruiseControl")  
-			and self.driveControl.cruiseControl     ~= nil
-		--and g_currentMission.controlledVehicle  ~= self 
-			and self.cruiseControl.state             > 0 then
-			
-		local rootVehicle = self:getRootAttacherVehicle();
-			
-		if self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_FULL then
-			local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
-			if trailerFillLevel~= nil and trailerCapacity~= nil then
-				if trailerFillLevel >= trailerCapacity then
-					self:setCruiseControlState(0);
+		if      self.dCcheckModule                  ~= nil
+				and self.driveControl                   ~= nil
+				and self:dCcheckModule("cruiseControl")  
+				and self.driveControl.cruiseControl     ~= nil
+			--and g_currentMission.controlledVehicle  ~= self 
+				and self.cruiseControl.state             > 0 then
+				
+			local rootVehicle = self:getRootAttacherVehicle();
+				
+			if self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_FULL then
+				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
+				if trailerFillLevel~= nil and trailerCapacity~= nil then
+					if trailerFillLevel >= trailerCapacity then
+						self:setCruiseControlState(0);
+					end;
 				end;
-			end;
-			self.driveControl.cruiseControl.refVehicle = nil;
-		elseif self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_EMPTY then
-			local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
-			if trailerFillLevel~= nil and trailerCapacity~= nil then
-				if trailerFillLevel <= 0 then
-					self:setCruiseControlState(0);
+				self.driveControl.cruiseControl.refVehicle = nil;
+			elseif self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_EMPTY then
+				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
+				if trailerFillLevel~= nil and trailerCapacity~= nil then
+					if trailerFillLevel <= 0 then
+						self:setCruiseControlState(0);
+					end;
 				end;
-			end;
-			self.driveControl.cruiseControl.refVehicle = nil;
-		elseif  self.driveControl.cruiseControl.mode                == self.driveControl.cruiseControl.MODE_PARALLEL
-				and self.driveControl.cruiseControl.refVehicle          ~= nil
-				and self.driveControl.cruiseControl.refVehicle.rootNode ~= nil then
-			local dx, _, dz = localDirectionToWorld(rootVehicle.rootNode, 0, 0, 1)
-			local sdx, _, sdz = localDirectionToWorld(self.driveControl.cruiseControl.refVehicle.rootNode, 0, 0, 1)
-										
-			local diffAngle = (dx*sdx + dz*sdz)/(math.sqrt(dx^2+dz^2)*math.sqrt(sdx^2+sdz^2))
-			diffAngle = math.acos(diffAngle);
-			
-			if diffAngle > math.rad(20) then
-				self:setCruiseControlState(0);
-			else				
-				self:setCruiseControlMaxSpeed(self.driveControl.cruiseControl.refVehicle.lastSpeed*3600/math.cos(diffAngle))
-				self.cruiseControl.wasSpeedChanged = true;
-				self.cruiseControl.changeCurrentDelay = 0;
+				self.driveControl.cruiseControl.refVehicle = nil;
+			elseif  self.driveControl.cruiseControl.mode                == self.driveControl.cruiseControl.MODE_PARALLEL
+					and self.driveControl.cruiseControl.refVehicle          ~= nil
+					and self.driveControl.cruiseControl.refVehicle.rootNode ~= nil then
+				local dx, _, dz = localDirectionToWorld(rootVehicle.rootNode, 0, 0, 1)
+				local sdx, _, sdz = localDirectionToWorld(self.driveControl.cruiseControl.refVehicle.rootNode, 0, 0, 1)
+											
+				local diffAngle = (dx*sdx + dz*sdz)/(math.sqrt(dx^2+dz^2)*math.sqrt(sdx^2+sdz^2))
+				diffAngle = math.acos(diffAngle);
+				
+				if diffAngle > math.rad(20) then
+					self:setCruiseControlState(0);
+				else				
+					self:setCruiseControlMaxSpeed(self.driveControl.cruiseControl.refVehicle.lastSpeed*3600/math.cos(diffAngle))
+					self.cruiseControl.wasSpeedChanged = true;
+					self.cruiseControl.changeCurrentDelay = 0;
 
-				if g_server ~= nil then
-					g_server:broadcastEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed), nil, nil, self)
-				else
-					g_client:getServerConnection():sendEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed))
+					if g_server ~= nil then
+						g_server:broadcastEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed), nil, nil, self)
+					else
+						g_client:getServerConnection():sendEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed))
+					end
+
+					self.cruiseControl.speedSent = self.cruiseControl.speed
 				end
-
-				self.cruiseControl.speedSent = self.cruiseControl.speed
 			end
 		end
-	end
 
 	
 --**********************************************************************************************************			
 -- keep on going if not entered 
 --**********************************************************************************************************			
-	if      self.steeringEnabled 
-		  and not ( self.isEntered )
-			and self.isServer then
-		if      self.cruiseControl.state > 0 then	
+		if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then	
 			Drivable.updateVehiclePhysics(self, 0, false, 0, false, dt)
 		elseif  not self.mrGbMS.NeutralActive
 				and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 			self:mrGbMSetNeutralActive( true, false, true )
+			Drivable.updateVehiclePhysics(self, 1, false, 0, false, dt)
 		end
 	end	
 end 
