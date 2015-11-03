@@ -27,7 +27,7 @@ mrGearboxMogli.eps                  = 1E-6
 mrGearboxMogli.factor30pi           = 9.5492965855137201461330258023509
 mrGearboxMogli.factorpi30           = 0.10471975511965977461542144610932
 mrGearboxMogli.factor255            = 0.0039215686274509803921568627451
-mrGearboxMogli.rpmMinus             = 500 -- 100  -- min RPM at 900 RPM
+mrGearboxMogli.rpmMinus             = 100 -- 100  -- min RPM at 900 RPM
 mrGearboxMogli.rpmFadeOut           = 100  -- no torque at 2300 RPM
 mrGearboxMogli.rpmPlus              = 200  -- braking at 2350 RPM
 mrGearboxMogli.ptoRpmFactor         = 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
@@ -693,7 +693,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 
 --**************************************************************************************************	
 --**************************************************************************************************		
-	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), 0 ) -- no automatic opening of clutch by default!!!
+	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), self.mrGbMS.StallRpm ) -- no automatic opening of clutch by default!!!
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), self.mrGbMS.IdleRpm+0.1*(self.mrGbMS.RatedRpm-self.mrGbMS.IdleRpm) )
 	self.mrGbMS.AutoStartStop           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#autoStartStop"), true)
 	self.mrGbMS.AutoStartStopBackup     = self.mrGbMS.AutoStartStop 
