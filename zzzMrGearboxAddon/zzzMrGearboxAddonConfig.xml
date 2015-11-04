@@ -2961,6 +2961,7 @@
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/fendt-930-vario-tms%2D%2D11 -->
 		<configFile modName="Fendt930TMS" xmlName="FendtVario930TMS.xml"/>
+		<configFile modName="fendtms" xmlName="FendtVario930TMS.xml"/>
 		
 		<!-- http://www.dlg-test.de/tests/Fendt930VarioTMS_2004.pdf -->
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_930_Vario -->

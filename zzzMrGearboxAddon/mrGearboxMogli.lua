@@ -259,6 +259,7 @@ function mrGearboxMogli:initClient()
 	self.mrGbMGetGearNumber     = mrGearboxMogli.mrGbMGetGearNumber
 	self.mrGbMGetRangeNumber    = mrGearboxMogli.mrGbMGetRangeNumber
 	self.mrGbMGetRange2Number   = mrGearboxMogli.mrGbMGetRange2Number
+	self.mrGbMGetHasAllAuto     = mrGearboxMogli.mrGbMGetHasAllAuto
 	
 --**********************************************************************************************************	
 
@@ -1607,7 +1608,7 @@ function mrGearboxMogli:update(dt)
 			self:mrGbMSetNeutralActive( false ) 
 		end
 
-		if self.mrGbMS.Hydrostatic and self.mrGbMS.AllAuto then
+		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
 		end
 
@@ -1699,8 +1700,8 @@ function mrGearboxMogli:update(dt)
 				m = 1
 			end
 			self:mrGbMSetState( "HudMode", m )
-		elseif mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliAllAuto" ) 
-		    and not ( self.mrGbMS.Hydrostatic ) then
+		elseif  mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliAllAuto" )
+				and self:mrGbMGetHasAllAuto() then
 			-- toggle always AI => has to work with worker too
 			self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
 		elseif mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliNEUTRAL" ) then
@@ -2594,7 +2595,8 @@ function mrGearboxMogli:draw()
 			if InputBinding.mrGearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
 				g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliON", "Gearbox [on]"),  InputBinding.mrGearboxMogliON_OFF);		
 			end
-			if not ( self.mrGbMS.Hydrostatic ) and InputBinding.mrGearboxMogliAllAuto ~= nil then
+		--if not ( self.mrGbMS.Hydrostatic ) and InputBinding.mrGearboxMogliAllAuto ~= nil then
+			if InputBinding.mrGearboxMogliAllAuto ~= nil then
 				if self.mrGbMS.AllAuto then
 					g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliAllAutoON", "All auto [on]"),  InputBinding.mrGearboxMogliAllAuto);	
 				else
@@ -3380,6 +3382,48 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetIsOn()
 	return self.mrGbMS.IsOn
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMGetHasAllAuto
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMGetHasAllAuto()
+
+	if not self.mrGbMS.AutoShiftHl then
+		local cf, cr = 0, 0
+		for _,r in pairs(self.mrGbMS.Ranges) do
+			if r.forwardOnly then
+				cf = cf + 1
+			elseif r.reverseOnly then
+				cr = cr + 1
+			else
+				cf = cf + 1
+				cr = cr + 1 
+			end
+		end
+		if cf > 1 or cr > 1 then
+			return true
+		end
+	end
+	
+	if not self.mrGbMS.AutoShiftGears then
+		local cf, cr = 0, 0
+		for _,g in pairs(self.mrGbMS.Gears) do
+			if g.forwardOnly then
+				cf = cf + 1
+			elseif g.reverseOnly then
+				cr = cr + 1
+			else
+				cf = cf + 1
+				cr = cr + 1 
+			end
+		end
+		if cf > 1 or cr > 1 then
+			return true
+		end
+	end
+	
+	return false
 end
 
 --**********************************************************************************************************	
