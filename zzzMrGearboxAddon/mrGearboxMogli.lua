@@ -8,7 +8,7 @@
 --
 --***************************************************************
 
-local mrGearboxMogliVersion=1.301
+local mrGearboxMogliVersion=1.302
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if mrGearboxMogli == nil or mrGearboxMogli.version == nil or mrGearboxMogli.version < mrGearboxMogliVersion then
@@ -45,10 +45,9 @@ mrGearboxMogli.smoothRpm            = 0.05
 mrGearboxMogli.smoothPossible       = 0.05
 mrGearboxMogli.smoothSpeed          = 0.2
 mrGearboxMogli.smoothLastSpeed      = 0.02
-mrGearboxMogli.smoothCombineArea    = 0.005
 mrGearboxMogli.smoothTorque         = 0.125 -- careful if used together with limitRpmIncrease="M"!
-mrGearboxMogli.smoothHydro          = 0.5
-mrGearboxMogli.smoothClutch         = 1
+mrGearboxMogli.smoothHydro          = 0.08
+mrGearboxMogli.smoothClutch         = 1 -- 0.08
 mrGearboxMogli.smoothFuelUsage      = 0.08
 mrGearboxMogli.hydroEffDiff         = 75
 mrGearboxMogli.hydroPtoDiff         = 25
@@ -111,7 +110,7 @@ mrGearboxMogliGlobals.ddsDirectory          = "dds/"
 mrGearboxMogliGlobals.initMotorOnLoad       = true
 mrGearboxMogliGlobals.ptoSpeedLimit         = true
 mrGearboxMogliGlobals.clutchFrom            = 0.0
-mrGearboxMogliGlobals.clutchTo              = 0.7
+mrGearboxMogliGlobals.clutchTo              = 0.8
 mrGearboxMogliGlobals.clutchExp             = 3
 mrGearboxMogliGlobals.clutchFactor          = 2
 
@@ -424,7 +423,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
-	self.mrGbMS.MinTragetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.8 * self.mrGbMS.IdleRpm + 0.2 * self.mrGbMS.RatedRpm )
+	self.mrGbMS.MinTragetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.6 * self.mrGbMS.IdleRpm + 0.3 * self.mrGbMS.RatedRpm )
 	
 --**************************************************************************************************	
 --**************************************************************************************************	
@@ -506,7 +505,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end
 	
 	if self.mrGbMS.Engine.fuelUsageValues == nil then
-		self.mrGbMS.GlobalFuelUsageRatio = Utils.getNoNil( getXMLFloat(xmlFile, xmlString.."#fuelUsageRatio"), 230 );
+		local fuelUsageRatio = getXMLFloat(xmlFile, xmlString.."#minFuelUsageRatio")
+		if fuelUsageRatio == nil then
+			self.mrGbMS.GlobalFuelUsageRatio = Utils.getNoNil( getXMLFloat(xmlFile, xmlString.."#fuelUsageRatio"), 230 )			
+		else
+			self.mrGbMS.GlobalFuelUsageRatio = fuelUsageRatio / 0.9
+		end
 	end
 	
 	if self.mrGbMG.modifySound then
@@ -2300,15 +2304,26 @@ function mrGearboxMogli:updateTick(dt)
 				end
 			end 	
 		
-			if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil then	
+			if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then	
 				self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
 					
 				if self.mrGbML.lastSumDt > 333 then
 					if self.isMotorStarted then
-						self.mrGbMD.Rpm    = tonumber( Utils.clamp( math.floor( 255*(self.motor.targetRpm-self.mrGbMS.OrigMinRpm)/(self.mrGbMS.OrigMaxRpm-self.mrGbMS.OrigMinRpm)+0.5), 0, 255 ))	 				
-						self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( self.motor.clutchPercent * 200+0.5), 0, 255 ))	
-						self.mrGbMD.Load   = tonumber( Utils.clamp( math.floor( self.motor.motorLoadS*20+0.5)*5, 0, 255 ))	
-						if self.mrGbMG.drawReqPower then
+						if self.motor.targetRpm     ~= nil then
+							self.mrGbMD.Rpm    = tonumber( Utils.clamp( math.floor( 255*(self.motor.targetRpm-self.mrGbMS.OrigMinRpm)/(self.mrGbMS.OrigMaxRpm-self.mrGbMS.OrigMinRpm)+0.5), 0, 255 ))	 				
+						end
+						if self.motor.clutchPercent ~= nil then
+							self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( self.motor.clutchPercent * 200+0.5), 0, 255 ))	
+						end
+						if self.motor.motorLoadS    ~= nil then
+							self.mrGbMD.Load   = tonumber( Utils.clamp( math.floor( self.motor.motorLoadS*20+0.5)*5, 0, 255 ))	
+						end
+						if      self.mrGbMG.drawReqPower 
+								and self.motor.motorLoad              ~= nil
+								and self.motor.lastPtoTorque          ~= nil
+								and self.motor.lastLostTorque         ~= nil
+								and self.motor.prevNonClampedMotorRpm ~= nil
+								and self.motor.stallRpm               ~= nil then
 							local power = ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
 							self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * mrGearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
 						end
@@ -4337,12 +4352,13 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	
 	self.fuelCurve = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
 	if vehicle.mrGbMS.Engine.fuelUsageValues == nil then		
-		self.fuelCurve:addKeyframe( { v = 1.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.stallRpm } )
-		self.fuelCurve:addKeyframe( { v = 0.92 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.75*self.idleRpm+0.25*self.ratedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 0.90 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.50*self.idleRpm+0.50*self.ratedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 0.92 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.25*self.idleRpm+0.75*self.ratedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.96 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.stallRpm } )
+		self.fuelCurve:addKeyframe( { v = 0.94 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.idleRpm } )
+		self.fuelCurve:addKeyframe( { v = 0.91 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.8*self.idleRpm+0.2*self.ratedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.90 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.6*self.idleRpm+0.4*self.ratedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.92 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.3*self.idleRpm+0.7*self.ratedRpm } )		
 		self.fuelCurve:addKeyframe( { v = 1.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.ratedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 1.25 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.50*self.ratedRpm+0.50*self.maxAllowedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 1.25 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.5*self.ratedRpm+0.5*self.maxAllowedRpm } )		
 		self.fuelCurve:addKeyframe( { v = 2.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.maxAllowedRpm } )		
 	else
 		for _,k in pairs(vehicle.mrGbMS.Engine.fuelUsageValues) do

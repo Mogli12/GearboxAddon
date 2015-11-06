@@ -2043,6 +2043,65 @@
 	</vehicle>	
 		
 	<vehicle>
+		<configFile modName="JD8110" xmlName="JD8110.xml" isPrefix="true"/>
+
+		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false">>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="13" automatic="true">	
+				<gear name="R1" speed="2" reverseOnly="true" />
+				<gear name="1" speed="2.2" forwardOnly="true" />
+				<gear name="2" speed="2.9" forwardOnly="true" />
+				<gear name="3" speed="3.6" forwardOnly="true" />
+				<gear name="4" speed="4.7" forwardOnly="true" />
+				<gear name="R2" speed="4.9" reverseOnly="true" />
+				<gear name="5" speed="5.6" forwardOnly="true" />
+				<gear name="R3" speed="6.1" reverseOnly="true" />
+				<gear name="6" speed="6.4" forwardOnly="true" />
+				<gear name="7" speed="7.2" forwardOnly="true" />
+				<gear name="8" speed="8.1" forwardOnly="true" />
+				<gear name="9" speed="9.2" forwardOnly="true" />
+				<gear name="10" speed="10.4" forwardOnly="true" />
+				<gear name="R4" speed="10.7" reverseOnly="true" />
+				<gear name="11" speed="11.7" forwardOnly="true" />
+				<gear name="12" speed="13.2" forwardOnly="true" />
+				<gear name="R5" speed="14.7" reverseOnly="true" />
+				<gear name="13" speed="16.8" forwardOnly="true" />
+				<gear name="14" speed="21.5" forwardOnly="true" />
+				<gear name="15" speed="27.4" forwardOnly="true" />
+				<gear name="16" speed="38.2" forwardOnly="true" />
+			</gears>		
+			<reverse shiftTimeMs="500" /> 
+			
+			<!-- turbo sound -->
+			<blowOffVentilSound volume="2"/>			
+			
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="267"/><!-- 2200: 195(156.975) | 2200: 195(156.975) | 1500..1500: 794.6(746.924) | 90 | 0.5 | 300 | 2.2 -->
+        <torque rpm="100" motorTorque="174" motorTorqueEco="163" fuelUsageRatio="259"/>
+        <torque rpm="400" motorTorque="509" motorTorqueEco="479" fuelUsageRatio="237"/>
+        <torque rpm="700" motorTorque="659" motorTorqueEco="620" fuelUsageRatio="221"/>
+        <torque rpm="800" motorTorque="689" motorTorqueEco="647" fuelUsageRatio="217"/>
+        <torque rpm="900" motorTorque="715" motorTorqueEco="672" fuelUsageRatio="214"/>
+        <torque rpm="1000" motorTorque="739" motorTorqueEco="695" fuelUsageRatio="211"/>
+        <torque rpm="1100" motorTorque="759" motorTorqueEco="714" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="775" motorTorqueEco="728" fuelUsageRatio="208"/>
+        <torque rpm="1300" motorTorque="786" motorTorqueEco="739" fuelUsageRatio="207"/>
+        <torque rpm="1400" motorTorque="792" motorTorqueEco="745" fuelUsageRatio="207"/>
+        <torque rpm="1500" motorTorque="795" motorTorqueEco="747" fuelUsageRatio="208"/>
+        <torque rpm="1600" motorTorque="781" motorTorqueEco="727" fuelUsageRatio="209"/>
+        <torque rpm="1700" motorTorque="763" motorTorqueEco="702" fuelUsageRatio="211"/>
+        <torque rpm="1800" motorTorque="742" motorTorqueEco="672" fuelUsageRatio="213"/>
+        <torque rpm="1900" motorTorque="717" motorTorqueEco="637" fuelUsageRatio="217"/>
+        <torque rpm="2000" motorTorque="689" motorTorqueEco="596" fuelUsageRatio="220"/>
+        <torque rpm="2100" motorTorque="658" motorTorqueEco="551" fuelUsageRatio="225"/>
+        <torque rpm="2200" motorTorque="622" motorTorqueEco="501" fuelUsageRatio="230"/>
+        <torque rpm="2300" motorTorque="567" motorTorqueEco="456" fuelUsageRatio="256"/>
+        <torque rpm="2400" motorTorque="367" motorTorqueEco="296" fuelUsageRatio="332"/>
+        <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>	
+		
+	<vehicle>
 		<configFile modName="UnimogU1200_U1600" xmlName="UnimogU1200.xml" />
 		
 		<!-- http://www.daimler.com/Projects/c2c/channel/images/6787_9660_-1_-1_20399.pdf -->
@@ -3505,6 +3564,52 @@
         <torque rpm="2100" motorTorque="1332" fuelUsageRatio="273"/>
         <torque rpm="2200" motorTorque="525" fuelUsageRatio="357"/>
         <torque rpm="2300" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="Lexion670" xmlName="Lexion670.xml" />
+		<configFile modName="Lexion670" xmlName="Lexion670TT.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="9" minRpm="1600" maxRpm="1900"/> 
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="33"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+			
+			<realEngine idleRpm="900" ratedRpm="1900">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="280"/><!-- 1700: 431(370.229) | 1900: 390(313.95) | 1400..1400: 2020(1898.8) | 97 | 0.5 | 300 | 1.5 -->
+        <torque rpm="100" motorTorque="544" motorTorqueEco="512" fuelUsageRatio="267"/>
+        <torque rpm="400" motorTorque="1543" motorTorqueEco="1450" fuelUsageRatio="235"/>
+        <torque rpm="700" motorTorque="1893" motorTorqueEco="1779" fuelUsageRatio="212"/>
+        <torque rpm="800" motorTorque="1933" motorTorqueEco="1817" fuelUsageRatio="207"/>
+        <torque rpm="900" motorTorque="1959" motorTorqueEco="1842" fuelUsageRatio="203"/>
+        <torque rpm="1000" motorTorque="1981" motorTorqueEco="1862" fuelUsageRatio="200"/>
+        <torque rpm="1100" motorTorque="1998" motorTorqueEco="1878" fuelUsageRatio="197"/>
+        <torque rpm="1200" motorTorque="2010" motorTorqueEco="1890" fuelUsageRatio="196"/>
+        <torque rpm="1300" motorTorque="2018" motorTorqueEco="1897" fuelUsageRatio="196"/>
+        <torque rpm="1400" motorTorque="2020" motorTorqueEco="1899" fuelUsageRatio="197"/>
+        <torque rpm="1500" motorTorque="1967" motorTorqueEco="1817" fuelUsageRatio="199"/>
+        <torque rpm="1600" motorTorque="1887" motorTorqueEco="1694" fuelUsageRatio="203"/>
+        <torque rpm="1700" motorTorque="1780" motorTorqueEco="1529" fuelUsageRatio="207"/>
+        <torque rpm="1800" motorTorque="1641" motorTorqueEco="1389" fuelUsageRatio="212"/>
+        <torque rpm="1900" motorTorque="1441" motorTorqueEco="1160" fuelUsageRatio="218"/>
+        <torque rpm="2000" motorTorque="1164" motorTorqueEco="937" fuelUsageRatio="242"/>
+        <torque rpm="2100" motorTorque="657" motorTorqueEco="529" fuelUsageRatio="315"/>
+        <torque rpm="2200" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="436"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle>
