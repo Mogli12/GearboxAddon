@@ -229,9 +229,11 @@ function mrGearboxMogli:initClient()
 	mrGearboxMogli.registerState( self, "CurrentGear",   1,     mrGearboxMogli.mrGbMOnSetGear ) 
 	mrGearboxMogli.registerState( self, "CurrentRange",  1,     mrGearboxMogli.mrGbMOnSetRange )
 	mrGearboxMogli.registerState( self, "CurrentRange2", 1,     mrGearboxMogli.mrGbMOnSetRange2 )
+	mrGearboxMogli.registerState( self, "IsNeutral",     false )
 	mrGearboxMogli.registerState( self, "Automatic",     false )
 	mrGearboxMogli.registerState( self, "ReverseActive", false, mrGearboxMogli.mrGbMOnSetReverse )
 	mrGearboxMogli.registerState( self, "NeutralActive", false, mrGearboxMogli.mrGbMOnSetNeutral ) 	
+	mrGearboxMogli.registerState( self, "HandBrake",     false ) 	
 	mrGearboxMogli.registerState( self, "AutoClutch",    true  )
 	mrGearboxMogli.registerState( self, "ManualClutch",  1,     mrGearboxMogli.mrGbMOnSetManualClutch )
 	mrGearboxMogli.registerState( self, "HandThrottle",  0 )
@@ -320,19 +322,6 @@ function mrGearboxMogli:initClient()
 	self.mrGbMD.Rate       = 0 
 	
 	self.mrGbMB.fuelUsage              = self.fuelUsage
-	--if self.isClient then
-	--	self.mrGbMB.soundModified        = false
-	--	self.mrGbMB.soundPitchScale      = self.motorSoundPitchScale
-	--	self.mrGbMB.soundPitchMax        = self.motorSoundPitchMax
-	--	self.mrGbMB.soundRunPitchScale   = self.motorSoundRunPitchScale	
-	--	self.mrGbMB.soundRunPitchMax     = self.motorSoundRunPitchMax
-	--	self.mrGbMB.soundRun2PitchMax    = self.motorRun2PitchMax
-	--	self.mrGbMB.soundVolume          = self.sampleMotor.volume   
-	--	self.mrGbMB.soundRunVolume       = self.sampleMotorRun.volume
-	--	self.mrGbMB.soundPitchOffset     = self.sampleMotor.pitchOffset   
-	--	self.mrGbMB.soundRunPitchOffset  = self.sampleMotorRun.pitchOffset
-	--	self.mrGbMB.soundRun2PitchOffset = self.sampleMotorRun2.pitchOffset
-	--end
 end 
 
 --**********************************************************************************************************	
@@ -1163,13 +1152,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	if enableAI == nil then
 		if     self.mrGbMS.Hydrostatic then
 			self.mrGbMS.EnableAI = "Y"
-		elseif self.mrGbMS.AutoShiftGears 
-				or table.getn( self.mrGbMS.Gears  ) < 2 then
-			self.mrGbMS.EnableAI = "A"
-		elseif self.mrGbMS.AutoShiftHl then
-			self.mrGbMS.EnableAI = "A"
 		else
-			self.mrGbMS.EnableAI = "N"
+			self.mrGbMS.EnableAI = "A"
 		end
 	elseif enableAI then
 		self.mrGbMS.EnableAI = "Y"
@@ -1511,6 +1495,7 @@ function mrGearboxMogli:update(dt)
 			if self.driveControl.handBrake.isActive then
 				driveControlHandBrake = true
 				self:mrGbMSetNeutralActive( true, false, true ) 
+				self:mrGbMSetState( "HandBrake", true )
 			elseif self.mrGbML.lastDCHandBrake then
 				if self:mrGbMGetAutoClutch() and not ( self:mrGbMGetAutoStartStop() ) then
 					self:mrGbMSetNeutralActive( false )
@@ -1530,7 +1515,7 @@ function mrGearboxMogli:update(dt)
 		elseif not ( self.steeringEnabled ) then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_AI", "AI" )
 			text2 = text
-		elseif driveControlHandBrake then
+		elseif self.mrGbMS.HandBrake then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_BRAKE", "handbrake" )
 		elseif self.mrGbML.gearShiftingNeeded < 0 then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_DC", "double clutch" ) .." "..tostring(-self.mrGbML.gearShiftingNeeded)
@@ -1705,7 +1690,8 @@ function mrGearboxMogli:update(dt)
 			end
 			self:mrGbMSetState( "HudMode", m )
 		elseif  mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliAllAuto" )
-				and self:mrGbMGetHasAllAuto() then
+				and self:mrGbMGetHasAllAuto() 
+				and self.steeringEnabled then
 			-- toggle always AI => has to work with worker too
 			self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
 		elseif mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliNEUTRAL" ) then
@@ -1807,10 +1793,6 @@ function mrGearboxMogli:update(dt)
 
 				if     self.mrGbMS.NeutralActive then
 					curGear = 0
-					self:mrGbMSetState( "G27Mode", 1 ) 
-					self:mrGbMSetNeutralActive( false, false, true )
-				elseif self.mrGbMS.G27Mode == 1 then
-					curGear = 0
 				elseif self.mrGbMS.ReverseActive then
 					curGear = -curGear 
 				end
@@ -1819,7 +1801,7 @@ function mrGearboxMogli:update(dt)
 					curGear = math.abs( curGear )
 				end
 				
-				if self:mrGbMGetAutoClutch() then --or self.mrGbMS.AutoStartStop then
+				if self:mrGbMGetAutoClutch() then
 					manClutch = false
 				elseif curGear == 0 or gear == 0 then
 					manClutch = self.mrGbMS.ManualClutchReverse --not ( self.mrGbMS.AutoStartStop )
@@ -1828,24 +1810,43 @@ function mrGearboxMogli:update(dt)
 				end
 				
 				if curGear ~= gear then
-					if manClutch and not ( self.mrGbMS.NeutralActive ) and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1 then
-						self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear; clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ))
-						self.mrGbMS.GrindingGearsPlay = false
-						self:mrGbMSetState( "GrindingGearsPlay", true )
-					elseif gear == 0 then
-						self:mrGbMSetState( "G27Mode", 1 ) 
+					if gear == 0 then
+						self:mrGbMSetNeutralActive( true  )						
 					else
-						self:mrGbMSetState( "G27Mode", 2 ) 
 						if self.mrGbMS.G27Gears[7] < 0 then
 							self:mrGbMSetReverseActive( (gear < 0) )
 						end
 						
+						local done = false
 						if self.mrGbMS.SwapGearRangeKeys then
-							self:mrGbMSetCurrentRange(math.abs(gear), false, true)
+							done    = self:mrGbMSetCurrentRange(math.abs(gear), false, true)
+							curGear = self.mrGbMS.currentRange
 						else
-							self:mrGbMSetCurrentGear(math.abs(gear), false, true)
+							done    = self:mrGbMSetCurrentGear(math.abs(gear), false, true)
+							curGear = self.mrGbMS.CurrentGear
+						end
+						if done then
+							self:mrGbMSetNeutralActive( false  )
+						end
+						if self.mrGbMS.ReverseActive then
+							curGear = -curGear 
 						end
 					end
+					
+					if self.mrGbMS.NeutralActive then
+						self:mrGbMSetState( "G27Mode", 1 ) 
+					elseif curGear == self.mrGbMS.G27Gears[1]
+							or curGear == self.mrGbMS.G27Gears[2]
+							or curGear == self.mrGbMS.G27Gears[3]
+							or curGear == self.mrGbMS.G27Gears[4]
+							or curGear == self.mrGbMS.G27Gears[5]
+							or curGear == self.mrGbMS.G27Gears[6]
+							or curGear == self.mrGbMS.G27Gears[7] then
+						self:mrGbMSetState( "G27Mode", 2 ) 
+					else
+						self:mrGbMSetState( "G27Mode", 1 ) 
+					end
+
 				elseif self.mrGbMS.G27Mode < 1 then
 					self:mrGbMSetState( "G27Mode", 2 ) 
 				end
@@ -2154,6 +2155,7 @@ function mrGearboxMogli:update(dt)
 		elseif  not self.mrGbMS.NeutralActive
 				and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 			self:mrGbMSetNeutralActive( true, false, true )
+			self:mrGbMSetState( "HandBrake", true )
 			Drivable.updateVehiclePhysics(self, 1, false, 0, false, dt)
 		end
 	end	
@@ -2209,6 +2211,7 @@ function mrGearboxMogli:onLeave()
 			and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_OFF
 			and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 		self:mrGbMSetNeutralActive( true, false, true )
+		self:mrGbMSetState( "HandBrake", true )
 	end
 end
 
@@ -2225,38 +2228,35 @@ function mrGearboxMogli:updateTick(dt)
 		if self.isServer then
 			if not ( self.mrGbMS.IsOnOff ) then
 				self:mrGbMSetState( "IsOn", false ) 
-		--elseif self.isAITractorActivated 
-		--		or self.isAIThreshing 
-		--		or ( self.getIsCourseplayDriving ~= nil and self:getIsCourseplayDriving() ) then
 			elseif not ( self.steeringEnabled ) then
-				self:mrGbMSetState( "AutoStartStop", true )       
-				if     self.mrGbMS.EnableAI == "Y"
-						or ( self.mrGbMS.EnableAI == "A" and self:mrGbMGetAutomatic() )
-						or self.mrGbMS.AllAuto then
+				
+				if self.mrGbMS.EnableAI == "Y" or self.mrGbMS.EnableAI == "A" then
 					self:mrGbMSetState( "IsOn", true ) 
 				
-				--if self.mrGbMS.IsOn and self.mrGbMS.EnableAI ~= "Y" then				
-				--	if not ( self:mrGbMGetAutomatic() ) then
-				--		self.mrGbML.aiAutomatic = true
-				--		self:mrGbMSetState( "Automatic", true )
-				--	end
-				--end
-								
 					if not ( self.mrGbML.aiControlled ) then
 						self.mrGbML.aiControlled = true
+						self:mrGbMSetState( "AutoStartStop", true )       
+						
+						if      self.mrGbMS.EnableAI == "A"
+								and self:mrGbMGetHasAllAuto() 
+								and not ( self.mrGbMS.AllAuto ) then
+							self.mrGbML.aiAutomatic = true
+							self:mrGbMSetState( "AllAuto", true )
+						end
+						
+						if self.mrGbMS.MaxAIRange ~= nil and self.mrGbMS.MaxAIRange < self.mrGbMS.CurrentRange then
+							self:mrGbMSetCurrentRange( self.mrGbMS.MaxAIRange ) 	
+						end
+						if self.mrGbMS.MaxAIGear  ~= nil and self.mrGbMS.MaxAIGear  < self.mrGbMS.CurrentGear  then
+							self:mrGbMSetCurrentGear( self.mrGbMS.MaxAIGear ) 	
+						end
+						
 						self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear ) 
 						self:mrGbMSetState( "DefaultRange", self.mrGbMS.CurrentRange ) 
 						self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2 ) 
 						
 						if self:mrGbMGetAutomatic() then
 							mrGearboxMogli.setLaunchGear( self )
-						else
-							if self.mrGbMS.MaxAIRange ~= nil and self.mrGbMS.MaxAIRange < self.mrGbMS.CurrentRange then
-								self:mrGbMSetCurrentRange( self.mrGbMS.MaxAIRange ) 	
-							end
-							if self.mrGbMS.MaxAIGear  ~= nil and self.mrGbMS.MaxAIGear  < self.mrGbMS.CurrentGear  then
-								self:mrGbMSetCurrentGear( self.mrGbMS.MaxAIGear ) 	
-							end
 						end
 						
 					elseif self.mrGbML.gearShiftingNeeded == 0 then
@@ -2268,6 +2268,13 @@ function mrGearboxMogli:updateTick(dt)
 							self.mrGbML.aiRangeF = self.mrGbMS.CurrentGear
 						end
 					end
+					
+					if      self.mrGbMS.EnableAI == "A"
+							and self:mrGbMGetHasAllAuto() 
+							and not ( self.mrGbMS.AllAuto ) then
+						self:mrGbMSetState( "AllAuto", true )
+					end
+					
 				else
 					self:mrGbMSetState( "IsOn", false ) 	
 				end
@@ -2276,9 +2283,10 @@ function mrGearboxMogli:updateTick(dt)
 				self.mrGbML.aiControlled = false
 				self:mrGbMSetState( "AutoStartStop", self.mrGbMS.AutoStartStopBackup )
 				self:mrGbMSetNeutralActive( true, false, true )
+				self:mrGbMSetState( "HandBrake", true )
 				self:mrGbMSetState( "IsOn", true ) 
 				if self.mrGbML.aiAutomatic then
-					self:mrGbMSetState( "Automatic", false )
+					self:mrGbMSetState( "AllAuto", false )
 				end
 				self.mrGbML.aiAutomatic = nil
 			else		
@@ -2288,6 +2296,7 @@ function mrGearboxMogli:updateTick(dt)
 			
 			if not ( self.isMotorStarted ) or g_currentMission.time < self.motorStartTime then
 				self:mrGbMSetNeutralActive( true, false, true )
+				self:mrGbMSetState( "HandBrake", true )
 			end
 			
 			if  not ( self.mrGbMS.Automatic ) 
@@ -2614,7 +2623,7 @@ function mrGearboxMogli:draw()
 			if InputBinding.mrGearboxMogliAllAuto ~= nil then
 				if self.mrGbMS.AllAuto then
 					g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliAllAutoON", "All auto [on]"),  InputBinding.mrGearboxMogliAllAuto);	
-				else
+				elseif self:mrGbMGetHasAllAuto() and self.steeringEnabled then
 					g_currentMission:addHelpButtonText(mrGearboxMogli.getText("mrGearboxMogliAllAutoOFF", "All auto [off]"),  InputBinding.mrGearboxMogliAllAuto);		
 				end
 			end
@@ -2943,6 +2952,21 @@ function mrGearboxMogli:mrGbMCheckGrindingGears( checkIt, noEventSend )
 end
 
 --**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMCheckDoubleClutch
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMCheckDoubleClutch( checkIt, noEventSend )
+	if self.steeringEnabled and checkIt and not ( self:mrGbMGetAutoClutch() ) and not ( self:mrGbMGetAutomatic() ) then
+		if not self.mrGbMS.IsNeutral then
+			self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear; go to neutral 1st" ))
+			self.mrGbMS.GrindingGearsPlay = false
+			self:mrGbMSetState( "GrindingGearsPlay", true )
+			return true
+		end		
+	end		
+	return false
+end
+
+--**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMGetRangeForNewGear
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetRangeForNewGear( newGear )
@@ -2960,10 +2984,11 @@ end
 -- mrGearboxMogli:mrGbMSetCurrentGear
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend ) then
-		return 
+	if     mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend )
+	    or mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.GearsDoubleClutch, noEventSend ) then
+		return false
 	end
-
+	
 	local newGear  = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears, self.mrGbMS.CurrentGear, new, "gear" )
 	local newRange = self.mrGbMS.CurrentRange
 	if manual then
@@ -2976,7 +3001,19 @@ function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
 		self:mrGbMSetState( "CurrentRange", newRange, noEventSend ) 
 		self:mrGbMSetState( "CurrentRange2", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
+
+		if      self.steeringEnabled 
+				and not ( self:mrGbMGetAutoClutch() ) 
+				and not ( self:mrGbMGetAutomatic() ) 
+				and self.mrGbMS.IsNeutral
+				and self.mrGbMS.ManualClutch <= self.mrGbMS.MinClutchPercent + 0.1 then	
+			self:mrGbMSetNeutralActive( false, noEventSend, true )
+		end
+		
+		return true
 	end
+	
+	return false
 end 
 
 --**********************************************************************************************************	
@@ -2997,8 +3034,9 @@ end
 -- mrGearboxMogli:mrGbMSetCurrentRange
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend ) then
-		return 
+	if     mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend )
+	    or mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.Range1DoubleClutch, noEventSend ) then
+		return false
 	end
 
 	local newRange = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, new, "range" )
@@ -3013,14 +3051,27 @@ function mrGearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 		self:mrGbMSetState( "CurrentRange", newRange, noEventSend ) 
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
 		self:mrGbMSetState( "CurrentRange2", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
+	
+		if      self.steeringEnabled 
+				and not ( self:mrGbMGetAutoClutch() ) 
+				and not ( self:mrGbMGetAutomatic() ) 
+				and self.mrGbMS.IsNeutral
+				and self.mrGbMS.ManualClutch <= self.mrGbMS.MinClutchPercent + 0.1 then
+			self:mrGbMSetNeutralActive( false, noEventSend, true )
+		end
+		
+		return true
 	end
+	
+	return false
 end
 
 --**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMSetCurrentRange2
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchRanges2, noEventSend ) then
+	if     mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchRanges2, noEventSend )
+	    or mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.Range2DoubleClutch, noEventSend ) then
 		return 
 	end
 
@@ -3030,7 +3081,19 @@ function mrGearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 		self:mrGbMSetState( "CurrentRange2", newRange2, noEventSend ) 
 		self:mrGbMSetState( "CurrentRange", mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, self.mrGbMS.CurrentRange, "range" ), noEventSend ) 
 		self:mrGbMSetState( "CurrentGear",  mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,  self.mrGbMS.CurrentGear,  self.mrGbMS.CurrentGear,  "gear" ),  noEventSend ) 		
+
+		if      self.steeringEnabled 
+				and not ( self:mrGbMGetAutoClutch() ) 
+				and not ( self:mrGbMGetAutomatic() ) 
+				and self.mrGbMS.IsNeutral
+				and self.mrGbMS.ManualClutch <= self.mrGbMS.MinClutchPercent + 0.1 then
+			self:mrGbMSetNeutralActive( false, noEventSend, true )
+		end
+	
+		return true
 	end
+	
+	return false
 end
 
 --**********************************************************************************************************	
@@ -3065,10 +3128,12 @@ function mrGearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 	if      self.mrGbMS.NeutralActive ~= nil
 			and self.mrGbMS.NeutralActive ~= value 
 			and mrGearboxMogli.mrGbMCheckGrindingGears( self, not ( noCheck ) and self.mrGbMS.ManualClutchReverse, noEventSend ) then
-		return 
+		return false
 	end
 
-	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 		
+	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
+	
+	return true
 end 
 
 --**********************************************************************************************************	
@@ -3077,11 +3142,22 @@ end
 function mrGearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 	if      self.mrGbMS.ReverseActive ~= nil
 			and self.mrGbMS.ReverseActive ~= value 
-			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
-		return 
+			and ( mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend )
+			   or mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) ) then
+		return false
 	end
 
+	if      self.steeringEnabled 
+			and not ( self:mrGbMGetAutoClutch() ) 
+			and not ( self:mrGbMGetAutomatic() ) 
+			and self.mrGbMS.IsNeutral
+			and self.mrGbMS.ManualClutch <= self.mrGbMS.MinClutchPercent + 0.1 then
+		self:mrGbMSetNeutralActive( false, noEventSend, true )
+	end
+	
 	self:mrGbMSetState( "ReverseActive", value, noEventSend ) 		
+	
+	return true
 end 
 
 --**********************************************************************************************************	
@@ -3403,6 +3479,10 @@ end
 -- mrGearboxMogli:mrGbMGetHasAllAuto
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetHasAllAuto()
+
+	if self.mrGbMS.IsCombine then
+		return false
+	end
 
 	if not self.mrGbMS.AutoShiftHl then
 		local cf, cr = 0, 0
@@ -3827,6 +3907,12 @@ function mrGearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		if self.mrGbML.motor ~= nil then
 			self.mrGbML.motor.speedLimitS = 0
 		end
+		
+		if not ( new ) then
+			self:mrGbMSetState( "HandBrake", false )
+		elseif self.lastSpeedReal < 0.0003 then
+			self:mrGbMSetState( "HandBrake", true )
+		end
 	end
 end 
 
@@ -4028,13 +4114,9 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 			end
 		end
 	elseif doHandbrake  then
-		if math.abs( self.lastSpeedReal ) < 0.0003 then
-			self.motor.speedLimitS = 0
-			self:mrGbMSetNeutralActive( true )
-			acceleration = 0
-		else
-			acceleration = -1
-		end
+		self.motor.speedLimitS = 0
+		self:mrGbMSetNeutralActive( true )
+		acceleration = -1
 	elseif self.movingDirection*currentSpeed*acc < -0.0003 then
 		acceleration = -math.abs( acc )
 		if math.abs( self.lastSpeedReal ) < 0.0003 then
@@ -4050,10 +4132,8 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		self:mrGbMSetNeutralActive( false )
 	else
 		acceleration = 0
-		if math.abs( self.lastSpeedReal ) < 0.0003 then
-			self.motor.speedLimitS = 0
-			self:mrGbMSetNeutralActive( true )
-		end
+		self.motor.speedLimitS = 0
+		self:mrGbMSetNeutralActive( true )
 	end
 	
 	-- blow off ventil
@@ -4090,7 +4170,7 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		
 	self.motor:updateMotorRpm(dt)	
 	
-	if     doHandbrake or self.mrGbMS.NeutralActive or not ( self.isMotorStarted ) then
+	if     doHandbrake or self.mrGbMS.HandBrake or not ( self.isMotorStarted ) then
 		-- hand brake
 		if math.abs(self.rotatedTime) < 0.01 or self.articulatedAxis == nil then
 			brakePedal = 1
@@ -5071,9 +5151,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	lastPtoOn  = self.ptoOn
 	self.ptoOn = false
 	--if self.hydroEff ~= nil then
-	if self.vehicle.mrGbMS.HandThrottle > 0.01 and self.minRequiredRpm < self.ratedRpm then
+	if self.vehicle.mrGbMS.HandThrottle > 0.01 then
 		self.ptoOn = true
-		self.minRequiredRpm = self.minRequiredRpm + self.vehicle.mrGbMS.HandThrottle * ( self.ratedRpm - self.minRequiredRpm - 100 )
+		self.minRequiredRpm = math.max( self.minRequiredRpm, self.idleRpm + self.vehicle.mrGbMS.HandThrottle * math.max( 0, self.ratedRpm - self.idleRpm ) )
 	end
 	
 	local ptoTq = self.neededPtoTorque --PowerConsumer.getTotalConsumedPtoTorque(self.vehicle)
@@ -5131,7 +5211,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.ptoOn          = true
 			local targetRpmC 
 			if self.vehicle.mrGbMS.HandThrottle > 0.01 then
-				targetRpmC        = self.vehicle.mrGbMS.ThreshingMinRpm + self.vehicle.mrGbMS.HandThrottle * math.max( 0, self.vehicle.mrGbMS.ThreshingMaxRpm - self.vehicle.mrGbMS.ThreshingMinRpm )
+				targetRpmC        = math.max( self.vehicle.mrGbMS.ThreshingMinRpm, self.idleRpm + self.vehicle.mrGbMS.HandThrottle * math.max( 0, self.ratedRpm - self.idleRpm ) )
 			elseif self.lastMissingTorque > 0 then
 				targetRpmC        = math.min( self.vehicle.mrGbMS.ThreshingMaxRpm, self.maxMaxPowerRpm )
 			else
@@ -5267,8 +5347,17 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.vehicle:mrGbMGetAutoClutch() and self.vehicle:mrGbMGetAutoStartStop() then
 				self.vehicle:mrGbMSetNeutralActive( true ) 
 			end
+			if self.vehicle.mrGbMS.NeutralActive then
+				self.vehicle:mrGbMSetState( "HandBrake", true )
+			end
 		end
 					
+		if self.vehicle:mrGbMGetAutoClutch() then
+			self.autoClutchPercent  = math.max( 0, self.autoClutchPercent -self.tickDt/self.vehicle.mrGbMS.ClutchTimeDec ) 
+		elseif self.vehicle.mrGbMS.ManualClutch > self.vehicle.mrGbMS.MaxClutchPercent - 0.1 then
+			self.vehicle:mrGbMSetState( "IsNeutral", true )
+		end
+		
 		if self.vehicle.mrGbML.gearShiftingNeeded > 0 then
 			if g_currentMission.time>=self.vehicle.mrGbML.gearShiftingTime then
 				if self.vehicle.mrGbML.gearShiftingNeeded < 2 then	
@@ -5280,14 +5369,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					self.vehicle:mrGbMDoGearShift() 
 				end 
 			end 
-		elseif self.vehicle.mrGbML.gearShiftingNeeded < 0 then
-			self.vehicle:mrGbMDoGearShift() 
-			self.vehicle.mrGbML.gearShiftingNeeded = 0 
 		end
 
-		if self.vehicle:mrGbMGetAutoClutch() then
-			self.autoClutchPercent  = math.max( 0, self.autoClutchPercent -self.tickDt/self.vehicle.mrGbMS.ClutchTimeDec ) 
-		end
 		self.noTransmission = true
 		self.minThrottle    = self.vehicle.mrGbMS.HandThrottle
 		self.minThrottleS   = self.vehicle.mrGbMS.HandThrottle
@@ -5300,7 +5383,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 --**********************************************************************************************************		
 	else
 --**********************************************************************************************************		
-		-- acceleration for idle/minimum rpm
+		self.vehicle:mrGbMSetState( "IsNeutral", false )
+
+		-- acceleration for idle/minimum rpm		
 		if lastNoTransmission then
 			self.minThrottle  = 0.3
 			self.minThrottleS = 0.3
@@ -5371,16 +5456,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.minThrottle    = self.vehicle.mrGbMS.HandThrottle
 			self.minThrottleS   = self.vehicle.mrGbMS.HandThrottle
 			
-			if     self.vehicle.mrGbML.gearShiftingNeeded == -1 then	
-				if self.vehicle.mrGbMS.ManualClutch > self.vehicle.mrGbMS.MaxClutchPercent - 0.1 then
-					self.vehicle.mrGbML.gearShiftingNeeded = -2
-				end
-			elseif self.vehicle.mrGbML.gearShiftingNeeded == -2 then	
-				if self.vehicle.mrGbMS.ManualClutch < self.vehicle.mrGbMS.MinClutchPercent + 0.1 then
-					self.vehicle:mrGbMDoGearShift() 
-					self.vehicle.mrGbML.gearShiftingNeeded = 0						
-				end
-			end
+		--if     self.vehicle.mrGbML.gearShiftingNeeded == -1 then	
+		--	if self.vehicle.mrGbMS.ManualClutch > self.vehicle.mrGbMS.MaxClutchPercent - 0.1 then
+		--		self.vehicle.mrGbML.gearShiftingNeeded = -2
+		--	end
+		--elseif self.vehicle.mrGbML.gearShiftingNeeded == -2 then	
+		--	if self.vehicle.mrGbMS.ManualClutch < self.vehicle.mrGbMS.MinClutchPercent + 0.1 then
+				self.vehicle:mrGbMDoGearShift() 
+				self.vehicle.mrGbML.gearShiftingNeeded = 0						
+		--	end
+		--end
 			
 			if acc > 0 then
 				self.currentRpmS = Utils.clamp( self.lastMotorRpm + 5 * acc * self.tickDt * self.rpmIncFactor, self.minRequiredRpm, self.minRequiredRpm + acc * ( self.maxAllowedRpm - self.minRequiredRpm ) ) 
@@ -5876,16 +5961,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			else
 				local refRpm   = math.max( self.lastMotorRpmS, self.idleRpm )
 			
-				if     self.ptoOn 
-						or accelerationPedal > 0.5 
-						or self.vehicle.mrGbMS.OpenRpm >= self.idleRpm then
-				-- open the clutch only if needed: PTO, acceleration or torque converter
-					openRpm = minRpmReduced
-				
-					if self.vehicle.mrGbMS.OpenRpm > minRpmReduced then
-						openRpm = minRpmReduced + self.motorLoadS * ( self.vehicle.mrGbMS.OpenRpm - minRpmReduced )
-					end
-				end					
+			--if     self.ptoOn 
+			--		or accelerationPedal > 0.5 
+			--		or self.vehicle.mrGbMS.OpenRpm >= self.idleRpm then
+			---- open the clutch only if needed: PTO, acceleration or torque converter
+			--	openRpm = minRpmReduced
+			--
+			--	if self.vehicle.mrGbMS.OpenRpm > minRpmReduced then
+			--		openRpm = minRpmReduced + self.motorLoadS * ( self.vehicle.mrGbMS.OpenRpm - minRpmReduced )
+			--	end
+			--end					
 				if self.vehicle.mrGbMS.CloseRpm > refRpm then
 					closeRpm = refRpm + self.motorLoadS * ( self.vehicle.mrGbMS.CloseRpm - refRpm )
 				end
