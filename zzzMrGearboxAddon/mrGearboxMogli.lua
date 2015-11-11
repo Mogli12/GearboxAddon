@@ -111,8 +111,8 @@ mrGearboxMogliGlobals.initMotorOnLoad       = true
 mrGearboxMogliGlobals.ptoSpeedLimit         = true
 mrGearboxMogliGlobals.clutchFrom            = 0.0
 mrGearboxMogliGlobals.clutchTo              = 0.8
-mrGearboxMogliGlobals.clutchExp             = 3
-mrGearboxMogliGlobals.clutchFactor          = 2
+mrGearboxMogliGlobals.clutchExp             = 2.2
+mrGearboxMogliGlobals.clutchFactor          = 2.4
 mrGearboxMogliGlobals.blinkingWarning       = true
 mrGearboxMogliGlobals.grindingMinRpmDelta   = 100
 mrGearboxMogliGlobals.grindingMaxRpmDelta   = 500
@@ -4126,6 +4126,7 @@ function mrGearboxMogli:checkGearShiftDC( new, what, noEventSend )
 		end
 			
 		if     v > 1 then
+			self:mrGbMSetNeutralActive( true, noEventSend )
 			self:mrGbMSetState( "WarningText", string.format( "Cannot shift gear: rpm in: %4.0f / out: %4.0f", self.motor.transmissionInputRpm, w ))
 			self.mrGbMS.GrindingGearsVol = 0
 			self:mrGbMSetState( "GrindingGearsVol", 1 )
@@ -6271,7 +6272,10 @@ function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, c
 	local minPercent, clutchPercent = self.vehicle.mrGbMS.MinClutchPercent, self.vehicle.mrGbMS.MaxClutchPercent 			
 
 	local target   = Utils.clamp( targetRpm, self.idleRpm, closeRpm ) 
-	local throttle = math.max( self.stallRpm, (self.minThrottle + ( 1 - self.minThrottle ) * math.max(0,accelerationPedal) ) * self.maxAllowedRpm )
+	local throttle = self.idleRpm + ( self.minThrottle + ( 1 - self.minThrottle ) * math.max(0,accelerationPedal) ) * ( self.maxAllowedRpm - self.idleRpm )
+	if throttle < currentRpm then
+		throttle = currentRpm
+	end
 	
 	if currentRpm > openRpm and self.autoClutchPercent + mrGearboxMogli.eps >= self.vehicle.mrGbMS.MaxClutchPercent then
 	-- do not open clutch above openRpm 
@@ -6279,8 +6283,8 @@ function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, c
 	end 
 	
 	local eps       = 0.01 * ( clutchPercent - minPercent )
-	local delta     = ( throttle - self.wheelRpm ) * eps
-	local clutchRpm = (1 - clutchPercent) * throttle + clutchPercent *  self.wheelRpm
+	local delta     = ( throttle - math.max( self.wheelRpm, 0 ) ) * eps
+	local clutchRpm = (1 - clutchPercent) * throttle + clutchPercent * math.max( self.wheelRpm, 0 )
 	local diff      = math.abs( target - clutchRpm )
 	
 	for i=0,100 do
@@ -6291,7 +6295,14 @@ function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, c
 			clutchPercent = self.vehicle.mrGbMS.MaxClutchPercent - i * eps
 		end
 	end
-		
+	
+	--if self.vehicle.mrGbMG.debugPrint and clutchPercent < 0.1 then
+	--	print(string.format("Clutch: cur: %4.0f tar: %4.0f opn: %4.0f cls: %4.0f acc: %1.3f => tar: %4.0f thr: %4.0f whl: %4.0f => clu %4.0f diffi %4.0f => %1.3f (%4.4f %4.4f)",
+	--	                    currentRpm, targetRpm, openRpm, closeRpm, accelerationPedal,
+	--											target, throttle, self.wheelRpm,
+	--											clutchRpm, diff, clutchPercent, eps, delta ) )
+	--end 
+	
 	return clutchPercent 
 end
 
