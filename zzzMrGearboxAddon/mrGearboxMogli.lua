@@ -114,6 +114,8 @@ mrGearboxMogliGlobals.clutchTo              = 0.8
 mrGearboxMogliGlobals.clutchExp             = 3
 mrGearboxMogliGlobals.clutchFactor          = 2
 mrGearboxMogliGlobals.blinkingWarning       = true
+mrGearboxMogliGlobals.grindingMinRpmDelta   = 100
+mrGearboxMogliGlobals.grindingMaxRpmDelta   = 500
 
 
 --setSamplePitch( mrGearboxMogli.BOVSample, 0.85 )
@@ -4109,20 +4111,30 @@ function mrGearboxMogli:checkGearShiftDC( new, what, noEventSend )
 		local r2 = mrGearboxMogli.gearSpeedToRatio( self, s )
 		local w  = self.motor.clutchRpm * r2 / r1
 		
+		local v = 0			
+		if self.motor.transmissionInputRpm < w then
+			v = ( w - self.motor.transmissionInputRpm ) / self.mrGbMG.grindingMinRpmDelta
+		else
+			v = ( self.motor.transmissionInputRpm - w ) / self.mrGbMG.grindingMaxRpmDelta
+		end
+		
+		-- grinding sound if v > 0.5, no shift if v > 1
+		v = math.max( v + v - 1, 0 )
+		
 		if self.mrGbMG.debugPrint then
-			print(string.format("DC: %3.0fkm/h (%3.0f) %3.0fkm/h (%3.0f) => in %4.0f U/min / out %4.0f U/min", self.mrGbML.currentGearSpeed, r1, s, r2, self.motor.transmissionInputRpm, w ))
+			print(string.format("DC: %3.0fkm/h (%3.0f) %3.0fkm/h (%3.0f) => in %4.0f U/min / out %4.0f U/min => %1.2f", self.mrGbML.currentGearSpeed, r1, s, r2, self.motor.transmissionInputRpm, w, v ))
 		end
 			
-		if self.motor.transmissionInputRpm + 20 < w then
-			self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear; go to neutral 1st" ))
+		if     v > 1 then
+			self:mrGbMSetState( "WarningText", string.format( "Cannot shift gear: rpm in: %4.0f / out: %4.0f", self.motor.transmissionInputRpm, w ))
 			self.mrGbMS.GrindingGearsVol = 0
 			self:mrGbMSetState( "GrindingGearsVol", 1 )
 			return false
-		else
-			local v = Utils.clamp( ( self.motor.transmissionInputRpm - w ) / 200, 0, 2 )
-			if v > self.mrGbMS.GrindingGearsVol then
-				self:mrGbMSetState( "GrindingGearsVol", v )
-			end
+		elseif v > 0 and v > self.mrGbMS.GrindingGearsVol then
+			self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear: rpm in: %4.0f / out: %4.0f", self.motor.transmissionInputRpm, w ))
+			self:mrGbMSetState( "GrindingGearsVol", v )
+		elseif self.mrGbMS.GrindingGearsVol > 0 then
+			self:mrGbMSetState( "GrindingGearsVol", 0 )
 		end
 	end
 	
