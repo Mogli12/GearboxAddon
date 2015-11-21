@@ -57,6 +57,9 @@
 		<!-- http://www.modhoster.de/mods/2500vl%2D%2D3 -->
 		<configFile modName="Schlueter2500VL_V2_1" xmlName="schlueter2500VL.xml"/>
 		
+		<configFile modName="ProfiTrac2500VLFH" xmlName="ProfiTrac2500VLFH.xml" isPrefix="true"/>
+		<configFile modName="ProfiTrac2500VL" xmlName="ProfiTrac2500VL.xml" isPrefix="true"/>
+		
 		<gearboxMogli autoStartStop="false" clutchOpenRpm="1100" clutchCloseRpm="1300" minClutchRatio="0.3" maxClutchRatio="0.95">
 
 			<realEngine idleRpm="800" ratedRpm="2200" >
@@ -97,6 +100,8 @@
 				<range ratio="1"     forwardOnly="true" name="H"/>
 				<range ratio="0.842" reverseOnly="true" name="R"/>
 			</ranges>
+			
+			<reverse shiftTimeMs="0"/>
 		</gearboxMogli>			
 
 	</vehicle>
@@ -1387,7 +1392,7 @@
 		<configFile modName="FendtFarmer300LSA" xmlName="fendt311LSA.xml"/>
 		<configFile modName="FendtFarmer300LSA" xmlName="fendt312LSA.xml"/>
 		
-		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" maxClutchRatio="0.95" revUpDownMs="5000" ptoRpm="1676">
+		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" minClutchRatio="0.3" maxClutchRatio="0.95" revUpDownMs="5000" ptoRpm="1676">
 			<blowOffVentilSound volume="0"/>
 
 			<gears defaultGear="1" reverseReset="true" shiftTimeMs="1000">	

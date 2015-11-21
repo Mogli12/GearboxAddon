@@ -694,7 +694,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 
 --**************************************************************************************************	
 --**************************************************************************************************		
-	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), self.mrGbMS.StallRpm ) -- no automatic opening of clutch by default!!!
+	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), self.mrGbMS.StallRpm-1 ) -- no automatic opening of clutch by default!!!
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), self.mrGbMS.IdleRpm+0.1*(self.mrGbMS.RatedRpm-self.mrGbMS.IdleRpm) )
 	self.mrGbMS.AutoStartStop           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#autoStartStop"), true)
 	self.mrGbMS.AutoStartStopBackup     = self.mrGbMS.AutoStartStop 
@@ -4868,7 +4868,7 @@ function mrGearboxMogliMotor:getCurMaxRpm()
 			speedLimit = math.min(speedLimit, self.vehicle.mrGbML.currentGearSpeed * self.vehicle.mrGbMS.HydrostaticMax )
 		end
 
-		local maxSpeedRpm  = speedLimit * mrGearboxMogli.factor30pi * self:getMogliGearRatio()
+		local maxSpeedRpm  = math.max( speedLimit * mrGearboxMogli.factor30pi * self:getMogliGearRatio(), self.idleRpm )
 		self.lastCurMaxRpm = math.min( self.lastCurMaxRpm, maxSpeedRpm )
 		self.lastLimitRpm  = math.min( self.lastLimitRpm,  maxSpeedRpm )
 		self.lastCurMaxRpm = math.min( self.lastCurMaxRpm, self.rpmLimit )	
@@ -6024,6 +6024,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			end
 			
 			local hMin
+			local hMax = self.vehicle.mrGbMS.HydrostaticMax			
+			if self.vehicle.cruiseControl.state > 0 then
+				hMax = Utils.clamp( self.vehicle.cruiseControl.speed * 0.277778 * mrGearboxMogli.factor30pi * r / self.idleRpm, self.vehicle.mrGbMS.HydrostaticMin, self.vehicle.mrGbMS.HydrostaticMax )
+			end
+			local hStart = math.min( self.vehicle.mrGbMS.HydrostaticStart, hMax )
 			
 			local reducedMin = (self.vehicle.mrGbMS.CurrentGear == 1)
 			if      self.vehicle.mrGbMS.MaxAIGear   ~= nil
@@ -6040,24 +6045,24 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				hMin = self.vehicle.mrGbMS.HydrostaticMin
 			elseif  reducedMin then
 				-- lower ratio at high motor load
-				hMin = self.vehicle.mrGbMS.HydrostaticStart + Utils.clamp( self.motorLoadS+self.motorLoadS - 1, 0, 1 ) * ( self.vehicle.mrGbMS.HydrostaticMin - self.vehicle.mrGbMS.HydrostaticStart )
+				hMin = hStart + Utils.clamp( self.motorLoadS+self.motorLoadS - 1, 0, 1 ) * ( self.vehicle.mrGbMS.HydrostaticMin - hStart )
 			else
 				-- less reduction of ratio
-				hMin = self.vehicle.mrGbMS.HydrostaticStart + Utils.clamp( self.motorLoadS+self.motorLoadS+self.motorLoadS - 2.3, 0, 1 ) * ( self.vehicle.mrGbMS.HydrostaticMin - self.vehicle.mrGbMS.HydrostaticStart )
+				hMin = hStart + Utils.clamp( self.motorLoadS+self.motorLoadS+self.motorLoadS - 2.3, 0, 1 ) * ( self.vehicle.mrGbMS.HydrostaticMin - hStart )
 			end
 			
 			-- allow low ratio w/o acceleration pedal
 			hMin = self.vehicle.mrGbMS.HydrostaticMin + accelerationPedal * ( hMin - self.vehicle.mrGbMS.HydrostaticMin )
 			
-			if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and w > self.vehicle.mrGbMS.HydrostaticMaxRpm * self.vehicle.mrGbMS.HydrostaticMax then
-				h = self.vehicle.mrGbMS.HydrostaticMax				
-			elseif w > m * self.vehicle.mrGbMS.HydrostaticMax then
-				h = self.vehicle.mrGbMS.HydrostaticMax				
+			if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and w > self.vehicle.mrGbMS.HydrostaticMaxRpm * hMax then
+				h = hMax				
+			elseif w > m * hMax then
+				h = hMax				
 			elseif self.ptoOn or accelerationPedal < 0.001 then
-				h = Utils.clamp( w / t, hMin, self.vehicle.mrGbMS.HydrostaticMax )  
+				h = Utils.clamp( w / t, hMin, hMax )  
 			else
 				for t = math.max(self.idleRpm,self.targetRpm-mrGearboxMogli.hydroEffDiff), m, 10 do
-					local h2 = Utils.clamp( w / t, hMin, self.vehicle.mrGbMS.HydrostaticMax )  
+					local h2 = Utils.clamp( w / t, hMin, hMax )  
 					local e2 = math.min( self.hydroEff:get( h2 ) * t * currentTorqueCurve:get( t ), requestedPower * self.vehicle.mrGbMS.TransmissionEfficiency )
 					if e2 > e + mrGearboxMogli.eps then
 						e = e2
@@ -6078,7 +6083,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.hydrostaticFactor = self.hydrostaticFactor + math.max( mrGearboxMogli.smoothHydro * ( h - self.hydrostaticFactor ), -d )
 			end
 			self.hydrostaticFactor   = math.max( self.hydrostaticFactor, absWheelSpeedRpm * r / self.maxAllowedRpm ) 
-
+			
 		--clutchMode = 0
 			if     self.vehicle.mrGbMS.HydrostaticLaunch then
 				clutchMode             = 0
@@ -6101,7 +6106,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- clutch				
 	if clutchMode > 0 and not ( self.noTransmission ) then
 		if self.vehicle:mrGbMGetAutoClutch() or self.vehicle:mrGbMGetOneButtonClutch() then 
-			local openRpm   = math.max( self.vehicle.mrGbMS.OpenRpm, self.stallRpm + 20 )
+			local openRpm   = self.vehicle.mrGbMS.OpenRpm --math.max( self.vehicle.mrGbMS.OpenRpm, self.stallRpm + 20 )
 			local closeRpm  = self.vehicle.mrGbMS.CloseRpm
 			local targetRpm = self.targetRpm
 			
@@ -6259,28 +6264,21 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, closeRpm, accelerationPedal )
 
-	--if currentRpm   <= self.stallRpm then
-	--	return self.vehicle.mrGbMS.MinClutchPercent
-	--end
 	if self.wheelRpm >= closeRpm then
 		return self.vehicle.mrGbMS.MaxClutchPercent 					
 	end	
-	if currentRpm < openRpm and currentRpm < targetRpm * mrGearboxMogli.rpmReduction then
-		return self.vehicle.mrGbMS.MinClutchPercent	
-	end
+	if openRpm > self.stallRpm and currentRpm < self.stallRpm then
+		return self.vehicle.mrGbMS.MinClutchPercent 					
+	end	
 	
-	local minPercent, clutchPercent = self.vehicle.mrGbMS.MinClutchPercent, self.vehicle.mrGbMS.MaxClutchPercent 			
-
+	local minPercent    = self.vehicle.mrGbMS.MinClutchPercent + Utils.clamp( 0.5 + 0.02 * ( currentRpm - openRpm ), 0, 1 ) * math.max( 0, self.autoClutchPercent - self.vehicle.mrGbMS.MinClutchPercent )
+	local clutchPercent = self.vehicle.mrGbMS.MaxClutchPercent 			
+	
 	local target   = Utils.clamp( targetRpm, self.idleRpm, closeRpm ) 
 	local throttle = self.idleRpm + ( self.minThrottle + ( 1 - self.minThrottle ) * math.max(0,accelerationPedal) ) * ( self.maxAllowedRpm - self.idleRpm )
 	if throttle < currentRpm then
 		throttle = currentRpm
 	end
-	
-	if currentRpm > openRpm and self.autoClutchPercent + mrGearboxMogli.eps >= self.vehicle.mrGbMS.MaxClutchPercent then
-	-- do not open clutch above openRpm 
-		minPercent = self.autoClutchPercent		
-	end 
 	
 	local eps       = 0.01 * ( clutchPercent - minPercent )
 	local delta     = ( throttle - math.max( self.wheelRpm, 0 ) ) * eps
