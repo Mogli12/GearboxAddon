@@ -50,6 +50,52 @@
 	</vehicle>
 
 	<vehicle>
+		<configFile modName="RABA" xmlName="RABA.xml"/>
+		<configFile modName="RABA" xmlName="RABADUPLAKEREK.xml"/>
+
+		<!-- http://mezogeparchivum.hu/Madat/tra_raba250.htm -->
+		<gearboxMogli autoStartStop="false" speedLimiter="false">
+			<gears defaultGear="3" shiftTimeMs="1000">
+				<gear speed="3.26"  name="1" forwardOnly="true"/>
+				<gear speed="3.27"  name="R" reverseOnly="true"/>
+				<gear speed="5.36"  name="2" forwardOnly="true"/>
+				<gear speed="7.52"  name="3" forwardOnly="true"/>
+				<gear speed="14.33" name="4" forwardOnly="true"/>
+				<gear speed="22.80" name="5" forwardOnly="true"/>
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
+				<range ratio="0.788" name="L" />
+				<range ratio="1"     name="H" />
+			</ranges>
+
+			<reverse ratio="1" shiftTimeMs="1200" resetRange="false" resetGear="false"/>
+
+			<realEngine idleRpm="900" ratedRpm="1900">
+        <!-- 1900: 250(250) | 1900: 250(250) | 1500..1500: 1100(1100) | 90 | 0.5 | 300 | 1.8 | 2000 | 1300: 215 -->
+        <torque rpm="100" motorTorque="240" motorTorqueEco="240" fuelUsageRatio="301"/>
+        <torque rpm="400" motorTorque="705" motorTorqueEco="705" fuelUsageRatio="263.4"/>
+        <torque rpm="700" motorTorque="913" motorTorqueEco="913" fuelUsageRatio="236.5"/>
+        <torque rpm="800" motorTorque="953" motorTorqueEco="953" fuelUsageRatio="229.9"/>
+        <torque rpm="900" motorTorque="990" motorTorqueEco="990" fuelUsageRatio="224.6"/>
+        <torque rpm="1000" motorTorque="1024" motorTorqueEco="1024" fuelUsageRatio="220.4"/>
+        <torque rpm="1100" motorTorque="1051" motorTorqueEco="1051" fuelUsageRatio="217.4"/>
+        <torque rpm="1200" motorTorque="1073" motorTorqueEco="1073" fuelUsageRatio="215.6"/>
+        <torque rpm="1300" motorTorque="1088" motorTorqueEco="1088" fuelUsageRatio="215"/>
+        <torque rpm="1400" motorTorque="1097" motorTorqueEco="1097" fuelUsageRatio="215.7"/>
+        <torque rpm="1500" motorTorque="1100" motorTorqueEco="1100" fuelUsageRatio="217.7"/>
+        <torque rpm="1600" motorTorque="1072" motorTorqueEco="1072" fuelUsageRatio="221"/>
+        <torque rpm="1700" motorTorque="1033" motorTorqueEco="1033" fuelUsageRatio="225.6"/>
+        <torque rpm="1800" motorTorque="975" motorTorqueEco="975" fuelUsageRatio="231.6"/>
+        <torque rpm="1900" motorTorque="924" motorTorqueEco="924" fuelUsageRatio="238.9"/>
+        <torque rpm="2000" motorTorque="796" motorTorqueEco="796" fuelUsageRatio="254.2"/>
+        <torque rpm="2100" motorTorque="479" motorTorqueEco="479" fuelUsageRatio="325.6"/>
+        <torque rpm="2200" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>	
+	
+	<vehicle>
 		<!-- http://www.modhoster.de/mods/2500vl -->
 		<configFile modName="Schlueter2500Vl" xmlName="schlueter2500VL.xml"/>
 		<!-- http://www.modhoster.de/mods/2500vl%2D%2D2 -->
@@ -283,6 +329,58 @@
 			</realEngine>
 		</gearboxMogli>	
 	</vehicle>
+	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/john-deere-6210r%2D%2D3 -->
+		<configFile modName="FS15_JohnDeere6210R" xmlName="JohnDeere6210R.xml" />
+	
+		<!-- http://www.dlg-test.de/tests/1212_JohnDeere_6210R.pdf -->
+		<!-- http://manuals.deere.com/omview/OMETN78900_19/?tM= -->
+		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="30" soundMaxRpm="1900">
+			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="1" automatic="true">	
+				<gear speed="16.5" name="1" />
+				<gear speed="20.0" name="2" />
+				<gear speed="24.5" name="3" />
+				<gear speed="29.7" name="4" />
+				<gear speed="36.4" name="5" />
+				<gear speed="44.1" name="6" />
+				<gear speed="53.7" name="7" />
+				<gear speed="65.3" name="8" />
+			</gears>
+
+			<ranges shiftTimeMs="800" defaultRange="3" automatic="false">
+				<range ratio="0.1653" name="A" upGearOffset="-3"/>
+				<range ratio="0.3294" name="B" upGearOffset="-5" downGearOffset="3"/>
+				<range ratio="1"      name="C" downGearOffset="5"/>
+			</ranges>
+					
+			<reverse ratio="1.044" shiftTimeMs="100" resetGear="false" resetRange="false" />
+		
+			<realEngine idleRpm="850" ratedRpm="2100">
+        <!-- 2100: 240(210) | 2100: 240(210) | 1400..1600: 1004(983) | 84 | 0.5 | 300 | 1.8 | 2200 | 1350: 200 -->
+        <torque rpm="100" motorTorque="177" motorTorqueEco="174" fuelUsageRatio="255.6"/>
+        <torque rpm="400" motorTorque="544" motorTorqueEco="533" fuelUsageRatio="232.1"/>
+        <torque rpm="700" motorTorque="757" motorTorqueEco="741" fuelUsageRatio="215"/>
+        <torque rpm="800" motorTorque="814" motorTorqueEco="797" fuelUsageRatio="210.8"/>
+        <torque rpm="900" motorTorque="871" motorTorqueEco="853" fuelUsageRatio="207.2"/>
+        <torque rpm="1000" motorTorque="919" motorTorqueEco="900" fuelUsageRatio="204.4"/>
+        <torque rpm="1100" motorTorque="956" motorTorqueEco="936" fuelUsageRatio="202.2"/>
+        <torque rpm="1200" motorTorque="983" motorTorqueEco="962" fuelUsageRatio="200.8"/>
+        <torque rpm="1300" motorTorque="999" motorTorqueEco="978" fuelUsageRatio="200.1"/>
+        <torque rpm="1400" motorTorque="1004" motorTorqueEco="983" fuelUsageRatio="200.1"/>
+        <torque rpm="1500" motorTorque="1004" motorTorqueEco="970" fuelUsageRatio="200.9"/><!-- manDataEco: 970-->
+        <torque rpm="1600" motorTorque="1004" motorTorqueEco="921" fuelUsageRatio="202.5"/><!-- manDataEco: 921-->
+        <torque rpm="1700" motorTorque="980" motorTorqueEco="867" fuelUsageRatio="204.8"/>
+        <torque rpm="1800" motorTorque="936" motorTorqueEco="819" fuelUsageRatio="208"/>
+        <torque rpm="1900" motorTorque="887" motorTorqueEco="776" fuelUsageRatio="212"/>
+        <torque rpm="2000" motorTorque="843" motorTorqueEco="737" fuelUsageRatio="216.7"/>
+        <torque rpm="2100" motorTorque="803" motorTorqueEco="702" fuelUsageRatio="222.2"/>
+        <torque rpm="2200" motorTorque="691" motorTorqueEco="605" fuelUsageRatio="236.5"/>
+        <torque rpm="2300" motorTorque="416" motorTorqueEco="364" fuelUsageRatio="302.9"/>
+        <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
 
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/deutz/deutzAgroStar661.xml"/>
@@ -388,31 +486,33 @@
 		<configFile modName="LS15DeutzAgroStarReihe_PumaFBM" xmlName="deutzAgroStar681.xml"/>
 
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
-		<gearboxMogli autoStartStop="false" soundMaxRpm="1900">
+		<gearboxMogli autoStartStop="true" soundMaxRpm="1900">
 			<realEngine idleRpm="1000" ratedRpm="2350" >
-        <torque rpm="0" motorTorque="0"/>
-        <torque rpm="700" motorTorque="674"/>
-        <torque rpm="800" motorTorque="708"/>
-        <torque rpm="900" motorTorque="735"/>
-        <torque rpm="1000" motorTorque="755"/>
-        <torque rpm="1100" motorTorque="766"/>
-        <torque rpm="1200" motorTorque="770"/>
-        <torque rpm="1300" motorTorque="768"/>
-        <torque rpm="1400" motorTorque="764"/>
-        <torque rpm="1500" motorTorque="756"/>
-        <torque rpm="1600" motorTorque="746"/>
-        <torque rpm="1700" motorTorque="732"/>
-        <torque rpm="1800" motorTorque="715"/>
-        <torque rpm="1900" motorTorque="695"/>
-        <torque rpm="2000" motorTorque="672"/>
-        <torque rpm="2100" motorTorque="646"/>
-        <torque rpm="2200" motorTorque="617"/>
-        <torque rpm="2300" motorTorque="585"/>
-        <torque rpm="2400" motorTorque="505"/>
-        <torque rpm="2500" motorTorque="0"/>
+        <!-- 2300: 190(190) | 2350: 190(190) | 1200..1200: 723(723) | 97 | 0 | 250 | 2.2 | 2500 | 1200: 207 -->
+        <torque rpm="100" motorTorque="179" motorTorqueEco="179" fuelUsageRatio="381.8"/>
+        <torque rpm="400" motorTorque="522" motorTorqueEco="522" fuelUsageRatio="299.4"/>
+        <torque rpm="700" motorTorque="664" motorTorqueEco="664" fuelUsageRatio="243.1"/>
+        <torque rpm="800" motorTorque="685" motorTorqueEco="685" fuelUsageRatio="230.1"/>
+        <torque rpm="900" motorTorque="701" motorTorqueEco="701" fuelUsageRatio="220"/>
+        <torque rpm="1000" motorTorque="713" motorTorqueEco="713" fuelUsageRatio="212.8"/>
+        <torque rpm="1100" motorTorque="721" motorTorqueEco="721" fuelUsageRatio="208.4"/>
+        <torque rpm="1200" motorTorque="723" motorTorqueEco="723" fuelUsageRatio="207"/>
+        <torque rpm="1300" motorTorque="722" motorTorqueEco="722" fuelUsageRatio="207.3"/>
+        <torque rpm="1400" motorTorque="718" motorTorqueEco="718" fuelUsageRatio="208.3"/>
+        <torque rpm="1500" motorTorque="712" motorTorqueEco="712" fuelUsageRatio="209.9"/>
+        <torque rpm="1600" motorTorque="704" motorTorqueEco="704" fuelUsageRatio="212.2"/>
+        <torque rpm="1700" motorTorque="693" motorTorqueEco="693" fuelUsageRatio="215.1"/>
+        <torque rpm="1800" motorTorque="680" motorTorqueEco="680" fuelUsageRatio="218.7"/>
+        <torque rpm="1900" motorTorque="665" motorTorqueEco="665" fuelUsageRatio="222.9"/>
+        <torque rpm="2000" motorTorque="647" motorTorqueEco="647" fuelUsageRatio="227.8"/>
+        <torque rpm="2100" motorTorque="627" motorTorqueEco="627" fuelUsageRatio="233.3"/>
+        <torque rpm="2200" motorTorque="605" motorTorqueEco="605" fuelUsageRatio="239.5"/>
+        <torque rpm="2300" motorTorque="580" motorTorqueEco="580" fuelUsageRatio="246.3"/>
+        <torque rpm="2400" motorTorque="551" motorTorqueEco="551" fuelUsageRatio="254.5"/>
+        <torque rpm="2500" motorTorque="383" motorTorqueEco="383" fuelUsageRatio="319.7"/>
 			</realEngine>
 		
-			<gears defaultGear="3" shiftTimeMs="0">
+			<gears defaultGear="4" shiftTimeMs="0">
 				<gear speed="10.2"/>
 				<gear speed="12.3"/>
 				<gear speed="15.0"/>
@@ -424,7 +524,59 @@
 				<gear speed="42.0" forwardOnly="true"/>
 			</gears>
 
-			<ranges defaultRange="4" reverseReset="true" doubleClutch="true">
+			<ranges defaultRange="3" reverseReset="true" doubleClutch="false">
+				<range ratio="0.0686" name="L" />
+				<range ratio="0.262"  name="M" />
+				<range ratio="1"      name="H" />
+			</ranges>
+			
+			<reverse ratio="0.91" shiftTimeMs="0"/>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/deutz-agroallis-6-93 -->
+		<configFile modName="DeutzAgroAllis6_93" xmlName="deutzAgroAllis6.39.xml"/>
+
+		<gearboxMogli autoStartStop="true">
+			<realEngine idleRpm="1000" ratedRpm="2350" >
+        <!-- 2300: 230(230) | 2350: 230(230) | 1200..1200: 873(873) | 97 | 0.5 | 250 | 1.8 | 2500 | 1200: 207 -->
+        <torque rpm="100" motorTorque="216" motorTorqueEco="216" fuelUsageRatio="330.7"/>
+        <torque rpm="400" motorTorque="630" motorTorqueEco="630" fuelUsageRatio="272.4"/>
+        <torque rpm="700" motorTorque="801" motorTorqueEco="801" fuelUsageRatio="232.6"/>
+        <torque rpm="800" motorTorque="828" motorTorqueEco="828" fuelUsageRatio="223.4"/>
+        <torque rpm="900" motorTorque="847" motorTorqueEco="847" fuelUsageRatio="216.2"/>
+        <torque rpm="1000" motorTorque="861" motorTorqueEco="861" fuelUsageRatio="211.1"/>
+        <torque rpm="1100" motorTorque="870" motorTorqueEco="870" fuelUsageRatio="208"/>
+        <torque rpm="1200" motorTorque="873" motorTorqueEco="873" fuelUsageRatio="207"/>
+        <torque rpm="1300" motorTorque="865" motorTorqueEco="865" fuelUsageRatio="207.2"/>
+        <torque rpm="1400" motorTorque="855" motorTorqueEco="855" fuelUsageRatio="207.7"/>
+        <torque rpm="1500" motorTorque="843" motorTorqueEco="843" fuelUsageRatio="208.6"/>
+        <torque rpm="1600" motorTorque="831" motorTorqueEco="831" fuelUsageRatio="209.8"/>
+        <torque rpm="1700" motorTorque="817" motorTorqueEco="817" fuelUsageRatio="211.3"/>
+        <torque rpm="1800" motorTorque="801" motorTorqueEco="801" fuelUsageRatio="213.3"/>
+        <torque rpm="1900" motorTorque="784" motorTorqueEco="784" fuelUsageRatio="215.5"/>
+        <torque rpm="2000" motorTorque="766" motorTorqueEco="766" fuelUsageRatio="218.1"/>
+        <torque rpm="2100" motorTorque="746" motorTorqueEco="746" fuelUsageRatio="221.1"/>
+        <torque rpm="2200" motorTorque="725" motorTorqueEco="725" fuelUsageRatio="224.4"/>
+        <torque rpm="2300" motorTorque="702" motorTorqueEco="702" fuelUsageRatio="228"/>
+        <torque rpm="2400" motorTorque="649" motorTorqueEco="649" fuelUsageRatio="234.1"/>
+        <torque rpm="2500" motorTorque="413" motorTorqueEco="413" fuelUsageRatio="294.1"/>
+			</realEngine>
+		
+			<gears defaultGear="4" shiftTimeMs="0">
+				<gear speed="10.2"/>
+				<gear speed="12.3"/>
+				<gear speed="15.0"/>
+				<gear speed="17.1"/>
+				<gear speed="20.8"/>
+				<gear speed="24.9"/>
+				<gear speed="28.1"/>
+				<gear speed="34.0"/>
+				<gear speed="42.0" forwardOnly="true"/>
+			</gears>
+
+			<ranges defaultRange="3" reverseReset="true" doubleClutch="false">
 				<range ratio="0.0686" name="L" />
 				<range ratio="0.262"  name="M" />
 				<range ratio="1"      name="H" />
@@ -2877,6 +3029,53 @@
 			</realEngine>			
 		</gearboxMogli>	
 	</vehicle>
+	
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/deutz-fahr-9340 -->
+		<configFile modName="deutzFahr9340" xmlName="scripts/vehicleShaderDirt.dds"/>
+
+		<gearboxMogli maxBackwardSpeed="32">
+      <hydrostatic>
+        <efficiency ratio="0.017531" factor="0.68"/> <!-- 0.05 .. 0.9 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.9 .. 35.5 -->
+        <efficiency ratio="0.833333" factor="0.93"/> <!-- 2.38 .. 44.4 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.85 .. 53.2 -->
+        <efficiency ratio="1.166667" factor="0.93"/> <!-- 3.33 .. 62.1 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.8 .. 71 -->
+      </hydrostatic>
+      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+        <gear speed="6.65" name=""/> <!-- 0.05 1.9 4 9-->
+        <gear speed="13.31" name=""/> <!-- 0.1 3.8 9 18-->
+        <gear speed="26.62" name=""/> <!-- 0.2 7.61 18 35-->
+        <gear speed="53.24" name=""/> <!-- 0.4 15.21 35 71-->
+      </gears>
+      <reverse ratio="1" shiftTimeMs="0" />
+
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <!-- 1900: 336(308) | 2100: 316(284) | 1500..1500: 1372(1303) | 95 | 0 | 300 | 1.5 | 2200 | 1380: 200 -->
+        <torque rpm="100" motorTorque="354" motorTorqueEco="336" fuelUsageRatio="263.2"/>
+        <torque rpm="400" motorTorque="1008" motorTorqueEco="958" fuelUsageRatio="237.1"/>
+        <torque rpm="700" motorTorque="1248" motorTorqueEco="1185" fuelUsageRatio="217.8"/>
+        <torque rpm="800" motorTorque="1280" motorTorqueEco="1216" fuelUsageRatio="213"/>
+        <torque rpm="900" motorTorque="1303" motorTorqueEco="1238" fuelUsageRatio="208.9"/>
+        <torque rpm="1000" motorTorque="1324" motorTorqueEco="1258" fuelUsageRatio="205.6"/>
+        <torque rpm="1100" motorTorque="1342" motorTorqueEco="1274" fuelUsageRatio="203"/>
+        <torque rpm="1200" motorTorque="1355" motorTorqueEco="1287" fuelUsageRatio="201.3"/>
+        <torque rpm="1300" motorTorque="1364" motorTorqueEco="1296" fuelUsageRatio="200.2"/>
+        <torque rpm="1400" motorTorque="1370" motorTorqueEco="1302" fuelUsageRatio="200"/>
+        <torque rpm="1500" motorTorque="1372" motorTorqueEco="1303" fuelUsageRatio="200.6"/>
+        <torque rpm="1600" motorTorque="1364" motorTorqueEco="1293" fuelUsageRatio="202.1"/>
+        <torque rpm="1700" motorTorque="1339" motorTorqueEco="1262" fuelUsageRatio="204.4"/>
+        <torque rpm="1800" motorTorque="1299" motorTorqueEco="1202" fuelUsageRatio="207.6"/>
+        <torque rpm="1900" motorTorque="1242" motorTorqueEco="1138" fuelUsageRatio="211.6"/>
+        <torque rpm="2000" motorTorque="1162" motorTorqueEco="1061" fuelUsageRatio="216.5"/>
+        <torque rpm="2100" motorTorque="1057" motorTorqueEco="951" fuelUsageRatio="222.2"/>
+        <torque rpm="2200" motorTorque="853" motorTorqueEco="768" fuelUsageRatio="236.5"/>
+        <torque rpm="2300" motorTorque="481" motorTorqueEco="433" fuelUsageRatio="302.9"/>
+        <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+			</realEngine>			
+		</gearboxMogli>	
+	</vehicle>	
 	
 <!-- ********** SameDeutzFahr TTV ******************** -->	
 <!-- ********** SameDeutzFahr TTV ******************** -->	
