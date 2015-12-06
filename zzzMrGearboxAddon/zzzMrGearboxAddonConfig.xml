@@ -106,7 +106,7 @@
 		<configFile modName="ProfiTrac2500VLFH" xmlName="ProfiTrac2500VLFH.xml" isPrefix="true"/>
 		<configFile modName="ProfiTrac2500VL" xmlName="ProfiTrac2500VL.xml" isPrefix="true"/>
 		
-		<gearboxMogli autoStartStop="false" clutchOpenRpm="1100" clutchCloseRpm="1300" minClutchRatio="0.3" maxClutchRatio="0.95">
+		<gearboxMogli autoStartStop="false" clutchOpenRpm="1100" clutchCloseRpm="1300" torqueConverter="true">
 
 			<realEngine idleRpm="800" ratedRpm="2200" >
 				<torque rpm="0" motorTorque="0"/>
@@ -156,7 +156,7 @@
 		<!-- http://www.modhoster.de/mods/schluter-1500-tvl%2D%2D8 -->
 		<configFile modName="Schlueter1500TVL" xmlName="schlueter1500tvl.xml"/>
 		
-		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" minClutchRatio="0.3">
+		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="2000">
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="800" motorTorque="508"/>
@@ -205,7 +205,7 @@
 		<!-- http://www.modhoster.de/mods/schluter-super-1500v-8-zyl-mit-verdeck -->
 		<configFile modName="Schlueter_Super_1500VLS15Beta" xmlName="Schlueter_Super_1500_V.xml"/>
 		
-		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" minClutchRatio="0.3">
+		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="1800">
         <torque rpm="0" motorTorque="0"/>
         <torque rpm="700" motorTorque="546"/>
@@ -922,7 +922,7 @@
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/cars/piQup.xml"/>
 		
-		<gearboxMogli clutchOpenRpm="1150" clutchCloseRpm="1600" minClutchRatio="0.3" maxClutchRatio="0.9" speedLimiter="false">
+		<gearboxMogli clutchOpenRpm="1150" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="500" defaultGear="1" automatic="true" reverseReset="true">	
@@ -1345,7 +1345,7 @@
 		<!-- http://www.modhoster.de/mods/chevrolet-c-10-fleetside-lwb-1966 -->
 		<configFile modName="ChevroletC101966" xmlName="ChevroletC101966.xml"/>
 		
-		<gearboxMogli  clutchOpenRpm="1300" clutchCloseRpm="1800" minClutchRatio="0.3" maxClutchRatio="0.9" speedLimiter="false">
+		<gearboxMogli  clutchOpenRpm="1300" clutchCloseRpm="1800" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="500" defaultGear="1" automatic="true" reverseReset="true">	
@@ -1363,7 +1363,7 @@
 		<configFile modName="ST_Schlueter_TVL1250_rot"   xmlName="Schlueter_TVL1250_Compact.xml"/>
 		<configFile modName="ST_Schlueter_TVL1250_gruen" xmlName="Schlueter_TVL1250_Compact.xml"/>
 
-		<gearboxMogli autoStartStop="false"  clutchShiftingTimeMs="600" clutchOpenRpm="1150" clutchCloseRpm="1300" minClutchRatio="0.3" maxClutchRatio="0.95">
+		<gearboxMogli autoStartStop="false"  clutchShiftingTimeMs="600" clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="2000">
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="800" motorTorque="477"/>
@@ -1475,7 +1475,7 @@
 			<reverse ratio="0.7475" shiftTimeMs="500" clutchRatio="1" resetRange="false" resetGear="false"/>
 		</gearboxMogli>	
 		
-		<realEngine idleRpm="1000" ratedRpm="2200">
+		<realEngine idleRpm="900" ratedRpm="2200">
 			<torque rpm="0" motorTorque="0"/>
 			<torque rpm="700" motorTorque="410"/>
 			<torque rpm="800" motorTorque="435"/>
@@ -1521,6 +1521,60 @@
 	</vehicle>
 
 	<vehicle>
+		<!-- http://www.kreters-island.de/node/90 and http://www.kreters-island.de/node/91 -->
+		<configFile modName="IHC_955" xmlName="IHC_955.xml" />
+		<configFile modName="IHC_955_FH" xmlName="IHC_955.xml" />
+		<configFile modName="IHC_955A" xmlName="IHC_955A.xml" />
+		<configFile modName="IHC_955A_FH" xmlName="IHC_955A.xml" />
+		<!-- http://www.kreters-island.de/node/88 and http://www.kreters-island.de/node/89 -->
+		<configFile modName="IHC_1055" xmlName="IHC_1055.xml" />
+		<configFile modName="IHC_1055_FH" xmlName="IHC_1055.xml" />
+		<configFile modName="IHC_1055A" xmlName="IHC_1055A.xml" />
+		<configFile modName="IHC_1055A_FH" xmlName="IHC_1055A.xml" />
+
+		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
+			<realEngine idleRpm="850" ratedRpm="2200">
+        <!-- 2200: 100(100) | 2200: 100(100) | 1400..1400: 377.6(378) | 90 | 0.5 | 300 | 1.8 | 2300 | 1400: 220 -->
+        <torque rpm="100" motorTorque="77" motorTorqueEco="77" fuelUsageRatio="286.1"/>
+        <torque rpm="400" motorTorque="231" motorTorqueEco="231" fuelUsageRatio="259.1"/>
+        <torque rpm="700" motorTorque="308" motorTorqueEco="308" fuelUsageRatio="239.2"/>
+        <torque rpm="800" motorTorque="325" motorTorqueEco="325" fuelUsageRatio="234.1"/>
+        <torque rpm="900" motorTorque="340" motorTorqueEco="340" fuelUsageRatio="229.8"/>
+        <torque rpm="1000" motorTorque="353" motorTorqueEco="353" fuelUsageRatio="226.3"/>
+        <torque rpm="1100" motorTorque="364" motorTorqueEco="364" fuelUsageRatio="223.5"/>
+        <torque rpm="1200" motorTorque="372" motorTorqueEco="372" fuelUsageRatio="221.6"/>
+        <torque rpm="1300" motorTorque="376" motorTorqueEco="376" fuelUsageRatio="220.4"/>
+        <torque rpm="1400" motorTorque="378" motorTorqueEco="378" fuelUsageRatio="220"/>
+        <torque rpm="1500" motorTorque="373" motorTorqueEco="373" fuelUsageRatio="220.4"/>
+        <torque rpm="1600" motorTorque="368" motorTorqueEco="368" fuelUsageRatio="221.5"/>
+        <torque rpm="1700" motorTorque="363" motorTorqueEco="363" fuelUsageRatio="223.4"/>
+        <torque rpm="1800" motorTorque="356" motorTorqueEco="356" fuelUsageRatio="226.1"/>
+        <torque rpm="1900" motorTorque="348" motorTorqueEco="348" fuelUsageRatio="229.5"/>
+        <torque rpm="2000" motorTorque="339" motorTorqueEco="339" fuelUsageRatio="233.8"/>
+        <torque rpm="2100" motorTorque="330" motorTorqueEco="330" fuelUsageRatio="238.7"/>
+        <torque rpm="2200" motorTorque="319" motorTorqueEco="319" fuelUsageRatio="244.4"/>
+        <torque rpm="2300" motorTorque="275" motorTorqueEco="275" fuelUsageRatio="260.1"/>
+        <torque rpm="2400" motorTorque="165" motorTorqueEco="165" fuelUsageRatio="333.2"/>
+        <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="488.9"/>
+			</realEngine>
+		
+			<gears shiftTimeMs="800">	
+				<gear speed="8.4"  name="1" />
+				<gear speed="12.5"  name="2" />
+				<gear speed="21.2"  name="3" />
+				<gear speed="31.2"  name="4" />
+			</gears>
+			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="1200">
+				<range ratio="0.2106" name="A+Z" />
+				<range ratio="0.2583" name="A" />
+				<range ratio="0.8155" name="S+Z" />
+				<range ratio="1.0000" name="S" />
+			</ranges>
+			<reverse ratio="0.3801" shiftTimeMs="1200" clutchRatio="1" resetRange="false" resetGear="false"/>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
 		<!-- http://www.modhoster.de/mods/fahr-m66 -->
 		<configFile modName="Fahr_M66_for_LS15" xmlName="fahrM66.xml"/>
 		
@@ -1544,7 +1598,7 @@
 		<configFile modName="FendtFarmer300LSA" xmlName="fendt311LSA.xml"/>
 		<configFile modName="FendtFarmer300LSA" xmlName="fendt312LSA.xml"/>
 		
-		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" minClutchRatio="0.3" maxClutchRatio="0.95" revUpDownMs="5000" ptoRpm="1676">
+		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="5000" ptoRpm="1676">
 			<blowOffVentilSound volume="0"/>
 
 			<gears defaultGear="1" reverseReset="true" shiftTimeMs="1000">	
@@ -2082,7 +2136,7 @@
 		<configFile modName="Fiat_126p" xmlName="Fiat_126p.xml" />
 		
 		<!-- http://www.fiat-126.org/Technik-luft.html#Fiat126-Lufti-1 -->
-		<gearboxMogli speedLimiter="false" clutchOpenRpm="1200" clutchCloseRpm="2500" autoStartStop="false">
+		<gearboxMogli speedLimiter="false" clutchOpenRpm="1200" clutchCloseRpm="2500" torqueConverter="false" autoStartStop="false">
 			<realEngine idleRpm="1000" ratedRpm="4500">
         <torque rpm="0" motorTorque="0" fuelUsageRatio="260"/><!-- 4500: 24 | 4500: 24 | 3000..3000: 42 | 0.8 | 0.5 -->
         <torque rpm="700" motorTorque="31" fuelUsageRatio="260"/>
@@ -4046,22 +4100,15 @@
 	<vehicle>
 		<configFile modName="ClassDominator" xmlName="dominator.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" torqueConverter="true">
 			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2100" threshingSoundOffset="1" threshingSoundScale="0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500">
-				<gear name="I"   speed="4"  forwardOnly="true"/>
-				<gear name="II"  speed="8"  forwardOnly="true"/>
-				<gear name="R"   speed="8"  reverseOnly="true"/>
-				<gear name="III" speed="16" forwardOnly="true"/>
+				<gear name="I"   speed="5.5"  forwardOnly="true"/>
+				<gear name="II"  speed="11"   forwardOnly="true"/>
+				<gear name="R"   speed="11"   reverseOnly="true"/>
+				<gear name="III" speed="21.5" forwardOnly="true"/>
 			</gears>
 			<reverse ratio="1" shiftTimeMs="1500" />
 			
@@ -4095,22 +4142,15 @@
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/claas-mega-208-218-pack -->
 		<configFile modName="ClaasMega218" xmlName="ClaasMega208.xml"/>
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8" />
-				<gear name="street" speed="16"/>
+			<gears shiftTimeMs="1000" defaultGear="2">	
+				<gear name="work"   speed="11" />
+				<gear name="street" speed="22"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" shiftTimeMs="1000" />
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
@@ -4141,22 +4181,15 @@
 	<vehicle>
 		<!-- http://www.modhoster.de/mods/claas-mega-208-218-pack -->
 		<configFile modName="ClaasMega218" xmlName="ClaasMega218.xml"/>
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
+		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic minMaxTimeMs="1000" startWithClutch="true">
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="17.2"/>
+			<gears shiftTimeMs="1000" defaultGear="2">	
+				<gear name="work"   speed="12" />
+				<gear name="street" speed="24"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" shiftTimeMs="1000" />
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 270(230.604545454545) | 2100: 271(218.155) | 1000..1550: 1173(1102.62) | 97 | 1 | 300 | 2.2 -->
@@ -4180,6 +4213,51 @@
         <torque rpm="2200" motorTorque="825" motorTorqueEco="664" fuelUsageRatio="242"/>
         <torque rpm="2300" motorTorque="535" motorTorqueEco="431" fuelUsageRatio="315"/>
         <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="436"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle> 
+		<!-- http://www.modhoster.de/mods/claas-dominator-105%2D%2D5 -->
+		<configFile modName="Claas_Dominator_105" isPrefix="true" xmlName="Dominator105_zold.xml" />
+		<configFile modName="Claas_Dominator_105" isPrefix="true" xmlName="Dominator105_sarga.xml" />
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" torqueConverter="true">
+			<combine defaultWidth="5.1" minRpm="2300"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000" clutchRatio="0.8">
+				<gear name="I"   speed="5.5"  forwardOnly="true"/>
+				<gear name="II"  speed="11"   forwardOnly="true"/>
+				<gear name="R"   speed="11"   reverseOnly="true"/>
+				<gear name="III" speed="21.5" forwardOnly="true"/>
+			</gears>
+			<reverse ratio="1" shiftTimeMs="1000" />
+			
+			<realEngine idleRpm="1000" ratedRpm="2600">
+        <!-- 2600: 180(180) | 2600: 180(180) | 1500..1500: 650(650) | 95 | 0.5 | 300 | 1.8 | 2700 | 1500: 207 -->
+        <torque rpm="100" motorTorque="168" motorTorqueEco="168" fuelUsageRatio="257.1"/>
+        <torque rpm="400" motorTorque="478" motorTorqueEco="478" fuelUsageRatio="237.9"/>
+        <torque rpm="700" motorTorque="591" motorTorqueEco="591" fuelUsageRatio="223.4"/>
+        <torque rpm="800" motorTorque="606" motorTorqueEco="606" fuelUsageRatio="219.5"/>
+        <torque rpm="900" motorTorque="618" motorTorqueEco="618" fuelUsageRatio="216.2"/>
+        <torque rpm="1000" motorTorque="627" motorTorqueEco="627" fuelUsageRatio="213.4"/>
+        <torque rpm="1100" motorTorque="636" motorTorqueEco="636" fuelUsageRatio="211.1"/>
+        <torque rpm="1200" motorTorque="642" motorTorqueEco="642" fuelUsageRatio="209.3"/>
+        <torque rpm="1300" motorTorque="646" motorTorqueEco="646" fuelUsageRatio="208"/>
+        <torque rpm="1400" motorTorque="649" motorTorqueEco="649" fuelUsageRatio="207.3"/>
+        <torque rpm="1500" motorTorque="650" motorTorqueEco="650" fuelUsageRatio="207"/>
+        <torque rpm="1600" motorTorque="642" motorTorqueEco="642" fuelUsageRatio="207.2"/>
+        <torque rpm="1700" motorTorque="632" motorTorqueEco="632" fuelUsageRatio="207.8"/>
+        <torque rpm="1800" motorTorque="622" motorTorqueEco="622" fuelUsageRatio="208.7"/>
+        <torque rpm="1900" motorTorque="609" motorTorqueEco="609" fuelUsageRatio="210"/>
+        <torque rpm="2000" motorTorque="596" motorTorqueEco="596" fuelUsageRatio="211.8"/>
+        <torque rpm="2100" motorTorque="581" motorTorqueEco="581" fuelUsageRatio="213.8"/>
+        <torque rpm="2200" motorTorque="565" motorTorqueEco="565" fuelUsageRatio="216.3"/>
+        <torque rpm="2300" motorTorque="547" motorTorqueEco="547" fuelUsageRatio="219.2"/>
+        <torque rpm="2400" motorTorque="527" motorTorqueEco="527" fuelUsageRatio="222.4"/>
+        <torque rpm="2500" motorTorque="506" motorTorqueEco="506" fuelUsageRatio="226"/>
+        <torque rpm="2750" motorTorque="347" motorTorqueEco="347" fuelUsageRatio="270.7"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
