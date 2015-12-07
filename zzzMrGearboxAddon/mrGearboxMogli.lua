@@ -746,19 +746,32 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 --**************************************************************************************************	
 -- Clutch parameter
 --**************************************************************************************************		
-	self.mrGbMS.TorqueConverter         = getXMLBool( xmlFile, xmlString .. "#torqueConverter" )
-	
+	self.mrGbMS.TorqueConverter         = getXMLBool( xmlFile, xmlString .. "#torqueConverter" )	
 	self.mrGbMS.MinClutchPercent        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minClutchRatio"), 2 * mrGearboxMogli.minClutchPercent )
-	if self.mrGbMS.MinClutchPercent < 2 * mrGearboxMogli.minClutchPercent then self.mrGbMS.MinClutchPercent  = 2 * mrGearboxMogli.minClutchPercent end
+	self.mrGbMS.MaxClutchPercent        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#maxClutchRatio"), 1 )
 	
-	default = 1
-	if self.mrGbMS.TorqueConverter then
-		default = 0.95
+	if     self.mrGbMS.MinClutchPercent < 2 * mrGearboxMogli.minClutchPercent then 
+		self.mrGbMS.MinClutchPercent      = 2 * mrGearboxMogli.minClutchPercent 
+	end	
+	if     self.mrGbMS.MaxClutchPercent > 1 then 
+		self.mrGbMS.MaxClutchPercent      = 1 
+	end	
+	if     self.mrGbMS.TorqueConverter == nil then
+		self.mrGbMS.TorqueConverter       = ( self.mrGbMS.MaxClutchPercent < 0.99 )		
 	end
-	self.mrGbMS.MaxClutchPercent        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#maxClutchRatio"), default )
-	if self.mrGbMS.TorqueConverter == nil then
-		self.mrGbMS.TorqueConverter       = ( self.mrGbMS.MaxClutchPercent < 0.99 )
-	end
+	if self.mrGbMS.TorqueConverter then		
+		self.mrGbMS.MaxClutchPercentTC    = getXMLFloat(xmlFile, xmlString .. "#maxClutchRatioTC")
+		if self.mrGbMS.MaxClutchPercentTC == nil then
+			if self.mrGbMS.MaxClutchPercent < 1 then
+				self.mrGbMS.MaxClutchPercentTC = self.mrGbMS.MaxClutchPercent
+				self.mrGbMS.MaxClutchPercent   = 1
+			else
+				self.mrGbMS.MaxClutchPercentTC = 0.91
+			end
+		end
+	else
+		self.mrGbMS.MaxClutchPercentTC    = self.mrGbMS.MaxClutchPercent
+	end	
 	
 	self.mrGbMS.TorqueConverterLossExp  = getXMLFloat(xmlFile, xmlString .. "#torqueConverterLossExponent")
 	
@@ -766,8 +779,6 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.TorqueConverterLossExp = 3 
 	end		
 	
-	if self.mrGbMS.MaxClutchPercent > 1 then self.mrGbMS.MaxClutchPercent = 1 end
-
 	default = self.mrGbMS.IdleRpm+0.1*(self.mrGbMS.RatedRpm-self.mrGbMS.IdleRpm)
 	if self.mrGbMS.TorqueConverter then 
 		default = self.mrGbMS.CurMaxRpm
@@ -1459,7 +1470,7 @@ function mrGearboxMogli:update(dt)
 		
 		if self.mrGbMS.IsCombine and self.sampleThreshing.sample ~= nil then
 			self.sampleThreshing.pitchOffset = self.mrGbMB.threshingPitchOffset
-			Utils.setSamplePitch( self.sampleThreshing.sample, self.sampleThreshing.pitchOffset )
+			Utils.setSamplePitch( self.sampleThreshing, self.sampleThreshing.pitchOffset )
 		end		
 		
 		if      self.mrGbMG.modifyVolume
@@ -4222,7 +4233,8 @@ function mrGearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
 			if self.mrGbMS.ReverseActive then	
 				gearSpeed = gearSpeed * self.mrGbMS.ReverseRatio 
 			end
-			clutchPercent = mrGearboxMogliMotor.getClutchPercent( self.mrGbML.motor, self.mrGbML.motor.currentRpmS, self.mrGbMS.RatedRpm, self.mrGbML.motor.currentRpmS, 0.6 )
+			-- ( currentRpm, targetRpm, openRpm, closeRpm, accelerationPedal )
+			clutchPercent = mrGearboxMogliMotor.getClutchPercent( self.mrGbML.motor, self.mrGbML.motor.currentRpmS, self.mrGbML.motor.currentRpmS, self.mrGbMS.RatedRpm, self.mrGbML.motor.currentRpmS, 0.6 )
 		end
 	
 		--timer to set the gear
@@ -4755,23 +4767,10 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 		self.maxAllowedRpm  = self.ratedRpm + mrGearboxMogli.rpmPlus
 	end
 
-	self.ecoTorqueCurve   = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
 	if vehicle.mrGbMS.Engine.ecoTorqueValues ~= nil then
+		self.ecoTorqueCurve = AnimCurve:new( motor.torqueCurve.interpolator, motor.torqueCurve.interpolatorDegree )
 		for _,k in pairs(vehicle.mrGbMS.Engine.ecoTorqueValues) do
 			self.ecoTorqueCurve:addKeyframe( k )	
-		end
-	else
-		for _,k in pairs(self.torqueCurve.keyframes) do
-			local torque = k.v
-			if k.time > self.maxTorqueRpm then
-				-- no Boost => only 90% of max power above max torque RPM
-				if k.time >= self.ratedRpm then
-					torque = math.min( torque, 0.9 * self.torqueCurve:get( self.ratedRpm ) )
-				else
-					torque = torque * ( 0.9 + 0.1 * ( self.ratedRpm - k.time ) / ( self.ratedRpm - self.maxTorqueRpm ) )
-				end
-			end
-			self.ecoTorqueCurve:addKeyframe( {v=torque, time=k.time} )
 		end
 	end
 	
@@ -5158,7 +5157,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		limit               = self.minRequiredRpm + acc * ( self.maxAllowedRpm - self.minRequiredRpm )	
 	end
 	local currentTorqueCurve = self.torqueCurve
-	if self.vehicle.mrGbMS.EcoMode then
+	if self.vehicle.mrGbMS.EcoMode and self.ecoTorqueCurve ~= nil then
 		currentTorqueCurve = self.ecoTorqueCurve
 	end
 	
@@ -5512,7 +5511,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- current RPM and power
 
 	local currentTorqueCurve = self.torqueCurve
-	if self.vehicle.mrGbMS.EcoMode then
+	if self.vehicle.mrGbMS.EcoMode and self.ecoTorqueCurve ~= nil then
 		currentTorqueCurve = self.ecoTorqueCurve
 	end
 
@@ -6355,12 +6354,14 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	self.maxRpmIncrease = self.maxAllowedRpm - self.lastMotorRpmS 
 	if self.clutchPercent < mrGearboxMogli.minClutchPercent then
 		self.noTransmission = true
+		self.maxPossibleRpm = mrGearboxMogli.huge
 	elseif self.noTransmission then
 		self.clutchPercent  = 0
+		self.maxPossibleRpm = mrGearboxMogli.huge
 	else
 		self.maxRpmIncrease = self.tickDt * self.rpmIncFactor
 
-		local m = math.max( self.nonClampedMotorRpm, self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * ( self.stallRpm + math.max( acc, 0 ) * ( self.maxAllowedRpm - self.stallRpm ) ) )
+		local m = self.nonClampedMotorRpm --math.max( self.nonClampedMotorRpm, self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * self.maxAllowedRpm )
 		if m > lastMaxPossibleRpm then
 			m = lastMaxPossibleRpm
 		end
@@ -6447,7 +6448,7 @@ function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, c
 	end	
 	
 	local minPercent    = self.vehicle.mrGbMS.MinClutchPercent + Utils.clamp( 0.5 + 0.02 * ( currentRpm - openRpm ), 0, 1 ) * math.max( 0, self.autoClutchPercent - self.vehicle.mrGbMS.MinClutchPercent )
-	local clutchPercent = self.vehicle.mrGbMS.MaxClutchPercent 			
+	local clutchPercent = self.vehicle.mrGbMS.MaxClutchPercentTC		
 	
 	local target   = Utils.clamp( targetRpm, self.idleRpm, closeRpm ) 
 	local throttle = self.idleRpm + accelerationPedal * ( self.maxAllowedRpm - self.idleRpm )
@@ -6469,7 +6470,7 @@ function mrGearboxMogliMotor:getClutchPercent( currentRpm, targetRpm, openRpm, c
 		diffi     = math.abs( target - clutchRpm )
 		if diff > diffi then
 			diff          = diffi
-			clutchPercent = self.vehicle.mrGbMS.MaxClutchPercent - i * eps
+			clutchPercent = self.vehicle.mrGbMS.MaxClutchPercentTC - i * eps
 		end
 	end
 	

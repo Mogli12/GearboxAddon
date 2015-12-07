@@ -1621,6 +1621,57 @@
 	</vehicle>	
 	
 	<vehicle>
+		<configFile modName="Fendt611" xmlName="Fendt611LSA.xml"/>
+		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_611_LSA -->
+		<gearboxMogli autoStartStop="true" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="4000">
+			<gears defaultGear="4">	
+				<gear speed="3.88" />
+				<gear speed="6.11" />
+				<gear speed="9.55" />
+				<gear speed="14.53" />
+				<gear speed="22.58" />
+				<gear speed="38.41" forwardOnly="true" />
+			</gears>
+			
+			<ranges defaultRange="2" reverseReset="true">
+				<range ratio="1.214"  name="R" reverseOnly="true"/>
+				<range ratio="0.8055" name="L" forwardOnly="true" />
+				<range ratio="1.0"    name="S" forwardOnly="true" />
+			</ranges>
+			
+			<ranges defaultRange="2">
+				<range ratio="0.5" name="Kriechgang" maxGear="4"/>
+				<range ratio="1.0" name="" />
+			</ranges>
+			
+			<realEngine idleRpm="900" ratedRpm="2300">
+        <!-- 2300: 125(125) | 2300: 125(125) | 1500..1500: 497(497) | 95 | 0.7 | 200 | 2.5 | 2400 | 1460: 207 -->
+        <torque rpm="100" motorTorque="128" motorTorqueEco="128" fuelUsageRatio="261.3"/>
+        <torque rpm="400" motorTorque="365" motorTorqueEco="365" fuelUsageRatio="240"/>
+        <torque rpm="700" motorTorque="452" motorTorqueEco="452" fuelUsageRatio="223.9"/>
+        <torque rpm="800" motorTorque="464" motorTorqueEco="464" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="472" motorTorqueEco="472" fuelUsageRatio="216.2"/>
+        <torque rpm="1000" motorTorque="480" motorTorqueEco="480" fuelUsageRatio="213.2"/>
+        <torque rpm="1100" motorTorque="486" motorTorqueEco="486" fuelUsageRatio="210.8"/>
+        <torque rpm="1200" motorTorque="491" motorTorqueEco="491" fuelUsageRatio="209"/>
+        <torque rpm="1300" motorTorque="494" motorTorqueEco="494" fuelUsageRatio="207.8"/>
+        <torque rpm="1400" motorTorque="496" motorTorqueEco="496" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="497" motorTorqueEco="497" fuelUsageRatio="207.1"/>
+        <torque rpm="1600" motorTorque="486" motorTorqueEco="486" fuelUsageRatio="207.6"/>
+        <torque rpm="1700" motorTorque="475" motorTorqueEco="475" fuelUsageRatio="208.9"/>
+        <torque rpm="1800" motorTorque="462" motorTorqueEco="462" fuelUsageRatio="210.8"/>
+        <torque rpm="1900" motorTorque="448" motorTorqueEco="448" fuelUsageRatio="213.3"/>
+        <torque rpm="2000" motorTorque="433" motorTorqueEco="433" fuelUsageRatio="216.5"/>
+        <torque rpm="2100" motorTorque="417" motorTorqueEco="417" fuelUsageRatio="220.4"/>
+        <torque rpm="2200" motorTorque="399" motorTorqueEco="399" fuelUsageRatio="224.8"/>
+        <torque rpm="2300" motorTorque="382" motorTorqueEco="382" fuelUsageRatio="230"/>
+        <torque rpm="2400" motorTorque="314" motorTorqueEco="314" fuelUsageRatio="270.7"/>
+        <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>	
+	
+	<vehicle>
 		<!-- http://www.modhoster.de/mods/steyr-8080a-turbo-sk1 -->
 		<configFile modName="Steyr8080aTurbo_SK1" xmlName="Steyr8080.xml"/>
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/steyr-8080a.pdf -->
@@ -3472,6 +3523,7 @@
 	</vehicle> 
 	
 	<vehicle>
+		<configFile modName="caseIH7130" xmlName="caseIH7130.xml" />
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
