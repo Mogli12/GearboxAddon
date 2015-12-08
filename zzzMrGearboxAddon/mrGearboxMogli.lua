@@ -285,23 +285,23 @@ function mrGearboxMogli:initClient()
 
 --**********************************************************************************************************	
 -- special getter functions for motor parameters
-	self.mrGbMGetClutchPercent  = mrGearboxMogli.mrGbMGetClutchPercent
-	self.mrGbMGetOneButtonClutch= mrGearboxMogli.mrGbMGetOneButtonClutch
-	self.mrGbMGetTargetRPM      = mrGearboxMogli.mrGbMGetTargetRPM
-	self.mrGbMGetMotorLoad      = mrGearboxMogli.mrGbMGetMotorLoad 
-	self.mrGbMGetUsedPower      = mrGearboxMogli.mrGbMGetUsedPower
-	self.mrGbMGetThroughPut     = mrGearboxMogli.mrGbMGetThroughPut
-	self.mrGbMGetModeText       = mrGearboxMogli.mrGbMGetModeText 
-	self.mrGbMGetModeShortText  = mrGearboxMogli.mrGbMGetModeShortText 
-	self.mrGbMGetGearText       = mrGearboxMogli.mrGbMGetGearText 
-	self.mrGbMGetIsOn           = mrGearboxMogli.mrGbMGetIsOn 
-	self.mrGbMGetAutoStartStop  = mrGearboxMogli.mrGbMGetAutoStartStop 
-	self.mrGbMGetAutoShiftGears = mrGearboxMogli.mrGbMGetAutoShiftGears 
-	self.mrGbMGetAutoShiftRange = mrGearboxMogli.mrGbMGetAutoShiftRange  
-	self.mrGbMGetGearNumber     = mrGearboxMogli.mrGbMGetGearNumber
-	self.mrGbMGetRangeNumber    = mrGearboxMogli.mrGbMGetRangeNumber
-	self.mrGbMGetRange2Number   = mrGearboxMogli.mrGbMGetRange2Number
-	self.mrGbMGetHasAllAuto     = mrGearboxMogli.mrGbMGetHasAllAuto
+	self.mrGbMGetClutchPercent     = mrGearboxMogli.mrGbMGetClutchPercent
+	self.mrGbMGetAutoClutchPercent = mrGearboxMogli.mrGbMGetAutoClutchPercent
+	self.mrGbMGetTargetRPM         = mrGearboxMogli.mrGbMGetTargetRPM
+	self.mrGbMGetMotorLoad         = mrGearboxMogli.mrGbMGetMotorLoad 
+	self.mrGbMGetUsedPower         = mrGearboxMogli.mrGbMGetUsedPower
+	self.mrGbMGetThroughPut        = mrGearboxMogli.mrGbMGetThroughPut
+	self.mrGbMGetModeText          = mrGearboxMogli.mrGbMGetModeText 
+	self.mrGbMGetModeShortText     = mrGearboxMogli.mrGbMGetModeShortText 
+	self.mrGbMGetGearText          = mrGearboxMogli.mrGbMGetGearText 
+	self.mrGbMGetIsOn              = mrGearboxMogli.mrGbMGetIsOn 
+	self.mrGbMGetAutoStartStop     = mrGearboxMogli.mrGbMGetAutoStartStop 
+	self.mrGbMGetAutoShiftGears    = mrGearboxMogli.mrGbMGetAutoShiftGears 
+	self.mrGbMGetAutoShiftRange    = mrGearboxMogli.mrGbMGetAutoShiftRange  
+	self.mrGbMGetGearNumber        = mrGearboxMogli.mrGbMGetGearNumber
+	self.mrGbMGetRangeNumber       = mrGearboxMogli.mrGbMGetRangeNumber
+	self.mrGbMGetRange2Number      = mrGearboxMogli.mrGbMGetRange2Number
+	self.mrGbMGetHasAllAuto        = mrGearboxMogli.mrGbMGetHasAllAuto
 	
 --**********************************************************************************************************	
 
@@ -805,6 +805,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
+	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"),   math.max(clutchEngagingTimeMs, 1000)), 1 )
 	
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
 	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
@@ -1749,11 +1750,14 @@ function mrGearboxMogli:update(dt)
 				self:mrGbMSetManualClutch( math.min( self.mrGbMS.MaxClutchPercent, self.mrGbMS.ManualClutch + dt * clutchSpeed ))
 			end
 		end
-		
-		if self:mrGbMGetOneButtonClutch() then
-			self:mrGbMSetManualClutch( math.min( self.mrGbMS.MaxClutchPercent, self.mrGbMS.ManualClutch + dt / math.max( self.mrGbMS.ClutchShiftTime, 1 ) ))
-		end
 
+		if  self:mrGbMGetAutoClutch() and self.mrGbML.oneButtonClutchTimer > g_currentMission.time + 500 then
+			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
+		end
+		if self.mrGbMS.ManualClutch < self.mrGbMS.MaxClutchPercent and g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
+			self:mrGbMSetManualClutch( math.min( self.mrGbMS.MaxClutchPercent, self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeManual ))
+		end
+		
 		if InputBinding.mrGearboxMogliMINRPM ~= nil then
 			local handThrottle = InputBinding.getDigitalInputAxis(InputBinding.mrGearboxMogliMINRPM)
 			if InputBinding.isAxisZero(handThrottle) then
@@ -2153,25 +2157,25 @@ function mrGearboxMogli:update(dt)
 					motorLoad = Utils.getNoNil( self:mrGbMGetMotorLoad(), 0.5 )
 				end
 				
-				if self.mrGbML.motorLoadBreak == nil then
-					self.mrGbML.motorLoadBreak = 0
-				end
-				
-				if      self.isEntered 
-						and self.steeringEnabled 
-						and self.axisForward ~= nil 
-						and self.axisForward > -0.01
-						and self.lastSpeedReal > 0.0003
-						and not ( self.mrGbMS.IsNeutral )
-						and Utils.getNoNil( self:mrGbMGetClutchPercent(), 0 ) > self.mrGbMS.MaxClutchPercent - 0.1 then
-					self.mrGbML.motorLoadBreak = math.min( 0.7, self.mrGbML.motorLoadBreak + dt*0.001 )
-				elseif self.mrGbML.motorLoadBreak > 0 then
-					self.mrGbML.motorLoadBreak = math.max( 0, self.mrGbML.motorLoadBreak - dt*0.001 )
-				end
-				
-				if motorLoad < self.mrGbML.motorLoadBreak then
-					motorLoad = self.mrGbML.motorLoadBreak
-				end
+			--if self.mrGbML.motorLoadBreak == nil then
+			--	self.mrGbML.motorLoadBreak = 0
+			--end
+			--
+			--if      self.isEntered 
+			--		and self.steeringEnabled 
+			--		and self.axisForward ~= nil 
+			--		and self.axisForward > -0.01
+			--		and self.lastSpeedReal > 0.0003
+			--		and not ( self.mrGbMS.IsNeutral )
+			--		and Utils.getNoNil( self:mrGbMGetClutchPercent(), 0 ) > self.mrGbMS.MaxClutchPercent - 0.1 then
+			--	self.mrGbML.motorLoadBreak = math.min( 0.7, self.mrGbML.motorLoadBreak + dt*0.001 )
+			--elseif self.mrGbML.motorLoadBreak > 0 then
+			--	self.mrGbML.motorLoadBreak = math.max( 0, self.mrGbML.motorLoadBreak - dt*0.001 )
+			--end
+			--
+			--if motorLoad < self.mrGbML.motorLoadBreak then
+			--	motorLoad = self.mrGbML.motorLoadBreak
+			--end
 
 				local indoorFactor0 = 1				
 				if isIndoor then
@@ -2481,9 +2485,7 @@ function mrGearboxMogli:updateTick(dt)
 						if self.motor.targetRpm     ~= nil then
 							self.mrGbMD.Rpm    = tonumber( Utils.clamp( math.floor( 255*(self.motor.targetRpm-self.mrGbMS.OrigMinRpm)/(self.mrGbMS.OrigMaxRpm-self.mrGbMS.OrigMinRpm)+0.5), 0, 255 ))	 				
 						end
-						if self.motor.clutchPercent ~= nil then
-							self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( self.motor.clutchPercent * 200+0.5), 0, 255 ))	
-						end
+						self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( mrGearboxMogli.mrGbMGetAutoClutchPercent( self ) * 200+0.5), 0, 255 ))	
 						if self.motor.motorLoadS    ~= nil then
 							self.mrGbMD.Load   = tonumber( Utils.clamp( math.floor( self.motor.motorLoadS*20+0.5)*5, 0, 255 ))	
 						end
@@ -2662,8 +2664,7 @@ function mrGearboxMogli:draw()
 				ovRows = ovRows + 1
 			end
 			if     self.mrGbMS.Hydrostatic
-					or self.mrGbMS.TorqueConverter
-					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercent ) then
+					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercentTC ) then
 			else
 				ovRows = ovRows + 1
 			end
@@ -2708,8 +2709,7 @@ function mrGearboxMogli:draw()
 			drawY = drawY - deltaY renderText(ovLeft, drawY, deltaY, "Load..................")
 			drawY = drawY - deltaY renderText(ovLeft, drawY, deltaY, "Fuel used.............")
 			if     self.mrGbMS.Hydrostatic
-					or self.mrGbMS.TorqueConverter
-					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercent ) then
+					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercentTC ) then
 			elseif self:mrGbMGetAutoClutch() then 
 				drawY = drawY - deltaY renderText(ovLeft, drawY, deltaY, "Auto clutch...........")
 			else
@@ -2746,8 +2746,7 @@ function mrGearboxMogli:draw()
 			drawY = drawY - deltaY renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Load )) 	
 			drawY = drawY - deltaY renderText(ovRight, drawY, deltaY, string.format("%3d l/h", self.mrGbMD.Fuel ))  		          
 			if     self.mrGbMS.Hydrostatic
-					or self.mrGbMS.TorqueConverter
-					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercent ) then
+					or ( self:mrGbMGetAutoClutch() and self.mrGbMD.Clutch >= 199 * self.mrGbMS.MaxClutchPercentTC ) then
 			elseif self:mrGbMGetAutoClutch() then 
 				drawY = drawY - deltaY renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 / self.mrGbMS.MaxClutchPercent  )) 
 			else
@@ -3352,7 +3351,7 @@ function mrGearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 	if      self.mrGbMS.ReverseActive ~= nil
 			and self.mrGbMS.ReverseActive ~= value 
 			and ( mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) 
-				 or mrGearboxMogli.mrGbMCheckDoubleClutchNeutral( self, self.mrGbMS.ManualClutchReverse, noEventSend ) ) then
+				 or mrGearboxMogli.mrGbMCheckDoubleClutchNeutral( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) ) then
 		return false
 	end
 
@@ -3384,32 +3383,43 @@ function mrGearboxMogli:mrGbMSetManualClutch( value, noEventSend )
 end
 
 --**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMGetAutoClutchPercent
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMGetAutoClutchPercent()
+	if self.mrGbML.motor == nil or not ( self.isServer ) then
+		return 0
+	end
+	
+	if     self.mrGbMS.NeutralActive then
+		return 0
+	elseif self.mrGbMS.HydrostaticLaunch then
+		return self.mrGbMS.MaxClutchPercent
+	elseif self.motor.hydroEff ~= nil then
+		return self.mrGbMS.MaxClutchPercent
+	elseif self.mrGbMS.ManualClutch < self.mrGbMS.MaxClutchPercent
+	    or not self:mrGbMGetAutoClutch() then
+		return self.mrGbMS.ManualClutch
+	elseif self.mrGbMS.TorqueConverter then
+		return self.mrGbMS.MaxClutchPercent
+	else
+		return self.motor.clutchPercent
+	end
+end
+
+--**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMGetClutchPercent
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetClutchPercent()
 	if self.mrGbML.motor == nil then
-		return nil
-	end
-	if self.isServer then
-		return self.motor.clutchPercent 
+		return 0
 	end
 	if self:mrGbMGetAutoClutch() then 
 		if self.isServer then
-			return self.motor.clutchPercent
+			return mrGearboxMogli.mrGbMGetAutoClutchPercent( self )
 		end
 		return self.mrGbMD.Clutch*0.005
 	end	
 	return self.mrGbMS.ManualClutch
-end
-
---**********************************************************************************************************	
--- mrGearboxMogli:mrGbMGetOneButtonClutch
---**********************************************************************************************************	
-function mrGearboxMogli:mrGbMGetOneButtonClutch()
-	if self.mrGbMS.ManualClutch < self.mrGbMS.MaxClutchPercent and g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
-		return true
-	end
-	return false
 end
 
 --**********************************************************************************************************	
@@ -3777,7 +3787,7 @@ end
 -- mrGearboxMogli:mrGbMGetAutoClutch
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetAutoClutch()
-	return self.mrGbMS.AllAuto or self.mrGbMS.AutoClutch or not ( self.steeringEnabled ) or self.mrGbMS.Hydrostatic or self.mrGbMS.TorqueConverter
+	return self.mrGbMS.AllAuto or self.mrGbMS.AutoClutch or not ( self.steeringEnabled ) or self.mrGbMS.Hydrostatic
 end
 
 --**********************************************************************************************************	
@@ -4270,6 +4280,7 @@ function mrGearboxMogli:checkGearShiftDC( new, what, noEventSend )
 	end
 
 	if      mrGearboxMogli.mrGbMCheckDoubleClutch( self, dc, noEventSend )
+			and math.abs( self.lastSpeedReal ) > 0.0003
 			and self.motor.transmissionInputRpm ~= nil then				
 		
 		local s  = self.mrGbMS.Gears[g1].speed 
@@ -4895,7 +4906,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	self.maxRpmIncrease          = 0
 	self.tickDt                  = 0
 	self.absWheelSpeedRpm        = 0
-	self.hydrostaticFactor       = self.vehicle.mrGbMS.HydrostaticMin
+	self.hydrostaticFactor       = self.vehicle.mrGbMS.HydrostaticStart
 	self.autoClutchPercent       = 0
 	
 	if mrGearboxMogli.rpmIncPerGearSpeed then
@@ -5228,7 +5239,7 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		if not ( self.noTransmission 
 					or self.noTorque 
 					or self.vehicle.mrGbMS.HydrostaticLaunch 
-					or self.vehicle.mrGbMS.TorqueConverter ) then
+					or ( self.vehicle.mrGbMS.TorqueConverter and self.vehicle.mrGbMS.OpenRpm > self.maxPowerRpm - 1 ) ) then
 			local mt = currentTorqueCurve:get( Utils.clamp( self.lastMotorRpmR, self.idleRpm, self.ratedRpm ) ) 
 			if mt < pt then
 			--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastMotorRpmR))
@@ -5672,9 +5683,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			and ( self.vehicle.isAITractorActivated or self.vehicle.isAIThreshing )
 			and ( self.turnStage == nil or self.turnStage <= 0 ) then
 		targetRpm = self.maxTorqueRpm -- 0.5 * ( self.idleRpm + self.ratedRpm )
-	end
-	if targetRpm < self.vehicle.mrGbMS.OpenRpm then
-		targetRpm = self.vehicle.mrGbMS.OpenRpm
 	end
 	if self.vehicle.mrGbMS.EcoMode then
 		targetRpm = math.min( targetRpm, self.maxPowerRpm - mrGearboxMogli.rpmMinusEco )
@@ -6263,7 +6271,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--**********************************************************************************************************		
 	-- clutch				
 	if clutchMode > 0 and not ( self.noTransmission ) then
-		if self.vehicle:mrGbMGetAutoClutch() or self.vehicle:mrGbMGetOneButtonClutch() then 
+		if self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter then
 			local openRpm   = self.vehicle.mrGbMS.OpenRpm --math.max( self.vehicle.mrGbMS.OpenRpm, self.stallRpm + 20 )
 			local closeRpm  = self.vehicle.mrGbMS.CloseRpm
 			local targetRpm = self.targetRpm
@@ -6319,12 +6327,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.clutchPercent = 1 --mrGearboxMogliMotor.getClutchPercent( self, self.lastMotorRpmS, targetRpm, minRpmReduced, self.minRequiredRpm, accelerationPedal )
 	elseif self.hydroEff ~= nil then
 		self.clutchPercent = self.autoClutchPercent
-	elseif self.vehicle:mrGbMGetAutoClutch() then
-		if self.vehicle.mrGbML.manualClutchTime <= g_currentMission.time and g_currentMission.time < self.vehicle.mrGbML.manualClutchTime + 5000 then
-			self.clutchPercent = self.vehicle.mrGbMS.ManualClutch + ( g_currentMission.time - self.vehicle.mrGbML.manualClutchTime  ) / 5000 * ( self.autoClutchPercent - self.vehicle.mrGbMS.ManualClutch  )
-		else
-			self.clutchPercent = self.autoClutchPercent
-		end
+	elseif self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter then
+		self.clutchPercent = math.min( self.autoClutchPercent, self.vehicle.mrGbMS.ManualClutch )
 		
 		if not ( self.noTransmission ) and self.vehicle.mrGbML.debugTimer ~= nil and g_currentMission.time < self.vehicle.mrGbML.debugTimer and self.autoClutchPercent < self.vehicle.mrGbMS.MaxClutchPercent then
 			self.vehicle.mrGbML.debugTimer = math.max( g_currentMission.time + 200, self.vehicle.mrGbML.debugTimer )
@@ -6630,32 +6634,33 @@ function mrGearboxMogli:mrGbMTestAPI()
 		vehicle = g_currentMission.controlledVehicle
 	end
 	
-	print("vehicle.mrGbMGetClutchPercent: "..tostring(vehicle:mrGbMGetClutchPercent())) 
-	print("vehicle.mrGbMGetTargetRPM    : "..tostring(vehicle:mrGbMGetTargetRPM())) 
-	print("vehicle.mrGbMGetMotorLoad    : "..tostring(vehicle:mrGbMGetMotorLoad())) 
-	print("vehicle.mrGbMGetUsedPower    : "..tostring(vehicle:mrGbMGetUsedPower())) 
-	print("vehicle.mrGbMGetModeText     : "..tostring(vehicle:mrGbMGetModeText())) 
-	print("vehicle.mrGbMGetModeShortText: "..tostring(vehicle:mrGbMGetModeShortText())) 
-	print("vehicle.mrGbMGetGearText     : "..tostring(vehicle:mrGbMGetGearText())) 
-	print("vehicle.mrGbMGetIsOn         : "..tostring(vehicle:mrGbMGetIsOn())) 
-
-	print("vehicle.mrGbMGetIsOnOff      : "..tostring(vehicle:mrGbMGetIsOnOff())) 
-	print("vehicle.mrGbMGetCurrentGear  : "..tostring(vehicle:mrGbMGetCurrentGear())) 
-	print("vehicle.mrGbMGetGearNumber   : "..tostring(vehicle:mrGbMGetGearNumber())) 
-	print("vehicle.mrGbMGetCurrentRange : "..tostring(vehicle:mrGbMGetCurrentRange())) 
-	print("vehicle.mrGbMGetRangeNumber  : "..tostring(vehicle:mrGbMGetRangeNumber())) 
-	print("vehicle.mrGbMGetCurrentRange2: "..tostring(vehicle:mrGbMGetCurrentRange2())) 
-	print("vehicle.mrGbMGetRange2Number : "..tostring(vehicle:mrGbMGetRange2Number())) 
-	print("vehicle.mrGbMGetAutomatic    : "..tostring(vehicle:mrGbMGetAutomatic())) 
-	print("vehicle.mrGbMGetAutoStartStop: "..tostring(vehicle:mrGbMGetAutoStartStop())) 
-	print("vehicle.mrGbMGetNeutralActive: "..tostring(vehicle:mrGbMGetNeutralActive())) 
-	print("vehicle.mrGbMGetReverseActive: "..tostring(vehicle:mrGbMGetReverseActive())) 
-	print("vehicle.mrGbMGetSpeedLimiter : "..tostring(vehicle:mrGbMGetSpeedLimiter())) 
-	print("vehicle.mrGbMGetHandThrottle : "..tostring(vehicle:mrGbMGetHandThrottle())) 
-	print("vehicle.mrGbMGetAutoClutch   : "..tostring(vehicle:mrGbMGetAutoClutch())) 
-	print("vehicle.mrGbMGetManualClutch : "..tostring(vehicle:mrGbMGetManualClutch())) 	
-	print("vehicle.mrGbMGetAccelerateToLimit : "..tostring(vehicle:mrGbMGetAccelerateToLimit())) 	
-	print("vehicle.mrGbMGetDecelerateToLimit : "..tostring(vehicle:mrGbMGetDecelerateToLimit())) 	
+	print("vehicle.mrGbMGetClutchPercent        : "..tostring(vehicle:mrGbMGetClutchPercent())) 
+	print("vehicle.mrGbMGetAutoClutchPercent    : "..tostring(vehicle:mrGbMGetAutoClutchPercent())) 
+	print("vehicle.mrGbMGetTargetRPM            : "..tostring(vehicle:mrGbMGetTargetRPM())) 
+	print("vehicle.mrGbMGetMotorLoad            : "..tostring(vehicle:mrGbMGetMotorLoad())) 
+	print("vehicle.mrGbMGetUsedPower            : "..tostring(vehicle:mrGbMGetUsedPower())) 
+	print("vehicle.mrGbMGetModeText             : "..tostring(vehicle:mrGbMGetModeText())) 
+	print("vehicle.mrGbMGetModeShortText        : "..tostring(vehicle:mrGbMGetModeShortText())) 
+	print("vehicle.mrGbMGetGearText             : "..tostring(vehicle:mrGbMGetGearText())) 
+	print("vehicle.mrGbMGetIsOn                 : "..tostring(vehicle:mrGbMGetIsOn())) 
+                                              
+	print("vehicle.mrGbMGetIsOnOff              : "..tostring(vehicle:mrGbMGetIsOnOff())) 
+	print("vehicle.mrGbMGetCurrentGear          : "..tostring(vehicle:mrGbMGetCurrentGear())) 
+	print("vehicle.mrGbMGetGearNumber           : "..tostring(vehicle:mrGbMGetGearNumber())) 
+	print("vehicle.mrGbMGetCurrentRange         : "..tostring(vehicle:mrGbMGetCurrentRange())) 
+	print("vehicle.mrGbMGetRangeNumber          : "..tostring(vehicle:mrGbMGetRangeNumber())) 
+	print("vehicle.mrGbMGetCurrentRange2        : "..tostring(vehicle:mrGbMGetCurrentRange2())) 
+	print("vehicle.mrGbMGetRange2Number         : "..tostring(vehicle:mrGbMGetRange2Number())) 
+	print("vehicle.mrGbMGetAutomatic            : "..tostring(vehicle:mrGbMGetAutomatic())) 
+	print("vehicle.mrGbMGetAutoStartStop        : "..tostring(vehicle:mrGbMGetAutoStartStop())) 
+	print("vehicle.mrGbMGetNeutralActive        : "..tostring(vehicle:mrGbMGetNeutralActive())) 
+	print("vehicle.mrGbMGetReverseActive        : "..tostring(vehicle:mrGbMGetReverseActive())) 
+	print("vehicle.mrGbMGetSpeedLimiter         : "..tostring(vehicle:mrGbMGetSpeedLimiter())) 
+	print("vehicle.mrGbMGetHandThrottle         : "..tostring(vehicle:mrGbMGetHandThrottle())) 
+	print("vehicle.mrGbMGetAutoClutch           : "..tostring(vehicle:mrGbMGetAutoClutch())) 
+	print("vehicle.mrGbMGetManualClutch         : "..tostring(vehicle:mrGbMGetManualClutch())) 	
+	print("vehicle.mrGbMGetAccelerateToLimit    : "..tostring(vehicle:mrGbMGetAccelerateToLimit())) 	
+	print("vehicle.mrGbMGetDecelerateToLimit    : "..tostring(vehicle:mrGbMGetDecelerateToLimit())) 	
 
 	print("vehicle.tempomatMogliGetSpeedLimit   : "..tostring(vehicle:tempomatMogliGetSpeedLimit())) 	
 	print("vehicle.tempomatMogliGetSpeedLimit2  : "..tostring(vehicle:tempomatMogliGetSpeedLimit2())) 	
