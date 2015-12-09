@@ -270,10 +270,11 @@ function mrGearboxMogli:initClient()
 	mrGearboxMogli.registerState( self, "NewGear",       0,     mrGearboxMogli.mrGbMOnSetNewGear ) 
 	mrGearboxMogli.registerState( self, "NewRange",      0,     mrGearboxMogli.mrGbMOnSetNewRange )
 	mrGearboxMogli.registerState( self, "NewRange2",     0,     mrGearboxMogli.mrGbMOnSetNewRange2 )
-	mrGearboxMogli.registerState( self, "IsNeutral",     false )
+	mrGearboxMogli.registerState( self, "NewReverse",    false, mrGearboxMogli.mrGbMOnSetNewReverse )
+	mrGearboxMogli.registerState( self, "IsNeutral",     true )
 	mrGearboxMogli.registerState( self, "Automatic",     false )
 	mrGearboxMogli.registerState( self, "ReverseActive", false, mrGearboxMogli.mrGbMOnSetReverse )
-	mrGearboxMogli.registerState( self, "NeutralActive", false, mrGearboxMogli.mrGbMOnSetNeutral ) 	
+	mrGearboxMogli.registerState( self, "NeutralActive", true,  mrGearboxMogli.mrGbMOnSetNeutral ) 	
 	mrGearboxMogli.registerState( self, "HandBrake",     false ) 	
 	mrGearboxMogli.registerState( self, "AutoClutch",    true  )
 	mrGearboxMogli.registerState( self, "ManualClutch",  1,     mrGearboxMogli.mrGbMOnSetManualClutch )
@@ -1202,12 +1203,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end 
 	if i > 0 then   
 		self.mrGbMS.Hydrostatic         = true
-		self.mrGbMS.HydrostaticMaxRpm   = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm") 
-		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), revUpMs * 0.9 )
-		self.mrGbMS.HydrostaticStart    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), Utils.clamp( 0.6, self.mrGbMS.HydrostaticMin, 1 )  )
+		self.mrGbMS.HydrostaticMaxRpm   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm"), self.mrGbMS.RatedRpm )
+		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), 1000 )
+		self.mrGbMS.HydrostaticStart    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), Utils.clamp( 2 - self.mrGbMS.HydrostaticMax, self.mrGbMS.HydrostaticMin, 1 )  )
 		local sc = getXMLBool(xmlFile, xmlString .. ".hydrostatic#startWithClutch")
 		if sc == nil then
-			self.mrGbMS.HydrostaticLaunch = false --self.mrGbMS.HydrostaticMin * self.mrGbMS.Gears[1].speed < 2 -- m/s
+			self.mrGbMS.HydrostaticLaunch = true
 		else
 			self.mrGbMS.HydrostaticLaunch = not ( sc )
 		end
@@ -2397,6 +2398,7 @@ function mrGearboxMogli:onLeave()
 			and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 		self:mrGbMSetNeutralActive( true, false, true )
 		self:mrGbMSetState( "HandBrake", true )
+		self:mrGbMSetState( "IsNeutral", true )
 	end
 end
 
@@ -3118,23 +3120,10 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMCheckDoubleClutch( checkIt, noEventSend )
 	if      self.steeringEnabled 
+			and math.abs( self.lastSpeedReal ) > 0.0003
 			and checkIt 
 			and not ( self:mrGbMGetAutoClutch() ) 
 			and not ( self:mrGbMGetAutomatic() ) then
-		return true
-	end		
-	return false
-end
-
---**********************************************************************************************************	
--- mrGearboxMogli:mrGbMCheckDoubleClutchNeutral
---**********************************************************************************************************	
-function mrGearboxMogli:mrGbMCheckDoubleClutchNeutral( checkIt, noEventSend )
-	if      mrGearboxMogli.mrGbMCheckDoubleClutch( self, checkIt, noEventSend )
-			and not self.mrGbMS.IsNeutral then
-		self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear; go to neutral 1st" ))
-		self.mrGbMS.GrindingGearsVol = 0
-		self:mrGbMSetState( "GrindingGearsVol", 1 )
 		return true
 	end		
 	return false
@@ -3350,9 +3339,20 @@ end
 function mrGearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 	if      self.mrGbMS.ReverseActive ~= nil
 			and self.mrGbMS.ReverseActive ~= value 
-			and ( mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) 
-				 or mrGearboxMogli.mrGbMCheckDoubleClutchNeutral( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) ) then
+			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
 		return false
+	end
+		
+	if      self.mrGbMS.ReverseActive ~= value 
+			and mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) then
+		if self.isServer then
+			if not mrGearboxMogli.checkGearShiftDC( self, value, "R", noEventSend ) then		
+				return true -- better false ???
+			end
+		else
+			self:mrGbMSetState( "NewReverse", value, noEventSend )
+			return true
+		end
 	end
 
 	if      self.steeringEnabled 
@@ -4273,14 +4273,13 @@ function mrGearboxMogli:checkGearShiftDC( new, what, noEventSend )
 		g3 = new
 		dc = self.mrGbMS.Range2DoubleClutch
 	elseif what == "R" then 
-		gr = not ( gr )
+		gr = new
 		dc = self.mrGbMS.ReverseDoubleClutch
 	else
 		return true
 	end
 
 	if      mrGearboxMogli.mrGbMCheckDoubleClutch( self, dc, noEventSend )
-			and math.abs( self.lastSpeedReal ) > 0.0003
 			and self.motor.transmissionInputRpm ~= nil then				
 		
 		local s  = self.mrGbMS.Gears[g1].speed 
@@ -4333,8 +4332,7 @@ end
 -- mrGearboxMogli:mrGbMOnSetNewGear
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMOnSetNewGear( old, new, noEventSend )
-	if      self.isServer 
-			and mrGearboxMogli.checkGearShiftDC( self, new, "G", noEventSend ) then		
+	if self.isServer then		
 		self:mrGbMSetCurrentGear( new, noEventSend, true )
 	end
 end
@@ -4343,8 +4341,7 @@ end
 -- mrGearboxMogli:mrGbMOnSetNewRange
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMOnSetNewRange( old, new, noEventSend )
-	if      self.isServer 
-			and mrGearboxMogli.checkGearShiftDC( self, new, "1", noEventSend ) then		
+	if self.isServer then		
 		self:mrGbMSetCurrentRange( new, noEventSend, true )
 	end
 end
@@ -4353,9 +4350,17 @@ end
 -- mrGearboxMogli:mrGbMOnSetNewRange2
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMOnSetNewRange2( old, new, noEventSend )
-	if      self.isServer 
-			and mrGearboxMogli.checkGearShiftDC( self, new, "2", noEventSend ) then		
-		self:mrGbMSetCurrentRange2( new, noEventSend, true )
+	if self.isServer then		
+		self:mrGbMSetCurrentRange2( new, noEventSend )
+	end
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMOnSetNewRange2
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMOnSetNewReverse( old, new, noEventSend )
+	if self.isServer then		
+		self:mrGbMSetReverseActive( new, noEventSend )
 	end
 end
 
@@ -5110,12 +5115,12 @@ end
 -- mrGearboxMogliMotor:increaseHyroLaunchRpm
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:increaseHyroLaunchRpm()
-	if      self.hydroEff ~= nil
-		--and self.ptoOn
-			and self.vehicle.mrGbMS.HydrostaticLaunch
-			and self:getMogliGearRatio() + 1 > mrGearboxMogli.maxHydroGearRatio then
-		return true
-	end
+--if      self.hydroEff ~= nil
+--	--and self.ptoOn
+--		and self.vehicle.mrGbMS.HydrostaticLaunch
+--		and self:getMogliGearRatio() + 1 > mrGearboxMogli.maxHydroGearRatio then
+--	return true
+--end
 	return false
 end
 
@@ -5712,26 +5717,28 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local clutchMode = 0 -- no clutch calculation
 		
 --**********************************************************************************************************		
+-- no transmission / neutral 
+--**********************************************************************************************************		
 	if     self.vehicle.mrGbMS.NeutralActive
 			or self.vehicle.mrGbMS.G27Mode == 1
 			or not ( self.vehicle.isMotorStarted )
 			or ( accelerationPedal                    < -0.001
 			 and self.vehicle.cruiseControl.state     == 0
 			 and ( self.lastMotorRpmS < minRpmReduced 
-					or math.abs( currentSpeed ) < 0.3 
+					or math.abs( currentSpeed ) < 1 
 					or ( self.lastMotorRpmS < self.minRequiredRpm and self.minThrottle > 0.2 ) )
 			 and self.vehicle:mrGbMGetAutoClutch() ) then
 	-- neutral
 		if not ( self.vehicle.mrGbMS.NeutralActive )
 				and self.vehicle:mrGbMGetAutoClutch() 
 				and self.vehicle:mrGbMGetAutoStartStop() 
-				and ( math.abs( currentSpeed ) < 0.3 
+				and ( math.abs( currentSpeed ) < 0.5 
 					 or ( self.lastMotorRpmS < minRpmReduced 
 					  and not self.vehicle:mrGbMGetAutomatic() ) ) then
 			self.vehicle:mrGbMSetNeutralActive( true ) 
 		end
 	-- handbrake 
-		if      math.abs( currentSpeed ) < 0.3 
+		if      math.abs( currentSpeed ) < 0.5 
 				and self.vehicle.mrGbMS.NeutralActive then
 			self.vehicle:mrGbMSetState( "HandBrake", true )
 		end
@@ -5757,6 +5764,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 
 		self.noTransmission = true
+		if self.vehicle.mrGbMS.HydrostaticStart ~= nil then
+			self.hydrostaticFactor = self.vehicle.mrGbMS.HydrostaticStart
+		end
 		
 --**********************************************************************************************************		
 	else
@@ -6165,30 +6175,25 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			local w = absWheelSpeedRpm * r
 			local e = 0
 			local h = self.hydrostaticFactor
-			local m = self.ratedRpm
 			local t = self.targetRpm 
 
-			if self.vehicle.mrGbMS.AutoShiftUpRpm ~= nil and self.vehicle.mrGbMS.AutoShiftUpRpm < m then
+			-- max RPM
+			local m = math.min( self.maxAllowedRpm, self.targetRpm + mrGearboxMogli.hydroEffDiff )
+			if self.vehicle.mrGbMS.AutoShiftUpRpm ~= nil and m > self.vehicle.mrGbMS.AutoShiftUpRpm then
 				m = self.vehicle.mrGbMS.AutoShiftUpRpm 
 			end
-			m = math.min(m,self.targetRpm) + mrGearboxMogli.hydroEffDiff
-			
-			if self.ptoOn and self.lastMissingTorque <= 0 then
-				local t0 = math.max( minRpmReduced, t ) - Utils.clamp( self.lastLimitRpm - self.nonClampedMotorRpm, 0, mrGearboxMogli.hydroPtoDiff )
-				local t1 = math.min( m, t ) + mrGearboxMogli.hydroPtoDiff
-				if t0 < t1 then
-				-- full throttle => reduce target rpm for acceleration
-					t = t1 + accelerationPedal * ( t0 - t1 )
-				end
-				self.maxPossibleRpm = m
+			if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and m > self.vehicle.mrGbMS.HydrostaticMaxRpm then
+				m = self.vehicle.mrGbMS.HydrostaticMaxRpm
 			end
 			
+			-- smooth shifting 
 			if clutchMode > 1 and self.vehicle.mrGbML.beforeShiftRpm ~= nil then
 				self.hydrostaticFactor = Utils.clamp( w / self.vehicle.mrGbML.beforeShiftRpm, self.vehicle.mrGbMS.HydrostaticMin, self.vehicle.mrGbMS.HydrostaticMax )  
 				self.vehicle.mrGbML.beforeShiftRpm = nil
 				self.vehicle.mrGbML.afterShiftRpm  = nil
 			end
 			
+			-- boundaries hMin & hMax
 			local hMin
 			local hMax = self.vehicle.mrGbMS.HydrostaticMax			
 			if self.vehicle.cruiseControl.state > 0 then
@@ -6202,12 +6207,15 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				reducedMin = true
 			end
 			
+			-- find the best hMin
 			if      reducedMin
 					and self.ptoOn then
 				-- allow full range with PTO for smooth transition
 				hMin = self.vehicle.mrGbMS.HydrostaticMin
 			elseif  self.vehicle:mrGbMGetAutoShiftGears() then
 				-- allow full range with automatic shifting for smooth transition
+				hMin = self.vehicle.mrGbMS.HydrostaticMin
+			elseif  hStart <= self.vehicle.mrGbMS.HydrostaticMin then
 				hMin = self.vehicle.mrGbMS.HydrostaticMin
 			elseif  reducedMin then
 				-- lower ratio at high motor load
@@ -6218,11 +6226,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			end
 			
 			-- allow low ratio w/o acceleration pedal
-			hMin = self.vehicle.mrGbMS.HydrostaticMin + accelerationPedal * ( hMin - self.vehicle.mrGbMS.HydrostaticMin )
+			if hMin > self.vehicle.mrGbMS.HydrostaticMin then
+				hMin = self.vehicle.mrGbMS.HydrostaticMin + accelerationPedal * ( hMin - self.vehicle.mrGbMS.HydrostaticMin )
+			end
 			
-			if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and w > self.vehicle.mrGbMS.HydrostaticMaxRpm * hMax then
-				h = hMax				
-			elseif w > m * hMax then
+			-- calculated target hydrostatic factor w/o smoothHydro / HydrostaticIncTime
+			if     w > m * hMax then
 				h = hMax				
 			elseif self.ptoOn or accelerationPedal < 0.001 then
 				h = Utils.clamp( w / t, hMin, hMax )  
@@ -6237,20 +6246,23 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 			end
 			
-			local d = self.tickDt / self.vehicle.mrGbMS.HydrostaticIncTime
+			-- now apply smoothHydro & HydrostaticIncTime
+			local d = self.tickDt / math.max( 1, self.vehicle.mrGbMS.HydrostaticIncTime )
 			if     h > self.hydrostaticFactor then
 				self.hydrostaticFactor = self.hydrostaticFactor + math.min( mrGearboxMogli.smoothHydro * ( h - self.hydrostaticFactor ), d )				
-			elseif self.lastMissingTorque > 0 then
+			elseif self.lastMissingTorque > 0 
+					or  self.nonClampedMotorRpm <= self.stallRpm then
+				-- this is urgent now!!!
 				self.hydrostaticFactor = h
-			elseif self.nonClampedMotorRpm <= self.stallRpm 
-					or self.ptoOn                 then
-				self.hydrostaticFactor = self.hydrostaticFactor + mrGearboxMogli.smoothHydro * ( h - self.hydrostaticFactor )
 			else
 				self.hydrostaticFactor = self.hydrostaticFactor + math.max( mrGearboxMogli.smoothHydro * ( h - self.hydrostaticFactor ), -d )
 			end
-			self.hydrostaticFactor   = math.max( self.hydrostaticFactor, absWheelSpeedRpm * r / self.maxAllowedRpm ) 
 			
-		--clutchMode = 0
+			--print(string.format( "d: %0.5f h: %0.5f hf: %0.5f hs: %0.5f min: %0.5f max: %0.5f w/m: %0.5f",d,h,self.hydrostaticFactor,hStart,hMin,hMax,w/m))
+			
+			self.hydrostaticFactor   = math.max( self.hydrostaticFactor, math.min( w / m, self.vehicle.mrGbMS.HydrostaticMax ) ) 
+			
+			-- launch & clutch
 			if     self.vehicle.mrGbMS.HydrostaticLaunch then
 				clutchMode             = 0
 				self.autoClutchPercent = self.vehicle.mrGbMS.MaxClutchPercent						
@@ -6258,6 +6270,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				clutchMode             = 1
 				self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / mrGearboxMogli.maxHydroGearRatioC )
 			elseif self.hydrostaticFactor < r / mrGearboxMogli.maxHydroGearRatio then
+				-- open clutch to stop
 				clutchMode             = 1
 				self.hydrostaticFactor = r / mrGearboxMogli.maxHydroGearRatio
 			else
@@ -6265,6 +6278,13 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.autoClutchPercent = self.vehicle.mrGbMS.MaxClutchPercent						
 				self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / mrGearboxMogli.maxHydroGearRatio )
 			end			
+			
+			-- check static boundaries
+			if     self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticMax then
+				self.hydrostaticFactor = self.vehicle.mrGbMS.HydrostaticMax
+			elseif self.hydrostaticFactor < self.vehicle.mrGbMS.HydrostaticMin then
+				self.hydrostaticFactor = self.vehicle.mrGbMS.HydrostaticMin 
+			end
 		end		
 	end
 	
@@ -6362,10 +6382,13 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	elseif self.noTransmission then
 		self.clutchPercent  = 0
 		self.maxPossibleRpm = mrGearboxMogli.huge
+	elseif self.lastMissingTorque > 0 then
+		self.maxPossibleRpm = self.maxAllowedRpm
 	else
 		self.maxRpmIncrease = self.tickDt * self.rpmIncFactor
 
-		local m = self.nonClampedMotorRpm --math.max( self.nonClampedMotorRpm, self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * self.maxAllowedRpm )
+	--local m = self.nonClampedMotorRpm --math.max( self.nonClampedMotorRpm, self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * self.maxAllowedRpm )
+		local m = self.lastMotorRpm
 		if m > lastMaxPossibleRpm then
 			m = lastMaxPossibleRpm
 		end
@@ -6390,7 +6413,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- reduce RPM if more power than available is requested 
 	if      self.lastMissingTorque  > 0 
 			and self.nonClampedMotorRpm > self.stallRpm
-			and self.clutchPercent + mrGearboxMogli.eps >= self.vehicle.mrGbMS.MaxClutchPercent
+		--and self.clutchPercent + mrGearboxMogli.eps >= self.vehicle.mrGbMS.MaxClutchPercent
+		--and ( self.hydroEff == nil or self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticStart + mrGearboxMogli.eps )
+			and currentSpeed            > 2
 			and not ( self.noTransmission ) then
 		if self.torqueRpmReduction == nil then
 			self.torqueRpmReference = self.nonClampedMotorRpm
