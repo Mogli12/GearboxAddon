@@ -38,7 +38,7 @@ mrGearboxMogli.minClutchPercent     = 1E-3
 mrGearboxMogli.clutchLoopTimes      = 200
 mrGearboxMogli.clutchLoopTimesTC    = 2000
 mrGearboxMogli.maxGearRatio         = 377  -- 1 km/h @1000 RPM / 2.20 km/h @2200 RPM / gear ratio might be bigger, but no clutch in this case
-mrGearboxMogli.maxHydroGearRatio    = 7540 -- 0.05 km/h @1000 RPM
+mrGearboxMogli.maxHydroGearRatio    = 1508 -- 0.25 km/h @1000 RPM
 mrGearboxMogli.maxHydroGearRatioC   = 188  -- 2 km/h @1000 RPM hydrostatic drive and launch with clutch
 mrGearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 mrGearboxMogli.rpmReduction         = 0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
@@ -1471,8 +1471,10 @@ function mrGearboxMogli:update(dt)
 		self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset
 		
 		if self.mrGbMS.IsCombine and self.sampleThreshing.sample ~= nil then
+			self.sampleThreshing.volume      = self.mrGbMB.threshingVolume
 			self.sampleThreshing.pitchOffset = self.mrGbMB.threshingPitchOffset
 			Utils.setSamplePitch( self.sampleThreshing, self.sampleThreshing.pitchOffset )
+			Utils.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
 		end		
 		
 		if      self.mrGbMG.modifyVolume
@@ -1537,6 +1539,7 @@ function mrGearboxMogli:update(dt)
 		self.mrGbMB.soundRunPitchOffset  = self.sampleMotorRun.pitchOffset
 		self.mrGbMB.soundRun2PitchOffset = self.sampleMotorRun2.pitchOffset
 		if self.mrGbMS.IsCombine then
+			self.mrGbMB.threshingVolume      = self.sampleThreshing.volume
 			self.mrGbMB.threshingPitchOffset = self.sampleThreshing.pitchOffset
 		end
 		if self.indoorSounds ~= nil and self.indoorSounds.sounds ~= nil then
@@ -2187,6 +2190,11 @@ function mrGearboxMogli:update(dt)
 					else
 						indoorFactor0 = 0.6
 					end
+				end
+				
+				if self.mrGbMS.IsCombine and self.sampleThreshing.sample ~= nil then
+					self.sampleThreshing.volume = self.mrGbMB.threshingVolume  * indoorFactor0
+					mrGearboxMogli.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
 				end
 				
 				if self.sampleMotor.sample ~= nil then					
@@ -5929,13 +5937,14 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local scorePwr = nil
 					local scoreLag = nil
 					local bestGear = currentGear 
-					local lowRpm   = self.idleRpm 					
-					local downRpm  = self.idleRpm  --minRpmReduced
+					local lowRpm   = math.max( self.idleRpm, self.vehicle.mrGbMS.MinTargetRpm )
+					local downRpm  = math.max( self.idleRpm, self.vehicle.mrGbMS.MinTargetRpm )
 					local upRpm    = self.ratedRpm -- minRpmReduced + mrGearboxMogli.rpmReduction * ( self.ratedRpm - minRpmReduced ) --self.maxAllowedRpm
-					
+										
 					if self.vehicle:mrGbMGetAutoClutch() and accelerationPedal > 0.5 then 
 						local c = Utils.clamp( self.vehicle.mrGbMS.MinClutchPercent, 0.5, self.vehicle.mrGbMS.MaxClutchPercent  )
-						lowRpm  = Utils.clamp( ( self.idleRpm - (1-c) * self.ratedRpm * accelerationPedal ) / c, 0, lowRpm )
+						local l = lowRpm
+						lowRpm  = Utils.clamp( ( l - (1-c) * self.ratedRpm * accelerationPedal ) / c, 0, lowRpm )
 					end
 					if self.vehicle.mrGbMS.AutoShiftDownRpm ~= nil and self.vehicle.mrGbMS.AutoShiftDownRpm > downRpm then
 						downRpm = self.vehicle.mrGbMS.AutoShiftDownRpm -- downRpm + self.motorLoadS * ( self.vehicle.mrGbMS.AutoShiftDownRpm - downRpm )
@@ -6048,6 +6057,24 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								isValidEntry = false
 							end
 						end
+						
+						if self.hydroEff == nil then
+							if     rpm > self.maxAllowedRpm then
+								tooSmall     = true
+								isValidEntry = false
+							elseif rpm < self.idleRpm       then
+								tooBig       = true
+								isValidEntry = false
+							end
+						else
+							if     rpm > self.maxAllowedRpm * self.vehicle.mrGbMS.HydrostaticMax then
+								tooSmall     = true
+								isValidEntry = false
+							elseif rpm < self.idleRpm       * self.vehicle.mrGbMS.HydrostaticMin then
+								tooBig       = true
+								isValidEntry = false
+							end
+						end
 																	
 						if isValidEntry then
 
@@ -6149,7 +6176,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 					
 					if scoreRpm == nil then
-						if     tooBig   then
+						if iMin == nil then
+						--print("ERROR finding a new gear")
+						elseif tooBig   then
 							bestGear = iMin						
 						elseif tooSmall then
 							bestGear = iMax
@@ -6411,17 +6440,22 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 	--**********************************************************************************************************		
 	-- reduce RPM if more power than available is requested 
+	local reductionMinRpm = self.stallRpm 
+	if     currentSpeed < 1 then
+		reductionMinRpm = self.maxAllowedRpm 
+	elseif currentSpeed < 2 then
+		reductionMinRpm = self.maxAllowedRpm + ( currentSpeed - 1 ) * ( self.stallRpm - self.maxAllowedRpm )
+	end
+	
 	if      self.lastMissingTorque  > 0 
-			and self.nonClampedMotorRpm > self.stallRpm
-		--and self.clutchPercent + mrGearboxMogli.eps >= self.vehicle.mrGbMS.MaxClutchPercent
-		--and ( self.hydroEff == nil or self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticStart + mrGearboxMogli.eps )
-			and currentSpeed            > 2
+			and self.nonClampedMotorRpm > reductionMinRpm
 			and not ( self.noTransmission ) then
 		if self.torqueRpmReduction == nil then
 			self.torqueRpmReference = self.nonClampedMotorRpm
 			self.torqueRpmReduction = 0
 		end
-		self.torqueRpmReduction   = math.min( self.nonClampedMotorRpm - self.stallRpm, self.torqueRpmReduction + math.min( 0.2, self.lastMissingTorque / self.lastMotorTorque ) * self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
+		local m = self.stallRpm
+		self.torqueRpmReduction   = math.min( self.nonClampedMotorRpm - reductionMinRpm, self.torqueRpmReduction + math.min( 0.2, self.lastMissingTorque / self.lastMotorTorque ) * self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
 	elseif  self.torqueRpmReduction ~= nil then
 		self.torqueRpmReduction = self.torqueRpmReduction - self.tickDt * self.vehicle.mrGbMS.RpmIncFactor 
 		if self.torqueRpmReduction < 0 then
