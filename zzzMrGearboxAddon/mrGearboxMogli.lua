@@ -6177,7 +6177,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					
 					if scoreRpm == nil then
 						if iMin == nil then
-						--print("ERROR finding a new gear")
+							if self.vehicle.mrGbMG.debugPrint then
+								print("ERROR finding a new gear: (too small: "..tostring(tooSmall).." / too big: "..tostring(tooBig)..")")
+							end
 						elseif tooBig   then
 							bestGear = iMin						
 						elseif tooSmall then
