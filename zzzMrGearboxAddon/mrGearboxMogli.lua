@@ -120,6 +120,7 @@ mrGearboxMogliGlobals.blinkingWarning       = true
 mrGearboxMogliGlobals.grindingMinRpmDelta   = 200
 mrGearboxMogliGlobals.grindingMaxRpmSound   = 600
 mrGearboxMogliGlobals.grindingMaxRpmDelta   = mrGearboxMogli.huge
+mrGearboxMogliGlobals.hydroTransVol         = false
 
 
 --**********************************************************************************************************	
@@ -362,6 +363,8 @@ function mrGearboxMogli:initClient()
 	self.mrGbMD.Power      = 0 
 	self.mrGbMD.lastRate   = 0 
 	self.mrGbMD.Rate       = 0 
+	self.mrGbMD.Hydro      = 0
+	self.mrGbMD.lastHydro  = 0
 	
 	self.mrGbMB.fuelUsage              = self.fuelUsage
 end 
@@ -1273,10 +1276,6 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 	end
 	
-	if math.abs( self.mrGbMS.Run2PitchEffect ) < mrGearboxMogli.eps then
-		self.mrGbMG.modifyTransVol = false
-	end
-	
 	self.mrGbMS.G27Gears = {} 
 	local revereGear     = nil
 	local defaultGear    = self.mrGbMS.LaunchGear
@@ -1466,6 +1465,7 @@ function mrGearboxMogli:update(dt)
 		self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchMax    
 		self.sampleMotor.volume          = self.mrGbMB.soundVolume         
 		self.sampleMotorRun.volume       = self.mrGbMB.soundRunVolume      
+		self.sampleMotorRun2.volume      = self.mrGbMB.soundRun2Volume      
 		self.sampleMotor.pitchOffset     = self.mrGbMB.soundPitchOffset    
 		self.sampleMotorRun.pitchOffset  = self.mrGbMB.soundRunPitchOffset 
 		self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset
@@ -1535,6 +1535,7 @@ function mrGearboxMogli:update(dt)
 		self.mrGbMB.soundRun2PitchMax    = self.motorRun2PitchMax
 		self.mrGbMB.soundVolume          = self.sampleMotor.volume   
 		self.mrGbMB.soundRunVolume       = self.sampleMotorRun.volume
+		self.mrGbMB.soundRun2Volume      = self.sampleMotorRun2.volume
 		self.mrGbMB.soundPitchOffset     = self.sampleMotor.pitchOffset   
 		self.mrGbMB.soundRunPitchOffset  = self.sampleMotorRun.pitchOffset
 		self.mrGbMB.soundRun2PitchOffset = self.sampleMotorRun2.pitchOffset
@@ -2135,9 +2136,21 @@ function mrGearboxMogli:update(dt)
 			end
 			
 			if self.mrGbMG.modifyTransVol then
-				local eff = ( self.mrGbMS.CurrentGear % 2 ) * self.mrGbMS.Run2PitchEffect * self.motorRun2PitchMax
-				self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchMax    - eff
-				self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset - eff
+				if self.mrGbMS.Hydrostatic then
+					if self.mrGbMG.hydroTransVol then
+						local factor = 0.005 * self.mrGbMS.HydrostaticMax * self.mrGbMD.Hydro 
+						factor = Utils.clamp( math.abs( factor - 1 ) / ( self.mrGbMS.HydrostaticMax - 1 ), 0, 1 )
+						local speedFactor = Utils.clamp(self:getLastSpeed() / math.ceil(self.motor:getMaximumForwardSpeed()*3.6), 0, 1);
+						factor = 0.5 * factor + 0.5 * speedFactor
+						self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchOffset + ( self.mrGbMB.soundRun2PitchMax - self.mrGbMB.soundRun2PitchOffset ) * factor
+						self.sampleMotorRun2.pitchOffset = self.motorRun2PitchMax
+						self.sampleMotorRun2.volume      = self.mrGbMB.soundRun2Volume + 0.5 * Utils.getNoNil( self:mrGbMGetMotorLoad(), 0 ) * ( self.motorRun2VolumeMax - self.mrGbMB.soundRun2Volume )
+					end
+				else
+					local eff = ( self.mrGbMS.CurrentGear % 2 ) * self.mrGbMS.Run2PitchEffect * self.motorRun2PitchMax
+					self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchMax    - eff
+					self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset - eff
+				end
 			end
 				
 			if self.mrGbMG.modifyVolume then -- and self.internalSound == nil then	
@@ -2508,11 +2521,15 @@ function mrGearboxMogli:updateTick(dt)
 							local power = ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
 							self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * mrGearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
 						end
+						if self.motor.hydrostaticFactor ~= nil then
+							self.mrGbMD.Hydro = 200 * self.motor.hydrostaticFactor / self.mrGbMS.HydrostaticMax
+						end
 					else
 						self.mrGbMD.Rpm    = 0
 					  self.mrGbMD.Clutch = 0
             self.mrGbMD.Load   = 0
 					  self.mrGbMD.Power  = 0
+					  self.mrGbMD.Hydro  = 0
 					end
 				--self.mrGbMD.Speed    = tonumber( Utils.clamp( math.floor( math.min( self.mrGbML.currentGearSpeed / self.mrGbMS.GlobalRatioFactor * 3.6, self.motor.speedLimit ) + 0.5 ), 0, 255 ))	
 					self.mrGbMD.Speed    = tonumber( Utils.clamp( math.floor( self.mrGbML.currentGearSpeed / self.mrGbMS.GlobalRatioFactor * 3.6 + 0.5 ), 0, 255 ))	
@@ -2538,6 +2555,7 @@ function mrGearboxMogli:updateTick(dt)
 					if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
 							or self.mrGbMD.lastLoad   ~= self.mrGbMD.Load   
 							or self.mrGbMD.lastSpeed  ~= self.mrGbMD.Speed 
+							or self.mrGbMD.lastHydro  ~= self.mrGbMD.Hydro
 							or ( self.mrGbMS.drawTargetRpm and self.mrGbMD.lastRpm    ~= self.mrGbMD.Rpm   )
 							or ( self.mrGbMG.drawReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
 							or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
@@ -2550,6 +2568,7 @@ function mrGearboxMogli:updateTick(dt)
 						self.mrGbMD.lastSpeed  = self.mrGbMD.Speed 
 						self.mrGbMD.lastPower  = self.mrGbMD.Power 
 						self.mrGbMD.lastRate   = self.mrGbMD.Rate
+						self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
 					end 
 					
 					self.mrGbML.lastSumDt = 0
@@ -2570,8 +2589,9 @@ function mrGearboxMogli:readUpdateStream(streamId, timestamp, connection)
 		if streamReadBool( streamId ) then
 			self.mrGbMD.Clutch = streamReadUInt8( streamId ) 
 			self.mrGbMD.Load   = streamReadUInt8( streamId )  
-			self.mrGbMD.Speed  = streamReadUInt8( streamId ) 			
+			self.mrGbMD.Speed  = streamReadUInt8( streamId ) 			 			
 			
+			if self.mrGbMS.Hydrostatic   then self.mrGbMD.Hydro  = streamReadUInt8( streamId  ) end		 
 			if self.mrGbMS.drawTargetRpm then self.mrGbMD.Rpm    = streamReadUInt8( streamId  ) end			
 			if self.mrGbMG.drawReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
 			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end			
@@ -2587,8 +2607,9 @@ function mrGearboxMogli:writeUpdateStream(streamId, connection, dirtyMask)
 		if streamWriteBool(streamId, bitAND(dirtyMask, self.mrGbML.dirtyFlag) ~= 0) then				
 			streamWriteUInt8(streamId, self.mrGbMD.Clutch ) 
 			streamWriteUInt8(streamId, self.mrGbMD.Load   ) 
-			streamWriteUInt8(streamId, self.mrGbMD.Speed  ) 			 
-			  
+			streamWriteUInt8(streamId, self.mrGbMD.Speed  ) 	
+			
+			if self.mrGbMS.Hydrostatic   then streamWriteUInt8(streamId, self.mrGbMD.Hydro  ) end		 
 			if self.mrGbMS.drawTargetRpm then streamWriteUInt8(streamId, self.mrGbMD.Rpm    ) end			
 			if self.mrGbMG.drawReqPower  then streamWriteUInt16(streamId, self.mrGbMD.Power ) end			
 			if self.mrGbMS.IsCombine     then streamWriteUInt8(streamId, self.mrGbMD.Rate   ) end

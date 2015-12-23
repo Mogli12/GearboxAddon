@@ -1524,6 +1524,31 @@
 		<configFile modName="IHC_955A_FH" xmlName="IHC_955A.xml" />
 
 		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
+			<realEngine idleRpm="850" ratedRpm="2200">
+        <!-- 2200: 90(90) | 2200: 90(90) | 1400..1400: 334(334) | 90 | 0.5 | 300 | 1.8 | 2300 | 1400: 215 -->
+        <torque rpm="100" motorTorque="68" fuelUsageRatio="279.6"/>
+        <torque rpm="400" motorTorque="205" fuelUsageRatio="253.2"/>
+        <torque rpm="700" motorTorque="272" fuelUsageRatio="233.7"/>
+        <torque rpm="800" motorTorque="287" fuelUsageRatio="228.8"/>
+        <torque rpm="900" motorTorque="301" fuelUsageRatio="224.6"/>
+        <torque rpm="1000" motorTorque="313" fuelUsageRatio="221.1"/>
+        <torque rpm="1100" motorTorque="322" fuelUsageRatio="218.4"/>
+        <torque rpm="1200" motorTorque="329" fuelUsageRatio="216.5"/>
+        <torque rpm="1300" motorTorque="333" fuelUsageRatio="215.4"/>
+        <torque rpm="1400" motorTorque="334" fuelUsageRatio="215"/>
+        <torque rpm="1500" motorTorque="331" fuelUsageRatio="215.4"/>
+        <torque rpm="1600" motorTorque="327" fuelUsageRatio="216.5"/>
+        <torque rpm="1700" motorTorque="322" fuelUsageRatio="218.4"/>
+        <torque rpm="1800" motorTorque="316" fuelUsageRatio="221"/>
+        <torque rpm="1900" motorTorque="310" fuelUsageRatio="224.3"/>
+        <torque rpm="2000" motorTorque="303" fuelUsageRatio="228.4"/>
+        <torque rpm="2100" motorTorque="296" fuelUsageRatio="233.3"/>
+        <torque rpm="2200" motorTorque="287" fuelUsageRatio="238.9"/>
+        <torque rpm="2300" motorTorque="248" fuelUsageRatio="254.2"/>
+        <torque rpm="2400" motorTorque="149" fuelUsageRatio="325.6"/>
+        <torque rpm="2500" motorTorque="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		
 			<gears shiftTimeMs="800">	
 				<gear speed="8.4"  name="1" />
 				<gear speed="12.5"  name="2" />
@@ -2355,7 +2380,7 @@
 		<configFile modName="JD8110" xmlName="JD8110.xml" isPrefix="true"/>
 
 		<gearboxMogli speedLimiter="false">
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="13" automatic="true">	
+			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="13" automatic="true">	
 				<gear name="R1" speed="2" reverseOnly="true" />
 				<gear name="1" speed="2.2" forwardOnly="true" />
 				<gear name="2" speed="2.9" forwardOnly="true" />
@@ -2406,6 +2431,126 @@
         <torque rpm="2300" motorTorque="567" motorTorqueEco="456" fuelUsageRatio="256"/>
         <torque rpm="2400" motorTorque="367" motorTorqueEco="296" fuelUsageRatio="332"/>
         <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>	
+		
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/john-deere-8430t -->
+		<configFile modName="JohnDeere_8430T" xmlName="JohnDeere8430T.xml" isPrefix="true"/>
+		<configFile modName="JohnDeere_8430T" xmlName="JohnDeere8430TFH.xml" isPrefix="true"/>
+
+		<!-- http://manuals.deere.com/omview/OMAR229550_19/?tM= -->
+		<gearboxMogli speedLimiter="false">
+			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="13" automatic="true">	
+				<gear name="R1" speed="1.4"  reverseOnly="true" />
+				<gear name="1"  speed="1.5"  forwardOnly="true" />
+				<gear name="2"  speed="2.0"  forwardOnly="true" />
+				<gear name="3"  speed="2.6"  forwardOnly="true" />
+				<gear name="4"  speed="3.5"  forwardOnly="true" />
+				<gear name="R2" speed="3.7"  reverseOnly="true" />
+				<gear name="5"  speed="3.9"  forwardOnly="true" />
+				<gear name="R3" speed="4.6"  reverseOnly="true" />
+				<gear name="6"  speed="4.5"  forwardOnly="true" />
+				<gear name="7"  speed="5.2"  forwardOnly="true" />
+				<gear name="8"  speed="6.0"  forwardOnly="true" />
+				<gear name="9"  speed="7.0"  forwardOnly="true" />
+				<gear name="10" speed="8.1"  forwardOnly="true" />
+				<gear name="R4" speed="8.5"  reverseOnly="true" />
+				<gear name="11" speed="9.3"  forwardOnly="true" />
+				<gear name="12" speed="10.8" forwardOnly="true" />
+				<gear name="R5" speed="11.9" reverseOnly="true" />
+				<gear name="13" speed="12.7" forwardOnly="true" />
+				<gear name="14" speed="17.0" forwardOnly="true" />
+				<gear name="15" speed="22.7" forwardOnly="true" />
+				<gear name="16" speed="30.4" forwardOnly="true" />
+			</gears>		
+			<reverse shiftTimeMs="500" /> 
+			
+			<!-- turbo sound -->
+			<blowOffVentilSound volume="2"/>			
+			
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <!-- 1900: 335(308) | 2100: 305(275) | 1600..1600: 1394(1324) | 90 | 0.5 | 150 | 2.3 | 2200 | 1380: 215 -->
+        <torque rpm="100" motorTorque="318" motorTorqueEco="302" fuelUsageRatio="283"/>
+        <torque rpm="400" motorTorque="919" motorTorqueEco="873" fuelUsageRatio="254.8"/>
+        <torque rpm="700" motorTorque="1170" motorTorqueEco="1112" fuelUsageRatio="234.2"/>
+        <torque rpm="800" motorTorque="1215" motorTorqueEco="1154" fuelUsageRatio="229"/>
+        <torque rpm="900" motorTorque="1255" motorTorqueEco="1192" fuelUsageRatio="224.6"/>
+        <torque rpm="1000" motorTorque="1292" motorTorqueEco="1227" fuelUsageRatio="221"/>
+        <torque rpm="1100" motorTorque="1323" motorTorqueEco="1257" fuelUsageRatio="218.3"/>
+        <torque rpm="1200" motorTorque="1348" motorTorqueEco="1281" fuelUsageRatio="216.3"/>
+        <torque rpm="1300" motorTorque="1368" motorTorqueEco="1300" fuelUsageRatio="215.3"/>
+        <torque rpm="1400" motorTorque="1383" motorTorqueEco="1313" fuelUsageRatio="215"/>
+        <torque rpm="1500" motorTorque="1391" motorTorqueEco="1322" fuelUsageRatio="215.7"/>
+        <torque rpm="1600" motorTorque="1394" motorTorqueEco="1324" fuelUsageRatio="217.2"/>
+        <torque rpm="1700" motorTorque="1359" motorTorqueEco="1273" fuelUsageRatio="219.7"/>
+        <torque rpm="1800" motorTorque="1307" motorTorqueEco="1202" fuelUsageRatio="223.1"/>
+        <torque rpm="1900" motorTorque="1238" motorTorqueEco="1139" fuelUsageRatio="227.5"/>
+        <torque rpm="2000" motorTorque="1150" motorTorqueEco="1053" fuelUsageRatio="232.7"/>
+        <torque rpm="2100" motorTorque="1020" motorTorqueEco="918" fuelUsageRatio="238.9"/>
+        <torque rpm="2200" motorTorque="619" motorTorqueEco="557" fuelUsageRatio="325.6"/>
+        <torque rpm="2300" motorTorque="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>	
+		
+	<vehicle>
+		<!-- http://www.modhoster.de/mods/john-deere-8530-usa -->
+		<configFile modName="JohnDeere_8530" xmlName="JohnDeere8530.xml" isPrefix="true"/>
+		<configFile modName="JohnDeere_8530" xmlName="JohnDeere8530FH.xml" isPrefix="true"/>
+
+		<!-- http://manuals.deere.com/omview/OMAR229550_19/?tM= -->
+		<gearboxMogli speedLimiter="false">
+			<gears shiftTimeMs="100" clutchRatio="1" defaultGear="13" automatic="true">	
+				<gear name="R1" speed="1.9"  reverseOnly="true" />
+				<gear name="1"  speed="2.0"  forwardOnly="true" />
+				<gear name="2"  speed="2.6"  forwardOnly="true" />
+				<gear name="3"  speed="3.5"  forwardOnly="true" />
+				<gear name="4"  speed="4.7"  forwardOnly="true" />
+				<gear name="R2" speed="4.9"  reverseOnly="true" />
+				<gear name="5"  speed="5.3"  forwardOnly="true" />
+				<gear name="6"  speed="6.1"  forwardOnly="true" />
+				<gear name="R3" speed="6.2"  reverseOnly="true" />
+				<gear name="7"  speed="7.1"  forwardOnly="true" />
+				<gear name="8"  speed="8.2"  forwardOnly="true" />
+				<gear name="9"  speed="9.4"  forwardOnly="true" />
+				<gear name="10" speed="10.9" forwardOnly="true" />
+				<gear name="R4" speed="11.5" reverseOnly="true" />
+				<gear name="11" speed="13.7" forwardOnly="true" />
+				<gear name="12" speed="14.6" forwardOnly="true" />
+				<gear name="R5" speed="16.1" reverseOnly="true" />
+				<gear name="13" speed="17.2" forwardOnly="true" />
+				<gear name="14" speed="23.8" forwardOnly="true" />
+				<gear name="15" speed="30.6" forwardOnly="true" />
+				<gear name="16" speed="40.1" forwardOnly="true" />
+			</gears>		
+			<reverse shiftTimeMs="500" /> 
+			
+			<!-- turbo sound -->
+			<blowOffVentilSound volume="2"/>			
+			
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <!-- 1900: 355(327) | 2100: 320(288) | 1600..1600: 1443(1371) | 90 | 0.5 | 150 | 2.3 | 2200 | 1380: 215 -->
+        <torque rpm="100" motorTorque="329" motorTorqueEco="313" fuelUsageRatio="283"/>
+        <torque rpm="400" motorTorque="952" motorTorqueEco="904" fuelUsageRatio="254.8"/>
+        <torque rpm="700" motorTorque="1211" motorTorqueEco="1151" fuelUsageRatio="234.2"/>
+        <torque rpm="800" motorTorque="1258" motorTorqueEco="1195" fuelUsageRatio="229"/>
+        <torque rpm="900" motorTorque="1299" motorTorqueEco="1234" fuelUsageRatio="224.6"/>
+        <torque rpm="1000" motorTorque="1337" motorTorqueEco="1270" fuelUsageRatio="221"/>
+        <torque rpm="1100" motorTorque="1369" motorTorqueEco="1301" fuelUsageRatio="218.3"/>
+        <torque rpm="1200" motorTorque="1396" motorTorqueEco="1326" fuelUsageRatio="216.3"/>
+        <torque rpm="1300" motorTorque="1416" motorTorqueEco="1346" fuelUsageRatio="215.3"/>
+        <torque rpm="1400" motorTorque="1431" motorTorqueEco="1360" fuelUsageRatio="215"/>
+        <torque rpm="1500" motorTorque="1440" motorTorqueEco="1368" fuelUsageRatio="215.7"/>
+        <torque rpm="1600" motorTorque="1443" motorTorqueEco="1371" fuelUsageRatio="217.2"/>
+        <torque rpm="1700" motorTorque="1414" motorTorqueEco="1334" fuelUsageRatio="219.7"/>
+        <torque rpm="1800" motorTorque="1370" motorTorqueEco="1274" fuelUsageRatio="223.1"/>
+        <torque rpm="1900" motorTorque="1312" motorTorqueEco="1207" fuelUsageRatio="227.5"/>
+        <torque rpm="2000" motorTorque="1216" motorTorqueEco="1113" fuelUsageRatio="232.7"/>
+        <torque rpm="2100" motorTorque="1070" motorTorqueEco="963" fuelUsageRatio="238.9"/>
+        <torque rpm="2200" motorTorque="649" motorTorqueEco="584" fuelUsageRatio="325.6"/>
+        <torque rpm="2300" motorTorque="0" fuelUsageRatio="477.8"/>
 			</realEngine>
 		</gearboxMogli>			
 	</vehicle>	
