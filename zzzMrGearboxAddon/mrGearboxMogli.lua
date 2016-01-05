@@ -120,7 +120,7 @@ mrGearboxMogliGlobals.blinkingWarning       = true
 mrGearboxMogliGlobals.grindingMinRpmDelta   = 200
 mrGearboxMogliGlobals.grindingMaxRpmSound   = 600
 mrGearboxMogliGlobals.grindingMaxRpmDelta   = mrGearboxMogli.huge
-mrGearboxMogliGlobals.hydroTransVol         = false
+mrGearboxMogliGlobals.hydroTransVolRatio    = 0.2
 
 
 --**********************************************************************************************************	
@@ -366,7 +366,7 @@ function mrGearboxMogli:initClient()
 	self.mrGbMD.Hydro      = 0
 	self.mrGbMD.lastHydro  = 0
 	
-	self.mrGbMB.fuelUsage              = self.fuelUsage
+	self.mrGbMB.fuelUsage  = self.fuelUsage
 end 
 
 --**********************************************************************************************************	
@@ -398,7 +398,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 		self.mrGbMG.modifySound    = false
 		self.mrGbMG.modifyVolume   = true
-		self.mrGbMG.modifyTransVol = false
+		self.mrGbMG.modifyTransVol = mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlString ..".hydrostatic.efficiency(0)#ratio" )
+		
 		self.mrGbMG.playGrindingSound = false
 		mrGearboxMogli.globalsLoad2( xmlFile, "vehicle.gearboxMogliGlobals", self.mrGbMG )	
 		self.mrGbMG.hudWidth = Utils.clamp( 16.0 * g_screenHeight * self.mrGbMG.hudWidth / ( 9.0 * g_screenWidth ), 0.05, 0.3 )
@@ -1215,6 +1216,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		else
 			self.mrGbMS.HydrostaticLaunch = not ( sc )
 		end
+		self.mrGbMS.HydroTransVolRatio  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#transVolRatio"), self.mrGbMG.hydroTransVolRatio )
 	else
 		self.mrGbMS.Hydrostatic         = false
 	end
@@ -1445,6 +1447,10 @@ function mrGearboxMogli:update(dt)
 		end
 	end
 
+	if self.mrGbMG.realFuelUsage and self.isServer and not ( self.mrGbMS.IsOn ) then
+		self.fuelUsage = self.mrGbMB.fuelUsage
+	end
+	
 	if self.mrGbMB.soundModified and not ( self.mrGbMS.IsOn ) then
 	--Utils.stopSample( self.sampleMotor )
 	--Utils.stopSample( self.sampleMotorRun )
@@ -1560,11 +1566,6 @@ function mrGearboxMogli:update(dt)
 		return 
 	end 	
 		
-	if      self.mrGbMG.realFuelUsage 
-			and self.isServer then
-		self.fuelUsage = self.mrGbMB.fuelUsage
-	end
-	
 	if self.mrGbMS.CurMinRpm == nil or self.mrGbMS.CurMaxRpm == nil then
 		print("Init failed")
 	end
@@ -1589,7 +1590,64 @@ function mrGearboxMogli:update(dt)
 		addConsoleCommand("mrGbMDebug", "Console output during gear shift", "mrGbMDebug", self)
 	end
 
+--**********************************************************************************************************			
+	-- fuel usage
+--**********************************************************************************************************			
+	if      self.mrGbMG.realFuelUsage 
+			and self.isServer then
+		if not ( self.isMotorStarted ) then
+			self.fuelUsage = 0		
+		elseif  self.motor.fuelCurve ~= nil
+				and ( not self:getIsHired() or self.lastMovedDistance > 0 ) then
+			-- see Motorized.lua, line 468
+			-- with GearboxAddon the vehicle will consume fuel if it is not hired of the hired worker moved 
+			
+			local rpm   = math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
+			local power = ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) * rpm * mrGearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
+			local ratio = self.motor.fuelCurve:get( rpm )
+
+			if self.motor.lastMotorTorque > 0 then
+				ratio = ratio / math.max( 0.001, mrGearboxMogli.powerFuelCurve:get( ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) / self.motor.lastMotorTorque ) )
+			else
+				ratio = 0
+			end
+
+			if mrGearboxMogli.realFuelUsageAdjust then
+				local rpmFactor = math.max(0.02, (self.motor.lastMotorRpm-self.motor.minRpm)/(self.motor.maxRpm-self.motor.minRpm));		
+				self.fuelUsage  = ratio * power * mrGearboxMogli.fuelFactor / rpmFactor 
+			else
+				self.fuelUsage  = 0		
+				local fuelUsed  = ratio * power * dt * mrGearboxMogli.fuelFactor
+				if fuelUsed > 0 then
+					self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
+					g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
+				end
+			end
+		end
+	end
+	
+--**********************************************************************************************************			
+-- area per second calculation for combines 
+--**********************************************************************************************************			
+	if self.mrGbML.strawDisableTime ~= nil and self.mrGbML.strawDisableTime > g_currentMission.time then 
+		local timeUntilDisable = self.mrGbML.strawDisableTime - g_currentMission.time
+		local numToDrop
+		
+		numToDrop = math.min((dt*self.mrGbML.currentCuttersArea)/timeUntilDisable, self.mrGbML.currentCuttersArea)
+		self.mrGbML.currentCuttersArea  = self.mrGbML.currentCuttersArea - numToDrop
+		self.mrGbML.cutterAreaPerSecond = numToDrop * 1000 / dt
+
+		numToDrop = math.min((dt*self.mrGbML.currentRealArea)/timeUntilDisable, self.mrGbML.currentRealArea)
+		self.mrGbML.currentRealArea  = self.mrGbML.currentRealArea - numToDrop		
+    self.mrGbML.realAreaPerSecond   = numToDrop * 1000 / dt
+	else
+		self.mrGbML.cutterAreaPerSecond = 0
+    self.mrGbML.realAreaPerSecond   = 0
+	end
+	
+--**********************************************************************************************************			
 -- driveControl 
+--**********************************************************************************************************			
 	local driveControlShuttle   = false
 	local driveControlHandBrake = false
 	if      self.dCcheckModule ~=  nil 
@@ -2137,11 +2195,11 @@ function mrGearboxMogli:update(dt)
 			
 			if self.mrGbMG.modifyTransVol then
 				if self.mrGbMS.Hydrostatic then
-					if self.mrGbMG.hydroTransVol then
+					if math.abs( self.mrGbMS.HydroTransVolRatio ) > mrGearboxMogli.eps then
 						local factor = 0.005 * self.mrGbMS.HydrostaticMax * self.mrGbMD.Hydro 
 						factor = Utils.clamp( math.abs( factor - 1 ) / ( self.mrGbMS.HydrostaticMax - 1 ), 0, 1 )
 						local speedFactor = Utils.clamp(self:getLastSpeed() / math.ceil(self.motor:getMaximumForwardSpeed()*3.6), 0, 1);
-						factor = 0.5 * factor + 0.5 * speedFactor
+						factor = self.mrGbMS.HydroTransVolRatio * factor + ( 1 - self.mrGbMS.HydroTransVolRatio ) * speedFactor
 						self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchOffset + ( self.mrGbMB.soundRun2PitchMax - self.mrGbMB.soundRun2PitchOffset ) * factor
 						self.sampleMotorRun2.pitchOffset = self.motorRun2PitchMax
 						self.sampleMotorRun2.volume      = self.mrGbMB.soundRun2Volume + 0.5 * Utils.getNoNil( self:mrGbMGetMotorLoad(), 0 ) * ( self.motorRun2VolumeMax - self.mrGbMB.soundRun2Volume )
@@ -2240,58 +2298,6 @@ function mrGearboxMogli:update(dt)
 				end
 			end
 		end
-	end
-
-	-- fuel usage
-	if      self.mrGbMG.realFuelUsage 
-			and self.isServer 
-			and self.motor.fuelCurve ~= nil
-			and ( not self:getIsHired() or self.lastMovedDistance > 0 ) then
-		-- see Motorized.lua, line 468
-		-- with GearboxAddon the vehicle will consume fuel if it is not hired of the hired worker moved 
-		
-		local rpm       = math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
-		local power     = ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) * rpm * mrGearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
-		local ratio     = self.motor.fuelCurve:get( rpm )
-
-		if self.motor.lastMotorTorque > 0 then
-			ratio = ratio / math.max( 0.001, mrGearboxMogli.powerFuelCurve:get( ( self.motor.motorLoad + self.motor.lastPtoTorque + self.motor.lastLostTorque ) / self.motor.lastMotorTorque ) )
-		--elseif ratio > 0 then
-		--	ratio = ratio * 100
-		else
-			ratio = 0
-		end
-
-		if mrGearboxMogli.realFuelUsageAdjust then
-			local rpmFactor = math.max(0.02, (self.motor.lastMotorRpm-self.motor.minRpm)/(self.motor.maxRpm-self.motor.minRpm));		
-			self.fuelUsage  = ratio * power * mrGearboxMogli.fuelFactor / rpmFactor 
-		else
-			self.fuelUsage  = 0		
-			local fuelUsed  = ratio * power * dt * mrGearboxMogli.fuelFactor
-			if fuelUsed > 0 then
-				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
-				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
-			end
-		end
-	end
-	
---**********************************************************************************************************			
--- area per second calculation for combines 
---**********************************************************************************************************			
-	if self.mrGbML.strawDisableTime ~= nil and self.mrGbML.strawDisableTime > g_currentMission.time then 
-		local timeUntilDisable = self.mrGbML.strawDisableTime - g_currentMission.time
-		local numToDrop
-		
-		numToDrop = math.min((dt*self.mrGbML.currentCuttersArea)/timeUntilDisable, self.mrGbML.currentCuttersArea)
-		self.mrGbML.currentCuttersArea  = self.mrGbML.currentCuttersArea - numToDrop
-		self.mrGbML.cutterAreaPerSecond = numToDrop * 1000 / dt
-
-		numToDrop = math.min((dt*self.mrGbML.currentRealArea)/timeUntilDisable, self.mrGbML.currentRealArea)
-		self.mrGbML.currentRealArea  = self.mrGbML.currentRealArea - numToDrop		
-    self.mrGbML.realAreaPerSecond   = numToDrop * 1000 / dt
-	else
-		self.mrGbML.cutterAreaPerSecond = 0
-    self.mrGbML.realAreaPerSecond   = 0
 	end
 
 	if      self.steeringEnabled 
@@ -2430,8 +2436,8 @@ function mrGearboxMogli:updateTick(dt)
 
 	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbML.motor == nil then
 		return
-	end
-
+	end	
+	
 	if self.isActive then
 		if self.isServer then
 			if not ( self.mrGbMS.IsOnOff ) then
@@ -2499,11 +2505,13 @@ function mrGearboxMogli:updateTick(dt)
 					self:mrGbMSetAutoClutch( true ) 
 				end
 			end 	
+		end
 		
-			if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then	
-				self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
+		if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then	
+			self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
 					
-				if self.mrGbML.lastSumDt > 333 then
+			if self.mrGbML.lastSumDt > 333 then
+				if self.isServer then
 					if self.isMotorStarted then
 						if self.motor.targetRpm     ~= nil then
 							self.mrGbMD.Rpm    = tonumber( Utils.clamp( math.floor( 255*(self.motor.targetRpm-self.mrGbMS.OrigMinRpm)/(self.mrGbMS.OrigMaxRpm-self.mrGbMS.OrigMinRpm)+0.5), 0, 255 ))	 				
@@ -2539,19 +2547,6 @@ function mrGearboxMogli:updateTick(dt)
 						self.mrGbMD.Speed = 0
 					end
 					
-					if self.mrGbML.lastFuelFillLevel == nil then
-						self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-						self.mrGbMD.Fuel              = 0
-					else
-						local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
-						self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-						if self.isFuelFilling then
-							fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
-						end
-						local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
-						self.mrGbMD.Fuel              = self.mrGbMD.Fuel + mrGearboxMogli.smoothFuelUsage * ( fuelUsageRatio - self.mrGbMD.Fuel )
-					end
-									
 					if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
 							or self.mrGbMD.lastLoad   ~= self.mrGbMD.Load   
 							or self.mrGbMD.lastSpeed  ~= self.mrGbMD.Speed 
@@ -2570,13 +2565,26 @@ function mrGearboxMogli:updateTick(dt)
 						self.mrGbMD.lastRate   = self.mrGbMD.Rate
 						self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
 					end 
-					
-					self.mrGbML.lastSumDt = 0
+				end
+				
+				if self.mrGbML.lastFuelFillLevel == nil then
+					self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+					self.mrGbMD.Fuel              = 0
+				else
+					local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
+					self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+					if self.isFuelFilling then
+						fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
+					end
+					local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
+					self.mrGbMD.Fuel              = self.mrGbMD.Fuel + mrGearboxMogli.smoothFuelUsage * ( fuelUsageRatio - self.mrGbMD.Fuel )
 				end 
-			else
-				self.mrGbML.lastSumDt         = 0
-				self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-			end
+				
+				self.mrGbML.lastSumDt = 0
+			end 
+		else
+			self.mrGbML.lastSumDt         = 0
+			self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
 		end
 	end	
 end 

@@ -4349,6 +4349,58 @@
 	</vehicle>	
 	
 	<vehicle>
+		<!-- http://www.modhoster.de/mods/claas-lexion-480%2D%2D4 -->
+		<configFile modName="ClaasLexion480" xmlName="claasLexion480.xml"/>
+		
+		<!-- http://www.claas-group.com/blueprint/servlet/blob/153496/8616156993dc3a08d17d79bddf39aa57/prospekt-lexion-480-data.pdf -->
+		<!-- http://www.konedata.net/claas_lexion440.htm -->
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="26.5" maxBackwardSpeed="26.5" enableAI="true" maxAIGear="2">
+			<combine defaultWidth="9.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+      <hydrostatic>
+        <efficiency ratio="0.022642" factor="0.68"/> <!-- 0.05 .. 0.5 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.47 .. 15.5 -->
+        <efficiency ratio="0.833333" factor="0.93"/> <!-- 1.84 .. 19.3 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.21 .. 23.2 -->
+        <efficiency ratio="1.166667" factor="0.93"/> <!-- 2.58 .. 27.1 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 2.94 .. 30.9 -->
+      </hydrostatic>
+      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="3">
+        <gear speed="5.8" name="slow"/> <!-- 0.05 1.47 4 8-->
+        <gear speed="11.59" name="1/2"/> <!-- 0.1 2.94 8 15-->
+        <gear speed="23.19" name="street"/> <!-- 0.2 5.89 15 31-->
+      </gears>
+			<reverse ratio="1" shiftTimeMs="0" />
+		
+			<!-- CAT C12 engine in lexion 480 evo -->
+			<realEngine idleRpm="1000" ratedRpm="2200">
+        <!-- 1800: 437(437) | 2100: 412(412) | 1200..1200: 2100(2100) | 83 | 0.7 | 220 | 2.3 | 2200 | 1200: 215 -->
+        <torque rpm="100" motorTorque="325" fuelUsageRatio="343.5"/>
+        <torque rpm="400" motorTorque="669" fuelUsageRatio="283"/>
+        <torque rpm="700" motorTorque="1230" fuelUsageRatio="241.5"/>
+        <torque rpm="800" motorTorque="1494" fuelUsageRatio="232"/>
+        <torque rpm="900" motorTorque="1743" fuelUsageRatio="224.6"/>
+        <torque rpm="1000" motorTorque="1941" fuelUsageRatio="219.2"/>
+        <torque rpm="1100" motorTorque="2060" fuelUsageRatio="216.1"/>
+        <torque rpm="1200" motorTorque="2100" fuelUsageRatio="215"/>
+        <torque rpm="1300" motorTorque="2051" fuelUsageRatio="215.3"/>
+        <torque rpm="1400" motorTorque="1995" fuelUsageRatio="216.2"/>
+        <torque rpm="1500" motorTorque="1932" fuelUsageRatio="217.7"/>
+        <torque rpm="1600" motorTorque="1863" fuelUsageRatio="219.7"/>
+        <torque rpm="1700" motorTorque="1787" fuelUsageRatio="222.4"/>
+        <torque rpm="1800" motorTorque="1705" fuelUsageRatio="225.6"/>
+        <torque rpm="1900" motorTorque="1605" fuelUsageRatio="229.5"/>
+        <torque rpm="2000" motorTorque="1495" fuelUsageRatio="233.9"/>
+        <torque rpm="2100" motorTorque="1378" fuelUsageRatio="238.9"/>
+        <torque rpm="2200" motorTorque="1153" fuelUsageRatio="272.2"/>
+        <torque rpm="2300" motorTorque="271" fuelUsageRatio="427.1"/>
+        <torque rpm="2400" motorTorque="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>	
+	
+	<vehicle>
 		<configFile modName="ClassDominator" xmlName="dominator.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" torqueConverter="true">
