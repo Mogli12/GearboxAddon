@@ -107,8 +107,8 @@ mrGearboxMogliGlobals.stallWarningTime      = 100
 mrGearboxMogliGlobals.stallMotorOffTime     = 1000
 mrGearboxMogliGlobals.realFuelUsage         = true
 mrGearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
-mrGearboxMogliGlobals.smoothTargetFast      = 0.05 --0.05
-mrGearboxMogliGlobals.smoothTargetSlow      = 0.01 --0.025
+mrGearboxMogliGlobals.smoothTargetFast      = 0.02  --0.05
+mrGearboxMogliGlobals.smoothTargetSlow      = 0.005 --0.01
 mrGearboxMogliGlobals.ddsDirectory          = "dds/"
 mrGearboxMogliGlobals.initMotorOnLoad       = true
 mrGearboxMogliGlobals.ptoSpeedLimit         = true
@@ -507,7 +507,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 				ecoTorque = ecoTorque / self.mrGbMS.TransmissionEfficiency
 			end
 		end		
-		if ecoTorque ~= nil then
+		if      ecoTorque ~= nil
+				and ( ecoTorque > 0 or self.mrGbMS.Engine.ecoTorqueValues ~= nil ) then
 			ecoTorque = ecoTorque * torqueF 
 			
 			if self.mrGbMS.Engine.ecoTorqueValues == nil then
@@ -517,7 +518,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 		
 		local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio");
-		if fuelUsageRatio ~= nil then
+		if      fuelUsageRatio ~= nil
+				and ( fuelUsageRatio > 0 or self.mrGbMS.Engine.fuelUsageValues ~= nil ) then
 			if self.mrGbMS.Engine.fuelUsageValues == nil then
 				self.mrGbMS.Engine.fuelUsageValues = {}
 			end
@@ -956,6 +958,13 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 		
 		if speed==nil then
+			local maxRatio = getXMLFloat(xmlFile, baseName .. "#maxForwardSpeedRatio") 
+			if maxRatio ~= nil then
+				speed = 3.6 * maxRatio * self.motor.maxForwardSpeed / self.mrGbMS.GlobalRatioFactor
+			end
+		end
+		
+		if speed==nil then
 			break 
 		end 
 		i = i + 1 
@@ -1176,6 +1185,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 	self.mrGbMS.AutoShiftUpRpm     = getXMLFloat(xmlFile, xmlString .. ".gears#autoUpRpm") 
 	self.mrGbMS.AutoShiftDownRpm   = getXMLFloat(xmlFile, xmlString .. ".gears#autoDownRpm") 
+	self.mrGbMS.AutoShiftRpmReduction = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".gears#autoRpmReduction"), (1-mrGearboxMogli.rpmReduction) * self.mrGbMS.RatedRpm )
 	self.mrGbMS.AutoShiftGears     = false
 	self.mrGbMS.AutoShiftHl        = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#automatic"), false )
 	self.mrGbMS.AutoShiftGears     = getXMLBool(xmlFile, xmlString .. ".gears#automatic")
@@ -6087,6 +6097,24 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							end
 						end
 						
+						if isValidEntry then
+							if minSpeed == nil then
+								iMin = i
+								iMax = i
+								minSpeed = spd
+								maxSpeed = spd
+							else
+								if spd < minSpeed then
+									iMin = i
+									minSpeed = spd
+								end
+								if spd > maxSpeed then
+									iMax = i
+									maxSpeed = spd
+								end
+							end
+						end
+						
 						if self.hydroEff == nil then
 							if     rpm > self.maxAllowedRpm then
 								tooSmall     = true
@@ -6106,23 +6134,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						end
 																	
 						if isValidEntry then
-
-							if minSpeed == nil then
-								iMin = i
-								iMax = i
-								minSpeed = spd
-								maxSpeed = spd
-							else
-								if spd < minSpeed then
-									iMin = i
-									minSpeed = spd
-								end
-								if spd > maxSpeed then
-									iMax = i
-									maxSpeed = spd
-								end
-							end
-														
 							local loRpm = lowRpm 
 							if spd >= self.vehicle.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
 								loRpm = downRpm 
@@ -6151,7 +6162,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 									drueckung = math.max( minRpmReduced       - mrGearboxMogli.autoShiftPtoDiff, self.stallRpm )
 									shiftRpm  = math.min( self.minRequiredRpm + mrGearboxMogli.autoShiftPtoDiff, self.ratedRpm )
 								else
-									drueckung = Utils.clamp( self.targetRpm - (1-mrGearboxMogli.rpmReduction) * self.ratedRpm, self.stallRpm, self.ratedRpm )
+									drueckung = Utils.clamp( self.targetRpm - self.vehicle.mrGbMS.AutoShiftRpmReduction, self.stallRpm, self.ratedRpm )
 									shiftRpm  = Utils.clamp( self.targetRpm, self.stallRpm, self.ratedRpm )
 								end
 								
