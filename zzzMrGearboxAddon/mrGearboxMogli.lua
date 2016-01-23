@@ -4503,7 +4503,7 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
 	end
 	
-	if self.isReverseDriving  then
+	if self.steeringEnabled and self.isReverseDriving  then
 		acc = -acc
 	end
 	
