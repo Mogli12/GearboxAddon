@@ -2,9 +2,10 @@
 <vehicles>
 
 	<vehicle>
-		<configFile modName="FS15_kirovetsK700A" xmlName="kirovets/KirovetsK700A.xml">
+		<mod name="FS15_kirovetsK700A">
 			<link href="http://farming-simulator.com/mod.php?lang=de&amp;mod_id=11689&amp;title=fs2015" />
-		</configFile>
+			<xmlFile name="kirovets/KirovetsK700A.xml" />
+		</mod>
 
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Kirovets_K-700A -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/kirovets701m.pdf -->
@@ -51,9 +52,11 @@
 	</vehicle>
 
 	<vehicle>
-		<configFile modName="RABA" xmlName="RABA.xml"/>
-		<configFile modName="RABA" xmlName="RABADUPLAKEREK.xml"/>
-
+		<mod name="RABA">
+			<xmlFile name="RABA.xml"/>
+			<xmlFile name="RABADUPLAKEREK.xml"/>
+		</mod>
+		
 		<!-- http://mezogeparchivum.hu/Madat/tra_raba250.htm -->
 		<gearboxMogli autoStartStop="false" speedLimiter="false">
 			<gears defaultGear="3" shiftTimeMs="1000">
@@ -97,13 +100,17 @@
 	</vehicle>	
 	
 	<vehicle>
-		<configFile modName="Schlueter2500VL" isPrefix="true" xmlName="schlueter2500VL.xml">
+		<mod name="Schlueter2500VL" isPrefix="true">
 			<link href="http://www.modhoster.de/mods/2500vl" />
 			<link href="http://www.modhoster.de/mods/2500vl--2" />
 			<link href="http://www.modhoster.de/mods/2500vl--3" />
-		</configFile> 
-		<configFile modName="ProfiTrac2500VLFH" xmlName="ProfiTrac2500VLFH.xml" isPrefix="true"/>
-		<configFile modName="ProfiTrac2500VL" xmlName="ProfiTrac2500VL.xml" isPrefix="true"/>
+			
+			<xmlFile name="schlueter2500VL.xml" />
+		</mod> 
+		<mod name="ProfiTrac2500VL" isPrefix="true">
+			<xmlFile name="ProfiTrac2500VLFH.xml" />
+			<xmlFile name="ProfiTrac2500VL.xml" />
+		</mod>
 		
 		<gearboxMogli autoStartStop="false" clutchOpenRpm="1100" clutchCloseRpm="1300" torqueConverter="true">
 
@@ -152,58 +159,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="Schlueter1500TVL" xmlName="schlueter1500tvl.xml">
-			<link href="http://www.modhoster.de/mods/schluter-1500-tvl--8" />
-		</configFile>
-		
-		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
-			<realEngine idleRpm="800" ratedRpm="2000">
-				<torque rpm="0" motorTorque="0"/>
-				<torque rpm="800" motorTorque="508"/>
-				<torque rpm="900" motorTorque="556"/>
-				<torque rpm="1000" motorTorque="591"/>
-				<torque rpm="1100" motorTorque="611"/>
-				<torque rpm="1200" motorTorque="618"/>
-				<torque rpm="1300" motorTorque="618"/>
-				<torque rpm="1400" motorTorque="617"/>
-				<torque rpm="1500" motorTorque="613"/>
-				<torque rpm="1600" motorTorque="608"/>
-				<torque rpm="1700" motorTorque="600"/>
-				<torque rpm="1800" motorTorque="589"/>
-				<torque rpm="1900" motorTorque="577"/>
-				<torque rpm="2000" motorTorque="562"/>
-				<torque rpm="2100" motorTorque="527"/>
-				<torque rpm="2200" motorTorque="421"/>
-				<torque rpm="2300" motorTorque="246"/>
-				<torque rpm="2400" motorTorque="0"/>
-			</realEngine>
-		
-			<gears defaultGear="1">	
-				<gear speed="9.7" />
-				<gear speed="11.9" />
-				<gear speed="15.0" />
-				<gear speed="18.6" />
-				<gear speed="24.3" />
-				<gear speed="30.0" />
-			</gears>
-			
-			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">	
-				<range ratio="1"    name="L"/>
-				<range ratio="1.66" name="H"/>
-			</ranges>
-
-			<ranges defaultRange="2" reverseReset="true" shiftTimeMs="1200" doubleClutch="true">	
-				<range ratio="0.263" forwardOnly="true" name="Z"/>
-				<range ratio="1"     forwardOnly="true" name="N"/>
-				<range ratio="0.78"  reverseOnly="true" name="R"/>
-			</ranges>
-		</gearboxMogli>	
-
-	</vehicle>
-	
-	<vehicle>
-		<link href="http://www.modhoster.de/mods/schluter-super-1500v-8-zyl-mit-verdeck" />
-		<configFile modName="Schlueter_Super_1500V" isPrefix="true" xmlName="Schlueter_Super_1500_V.xml"/>
+		<mod name="Schlueter_Super_1500V" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/schluter-super-1500v-8-zyl-mit-verdeck" />
+			<xmlFile name="Schlueter_Super_1500_V.xml"/>
+		</mod>
 		
 		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -245,10 +204,12 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-6810--7" />
-		<configFile modName="MB3D_JohnDeere6810" xmlName="JohnDeere6810FH.xml" />
-		<configFile modName="MB3D_JohnDeere6810" xmlName="JohnDeere6810FL.xml" />
-
+		<mod name="MB3D_JohnDeere6810">
+			<link href="http://www.modhoster.de/mods/john-deere-6810--7" />
+			<xmlFile name="JohnDeere6810FH.xml" />
+			<xmlFile name="JohnDeere6810FL.xml" />
+		</mod>
+		
 		<!-- http://manuals.deere.com/omview/OMAL152891_29/?tM= -->
 		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200" speedLimiter="false">
 
@@ -277,10 +238,12 @@
 	</vehicle>
 
 	<vehicle>
-		<!-- http://ls-portal.eu/john-deere-6115m-pack/ -->
-		<configFile modName="FS15_JD6115M_FH" xmlName="JD6115M_FH.xml" />
-		<configFile modName="FS15_JD6115M_Weight" xmlName="JD6115M.xml" />
-
+		<mod name="FS15_JD6115M_" isPrefix="true">
+			<link href="http://ls-portal.eu/john-deere-6115m-pack/" />
+			<xmlFile name="JD6115M_FH.xml" />
+			<xmlFile name="JD6115M.xml" />
+		</mod>
+		
 		<!-- http://manuals.deere.com/omview/OMAL213126_19/?tM= -->
 		<gearboxMogli>
 
@@ -331,9 +294,13 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-6210r--3" />
-		<configFile modName="FS15_JohnDeere6210R" xmlName="JohnDeere6210R.xml" />
-		<configFile modName="FBM_JohnDeere6210R" isPrefix="true" xmlName="JohnDeere6210R.xml" />
+		<mod name="FS15_JohnDeere6210R">
+			<link href="http://www.modhoster.de/mods/john-deere-6210r--3" />
+			<xmlFile name="JohnDeere6210R.xml" />
+		</mod>
+		<mod name="FBM_JohnDeere6210R" isPrefix="true">
+			<xmlFile name="JohnDeere6210R.xml" />
+		</mod>
 
 		<!-- http://www.dlg-test.de/tests/1212_JohnDeere_6210R.pdf -->
 		<!-- http://manuals.deere.com/omview/OMETN78900_19/?tM= -->
@@ -385,10 +352,13 @@
 
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/deutz/deutzAgroStar661.xml"/>
-		<link href="http://www.modhoster.de/mods/deutz-agrostar-6-31-6-61" />
-		<configFile modName="deutzAgroStar631and661" isPrefix="true" xmlName="deutzAgroStar661.xml"/>
-		
-		<configFile modName="LS15DeutzAgroStarReihe_PumaFBM" xmlName="deutzAgroStar661.xml"/>
+		<mod name="deutzAgroStar631and661" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-agrostar-6-31-6-61" />
+			<xmlFile name="deutzAgroStar661.xml"/>
+		</mod>
+		<mod name="LS15DeutzAgroStarReihe_PumaFBM">
+			<xmlFile name="deutzAgroStar661.xml"/>
+		</mod>
 
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
 		<gearboxMogli autoStartStop="false">
@@ -437,8 +407,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/deutz-agrostar-6-31-6-61" />
-		<configFile modName="deutzAgroStar631and661" isPrefix="true" xmlName="deutzAgroStar631.xml"/>
+		<mod name="deutzAgroStar631and661" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-agrostar-6-31-6-61" />
+			<xmlFile name="deutzAgroStar631.xml"/>
+		</mod>
 
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
 		<gearboxMogli autoStartStop="false">
@@ -483,8 +455,9 @@
 	</vehicle>
 
 	<vehicle>
-		<!--  -->
-		<configFile modName="LS15DeutzAgroStarReihe_PumaFBM" xmlName="deutzAgroStar681.xml"/>
+		<mod name="LS15DeutzAgroStarReihe_PumaFBM">
+			<xmlFile name="deutzAgroStar681.xml"/>
+		</mod>
 
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
 		<gearboxMogli autoStartStop="true" soundMaxRpm="1900">
@@ -536,8 +509,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/deutz-agroallis-6-93" />
-		<configFile modName="DeutzAgroAllis6_93" xmlName="deutzAgroAllis6.39.xml"/>
+		<mod name="DeutzAgroAllis6_93">
+			<link href="http://www.modhoster.de/mods/deutz-agroallis-6-93" />
+			<xmlFile name="deutzAgroAllis6.39.xml"/>
+		</mod>
 
 		<gearboxMogli autoStartStop="true">
 			<realEngine idleRpm="1000" ratedRpm="2350" >
@@ -588,8 +563,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<!-- http://schwabenmodding.bplaced.net/viewtopic.php?f=168&t=3557 -->
-		<configFile modName="DeutzD13006" xmlName="DeutzD06.xml"/>
+		<mod name="DeutzD13006">
+			<!-- http://schwabenmodding.bplaced.net/viewtopic.php?f=168&t=3557 -->
+			<xmlFile name="DeutzD06.xml"/>
+		</mod>
 		
 		<!-- http://www.deutz-traktoren.de/prospekte/d13006-prospekt.pdf -->
 		<gearboxMogli autoStartStop="false">
@@ -647,9 +624,13 @@
 
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/huerlimann/huerlimannH488.xml"/>
-		<configFile modName="Eicher_2090" xmlName="Eicher_2090.xml"/>
-		<!-- http://www.modhoster.de/mods/eicher-2090-turbo  -->
-		<configFile modName="ST_Eicher_2090S" xmlName="Eicher_2090.xml"/>
+		<mod name="Eicher_2090">
+			<xmlFile name="Eicher_2090.xml"/>
+		</mod>	
+		<mod name="ST_Eicher_2090S">
+			<link href="http://www.modhoster.de/mods/eicher-2090-turbo"/>
+			<xmlFile name="Eicher_2090.xml"/>
+		</mod>
 		
 		<gearboxMogli autoStartStop="false">
 			<blowOffVentilSound volume="0"/>
@@ -758,13 +739,16 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/same-fortis-190--2" />
-		<configFile modName="Same_Fortis_190_FL" xmlName="sameFortis190.xml" />
-		<link href="http://www.modhoster.de/mods/same-fortis-190-mit-wechselbare-pflegebereifung" />
-		<configFile modName="SameFortis190" isPrefix="true" xmlName="sameFortis190.xml" />
-				
 		<configFile xmlName="data/vehicles/steerable/same/sameFortis190.xml" />
-		
+		<mod name="Same_Fortis_190_FL">
+			<link href="http://www.modhoster.de/mods/same-fortis-190--2" />
+			<xmlFile name="sameFortis190.xml" />
+		</mod>
+		<mod name="SameFortis190" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/same-fortis-190-mit-wechselbare-pflegebereifung" />
+			<xmlFile name="sameFortis190.xml" />
+		</mod>
+						
 		<gearboxMogli   swapGearRangeKeys="true">
 			<realEngine idleRpm="800" ratedRpm="2100" >
 				<torque rpm="0" motorTorque="0"/>
@@ -807,10 +791,12 @@
 	</vehicle>
 	
 	<vehicle>
-		<!-- ??? -->
-		<configFile modName="DeutzFahr120MK3" xmlName="DeutzFahr120MK3.xml" />
-		<!-- https://www.facebook.com/ModdinggemeinschaftLs13 / http://uploaded.net/file/e9vdghz1 -->
-		<configFile modName="DeutzFahr120MK3" isPrefix="true" xmlName="DeutzMK3.xml"/>
+		<mod name="DeutzFahr120MK3" isPrefix="true"> 
+			<link href="https://www.facebook.com/ModdinggemeinschaftLs13" />
+			<link href="http://uploaded.net/file/e9vdghz1" />
+			<xmlFile name="DeutzMK3.xml"/>
+			<xmlFile name="DeutzFahr120MK3.xml" />
+		</mod>
 		
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-agrotron120mk3.pdf -->
 		<gearboxMogli swapGearRangeKeys="true">
@@ -994,9 +980,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="FordF250XLT" xmlName="FordF250.xml">
+		<mod name="FordF250XLT">
 			<link href="http://ls-portal.eu/ford-f250xlt-1985-diesel-4x4/"/>
-		</configFile>
+			<xmlFile name="FordF250.xml"/>
+		</mod>
 		
 		<!-- https://en.wikipedia.org/wiki/Ford_F-Series_seventh_generation -->
 		<gearboxMogli speedLimiter="false">
@@ -1047,14 +1034,17 @@
 	
 	
 	<vehicle>
-		<configFile xmlName="data/vehicles/steerable/man/man22S.xml"/>
-		
-		<link href="http://www.modhoster.de/mods/man-tgs-18440-kipper--2" />
-		<configFile modName="Vehicles_LKW_MAN_TGS_18440_Kipper_v2_LS15" xmlName="man22S.xml"/>
-		<link href="http://www.modhoster.de/mods/man-agrar-3er-pack" />
-		<configFile modName="MAN_Agrar" isPrefix="true" xmlName="man221.xml"/>
-		<configFile modName="MAN_Agrar" isPrefix="true" xmlName="man221M.xml"/>
-		<configFile modName="MAN_Agrar" isPrefix="true" xmlName="man222.xml"/>
+		<configFile xmlName="data/vehicles/steerable/man/man22S.xml"/>		
+		<mod name="Vehicles_LKW_MAN_TGS_18440" isPrefix="true"> 
+			<link href="http://www.modhoster.de/mods/man-tgs-18440-kipper--2" />
+			<xmlFile name="man22S.xml"/>
+		</mod>		
+		<mod name="MAN_Agrar" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/man-agrar-3er-pack" />
+			<xmlFile name="man221.xml"/>
+			<xmlFile name="man221M.xml"/>
+			<xmlFile name="man222.xml"/>
+		</mod>
 		
 		<!-- http://www.eurotransport.de/test/1/9/5/1/3/8/6/Technische_Daten_und_Messwerte.pdf -->
 		<gearboxMogli  maxForwardSpeed="90" maxBackwardSpeed="16">
@@ -1096,9 +1086,11 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/man-agrar-3er-pack" />
-		<configFile modName="MAN_Agrar" isPrefix="true" xmlName="man224.xml"/>
-		<configFile modName="MAN_Agrar" isPrefix="true" xmlName="man224M.xml"/>
+		<mod name="MAN_Agrar" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/man-agrar-3er-pack" />
+			<xmlFile name="man224.xml"/>
+			<xmlFile name="man224M.xml"/>
+		</mod>
 		
 		<gearboxMogli  maxForwardSpeed="90" maxBackwardSpeed="16">
 			<realEngine idleRpm="930" ratedRpm="1900">
@@ -1140,9 +1132,11 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/mercedes-zetros-sattelzug" />
-		<configFile modName="Mercedes_Zetros_by_Werkstattleiter" isPrefix="true" xmlName="Zetros_Sattel.xml"/>
-		<configFile modName="Mercedes_Zetros_by_Werkstattleiter" isPrefix="true" xmlName="Zetros_Sattel_Agrar.xml"/>
+		<mod name="Mercedes_Zetros_by_Werkstattleiter" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/mercedes-zetros-sattelzug" />
+			<xmlFile name="Zetros_Sattel.xml"/>
+			<xmlFile name="Zetros_Sattel_Agrar.xml"/>
+		</mod>
 		
 		<gearboxMogli   ratedRpm="2100" maxForwardSpeed="90" maxBackwardSpeed="16">
 			<gears clutchRatio="0.7" defaultGear="1" reverseReset="true" automatic="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
@@ -1165,9 +1159,13 @@
 	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/scania-r730-streamline" />
-		<configFile modName="Scania_R730" isPrefix="true" xmlName="scaniaR730.xml"/>
-		<configFile modName="scaniaR730" isPrefix="true" xmlName="scaniaR730.xml"/>
+		<mod name="Scania_R730" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/scania-r730-streamline" />
+			<xmlFile name="scaniaR730.xml"/>
+		</mod>
+		<mod name="scaniaR730" isPrefix="true">
+			<xmlFile name="scaniaR730.xml"/>
+		</mod>
 		
 		<gearboxMogli maxForwardSpeed="90">
 			<gears axleSpeed="3.57" tireWidth="315" tireRatio="80" rimDiameter="22.5" defaultGear="7" automatic="true">
@@ -1214,11 +1212,13 @@
 	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/unimog-u400-wb" />
-		<!-- http://www.mercedes-benz.de/content/media_library/hq/hq_mpc_reference_site/unimog/System_Unimog/Applications/brochures/unimog_systemunimog_applications_basicbrochure_u300-u500_01_2400_de_DE_05-2007_pdf.object-Single-MEDIA.download.tmp/Users/han/Desktop/broschuren_de/unimog_brochures_ugn_basic_de.pdf -->
-		<configFile modName="Unimog_U400_WB" xmlName="U400_WB.xml"/>
-		<configFile modName="Unimog_U400_WB" xmlName="U400_WB_street.xml"/>
+		<mod name="Unimog_U400_WB">
+			<link href="http://www.modhoster.de/mods/unimog-u400-wb" />
+			<xmlFile name="U400_WB.xml"/>
+			<xmlFile name="U400_WB_street.xml"/>
+		</mod>
 		
+		<!-- http://www.mercedes-benz.de/content/media_library/hq/hq_mpc_reference_site/unimog/System_Unimog/Applications/brochures/unimog_systemunimog_applications_basicbrochure_u300-u500_01_2400_de_DE_05-2007_pdf.object-Single-MEDIA.download.tmp/Users/han/Desktop/broschuren_de/unimog_brochures_ugn_basic_de.pdf -->
 		<gearboxMogli   ratedRpm="2100">
 			<gears shiftTimeMs="500" clutchRatio="0.7" defaultGear="1" automatic="true" reverseReset="false">	
 				<gear speed="6.98"/>
@@ -1242,7 +1242,9 @@
 	</vehicle>
 		
 	<vehicle>
-		<configFile modName="MBtrac1600" isPrefix="true" xmlName="xml/MBTrac1600.xml"/>
+		<mod name="MBtrac1600" isPrefix="true">
+			<xmlFile name="xml/MBTrac1600.xml"/>
+		</mod>
 
 		<gearboxMogli soundMaxRpm="2000" speedLimiter="false" autoStartStop="false">
 
@@ -1295,10 +1297,14 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800.xml"/>
-		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800fl.xml"/>
-		<configFile modName="LS15_MBTrac1800Intercooler" xmlName="MBTrac1800hl.xml"/>
-		<configFile modName="MBtrac1800" isPrefix="true" xmlName="xml/MBTrac1800.xml"/>
+		<mod name="LS15_MBTrac1800Intercooler">
+			<xmlFile name="MBTrac1800.xml"/>
+			<xmlFile name="MBTrac1800fl.xml"/>
+			<xmlFile name="MBTrac1800hl.xml"/>
+		</mod>
+		<mod name="MBtrac1800" isPrefix="true">
+			<xmlFile name="xml/MBTrac1800.xml"/>
+		</mod>
 
 		<gearboxMogli soundMaxRpm="1200" speedLimiter="false" autoStartStop="false">
 
@@ -1353,10 +1359,14 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/volkswagen-transporter-t2b-pritsche-plane-1972" />
-		<configFile modName="VWTransporter1972" xmlName="vwt2bpritsche.xml"/>
-		<link href="http://www.modhoster.de/mods/volkswagen-kaefer-1966" />
-		<configFile modName="VWKaefer1966" xmlName="kaefer66.xml"/>
+		<mod name="VWTransporter1972">
+			<link href="http://www.modhoster.de/mods/volkswagen-transporter-t2b-pritsche-plane-1972" />
+			<xmlFile name="vwt2bpritsche.xml"/>
+		</mod>
+		<mod name="VWKaefer1966">
+			<link href="http://www.modhoster.de/mods/volkswagen-kaefer-1966" />
+			<xmlFile name="kaefer66.xml"/>
+		</mod>
 		
 		<gearboxMogli>
 			<blowOffVentilSound volume="0"/>
@@ -1405,8 +1415,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/mercedes-benz-200d-1973" />
-		<configFile modName="Benzw115" xmlName="benzw115.xml"/>
+		<mod name="Benzw115">
+			<link href="http://www.modhoster.de/mods/mercedes-benz-200d-1973" />
+			<xmlFile name="benzw115.xml"/>
+		</mod>
 		
 		<gearboxMogli>
 			<blowOffVentilSound volume="0"/>
@@ -1452,7 +1464,9 @@
 
 	<vehicle>
 		<link href="http://www.modhoster.de/mods/chevrolet-c-10-fleetside-lwb-1966" />
-		<configFile modName="ChevroletC101966" xmlName="ChevroletC101966.xml"/>
+		<mod name="ChevroletC101966">
+			<xmlFile name="ChevroletC101966.xml"/>
+		</mod>
 		
 		<gearboxMogli  clutchOpenRpm="1300" clutchCloseRpm="1800" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
@@ -1468,9 +1482,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/schluter-tvl-1250-compact" />
-		<configFile modName="ST_Schlueter_TVL1250" isPrefix="true" xmlName="Schlueter_TVL1250_Compact.xml"/>
-		<configFile modName="ST_Schlueter_TVL1250" isPrefix="true" xmlName="Schlueter_TVL1250_Compact.xml"/>
+		<mod name="ST_Schlueter_TVL1250" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/schluter-tvl-1250-compact" />
+			<xmlFile name="Schlueter_TVL1250_Compact.xml"/>
+		</mod>
 
 		<gearboxMogli autoStartStop="false"  clutchShiftingTimeMs="600" clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="2000">
@@ -1519,8 +1534,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/same-argon-3-75--2" />
-		<configFile modName="LS2015_Same_Argon3_75"   xmlName="sameArgon3-75.xml"/>
+		<mod name="LS2015_Same_Argon3_75">
+			<link href="http://www.modhoster.de/mods/same-argon-3-75--2" />
+			<xmlFile name="sameArgon3-75.xml"/>
+		</mod>
 		
 		<gearboxMogli  >
 			<realEngine idleRpm="900" ratedRpm="2250">
@@ -1562,11 +1579,14 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/ihc-1455a" />
-		<configFile modName="IHC_1455_FH" xmlName="IHC_1455A.xml" />
-		<configFile modName="IHC_1455" xmlName="IHC_1455A.xml" />
-		<link href="http://www.modhoster.de/mods/case-ih-1455--2" />
-		<configFile modName="Case_1455xl_FS15_ModSchuppen" xmlName="1455xl.xml" />
+		<mod name="IHC_1455" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/ihc-1455a" />
+			<xmlFile name="IHC_1455A.xml" />
+		</mod>
+		<mod name="Case_1455xl_FS15_ModSchuppen">
+			<link href="http://www.modhoster.de/mods/case-ih-1455--2" />
+			<xmlFile name="1455xl.xml" />
+		</mod>
 
 		<gearboxMogli autoStartStop="false">
 			<gears shiftTimeMs="800">	
@@ -1608,9 +1628,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/ihc-1455a" />
-		<configFile modName="IHC_1255_FH" xmlName="IHC_1255A.xml" />
-		<configFile modName="IHC_1255" xmlName="IHC_1255A.xml" />
+		<mod name="IHC_1255" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/ihc-1455a" />
+			<xmlFile name="IHC_1255A.xml" />
+		</mod>
 
 		<gearboxMogli autoStartStop="false">
 			<gears shiftTimeMs="800">	
@@ -1630,11 +1651,14 @@
 	</vehicle>
 
 	<vehicle>
-		<!-- http://www.kreters-island.de/node/90 and http://www.kreters-island.de/node/91 -->
-		<configFile modName="IHC_955" xmlName="IHC_955.xml" />
-		<configFile modName="IHC_955_FH" xmlName="IHC_955.xml" />
-		<configFile modName="IHC_955A" xmlName="IHC_955A.xml" />
-		<configFile modName="IHC_955A_FH" xmlName="IHC_955A.xml" />
+		<mod name="IHC_955" isPrefix="true">
+			<link href="http://www.kreters-island.de/node/91"/>
+			<xmlFile name="IHC_955.xml" />
+		</mod>
+		<mod name="IHC_955A" isPrefix="true">
+			<link href="http://www.kreters-island.de/node/90"/>
+			<xmlFile name="IHC_955A.xml" />
+		</mod>
 
 		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
 			<realEngine idleRpm="850" ratedRpm="2200">
@@ -1662,28 +1686,34 @@
         <torque rpm="2500" motorTorque="0" fuelUsageRatio="477.8"/>
 			</realEngine>
 		
+			<!-- http://www.ihace.de/01_schlepper/0955/955.htm -->
 			<gears shiftTimeMs="800">	
-				<gear speed="8.4"  name="1" />
-				<gear speed="12.5"  name="2" />
-				<gear speed="21.2"  name="3" />
-				<gear speed="31.2"  name="4" />
+				<gear speed="8.8"   name="1" />
+				<gear speed="12.0"  name="2" />
+				<gear speed="18.7"  name="3" />
+				<gear speed="28.3"  name="4" />
 			</gears>
-			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="1200">
-				<range ratio="0.2106" name="A+Z" />
-				<range ratio="0.2583" name="A" />
-				<range ratio="0.8155" name="S+Z" />
-				<range ratio="1.0000" name="S" />
+			<ranges defaultRange="2" doubleClutch="false" shiftTimeMs="1200">
+				<range ratio="0.8155" name="Z" />
+				<range ratio="1.0000" name="" />
 			</ranges>
-			<reverse ratio="0.3801" shiftTimeMs="1200" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<ranges defaultRange="3" doubleClutch="false" shiftTimeMs="1200" reverseReset="true">
+				<range ratio="0.2583" forwardOnly="true" name="A" />
+				<range ratio="0.3801" reverseOnly="true" name="R" />
+				<range ratio="1.0000" forwardOnly="true" name="S" />
+			</ranges>
 		</gearboxMogli>	
 	</vehicle>
 	
 	<vehicle>
-		<!-- http://www.kreters-island.de/node/88 and http://www.kreters-island.de/node/89 -->
-		<configFile modName="IHC_1055" xmlName="IHC_1055.xml" />
-		<configFile modName="IHC_1055_FH" xmlName="IHC_1055.xml" />
-		<configFile modName="IHC_1055A" xmlName="IHC_1055A.xml" />
-		<configFile modName="IHC_1055A_FH" xmlName="IHC_1055A.xml" />
+		<mod name="IHC_1055" isPrefix="true">
+			<link href="http://www.kreters-island.de/node/89"/>
+			<xmlFile name="IHC_1055.xml" />
+		</mod>
+		<mod name="IHC_1055A" isPrefix="true">
+			<link href="http://www.kreters-island.de/node/88"/> 
+			<xmlFile name="IHC_1055A.xml" />
+		</mod>
 
 		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
 			<realEngine idleRpm="850" ratedRpm="2200">
@@ -1711,28 +1741,36 @@
         <torque rpm="2500" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="488.9"/>
 			</realEngine>
 		
+			<!-- http://www.ihace.de/01_schlepper/1055/1055ger.jpg but with 30 km/h -->
 			<gears shiftTimeMs="800">	
 				<gear speed="8.4"  name="1" />
 				<gear speed="12.5"  name="2" />
 				<gear speed="21.2"  name="3" />
 				<gear speed="31.2"  name="4" />
 			</gears>
-			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="1200">
-				<range ratio="0.2106" name="A+Z" />
-				<range ratio="0.2583" name="A" />
-				<range ratio="0.8155" name="S+Z" />
-				<range ratio="1.0000" name="S" />
+			<ranges defaultRange="2" doubleClutch="false" shiftTimeMs="1200">
+				<range ratio="0.8155" name="Z" />
+				<range ratio="1.0000" name="" />
 			</ranges>
-			<reverse ratio="0.3801" shiftTimeMs="1200" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<ranges defaultRange="3" doubleClutch="false" shiftTimeMs="1200" reverseReset="true">
+				<range ratio="0.2583" forwardOnly="true" name="A" />
+				<range ratio="0.3801" reverseOnly="true" name="R" />
+				<range ratio="1.0000" forwardOnly="true" name="S" />
+			</ranges>
 		</gearboxMogli>	
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/fendt-farmer-310-lsa--6" />
-		<configFile modName="FendtFarmer310LSA" xmlName="fendt310LSA.xml"/>
-		<configFile modName="FendtFarmer300LSA" xmlName="fendt310LSA.xml"/>
-		<configFile modName="FendtFarmer300LSA" xmlName="fendt311LSA.xml"/>
-		<configFile modName="FendtFarmer300LSA" xmlName="fendt312LSA.xml"/>
+		<mod name="FendtFarmer310LSA">
+			<link href="http://www.modhoster.de/mods/fendt-farmer-310-lsa--6" />
+			<xmlFile name="fendt310LSA.xml"/>
+		</mod>
+		<mod name="FendtFarmer300LSA">
+			<link href="https://www.modhoster.de/mods/fendt-farmer-310-312-lsa-pack" />
+			<xmlFile name="fendt310LSA.xml"/>
+			<xmlFile name="fendt311LSA.xml"/>
+			<xmlFile name="fendt312LSA.xml"/>
+		</mod>
 		
 		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="5000" ptoRpm="1676">
 			<blowOffVentilSound volume="0"/>
@@ -1757,7 +1795,10 @@
 	</vehicle>	
 	
 	<vehicle>
-		<configFile modName="Fendt611" xmlName="Fendt611LSA.xml"/>
+		<mod name="Fendt611">
+			<xmlFile name="Fendt611LSA.xml"/>
+		</mod>
+		
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_611_LSA -->
 		<gearboxMogli autoStartStop="true" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="4000">
 			<gears defaultGear="4">	
@@ -1808,8 +1849,11 @@
 	</vehicle>	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/steyr-8080a-turbo-sk1" />
-		<configFile modName="Steyr8080aTurbo_SK1" xmlName="Steyr8080.xml"/>
+		<mod name="Steyr8080aTurbo_SK1">
+			<link href="http://www.modhoster.de/mods/steyr-8080a-turbo-sk1" />
+			<xmlFile name="Steyr8080.xml"/>
+		</mod>
+		
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/steyr-8080a.pdf -->
 		<gearboxMogli autoStartStop="false" shiftTimeMs="800">
 			<gears defaultGear="1">	
@@ -1835,9 +1879,11 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/CaseIHMagnum380CVX" /> 
-		<configFile modName="LS15_CaseIHMagnum380" xmlName="caseIHMagnum380.xml" isPrefix="true"/>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIHMagnum380.xml"/>
+		<mod name="LS15_CaseIHMagnum380" isPrefix="true">
+			<link href="http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/CaseIHMagnum380CVX" /> 
+			<xmlFile name="caseIHMagnum380.xml"/>
+		</mod>
 	
 		<!-- full powershift 19.4 with 50 km/h -->
 		<!-- http://www.caseiheurope.com/Media/490856a6-ee37-422f-bff2-0e5e02dd34f0/CaseIH_FlipViewer/de_de/MAGNUM_CVX/flipviewerxpress.html -->
@@ -1925,8 +1971,10 @@
 	</vehicle>
 	
 	<vehicle> 
-		<link href="http://www.modhoster.de/mods/case-ih-jxu-85-115" />
-		<configFile modName="CaseJXU85_115" xmlName="caseJXU85.xml"/>
+		<mod name="CaseJXU85_115">
+			<link href="http://www.modhoster.de/mods/case-ih-jxu-85-115" />
+			<xmlFile name="caseJXU85.xml"/>
+		</mod>
 		
 		<!-- http://www.caseih.com/de_de/Products/Traktoren/Documents/JXU/9C0009DOO.pdf -->
 		<gearboxMogli ptoRpm="1600">
@@ -1976,8 +2024,10 @@
 	</vehicle>
 	
 	<vehicle> 
-		<link href="http://www.modhoster.de/mods/case-ih-jxu-85-115" />
-		<configFile modName="CaseJXU85_115" xmlName="caseJXU115.xml"/>
+		<mod name="CaseJXU85_115"> 
+			<link href="http://www.modhoster.de/mods/case-ih-jxu-85-115" />
+			<xmlFile name="caseJXU115.xml"/>
+		</mod>
 		
 		<!-- http://www.caseih.com/de_de/Products/Traktoren/Documents/JXU/9C0009DOO.pdf -->
 		<gearboxMogli ptoRpm="1600">
@@ -2122,10 +2172,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/deutz-serie-5-ttv" />
-		<configFile modName="FS15_deutz5110TTV" isPrefix="true" xmlName="huerlimannXM4Ti.xml" />
-		<configFile modName="FS15_deutz5110TTV" isPrefix="true" xmlName="huerlimannXM4Ti.xml" />
-		<configFile modName="FS15_deutz5110TTV" isPrefix="true" xmlName="huerlimannXM4Ti.xml" />
+		<mod name="FS15_deutz5110TTV" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-serie-5-ttv" />
+			<xmlFile name="huerlimannXM4Ti.xml" />
+		</mod>
 
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<!-- http://www.lamborghini-tractors.com/de-DE/weinberg-und-obstplantage/download/2618_de209aea3647557f5cfe006c19b4b317 -->
@@ -2174,11 +2224,15 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://americaneaglesmodding.com/index.php?action=downloads;sa=view;down=1098" />
-		<configFile modName="peterbilt_379" xmlName="Peterbilt379Daycab.xml" isPrefix="true"/>
-		<configFile modName="peterbilt_379" xmlName="Peterbilt379Daycab_LOG.xml" isPrefix="true"/>
-		<link href="http://www.modhoster.de/mods/peterbilt-3782D2D2" />
-		<configFile modName="pete378" xmlName="Peterbilt378.xml" />
+		<mod name="peterbilt_379" isPrefix="true">
+			<link href="http://americaneaglesmodding.com/index.php?action=downloads;sa=view;down=1098" />
+			<xmlFile name="Peterbilt379Daycab.xml"/>
+			<xmlFile name="Peterbilt379Daycab_LOG.xml"/>
+		</mod>
+		<mod name="pete378">
+			<link href="http://www.modhoster.de/mods/peterbilt-3782D2D2" />
+			<xmlFile name="Peterbilt378.xml" />
+		</mod>
 
 		<gearboxMogli transmissionEfficiency="0.93" maxForwardSpeed="110" maxBackwardSpeed="30">
 			<!-- http://pdf.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
@@ -2221,8 +2275,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/peterbilt-387--5" />
-		<configFile modName="Peterbilt" isPrefix="true" xmlName="peter387.xml" />
+		<mod name="Peterbilt" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/peterbilt-387--5" />
+			<xmlFile name="peter387.xml" />
+		</mod>
 		
 		<!-- Cummins ISX 600 -->
 		<gearboxMogli speedLimiter="false">
@@ -2273,7 +2329,9 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="KrAZ_6130S4" xmlName="KrAZ6130S4.xml" />
+		<mod name="KrAZ_6130S4">
+			<xmlFile name="KrAZ6130S4.xml" />
+		</mod>
 		
 		<gearboxMogli>
 			<!-- MB Zetros transmission -->
@@ -2320,7 +2378,9 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="Fiat_126p" xmlName="Fiat_126p.xml" />
+		<mod name="Fiat_126p">
+			<xmlFile name="Fiat_126p.xml" />
+		</mod>
 		
 		<!-- http://www.fiat-126.org/Technik-luft.html#Fiat126-Lufti-1 -->
 		<gearboxMogli speedLimiter="false" clutchOpenRpm="1100" clutchCloseRpm="1500" torqueConverter="false" autoStartStop="false" revUpMs="1000">
@@ -2369,8 +2429,10 @@
 	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/audi-80-b3-1-8-s" />
-		<configFile modName="Audi_80_B3" xmlName="syncer.xml" />
+		<mod name="Audi_80_B3">
+			<link href="http://www.modhoster.de/mods/audi-80-b3-1-8-s" />
+			<xmlFile name="syncer.xml" />
+		</mod>
 		
 		<!-- https://de.wikipedia.org/wiki/Audi_80_B3 -->
 		<gearboxMogli speedLimiter="false" clutchCloseRpm="1500" torqueConverter="false" autoStartStop="false" revUpMs="500">
@@ -2417,8 +2479,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/audi-allroad" />
-		<configFile modName="AllroadAudi" xmlName="Allroad.xml" />
+		<mod name="AllroadAudi">
+			<link href="http://www.modhoster.de/mods/audi-allroad" />
+			<xmlFile name="Allroad.xml" />
+		</mod>
 		
 		<!-- https://de.wikipedia.org/wiki/Audi_RS4 -->
 		<gearboxMogli speedLimiter="false" autoStartStop="true" revUpMs="300">
@@ -2483,9 +2547,62 @@
 		</gearboxMogli>		
 	</vehicle>
 	
+	<vehicle>
+		<mod name="JohnDeere7530" isPrefix="true">
+			<xmlFile name="xml/JD7530.xml"/>
+		</mod>
+	
+		<!-- http://manuals.deere.com/omview/OMAL171363_19/?tM= -->
+		<!-- http://www.dlg-test.de/pbdocs/traktoren/John_Deere_7530_0808.pdf -->
+		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1950" ptoRpmEco="1733">
+      <hydrostatic>
+        <efficiency ratio="0.024889" factor="0.68"/> <!-- 0.05 .. 0.9 -->
+        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.34 .. 25 -->
+        <efficiency ratio="0.833333" factor="0.93"/> <!-- 1.67 .. 31.3 -->
+        <efficiency ratio="1" factor="0.98"/> <!-- 2.01 .. 37.5 -->
+        <efficiency ratio="1.166667" factor="0.93"/> <!-- 2.34 .. 43.8 -->
+        <efficiency ratio="1.333333" factor="0.88"/> <!-- 2.68 .. 50 -->
+      </hydrostatic>
+      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+        <gear speed="4.69" name=""/> <!-- 0.05 1.34 3 6-->
+        <gear speed="9.38" name=""/> <!-- 0.1 2.68 6 13-->
+        <gear speed="18.75" name=""/> <!-- 0.2 5.36 13 25-->
+        <gear speed="37.5" name=""/> <!-- 0.4 10.71 25 50-->
+      </gears>
+      <reverse ratio="1" shiftTimeMs="1000" />
+			
+			<realEngine idleRpm="850" ratedRpm="2100">
+        <!-- 1900: 211(205) | 2100: 198(185) | 1500..1500: 835(834) | 90 | 0.5 | 150 | 2 | 2200 | 1380: 200 -->
+        <torque rpm="350" motorTorque="493" motorTorqueEco="493" fuelUsageRatio="240.9"/>
+        <torque rpm="700" motorTorque="693" motorTorqueEco="692" fuelUsageRatio="217.8"/>
+        <torque rpm="900" motorTorque="752" motorTorqueEco="751" fuelUsageRatio="208.9"/>
+        <torque rpm="1000" motorTorque="777" motorTorqueEco="776" fuelUsageRatio="205.6"/>
+        <torque rpm="1100" motorTorque="798" motorTorqueEco="797" fuelUsageRatio="203"/>
+        <torque rpm="1200" motorTorque="814" motorTorqueEco="813" fuelUsageRatio="201.3"/>
+        <torque rpm="1300" motorTorque="826" motorTorqueEco="825" fuelUsageRatio="200.2"/>
+        <torque rpm="1400" motorTorque="833" motorTorqueEco="832" fuelUsageRatio="200"/>
+        <torque rpm="1500" motorTorque="835" motorTorqueEco="834" fuelUsageRatio="200.6"/>
+        <torque rpm="1600" motorTorque="826" motorTorqueEco="822" fuelUsageRatio="202.1"/>
+        <torque rpm="1700" motorTorque="814" motorTorqueEco="805" fuelUsageRatio="204.4"/>
+        <torque rpm="1800" motorTorque="799" motorTorqueEco="784" fuelUsageRatio="207.6"/>
+        <torque rpm="1850" motorTorque="790" motorTorqueEco="771" fuelUsageRatio="209.5"/>
+        <torque rpm="1900" motorTorque="780" motorTorqueEco="758" fuelUsageRatio="211.6"/>
+        <torque rpm="1950" motorTorque="757" motorTorqueEco="734" fuelUsageRatio="213.9"/>
+        <torque rpm="2000" motorTorque="729" motorTorqueEco="702" fuelUsageRatio="216.5"/>
+        <torque rpm="2050" motorTorque="698" motorTorqueEco="664" fuelUsageRatio="219.2"/>
+        <torque rpm="2100" motorTorque="662" motorTorqueEco="619" fuelUsageRatio="222.2"/>
+        <torque rpm="2150" motorTorque="589" motorTorqueEco="550" fuelUsageRatio="236.5"/>
+        <torque rpm="2200" motorTorque="368" motorTorqueEco="344" fuelUsageRatio="302.9"/>
+        <torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+        <torque rpm="2300" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>	
 	
 	<vehicle>
-		<configFile modName="JohnDeere7810" xmlName="JohnDeere7810.xml" isPrefix="true"/>
+		<mod name="JohnDeere7810" isPrefix="true">
+			<xmlFile name="JohnDeere7810.xml"/>
+		</mod>
 
 		<!-- AutoPowr -->
 		<!--
@@ -2590,7 +2707,9 @@
 	</vehicle>	
 		
 	<vehicle>
-		<configFile modName="JD8110" xmlName="JD8110.xml" isPrefix="true"/>
+		<mod name="JD8110" isPrefix="true">
+			<xmlFile name="JD8110.xml"/>
+		</mod>
 
 		<gearboxMogli speedLimiter="false">
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="13" automatic="true">	
@@ -2649,9 +2768,11 @@
 	</vehicle>	
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-8430t" />
-		<configFile modName="JohnDeere_8430T" xmlName="JohnDeere8430T.xml" isPrefix="true"/>
-		<configFile modName="JohnDeere_8430T" xmlName="JohnDeere8430TFH.xml" isPrefix="true"/>
+		<mod name="JohnDeere_8430T" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/john-deere-8430t" />
+			<xmlFile name="JohnDeere8430T.xml"/>
+			<xmlFile name="JohnDeere8430TFH.xml"/>
+		</mod>
 
 		<!-- http://manuals.deere.com/omview/OMAR229550_19/?tM= -->
 		<gearboxMogli speedLimiter="false">
@@ -2709,10 +2830,12 @@
 	</vehicle>	
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-8530-usa" />
-		<configFile modName="JohnDeere_8530" xmlName="JohnDeere8530.xml" isPrefix="true"/>
-		<configFile modName="JohnDeere_8530" xmlName="JohnDeere8530FH.xml" isPrefix="true"/>
-
+		<mod name="JohnDeere_8530" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/john-deere-8530-usa" />
+			<xmlFile name="JohnDeere8530.xml"/>
+			<xmlFile name="JohnDeere8530FH.xml"/>
+		</mod>
+		
 		<!-- http://manuals.deere.com/omview/OMAR229550_19/?tM= -->
 		<gearboxMogli speedLimiter="false">
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="13" automatic="true">	
@@ -2769,7 +2892,9 @@
 	</vehicle>	
 		
 	<vehicle>
-		<configFile modName="UnimogU1200_U1600" xmlName="UnimogU1200.xml" />
+		<mod name="UnimogU1200_U1600">
+			<xmlFile name="UnimogU1200.xml" />
+		</mod>
 		
 		<!-- http://www.daimler.com/Projects/c2c/channel/images/6787_9660_-1_-1_20399.pdf -->
 		<gearboxMogli defaultGear="5">
@@ -2816,7 +2941,9 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="UnimogU1200_U1600" xmlName="UnimogU1600.xml" />
+		<mod name="UnimogU1200_U1600">
+			<xmlFile name="UnimogU1600.xml" />
+		</mod>
 		
 		<!-- http://www.daimler.com/Projects/c2c/channel/images/6787_9660_-1_-1_20399.pdf -->
 		<gearboxMogli defaultGear="5">
@@ -2863,8 +2990,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/massey-ferguson-7626--2" />
-		<configFile modName="CZMOD_MasseyFerguson_7626" xmlName="claas1.xml"/>
+		<mod name="CZMOD_MasseyFerguson_7626">
+			<link href="http://www.modhoster.de/mods/massey-ferguson-7626--2" />
+			<xmlFile name="claas1.xml"/>
+		</mod>
 		
 		<!-- http://read.uberflip.com/i/338540-mf-7600-brochure-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
@@ -2911,8 +3040,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-axion-850--88" />
-		<configFile modName="CZMOD_CLAAS_Axion_850" xmlName="claas1.xml"/>
+		<mod name="CZMOD_CLAAS_Axion_850">
+			<link href="http://www.modhoster.de/mods/claas-axion-850--88" />
+			<xmlFile name="claas1.xml"/>
+		</mod>
 
 		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1524">>
@@ -2957,10 +3088,11 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-4755--3" />
-		<configFile modName="JohnDeere4755" xmlName="JD_4755.xml"/>
+		<mod name="JohnDeere4755"> 
+			<link href="http://www.modhoster.de/mods/john-deere-4755--3" />
+			<xmlFile name="JD_4755.xml"/>
+		</mod>
 
-		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
 		<gearboxMogli autoStartStop="true" speedLimiter="false" ptoRpm="2205" ptoRpmEco="2205">
 		
 			<!-- http://www.tractordata.com/farm-tractors/000/1/4/145-john-deere-4755-transmission.html -->
@@ -3097,8 +3229,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/deutz-fahr-agrotron-6190ttv" />
-		<configFile modName="FS15_DeutzTTV6190" isPrefix="true" xmlName="Agrotron6190ttv.xml" />
+		<mod name="FS15_DeutzTTV6190" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-fahr-agrotron-6190ttv" />
+			<xmlFile name="Agrotron6190ttv.xml" />
+		</mod>
 
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz-Fahr_Agrotron_6190 -->
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/939-series-6-ttv -->
@@ -3147,7 +3281,9 @@
 	
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIHPuma160.xml"/>
-		<configFile modName="LS15_CasePumacvx160_" xmlName="caseIHPuma160.xml" isPrefix="true"/>
+		<mod name="LS15_CasePumacvx160_" isPrefix="true">
+			<xmlFile name="caseIHPuma160.xml"/>
+		</mod>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
@@ -3188,7 +3324,9 @@
 	</vehicle>
 		
 	<vehicle>
-		<configFile modName="LS15_CasePuma165CVX_" xmlName="caseIHPuma165.xml" isPrefix="true"/>
+		<mod name="LS15_CasePuma165CVX_" isPrefix="true">
+			<xmlFile name="caseIHPuma165.xml" />
+		</mod>
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600" soundMaxRpm="2000"> <!-- 1900 / 2200 = 0.86363636 --> 
@@ -3236,9 +3374,11 @@
 	</vehicle>
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/case-puma-230-cvx-frontlader" />
-		<link href="http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl" />
-		<configFile modName="LS15_CasePumacvx230_" xmlName="caseIHPuma230.xml" isPrefix="true"/>
+		<mod name="LS15_CasePumacvx230_" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/case-puma-230-cvx-frontlader" />
+			<link href="http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl" />
+			<xmlFile name="caseIHPuma230.xml"/>
+		</mod>
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
@@ -3279,9 +3419,11 @@
 	</vehicle>
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/case-puma-230-cvx-frontlader" />
-		<link href="http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl" />
-		<configFile modName="LS15_CasePumacvx240_" xmlName="caseIHPuma240.xml" isPrefix="true"/>
+		<mod name="LS15_CasePumacvx240_" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/case-puma-230-cvx-frontlader" />
+			<link href="http://www.modhoster.de/mods/bad-boy-case-puma-pack-cvx-fl" />
+			<xmlFile name="caseIHPuma240.xml"/>
+		</mod>
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
@@ -3367,8 +3509,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/case-ih-magnum-380-facelift-pack" /> 
-		<configFile modName="LS15_CaseIH_newMagnum380_" xmlName="caseIHMagnum380.xml" isPrefix="true"/>
+		<mod name="LS15_CaseIH_newMagnum380_" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/case-ih-magnum-380-facelift-pack" /> 
+			<xmlFile name="caseIHMagnum380.xml"/>
+		</mod>
 	
 		<!-- Case Magnum 380 CVT -->
 		<!-- http://assets.cnhindustrial.com/caseih/emea/EMEAASSETS/Products/Tractors/Magnum/Brochures/Magnum_new/14c0005doo_magnum_bro_low.pdf -->
@@ -3411,8 +3555,10 @@
 	</vehicle>
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/john-deere-7280r-beta" />
-		<configFile modName="AGO_JD7280R_BETA2_FS15" xmlName="JD7280R.xml" />
+		<mod name="AGO_JD7280R_BETA2_FS15">
+			<link href="http://www.modhoster.de/mods/john-deere-7280r-beta" />
+			<xmlFile name="JD7280R.xml" />
+		</mod>
 
 		<!-- http://www.deere.de/de_DE/docs/html/brochures/publication.html?id=e8ac80b8#6 -->
 		<!-- http://manuals.deere.com/omview/OMRE346524_19/?tM= -->
@@ -3457,8 +3603,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="CZMOD_CLAAS_Arion_650" xmlName="claas.xml"/>
-		<configFile modName="CZMOD_CLAAS_Arion_650" xmlName="claas1.xml"/>
+		<mod name="CZMOD_CLAAS_Arion_650">
+			<xmlFile name="claas.xml"/>
+			<xmlFile name="claas1.xml"/>
+		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
 			<hydrostatic>
@@ -3500,8 +3648,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="CZMOD_CLAAS_Axion_950" isPrefix="true" xmlName="claas.xml"/>
-		<configFile modName="CZMOD_CLAAS_Axion_950" isPrefix="true" xmlName="claas1.xml"/>
+		<mod name="CZMOD_CLAAS_Axion_950" isPrefix="true">
+			<xmlFile name="claas.xml"/>
+			<xmlFile name="claas1.xml"/>
+		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
 			<hydrostatic>
@@ -3544,8 +3694,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-xerion-4500" />
-		<configFile modName="CZMOD_CLAAS_Xerion_4500" xmlName="claas1.xml"/>
+		<mod name="CZMOD_CLAAS_Xerion_4500">
+			<link href="http://www.modhoster.de/mods/claas-xerion-4500" />
+			<xmlFile name="claas1.xml"/>
+		</mod>
 
 		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" clutchEngagingTimeMs="500">
 			<hydrostatic>
@@ -3589,8 +3741,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/deutz-fahr-9340" />
-		<configFile modName="deutzFahr9340" xmlName="scripts/vehicleShaderDirt.dds"/>
+		<mod name="deutzFahr9340">
+			<link href="http://www.modhoster.de/mods/deutz-fahr-9340" />
+			<xmlFile name="scripts/vehicleShaderDirt.dds"/>
+		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32">
       <hydrostatic>
@@ -3640,8 +3794,10 @@
 <!-- ********** SameDeutzFahr TTV ******************** -->	
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/huerlimann/huerlimannXM4Ti.xml"/>
-		<link href="http://www.modhoster.de/mods/deutz-serie-5-ttv" />
-		<configFile modName="FS15_deutz5130TTV" isPrefix="true" xmlName="huerlimannXM4Ti.xml" />
+		<mod name="FS15_deutz5130TTV" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-serie-5-ttv" />
+			<xmlFile name="huerlimannXM4Ti.xml" />
+		</mod>
 
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24">
@@ -3685,15 +3841,17 @@
 <!-- ********** Fendt Vario ******************** -->	
 <!-- ********** Fendt Vario ******************** -->	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/fendt-936-vario-pack--9" />
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936BBvario.xml"/>
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936BBvariozw.xml"/>
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936vario.xml"/>
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936variou.xml"/>
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936variozw.xml"/>
-		<configFile modName="fendtvario" xmlName="data/vehicles/steerable/fendt/fendt936variozwu.xml"/>
+		<mod name="fendtvario">
+			<link href="http://www.modhoster.de/mods/fendt-936-vario-pack--9" />
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936BBvario.xml"/>
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936BBvariozw.xml"/>
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936vario.xml"/>
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936variou.xml"/>
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936variozw.xml"/>
+			<xmlFile name="data/vehicles/steerable/fendt/fendt936variozwu.xml"/>
+		</mod>
 		
-		<configFile modName="Fendt936" isPrefix="true" xmlName="Fendt936.xml"/>
+		<mod name="Fendt936" isPrefix="true" xmlName="Fendt936.xml"/>
 		
 		<!-- http://www.fendt.com/download/900Vario_2014_TD_de.pdf -->
 		<!-- http://www.dlg-test.de/tests/0912_Fendt_939_Vario.pdf -->
@@ -3740,8 +3898,10 @@
 	</vehicle>	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/fendt-926-favorit--6" />
-		<configFile modName="FendtFavorit926" isPrefix="true" xmlName="FendtFavorit926.xml"/>
+		<mod name="FendtFavorit926" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/fendt-926-favorit--6" />
+			<xmlFile name="FendtFavorit926.xml"/>
+		</mod>
 		
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/fendt-favorit926varioi.pdf -->
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_926_Vario -->
@@ -3786,11 +3946,16 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/fendt-930-vario-tms--11" />
-		<link href="http://www.modhoster.de/mods/fendt-930-vario-tms--14" />
-		<configFile modName="Fendt930Vario" xmlName="Fendt930VarioTMS.xml"/>
-		<configFile modName="Fendt930TMS" xmlName="FendtVario930TMS.xml"/>
-		<configFile modName="fendtms" xmlName="FendtVario930TMS.xml"/>
+		<mod name="Fendt930Vario">
+			<link href="http://www.modhoster.de/mods/fendt-930-vario-tms--14" />
+			<xmlFile name="Fendt930VarioTMS.xml"/>
+		</mod>
+		<mod name="Fendt930TMS">
+			<xmlFile name="FendtVario930TMS.xml"/>
+		</mod>
+		<mod name="fendtms">
+			<xmlFile name="FendtVario930TMS.xml"/>
+		</mod>
 		
 		<!-- http://www.dlg-test.de/tests/Fendt930VarioTMS_2004.pdf -->
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_930_Vario -->
@@ -3838,9 +4003,13 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/Fendt1050" />
-		<configFile modName="LS15_Fendt1050" xmlName="Fendt1050.xml" isPrefix="true" />
-		<configFile modName="Fendt1050" xmlName="Fendt1050.xml"/>
+		<mod name="LS15_Fendt1050" isPrefix="true">
+			<link href="http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/Fendt1050" />
+			<xmlFile name="Fendt1050.xml"/>
+		</mod>
+		<mod name="Fendt1050">
+			<xmlFile name="Fendt1050.xml"/>
+		</mod>
 		
 		<!-- MAN D2676 engine => http://www.engines.man.eu/global/en/off-road/construction-agricultural-and-special-machinery/overview/Overview.html -->
 		<!-- http://youtu.be/FOg5EbLVqDU -->
@@ -3966,9 +4135,11 @@
 		</gearboxMogli>
 	</vehicle> 
 	
-	<!-- http://fs-uk.com/mods/view/36571/case-ih-ct5060 -->
 	<vehicle>
-		<configFile modName="CaseIH_CT5060" xmlName="CaseIH_CT5060.xml" />
+		<mod name="CaseIH_CT5060">
+			<link href="http://fs-uk.com/mods/view/36571/case-ih-ct5060"/>
+			<xmlFile name="CaseIH_CT5060.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3">
 			<combine defaultWidth="6.7"/>
@@ -3993,8 +4164,10 @@
 	</vehicle> 
 	
 	<vehicle>
-		<configFile modName="caseIH7130" xmlName="caseIH7130.xml" />
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
+		<mod name="caseIH7130">
+			<xmlFile name="caseIH7130.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="10.5"/>
@@ -4090,10 +4263,10 @@
 		</gearboxMogli>
 	</vehicle> 
 
-	<!-- http://www.agriculture.newholland.com/Germany/de/Products/Forage/Documents/FR_123001_DOO.pdf -->
 	<vehicle>
 		<configFile xmlName="newHollandPack/newHolland/newHollandFR850.xml" />
 		
+		<!-- http://www.agriculture.newholland.com/Germany/de/Products/Forage/Documents/FR_123001_DOO.pdf -->
 		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
 			<combine defaultFruit="chaff" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
@@ -4139,8 +4312,10 @@
 	</vehicle> 
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/class-lexion-550-560tt" />
-		<configFile modName="FS15_claasLexion550" xmlName="Lexion550.xml" />
+		<mod name="FS15_claasLexion550">
+			<link href="http://www.modhoster.de/mods/class-lexion-550-560tt" />
+			<xmlFile name="Lexion550.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="6.6"/>
@@ -4163,8 +4338,10 @@
 	</vehicle> 
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/class-lexion-550-560tt" />
-		<configFile modName="FS15_claasLexion550" xmlName="Lexion560.xml" />
+		<mod name="FS15_claasLexion550">
+			<link href="http://www.modhoster.de/mods/class-lexion-550-560tt" />
+			<xmlFile name="Lexion560.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5"/>
@@ -4187,7 +4364,9 @@
 	</vehicle> 
 	
 	<vehicle>
-		<configFile modName="MB3D_ClaasJaguar870" isPrefix="true" xmlName="Jaguar870.xml" />
+		<mod name="MB3D_ClaasJaguar870" isPrefix="true">
+			<xmlFile name="Jaguar870.xml"/>
+		</mod>
 		
 		<!-- http://www.claas.de/blueprint/servlet/blob/581552/a6e2675b4cfc4cb3880205b864185fce/203863-dataRaw.pdf -->
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
@@ -4229,11 +4408,12 @@
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
-
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/new-holland-tf78--7" />
-		<configFile modName="FS15_NewHollandTF78" xmlName="NHTF78.xml" />
+		<mod name="FS15_NewHollandTF78">
+			<link href="http://www.modhoster.de/mods/new-holland-tf78--7" />
+			<xmlFile name="NHTF78.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
 			<combine defaultWidth="6.0"/>
@@ -4281,8 +4461,12 @@
 	</vehicle> 
 	
 	<vehicle>
-		<configFile modName="KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
-		<configFile modName="CZMOD_KRONE_BIGX_580" xmlName="kroneBigX580.xml" />
+		<mod name="KRONE_BIGX_580">
+			<xmlFile name="kroneBigX580.xml" />
+		</mod>
+		<mod name="CZMOD_KRONE_BIGX_580">
+			<xmlFile name="kroneBigX580.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultFruit="chaff" defaultWidth="7.5"/>
@@ -4306,35 +4490,11 @@
 
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-lexion-580-600" />
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion580.xml" />
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion580TT.xml" />
-				
-		<!-- http://www.kaufmann-landtechnik.at/joomla15/images/pdf/Prospekte/lexion_580-570c.pdf -->
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
-			<combine defaultWidth="7.5"/>
-			<blowOffVentilSound volume="0"/>
-			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
-			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
-		</gearboxMogli>
-	</vehicle> 
-	
-	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-lexion-580-600" />
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion580.xml" />
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion580TT.xml" />
+		<mod name="FS15_claasLexionPack">
+			<link href="http://www.modhoster.de/mods/claas-lexion-580-600" />
+			<xmlFile name="Lexion580.xml" />
+			<xmlFile name="Lexion580TT.xml" />
+		</mod>
 				
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="9.0"/>
@@ -4381,10 +4541,12 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion600.xml" />
-		<configFile modName="FS15_claasLexionPack" xmlName="Lexion600TT.xml" />
+		<mod name="FS15_claasLexionPack">
+			<xmlFile name="Lexion600.xml"/>
+			<xmlFile name="Lexion600TT.xml"/>
+		</mod>
 
-		<configFile modName="Claas_Lexion600_Pack" xmlName="claasLexion600.xml" />
+		<mod name="Claas_Lexion600_Pack" xmlName="claasLexion600.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="10.5" minRpm="1600" maxRpm="1800"/> 
@@ -4429,8 +4591,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="Lexion670" xmlName="Lexion670.xml" />
-		<configFile modName="Lexion670" xmlName="Lexion670TT.xml" />
+		<mod name="Lexion670">
+			<xmlFile name="Lexion670.xml"/>
+			<xmlFile name="Lexion670TT.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="9" minRpm="1600" maxRpm="1900"/> 
@@ -4475,8 +4639,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="lexion750" xmlName="Lexion750.xml" />
-		<configFile modName="lexion750" xmlName="Lexion750TT.xml" />
+		<mod name="lexion750">
+			<xmlFile name="Lexion750.xml" />
+			<xmlFile name="Lexion750TT.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="9" minRpm="1600" maxRpm="1800"/> 
@@ -4519,7 +4685,9 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="lexion770" xmlName="Lexion770TT.xml" />
+		<mod name="lexion770">
+			<xmlFile name="Lexion770TT.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="12" minRpm="1600" maxRpm="1800"/>
@@ -4563,8 +4731,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="lexion780" xmlName="Lexion780.xml" />
-		<configFile modName="lexion780" xmlName="Lexion780TT.xml" />
+		<mod name="lexion780">
+			<xmlFile name="Lexion780.xml"/>
+			<xmlFile name="Lexion780TT.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="13.5" minRpm="1600" maxRpm="1800"/>
@@ -4608,8 +4778,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-lexion-400-pack" />
-		<configFile modName="ClaasLexion400" xmlName="claasLexion430.xml"/>
+		<mod name="ClaasLexion400">
+			<link href="http://www.modhoster.de/mods/claas-lexion-400-pack" />
+			<xmlFile name="claasLexion430.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="6.0"/>
@@ -4655,8 +4827,10 @@
 	</vehicle>
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-lexion-400-pack" />
-		<configFile modName="ClaasLexion400" xmlName="claasLexion460.xml"/>
+		<mod name="ClaasLexion400">
+			<link href="http://www.modhoster.de/mods/claas-lexion-400-pack" />
+			<xmlFile name="claasLexion460.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="7.5"/>
@@ -4702,8 +4876,10 @@
 	</vehicle>	
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-lexion-480--4" />
-		<configFile modName="ClaasLexion480" xmlName="claasLexion480.xml"/>
+		<mod name="ClaasLexion480">
+			<link href="http://www.modhoster.de/mods/claas-lexion-480--4" />
+			<xmlFile name="claasLexion480.xml"/>
+		</mod>
 		
 		<!-- http://www.claas-group.com/blueprint/servlet/blob/153496/8616156993dc3a08d17d79bddf39aa57/prospekt-lexion-480-data.pdf -->
 		<!-- http://www.konedata.net/claas_lexion440.htm -->
@@ -4754,7 +4930,9 @@
 	</vehicle>	
 	
 	<vehicle>
-		<configFile modName="ClassDominator" xmlName="dominator.xml" />
+		<mod name="ClassDominator">
+			<xmlFile name="dominator.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" torqueConverter="true">
 			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2100" threshingSoundOffset="1" threshingSoundScale="0"/>
@@ -4796,8 +4974,10 @@
 	</vehicle> 
 
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-mega-208-218-pack" />
-		<configFile modName="ClaasMega218" xmlName="ClaasMega208.xml"/>
+		<mod name="ClaasMega218">
+			<link href="http://www.modhoster.de/mods/claas-mega-208-218-pack" />
+			<xmlFile name="ClaasMega208.xml"/>
+		</mod>
 		
 		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
 			<combine defaultWidth="6.0"/>
@@ -4836,8 +5016,10 @@
 	</vehicle> 
 	
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/claas-mega-208-218-pack" />
-		<configFile modName="ClaasMega218" xmlName="ClaasMega218.xml"/>
+		<mod name="ClaasMega218">
+			<link href="http://www.modhoster.de/mods/claas-mega-208-218-pack" />
+			<xmlFile name="ClaasMega218.xml"/>
+		</mod>
 		
 		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
 			<combine defaultWidth="6.6"/>
@@ -4876,9 +5058,11 @@
 	</vehicle> 
 	
 	<vehicle> 
-		<link href="http://www.modhoster.de/mods/claas-dominator-105--5" />
-		<configFile modName="Claas_Dominator_105" isPrefix="true" xmlName="Dominator105_zold.xml" />
-		<configFile modName="Claas_Dominator_105" isPrefix="true" xmlName="Dominator105_sarga.xml" />
+		<mod name="Claas_Dominator_105" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/claas-dominator-105--5" />
+			<xmlFile name="Dominator105_zold.xml" />
+			<xmlFile name="Dominator105_sarga.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" torqueConverter="true">
 			<combine defaultWidth="5.1" minRpm="2300"/>
@@ -4921,8 +5105,10 @@
 	</vehicle> 
 	
 	<vehicle> 
-		<!-- http://www.mediafire.com/download/ezoomz6tbt9fs8t/JohnDeere_8400i_Pack_EXTRACT.zip -->
-		<configFile modName="JohnDeere_8400i" isPrefix="true" xmlName="JohnDeere8400i.xml" />
+		<mod name="JohnDeere_8400i" isPrefix="true">
+			<!--link href="http://www.mediafire.com/download/ezoomz6tbt9fs8t/JohnDeere_8400i_Pack_EXTRACT.zip"/-->
+			<xmlFile name="JohnDeere8400i.xml" />
+		</mod>
 		
 		<gearboxMogli disableManual="true" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1">
 			<combine defaultFruit="chaff" defaultWidth="9.0"/>
@@ -4969,8 +5155,10 @@
 	</vehicle> 
 		
 	<vehicle>
-		<link href="http://www.modhoster.de/mods/fahr-m66" />
-		<configFile modName="Fahr_M66" isPrefix="true" xmlName="fahrM66.xml"/>
+		<mod name="Fahr_M66" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/fahr-m66" />
+			<xmlFile name="fahrM66.xml"/>		
+		</mod>
 		
 		<gearboxMogli autoStartStop="false">
 			<combine defaultWidth="3.0"/>
@@ -4986,5 +5174,249 @@
 		</gearboxMogli>
 	</vehicle>
 
+	
+	
+
+
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- http://www.farming-simulator.com/dlc-detail-fs15-classics.php -->
+
+	<vehicle> 
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="gueldner/gueldnerG40.xml"/>
+			<xmlFile name="gueldner/gueldnerG40Frontloader.xml"/>
+		</mod>
+		
+		<gearboxMogli clutchShiftingTimeMs="400" indoorCameraIndexList="">
+
+			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1200">	
+				<gear speed="6.72"/>
+				<gear speed="11"/>
+				<gear speed="18.1"/>
+				<gear speed="29.8"/>
+			</gears>
+
+			<ranges reverseReset="true" doubleClutch="true">		
+				<range ratio="0.268" forwardOnly="true" name="L"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.5"   reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="buehrer/buehrerRP21.xml"/>
+		</mod>
+		
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1971_D.pdf -->
+		<gearboxMogli>
+			<realEngine idleRpm="600" ratedRpm="1900">		
+				<torque rpm="0" ptoTorque="0" fuelUsageRatio="1" />
+				<torque rpm="600" ptoTorque="237" fuelUsageRatio="0.951" /><!-- idle -->
+				<torque rpm="800" ptoTorque="254" fuelUsageRatio="0.928" />
+				<torque rpm="1000" ptoTorque="263" fuelUsageRatio="0.916" /><!-- max torque 280 Nm-->
+				<torque rpm="1200" ptoTorque="263" fuelUsageRatio="0.914" /><!-- max torque 280 Nm-->
+				<torque rpm="1430" ptoTorque="261" fuelUsageRatio="0.925" />
+				<torque rpm="1670" ptoTorque="256" fuelUsageRatio="0.952" />
+				<torque rpm="1900" ptoTorque="250" fuelUsageRatio="0.993" /><!-- max power 72 PS-->
+				<torque rpm="1950" ptoTorque="238" fuelUsageRatio="1.05" />
+				<torque rpm="2000" ptoTorque="125" fuelUsageRatio="1.2" />
+				<torque rpm="2050" ptoTorque="38" fuelUsageRatio="1.45" />
+				<torque rpm="2100" ptoTorque="25" fuelUsageRatio="1.5" /><!-- max rpm + fade out -->
+				<torque rpm="2150" ptoTorque="13" fuelUsageRatio="1.55" /><!-- max rpm + fade out -->
+				<torque rpm="2300" ptoTorque="0" fuelUsageRatio="3" />
+			</realEngine>
+		
+			<gears defaultGear="3" reverseReset="true">	
+				<gear speed="6.3"  forwardOnly="true" name="1"/>
+				<gear speed="8.9"  forwardOnly="true" name="2"/>
+				<gear speed="12.6" forwardOnly="true" name="3"/>
+				<gear speed="17.9" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="9"    reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">		
+				<range ratio="0.208"/>
+				<range ratio="0.6025"/>
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+		
+	<vehicle>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="bucher/bucherD4000.xml"/>
+		</mod>
+		
+		<!-- http://www.buchertraktoren.ch/d4000_01.html -->
+		<gearboxMogli indoorCameraIndexList="">
+
+			<gears defaultGear="4" reverseReset="true" shiftTimeMs="1200">	
+				<gear speed="4.1"  forwardOnly="true" name="1"/>
+				<gear speed="7.28" forwardOnly="true" name="2"/>
+				<gear speed="10.6" forwardOnly="true" name="3"/>
+				<gear speed="16.3" forwardOnly="true" name="4"/>
+				<gear speed="20"   forwardOnly="true" name="5"/>
+				<gear speed="4.1"  reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">			
+				<range ratio="0.2105"/>
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="hatz/hatzH340.xml"/>
+			<xmlFile name="lindner/lindnerBF450.xml"/>
+		</mod>
+		
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Hatz_H340 -->
+		<gearboxMogli indoorCameraIndexList="">
+			<gears defaultGear="4" shiftTimeMs="1200">	
+				<gear speed="4.23" />
+				<gear speed="7.23"/>
+				<gear speed="11.88"/>
+				<gear speed="19.26"/>
+				<gear speed="27.4" forwardOnly="true" name="Schnellgang"/>
+			</gears>
+
+			<ranges defaultRange="2" reverseReset="true" doubleClutch="true">	
+				<range ratio="0.277" forwardOnly="true" name="L"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.5"   reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>			
+
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="deutz/deutzD80.xml"/>
+		</mod>
+	
+<!-- ************************************************************************* -->	
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz_D_80 -->
+		<!-- http://www.deutz-traktoren.de/traktoren/d_serie/d80.php -->
+	
+		<gearboxMogli indoorCameraIndexList="">
+			<gears defaultGear="2" shiftTimeMs="1200">		
+				<gear speed="7"/>
+				<gear speed="11.3"/>
+				<gear speed="18.3"/>
+				<gear speed="30"/>
+			</gears>
+
+			<ranges defaultRange="3" reverseReset="true" doubleClutch="true">	
+				<range ratio="0.3"   forwardOnly="true" name="L"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.333" reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>	
+	
+<!-- ************************************************************************* -->	
+	
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="huerlimann/huerlimannD110.xml"/>
+		</mod>
+	
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1971_D.pdf -->
+		<gearboxMogli indoorCameraIndexList="">
+			<realEngine idleRpm="800" ratedRpm="2200">		
+				<torque rpm="0" ptoTorque="0" fuelUsageRatio="1" />
+				<torque rpm="800" ptoTorque="169" fuelUsageRatio="0.938" /><!-- idle -->
+				<torque rpm="1200" ptoTorque="185" fuelUsageRatio="0.911" />
+				<torque rpm="1600" ptoTorque="188" fuelUsageRatio="0.92" /><!-- max torque 200 Nm-->
+				<torque rpm="1770" ptoTorque="183" fuelUsageRatio="0.935" />
+				<torque rpm="1940" ptoTorque="178" fuelUsageRatio="0.956" />
+				<torque rpm="2100" ptoTorque="173" fuelUsageRatio="0.982" /><!-- max power 55 PS-->
+				<torque rpm="2200" ptoTorque="165" fuelUsageRatio="1" /><!-- max power 55 PS-->
+				<torque rpm="2250" ptoTorque="157" fuelUsageRatio="1.05" />
+				<torque rpm="2300" ptoTorque="82" fuelUsageRatio="1.2" />
+				<torque rpm="2350" ptoTorque="25" fuelUsageRatio="1.45" />
+				<torque rpm="2400" ptoTorque="16" fuelUsageRatio="1.5" /><!-- max rpm + fade out -->
+				<torque rpm="2450" ptoTorque="8" fuelUsageRatio="1.55" /><!-- max rpm + fade out -->
+				<torque rpm="2600" ptoTorque="0" fuelUsageRatio="3" />
+			</realEngine>
+		
+			<gears defaultGear="3" reverseReset="true" shiftTimeMs="1200">	
+				<gear speed="7.2"  forwardOnly="true" name="1"/>
+				<gear speed="10.2" forwardOnly="true" name="2"/>
+				<gear speed="12.6" forwardOnly="true" name="3"/>
+				<gear speed="15.9" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="9.6"  reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">		
+				<range ratio="0.236" />
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	
+	</vehicle>	
+		
+	<vehicle>
+		<mod name="Schlueter1500TVL">
+			<link href="http://www.modhoster.de/mods/schluter-1500-tvl--8" />
+			<xmlFile name="schlueter1500tvl.xml"/>
+		</mod>
+		<mod name="FS15_ClassicsPack">
+			<xmlFile name="schlueter/schlueter1500TVL.xml"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
+			<realEngine idleRpm="800" ratedRpm="2000">
+				<torque rpm="0" motorTorque="0"/>
+				<torque rpm="800" motorTorque="508"/>
+				<torque rpm="900" motorTorque="556"/>
+				<torque rpm="1000" motorTorque="591"/>
+				<torque rpm="1100" motorTorque="611"/>
+				<torque rpm="1200" motorTorque="618"/>
+				<torque rpm="1300" motorTorque="618"/>
+				<torque rpm="1400" motorTorque="617"/>
+				<torque rpm="1500" motorTorque="613"/>
+				<torque rpm="1600" motorTorque="608"/>
+				<torque rpm="1700" motorTorque="600"/>
+				<torque rpm="1800" motorTorque="589"/>
+				<torque rpm="1900" motorTorque="577"/>
+				<torque rpm="2000" motorTorque="562"/>
+				<torque rpm="2100" motorTorque="527"/>
+				<torque rpm="2200" motorTorque="421"/>
+				<torque rpm="2300" motorTorque="246"/>
+				<torque rpm="2400" motorTorque="0"/>
+			</realEngine>
+		
+			<gears defaultGear="1">	
+				<gear speed="9.7" />
+				<gear speed="11.9" />
+				<gear speed="15.0" />
+				<gear speed="18.6" />
+				<gear speed="24.3" />
+				<gear speed="30.0" />
+			</gears>
+			
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">	
+				<range ratio="1"    name="L"/>
+				<range ratio="1.66" name="H"/>
+			</ranges>
+
+			<ranges defaultRange="2" reverseReset="true" shiftTimeMs="1200" doubleClutch="true">	
+				<range ratio="0.263" forwardOnly="true" name="Z"/>
+				<range ratio="1"     forwardOnly="true" name="N"/>
+				<range ratio="0.78"  reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>	
+
+	</vehicle>
 	
 </vehicles>

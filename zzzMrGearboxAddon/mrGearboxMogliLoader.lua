@@ -104,110 +104,109 @@ function mrGearboxMogliLoader.initXmlFiles()
 	mrGearboxMogliLoader.defaultConfigI = {} 
 	mrGearboxMogliLoader.defaultConfigE = {} 
 	
-	local file1 = mrGearboxMogliLoader.baseDirectory.."zzzMrGearboxAddonConfig.xml"
-	print(file1)
-	if fileExists(file1) then	
-		local xmlFile = loadXMLFile( "vehicles", file1, "vehicles" )
-		mrGearboxMogliLoader.xmlFileInt = xmlFile
-		
-		i=0
-		while true do
-			local baseName       = string.format("vehicles.vehicle(%d)", i)
-			local j=0
-			local configFileName = getXMLString(xmlFile, baseName .. "#configFileName")
-			while true do
-				local entry = { xmlName = baseName }
+	for f=1,2 do 	
+		local file1
 
-				if configFileName ~= nil then
-					entry.configFileName = configFileName
-				else
-					local modName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
-					local xmlName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#xmlName", entry.xmlName, j ))
-					if xmlName == nil then
-						break
-					elseif modName ~= nil then
-						entry.configFileName = modName .. "/" .. xmlName
-						entry.configModName  = string.lower( modName )
-					else
-						entry.configFileName = xmlName
-					end
-					
-					entry.configXmlName  = string.lower( xmlName )
-					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
+		if f == 1 then
+			file1 = mrGearboxMogliLoader.baseDirectory.."zzzMrGearboxAddonConfig.xml"
+		else
+			file1 = mrGearboxMogliLoader.modsDirectory.."zzzMrGearboxAddonConfig.xml"
+		end
+		
+		print(file1)
+		if fileExists(file1) then	
+			local xmlFile = loadXMLFile( "vehicles", file1, "vehicles" )
+			
+			if f == 1 then
+				mrGearboxMogliLoader.xmlFileInt = xmlFile
+			else
+				mrGearboxMogliLoader.xmlFileExt = xmlFile
+			end
+			
+			local i = 0
+			while true do
+				local baseName       = string.format("vehicles.vehicle(%d)", i)
+				
+				if not hasXMLProperty( xmlFile, baseName..".gearboxMogli" ) then
+					print("Nothing found at index: "..tostring(i))									
+					break
 				end
 				
-				if      string.len( entry.configFileName ) >= 7 
-						and string.len( entry.configFileName ) <= 9
-						and string.sub( entry.configFileName, 1, 7 ) == "default" then
-				--print(string.format( "zzzMrGearboxAddon: found default configuration (%s)", entry.configFileName ))				
-					mrGearboxMogliLoader.defaultConfigI[entry.configFileName] = entry
-				elseif entry.configFileName ~= nil then
-				--print(string.format( "zzzMrGearboxAddon: found configuration for %s", entry.configFileName ))				
-					entry.configFileName = string.lower( entry.configFileName )
-					mrGearboxMogliLoader.configInt[entry.configFileName] = entry
-				end
-				j = j + 1
-				if configFileName ~= nil then
-					break
-				end
-			end
-			if j<=0 then
-				break
-			end
-			i = i + 1
-		end
-	end
-
-	local file2 = mrGearboxMogliLoader.modsDirectory.."zzzMrGearboxAddonConfig.xml"
-	print(file2)
-	if fileExists(file2) then	
-		local xmlFile = loadXMLFile( "vehicles", file2, "vehicles" )
-		mrGearboxMogliLoader.xmlFileExt = xmlFile
-		
-		i=0
-		while true do
-			local baseName       = string.format("vehicles.vehicle(%d)", i)
-			local configFileName = getXMLString(xmlFile, baseName .. "#configFileName")
-			local j              = 0
-			while true do
-				local entry = { xmlName = baseName }
-
-				if configFileName ~= nil then
-					entry.configFileName = configFileName
-				else
-					local modName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
-					local xmlName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#xmlName", entry.xmlName, j ))
-					if xmlName == nil then
-						break
-					elseif modName ~= nil then
-						entry.configFileName = modName .. "/" .. xmlName
-						entry.configModName  = string.lower( modName )
+				local configFileName = getXMLString(xmlFile, baseName .. "#configFileName")
+				
+				local j = 0
+				local k = 0				
+				while true do
+					local entry = { xmlName = baseName }
+					
+					if configFileName ~= nil then
+						entry.configFileName = configFileName
 					else
-						entry.configFileName = xmlName
+						local modName
+						local xmlName = getXMLString(xmlFile, string.format( "%s.configFile(%d)#xmlName", entry.xmlName, j ))
+						
+						if xmlName ~= nil then
+							modName              = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
+							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
+						else						
+							modName = getXMLString(xmlFile, string.format( "%s.mod(%d)#name", entry.xmlName, j ))
+							xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, j, k ))
+							
+							if modName ~= nil and xmlName ~= nil then															
+								entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.mod(%d)#isPrefix", entry.xmlName, j ))
+								
+							--print("New logic: "..tostring(modName).." "..tostring(xmlName).." "..tostring(entry.configIsPrefix).." ("..tostring(j).."/"..tostring(k)..")")
+								
+								j = j - 1
+								k = k + 1
+							else
+								break
+							end
+						end
+
+						if modName ~= nil then
+							entry.configFileName = modName .. "/" .. xmlName
+							entry.configModName  = string.lower( modName )
+						else
+							entry.configFileName = xmlName
+						end
+						
+						entry.configXmlName  = string.lower( xmlName )
 					end
 					
-					entry.configXmlName  = string.lower( xmlName )
-					entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
+					nothingFound = false
+					
+					if      string.len( entry.configFileName ) >= 7 
+							and string.len( entry.configFileName ) <= 9
+							and string.sub( entry.configFileName, 1, 7 ) == "default" then
+							
+						if f == 1 then
+						--print(string.format( "zzzMrGearboxAddon: found internal default configuration (%s)", entry.configFileName ))				
+							mrGearboxMogliLoader.defaultConfigI[entry.configFileName] = entry
+						else
+							print(string.format( "zzzMrGearboxAddon: found external default configuration (%s)", entry.configFileName ))				
+							mrGearboxMogliLoader.defaultConfigE[entry.configFileName] = entry
+						end
+					elseif entry.configFileName ~= nil then
+						entry.configFileName = string.lower( entry.configFileName )
+						if f == 1 then
+						--print(string.format( "zzzMrGearboxAddon: found internal configuration for %s", entry.configFileName ))				
+							mrGearboxMogliLoader.configInt[entry.configFileName] = entry
+						else
+							print(string.format( "zzzMrGearboxAddon: found external configuration for %s", entry.configFileName ))				
+							mrGearboxMogliLoader.configExt[entry.configFileName] = entry
+						end
+					end
+					j = j + 1
+					if configFileName ~= nil then
+						break
+					end
 				end
-				if      string.len( entry.configFileName )       == 9
-						and string.sub( entry.configFileName, 1, 7 ) == "default" then
-					mrGearboxMogliLoader.defaultConfigE[entry.configFileName] = entry
-				elseif entry.configFileName ~= nil then
-					print(string.format( "zzzMrGearboxAddon: found external configuration for %s", entry.configFileName ))				
-					entry.configFileName = string.lower( entry.configFileName )
-					mrGearboxMogliLoader.configExt[entry.configFileName] = entry
-				end
-				j = j + 1
-				if configFileName ~= nil then
-					break
-				end
+								
+				i = i + 1
 			end
-			if j<=0 then
-				break
-			end
-			i = i + 1
 		end
-	end
+	end	
 end
 
 function mrGearboxMogliLoader.testXMLProperty( xmlFile, name )
