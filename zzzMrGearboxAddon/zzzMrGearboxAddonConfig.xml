@@ -100,6 +100,60 @@
 	</vehicle>	
 	
 	<vehicle>
+		<mod name="MR_Raba245Devavanya">
+			<link href="http://www.modhoster.de/mods/raba-245-devavanya"/>
+			<xmlFile name="Traktor250.xml"/>
+		</mod>
+		
+		<!-- http://mezogeparchivum.hu/Madat/tra_raba245.htm -->
+		<gearboxMogli autoStartStop="false" speedLimiter="false">
+			<gears defaultGear="4" shiftTimeMs="1000">
+				<gear speed="3.61"  name="1" forwardOnly="true"/>
+				<gear speed="3.61"  name="R" reverseOnly="true"/>
+				<gear speed="5.92"  name="2" forwardOnly="true"/>
+				<gear speed="9.58"  name="3" forwardOnly="true"/>
+				<gear speed="15.84" name="4" forwardOnly="true"/>
+				<gear speed="25.20" name="5" forwardOnly="true"/>
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
+				<range ratio="0.788" name="L" />
+				<range ratio="1"     name="H" />
+			</ranges>
+
+			<reverse ratio="1" shiftTimeMs="1200" resetRange="false" resetGear="false"/>
+
+			<!-- http://www.raba.hu/jarmu/jarmu.raba.hu/doctar/jarmu/Szoroanyagok/Szir_teljes_08.19.pdf -->
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <!-- 2100: 245(245) | 2100: 245(245) | 1600..1600: 898(898) | 95 | 0 | 249 | 1.7 | 2200 | 1380: 210 -->
+        <torque rpm="350" motorTorque="620" fuelUsageRatio="253"/>
+        <torque rpm="700" motorTorque="821" fuelUsageRatio="228.7"/>
+        <torque rpm="900" motorTorque="853" fuelUsageRatio="219.3"/>
+        <torque rpm="1000" motorTorque="865" fuelUsageRatio="215.8"/>
+        <torque rpm="1100" motorTorque="875" fuelUsageRatio="213.2"/>
+        <torque rpm="1200" motorTorque="883" fuelUsageRatio="211.3"/>
+        <torque rpm="1300" motorTorque="890" fuelUsageRatio="210.3"/>
+        <torque rpm="1400" motorTorque="894" fuelUsageRatio="210"/>
+        <torque rpm="1500" motorTorque="897" fuelUsageRatio="210.6"/>
+        <torque rpm="1600" motorTorque="898" fuelUsageRatio="212.2"/>
+        <torque rpm="1700" motorTorque="895" fuelUsageRatio="214.6"/>
+        <torque rpm="1800" motorTorque="885" fuelUsageRatio="217.9"/>
+        <torque rpm="1850" motorTorque="878" fuelUsageRatio="219.9"/>
+        <torque rpm="1900" motorTorque="870" fuelUsageRatio="222.2"/>
+        <torque rpm="1950" motorTorque="859" fuelUsageRatio="224.6"/>
+        <torque rpm="2000" motorTorque="848" fuelUsageRatio="227.3"/>
+        <torque rpm="2050" motorTorque="834" fuelUsageRatio="230.2"/>
+        <torque rpm="2100" motorTorque="819" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="766" fuelUsageRatio="237.5"/>
+        <torque rpm="2200" motorTorque="646" fuelUsageRatio="257.2"/>
+        <torque rpm="2250" motorTorque="473" fuelUsageRatio="299.1"/>
+        <torque rpm="2300" motorTorque="255" fuelUsageRatio="368.2"/>
+        <torque rpm="2350" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>	
+	
+	<vehicle>
 		<mod name="Schlueter2500VL" isPrefix="true">
 			<link href="http://www.modhoster.de/mods/2500vl" />
 			<link href="http://www.modhoster.de/mods/2500vl--2" />
@@ -3156,16 +3210,16 @@
 		<!--gearboxMogli clutchEngagingTimeMs="0" clutchOpenRpm="1850" clutchCloseRpm="2200" minClutchRatio="0.123" maxClutchRatio="0.95" maxBackwardSpeed="32">
 				
 			<gears shiftTimeMs="-1" clutchRatio="0.123" defaultGear="1" reverseReset="false" autoUpRpm="1900" autoDownRpm="1150" autoShiftMinClutch="0.123"-->	
-		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
 			<hydrostatic>
-        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm
+        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm 
         <efficiency ratio="0.666667" factor="0.88"/>
         <efficiency ratio="0.933333" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true" autoShiftTimeout="0" autoShiftTimeout2="0">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
@@ -3610,7 +3664,7 @@
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
 			<hydrostatic>
-        <efficiency ratio="0.020202" factor="0.7"/> 0.05 km/h @ 900 rpm
+        <efficiency ratio="0.020202" factor="0.7"/> 0.05 km/h @ 900 rpm 
         <efficiency ratio="0.666667" factor="0.88"/>
         <efficiency ratio="0.933333" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -3655,7 +3709,7 @@
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
 			<hydrostatic>
-        <efficiency ratio="0.0172" factor="0.7"/> 0.05 km/h @ 1000 rpm
+        <efficiency ratio="0.0172" factor="0.7"/> 0.05 km/h @ 1000 rpm 
         <efficiency ratio="0.666667" factor="0.88"/>
         <efficiency ratio="0.933333" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -3802,7 +3856,7 @@
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24">
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 0.05 km/h @ 900 rpm
+        <efficiency ratio="0.00719" factor="0.7"/> 0.05 km/h @ 900 rpm 
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4091,9 +4145,8 @@
 			<combine defaultWidth="4.2"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic minMaxTimeMs="100" startFactor="0.1">
-        <!--efficiency ratio="0.00719" factor="0.7"/--> 
-        <efficiency ratio="0" factor="0.7"/> 
+			<hydrostatic>
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4118,7 +4171,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4146,7 +4199,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4174,7 +4227,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4199,7 +4252,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4225,7 +4278,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4272,7 +4325,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4322,7 +4375,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4374,7 +4427,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4473,7 +4526,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4501,7 +4554,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4553,7 +4606,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4601,7 +4654,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4649,7 +4702,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4694,7 +4747,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4741,7 +4794,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -4788,7 +4841,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
+        <efficiency ratio="0.00719" factor="0.7"/>
         <efficiency ratio="0.6" factor="0.88"/>
         <efficiency ratio="0.92" factor="0.96"/>
         <efficiency ratio="1" factor="0.98"/>
@@ -5115,7 +5168,7 @@
 			<blowOffVentilSound volume="0"/>
 			
       <hydrostatic>
-        <efficiency ratio="0.046554" factor="0.793"/> <!-- 0.25 .. 2 -->
+        <efficiency ratio="0.046554" factor="0.793"/><!-- 0.25 .. 2 -->
         <efficiency ratio="0.465116" factor="0.88"/> <!-- 2.5 .. 20.4 -->
         <efficiency ratio="0.732558" factor="0.93"/> <!-- 3.93 .. 32.1 -->
         <efficiency ratio="1" factor="0.98"/> <!-- 5.37 .. 43.8 -->

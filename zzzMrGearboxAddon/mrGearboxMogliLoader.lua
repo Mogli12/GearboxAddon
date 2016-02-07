@@ -148,20 +148,22 @@ function mrGearboxMogliLoader.initXmlFiles()
 						if xmlName ~= nil then
 							modName              = getXMLString(xmlFile, string.format( "%s.configFile(%d)#modName", entry.xmlName, j ))
 							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
+							j = j + 1
 						else						
-							modName = getXMLString(xmlFile, string.format( "%s.mod(%d)#name", entry.xmlName, j ))
 							xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, j, k ))
-							
-							if modName ~= nil and xmlName ~= nil then															
-								entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.mod(%d)#isPrefix", entry.xmlName, j ))
-								
-							--print("New logic: "..tostring(modName).." "..tostring(xmlName).." "..tostring(entry.configIsPrefix).." ("..tostring(j).."/"..tostring(k)..")")
-								
-								j = j - 1
-								k = k + 1
+							if xmlName == nil then
+								j = j + 1
+								xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, j, 0 ))
+								if xmlName == nil then
+									break
+								end
+								k = 1
 							else
-								break
+								k = k + 1
 							end
+							
+							modName = getXMLString(xmlFile, string.format( "%s.mod(%d)#name", entry.xmlName, j ))
+							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.mod(%d)#isPrefix", entry.xmlName, j ))								
 						end
 
 						if modName ~= nil then
@@ -197,7 +199,6 @@ function mrGearboxMogliLoader.initXmlFiles()
 							mrGearboxMogliLoader.configExt[entry.configFileName] = entry
 						end
 					end
-					j = j + 1
 					if configFileName ~= nil then
 						break
 					end
