@@ -1253,7 +1253,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	if i > 0 then   
 		self.mrGbMS.Hydrostatic         = true
 		self.mrGbMS.HydrostaticMaxRpm   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm"), self.mrGbMS.RatedRpm )
-		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), 2000 )
+		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), 5000 )
 		self.mrGbMS.HydrostaticStart    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), Utils.clamp( 2 - self.mrGbMS.HydrostaticMax, self.mrGbMS.HydrostaticMin, 1 )  )
 		local sc = getXMLBool(xmlFile, xmlString .. ".hydrostatic#startWithClutch")
 		if sc == nil then
@@ -6366,7 +6366,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			local c = w / self.hydrostaticFactor
 			local e = 0
 			local h = self.hydrostaticFactor
-			local t = math.min( self.targetRpm, self.lastMotorRpm + self.tickDt * self.rpmIncFactor )
+			local t = self.targetRpm -- math.min( self.targetRpm, self.lastMotorRpm + self.tickDt * self.rpmIncFactor )
 			
 			-- min RPM
 			local n = math.max( self.idleRpm,       t - mrGearboxMogli.hydroEffDiff )
