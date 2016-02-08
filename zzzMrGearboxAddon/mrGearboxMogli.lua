@@ -848,6 +848,10 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"),   math.max(clutchEngagingTimeMs, 1000)), 1 )
+	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), not self.mrGbMS.TorqueConverterOrHydro ) 
+	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
+	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
+	self.mrGbMS.ClutchOverheatMaxTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 25000 ) 
 	
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
 	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
@@ -4984,8 +4988,8 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	self.ptoMotorRpmRatio        = motor.ptoMotorRpmRatio
 
 	self.maxTorque               = motor.maxTorque
-	self.lowBrakeForceScale      = 0 -- vehicle.mrGbMS.RealMotorBrakeFx --motor.lowBrakeForceScale
-	self.lowBrakeForceSpeedLimit = 0 -- motor.lowBrakeForceSpeedLimit
+	self.lowBrakeForceScale      = vehicle.mrGbMS.RealMotorBrakeFx --motor.lowBrakeForceScale
+	self.lowBrakeForceSpeedLimit = 0.01 -- motor.lowBrakeForceSpeedLimit
 		
 	self.maxPossibleRpm          = self.ratedRpm
 	self.wheelRpm                = 0
@@ -5170,7 +5174,8 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:getBestGear( acceleration, wheelSpeedRpm, accSafeMotorRpm, requiredWheelTorque, requiredMotorRpm )
 
-	local bestGearRatio = mrGearboxMogliMotor.getMogliGearRatio( self )
+	local gearRatio     = mrGearboxMogliMotor.getMogliGearRatio( self )
+	local bestGearRatio = gearRatio
 	local maxGearRatio  = math.max( mrGearboxMogli.maxGearRatio, 10*bestGearRatio )
 		
 	if      self.vehicle.mrGbML.gearShiftingNeeded ~= nil
@@ -5204,11 +5209,15 @@ function mrGearboxMogliMotor:getBestGear( acceleration, wheelSpeedRpm, accSafeMo
 		local refRpm    = self.lastMotorRpm + self.tickDt * ( acc * ( self.rpmIncFactor + self.vehicle.mrGbMS.RpmDecFactor ) - self.vehicle.mrGbMS.RpmDecFactor )
 		local clutchRpm = self.clutchPercent * wheelRpm + ( 1 - self.clutchPercent ) * refRpm
 		
-		if bestGearRatio * clutchRpm > maxGearRatio * wheelRpm then
+		if     wheelRpm < mrGearboxMogli.eps then
+			bestGearRatio = maxGearRatio
+		elseif bestGearRatio * clutchRpm > maxGearRatio * wheelRpm then
 			bestGearRatio = maxGearRatio
 		else
 			bestGearRatio = bestGearRatio * clutchRpm / wheelRpm 
 		end
+		
+		bestGearRatio = Utils.clamp( bestGearRatio, 0.5 * gearRatio, maxGearRatio )
 		
 		if self.gearRatio ~= nil and mrGearboxMogli.smoothClutch < 1 and bestGearRatio > self.gearRatio then
 			bestGearRatio = self.gearRatio + mrGearboxMogli.smoothClutch * ( bestGearRatio - self.gearRatio )
@@ -6615,6 +6624,41 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 		
 		self.clutchPercent = self.vehicle.mrGbMS.ManualClutch
+	end
+	
+	if self.vehicle.mrGbMS.ClutchCanOverheat then
+		if 0.1 < self.clutchPercent and self.clutchPercent < 0.9 then
+			if self.clutchOverheatTimer == nil then
+				self.clutchOverheatTimer = 0
+			else
+				self.clutchOverheatTimer = self.clutchOverheatTimer + self.tickDt
+			end
+
+			if self.vehicle.mrGbMS.ClutchOverheatMaxTime > 0 then
+				self.clutchOverheatTimer = math.min( self.clutchOverheatTimer, self.vehicle.mrGbMS.ClutchOverheatMaxTime )
+			end
+			
+			if      self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime
+					and self.vehicle.mrGbMS.ClutchOverheatIncTime > 0 then
+				local w = "Clutch is overheating"
+				if      self.vehicle.mrGbMS.WarningText ~= nil
+						and self.vehicle.mrGbMS.WarningText ~= "" 
+						and self.vehicle.mrGbMS.WarningText ~= w 
+						and string.len( self.vehicle.mrGbMS.WarningText ) < 200 then
+					w = self.vehicle.mrGbMS.WarningText .. " / " .. w
+				end
+					
+				self.vehicle:mrGbMSetState( "WarningText", w )
+				local e = 1 + ( self.clutchOverheatTimer - self.vehicle.mrGbMS.ClutchOverheatStartTime ) / self.vehicle.mrGbMS.ClutchOverheatIncTime
+				self.clutchPercent = self.clutchPercent ^ e
+			end
+		elseif self.clutchOverheatTimer ~= nil then
+			self.clutchOverheatTimer = self.clutchOverheatTimer - self.tickDt
+			
+			if self.clutchOverheatTimer < 0 then
+				self.clutchOverheatTimer = nil
+			end
+		end
 	end
 
 	--**********************************************************************************************************		
