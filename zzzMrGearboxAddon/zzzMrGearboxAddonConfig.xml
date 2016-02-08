@@ -5242,7 +5242,7 @@
 			<xmlFile name="gueldner/gueldnerG40Frontloader.xml"/>
 		</mod>
 		
-		<gearboxMogli clutchShiftingTimeMs="400" indoorCameraIndexList="">
+		<gearboxMogli clutchShiftingTimeMs="400" indoorCameraIndexList="" autoStartStop="false">
 
 			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1200">	
 				<gear speed="6.72"/>
@@ -5306,7 +5306,7 @@
 		</mod>
 		
 		<!-- http://www.buchertraktoren.ch/d4000_01.html -->
-		<gearboxMogli indoorCameraIndexList="">
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
 
 			<gears defaultGear="4" reverseReset="true" shiftTimeMs="1200">	
 				<gear speed="4.1"  forwardOnly="true" name="1"/>
@@ -5331,7 +5331,7 @@
 		</mod>
 		
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Hatz_H340 -->
-		<gearboxMogli indoorCameraIndexList="">
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
 			<gears defaultGear="4" shiftTimeMs="1200">	
 				<gear speed="4.23" />
 				<gear speed="7.23"/>
@@ -5358,7 +5358,38 @@
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz_D_80 -->
 		<!-- http://www.deutz-traktoren.de/traktoren/d_serie/d80.php -->
 	
-		<gearboxMogli indoorCameraIndexList="">
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
+			<realEngine idleRpm="900" ratedRpm="2300">
+        <!-- 2300: 75(75) | 2300: 75(75) | 1300..1300: 285(285) | 95 | 0.2 | 249 | 1.7 | 2400 | 1300: 210 -->
+        <torque rpm="350" motorTorque="183" fuelUsageRatio="262.6"/>
+        <torque rpm="700" motorTorque="254" fuelUsageRatio="231"/>
+        <torque rpm="900" motorTorque="271" fuelUsageRatio="219.3"/>
+        <torque rpm="1000" motorTorque="277" fuelUsageRatio="215.3"/>
+        <torque rpm="1100" motorTorque="281" fuelUsageRatio="212.3"/>
+        <torque rpm="1200" motorTorque="284" fuelUsageRatio="210.6"/>
+        <torque rpm="1300" motorTorque="285" fuelUsageRatio="210"/>
+        <torque rpm="1400" motorTorque="283" fuelUsageRatio="210.2"/>
+        <torque rpm="1500" motorTorque="281" fuelUsageRatio="210.9"/>
+        <torque rpm="1600" motorTorque="278" fuelUsageRatio="212.1"/>
+        <torque rpm="1700" motorTorque="273" fuelUsageRatio="213.7"/>
+        <torque rpm="1800" motorTorque="268" fuelUsageRatio="215.8"/>
+        <torque rpm="1850" motorTorque="265" fuelUsageRatio="217.1"/>
+        <torque rpm="1900" motorTorque="262" fuelUsageRatio="218.4"/>
+        <torque rpm="1950" motorTorque="259" fuelUsageRatio="219.9"/>
+        <torque rpm="2000" motorTorque="255" fuelUsageRatio="221.4"/>
+        <torque rpm="2050" motorTorque="251" fuelUsageRatio="223.1"/>
+        <torque rpm="2100" motorTorque="247" fuelUsageRatio="224.9"/>
+        <torque rpm="2150" motorTorque="243" fuelUsageRatio="226.9"/>
+        <torque rpm="2200" motorTorque="239" fuelUsageRatio="228.9"/>
+        <torque rpm="2250" motorTorque="234" fuelUsageRatio="231.1"/>
+        <torque rpm="2300" motorTorque="229" fuelUsageRatio="233.3"/>
+        <torque rpm="2350" motorTorque="214" fuelUsageRatio="237.5"/>
+        <torque rpm="2400" motorTorque="180" fuelUsageRatio="257.2"/>
+        <torque rpm="2450" motorTorque="132" fuelUsageRatio="299.1"/>
+        <torque rpm="2500" motorTorque="71" fuelUsageRatio="368.2"/>
+        <torque rpm="2550" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+			
 			<gears defaultGear="2" shiftTimeMs="1200">		
 				<gear speed="7"/>
 				<gear speed="11.3"/>
@@ -5383,7 +5414,7 @@
 		</mod>
 	
 		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1971_D.pdf -->
-		<gearboxMogli indoorCameraIndexList="">
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
 			<realEngine idleRpm="800" ratedRpm="2200">		
 				<torque rpm="0" ptoTorque="0" fuelUsageRatio="1" />
 				<torque rpm="800" ptoTorque="169" fuelUsageRatio="0.938" /><!-- idle -->
@@ -5427,7 +5458,7 @@
 			<xmlFile name="schlueter/schlueter1500TVL.xml"/>
 		</mod>
 		
-		<gearboxMogli autoStartStop="false"  clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
+		<gearboxMogli autoStartStop="false" clutchOpenRpm="1150" clutchCloseRpm="1300" torqueConverter="true">
 			<realEngine idleRpm="800" ratedRpm="2000">
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="800" motorTorque="508"/>
@@ -5469,7 +5500,70 @@
 				<range ratio="0.78"  reverseOnly="true" name="R"/>
 			</ranges>
 		</gearboxMogli>	
+	</vehicle>
 
+	<vehicle>
+		<mod name="KramerKL600F" isPrefix="true">
+			<link href="https://www.modhoster.de/mods/kramer-kl-600-pendelachse"/>
+			<xmlFile name="kramerKL600.xml"/>
+			<xmlFile name="kramerKL600AP.xml"/>
+			<xmlFile name="kramerKL600FA.xml"/>
+			<xmlFile name="kramerKL600GE.xml"/>
+			<xmlFile name="kramerKL600OS.xml"/>
+		</mod>
+		
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
+			<realEngine idleRpm="900" ratedRpm="2500">
+        <!-- 2500: 61(61) | 2500: 61(61) | 1700..1700: 177(177) | 85 | 0.5 | 249 | 1.7 | 2600 | 1540: 210 -->
+        <torque rpm="350" motorTorque="97" fuelUsageRatio="242.3"/>
+        <torque rpm="700" motorTorque="137" fuelUsageRatio="226.1"/>
+        <torque rpm="900" motorTorque="150" fuelUsageRatio="219.3"/>
+        <torque rpm="1000" motorTorque="157" fuelUsageRatio="216.6"/>
+        <torque rpm="1100" motorTorque="162" fuelUsageRatio="214.4"/>
+        <torque rpm="1200" motorTorque="167" fuelUsageRatio="212.6"/>
+        <torque rpm="1300" motorTorque="170" fuelUsageRatio="211.3"/>
+        <torque rpm="1400" motorTorque="173" fuelUsageRatio="210.4"/>
+        <torque rpm="1500" motorTorque="175" fuelUsageRatio="210"/>
+        <torque rpm="1600" motorTorque="177" fuelUsageRatio="210.1"/>
+        <torque rpm="1700" motorTorque="177" fuelUsageRatio="210.6"/>
+        <torque rpm="1800" motorTorque="177" fuelUsageRatio="211.7"/>
+        <torque rpm="1850" motorTorque="176" fuelUsageRatio="212.4"/>
+        <torque rpm="1900" motorTorque="176" fuelUsageRatio="213.3"/>
+        <torque rpm="1950" motorTorque="176" fuelUsageRatio="214.3"/>
+        <torque rpm="2000" motorTorque="176" fuelUsageRatio="215.4"/>
+        <torque rpm="2050" motorTorque="175" fuelUsageRatio="216.6"/>
+        <torque rpm="2100" motorTorque="175" fuelUsageRatio="217.9"/>
+        <torque rpm="2150" motorTorque="175" fuelUsageRatio="219.4"/>
+        <torque rpm="2200" motorTorque="174" fuelUsageRatio="221"/>
+        <torque rpm="2250" motorTorque="174" fuelUsageRatio="222.8"/>
+        <torque rpm="2300" motorTorque="173" fuelUsageRatio="224.6"/>
+        <torque rpm="2350" motorTorque="173" fuelUsageRatio="226.6"/>
+        <torque rpm="2400" motorTorque="172" fuelUsageRatio="228.7"/>
+        <torque rpm="2450" motorTorque="172" fuelUsageRatio="231"/>
+        <torque rpm="2500" motorTorque="171" fuelUsageRatio="233.3"/>
+        <torque rpm="2550" motorTorque="160" fuelUsageRatio="237.5"/>
+        <torque rpm="2600" motorTorque="135" fuelUsageRatio="257.2"/>
+        <torque rpm="2650" motorTorque="99" fuelUsageRatio="299.1"/>
+        <torque rpm="2750" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+			
+			<gears defaultGear="3">			
+				<gear speed="3.04"/>
+				<gear speed="4.75"/>
+				<gear speed="7.42"/>
+				<gear speed="11.6"/>
+				<gear speed="18.1"/>
+				<gear speed="28.3"/>
+			</gears>
+			
+			<ranges defaultRange="2" shiftTimeMs="0">
+				<range ratio="0.7" forwardOnly="true" name="L"/>
+				<range ratio="1.0" forwardOnly="true" name="H"/>
+				<range ratio="1.0" reverseOnly="true" name="R"/>
+			</ranges>
+			
+			<reverse shiftTimeMs="0"/>
+		</gearboxMogli>	
 	</vehicle>
 	
 </vehicles>

@@ -62,7 +62,7 @@ mrGearboxMogli.accDeadZone          = 0.15
 mrGearboxMogli.blowOffVentilTime0   = 1000
 mrGearboxMogli.blowOffVentilTime1   = 1000
 mrGearboxMogli.blowOffVentilTime2   = 100
-mrGearboxMogli.limitRpmMode         = "M" -- "M" -- "H"uge/"T"orque/"M"axPossible/"TM" see smoothTorque
+mrGearboxMogli.limitRpmMode         = "M" -- "H"uge/"T"orque/"M"axPossible/"TM" see smoothTorque
 mrGearboxMogli.resetSoundRPM        = true
 mrGearboxMogli.debugGearShift       = false
 mrGearboxMogli.globalsLoaded        = false
@@ -4706,14 +4706,14 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c )
 		
 		if self.mrGbML.debugTimer ~= nil and g_currentMission.time < self.mrGbML.debugTimer then
-			print(string.format("%4.0f Nm, %4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %2.2f km/h %2.2f km/h, %3.1f, %3.1f, %3.1f, %3.0f%%, %d",
+			print(string.format("%4.0f Nm, %4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %2.2f %2.2f km/h, %3.1f, %3.1f, %3.1f, %3.0f%%, %d",
 													torque*1000, 
 													brakePedal*1000,
 													self.motor.nonClampedMotorRpm,
 													self.motor.wheelRpm,
 													self.motor.maxPossibleRpm,
-													maxRotSpeed, 
-													maxRotSpeed * 3.6 / math.max( ratio, 1 ),
+													maxRpm, 
+													maxRotSpeed,
 													self.lastSpeedReal * self.movingDirection * 3600,
 													ratio,
 													mrGearboxMogliMotor.getMogliGearRatio( self.motor ),
@@ -4984,7 +4984,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	self.ptoMotorRpmRatio        = motor.ptoMotorRpmRatio
 
 	self.maxTorque               = motor.maxTorque
-	self.lowBrakeForceScale      = vehicle.mrGbMS.RealMotorBrakeFx --motor.lowBrakeForceScale
+	self.lowBrakeForceScale      = 0 -- vehicle.mrGbMS.RealMotorBrakeFx --motor.lowBrakeForceScale
 	self.lowBrakeForceSpeedLimit = 0 -- motor.lowBrakeForceSpeedLimit
 		
 	self.maxPossibleRpm          = self.ratedRpm
@@ -5173,7 +5173,12 @@ function mrGearboxMogliMotor:getBestGear( acceleration, wheelSpeedRpm, accSafeMo
 	local bestGearRatio = mrGearboxMogliMotor.getMogliGearRatio( self )
 	local maxGearRatio  = math.max( mrGearboxMogli.maxGearRatio, 10*bestGearRatio )
 		
-	if self.noTorque then
+	if      self.vehicle.mrGbML.gearShiftingNeeded ~= nil
+			and self.vehicle.mrGbML.gearShiftingNeeded == 2 then
+		acc = 1
+	elseif  self.noTorque 
+			or  self.noTransmission 
+			or  self.clutchPercent < mrGearboxMogli.minClutchPercent then
 		acc = 0
 	end
 	
@@ -5184,26 +5189,35 @@ function mrGearboxMogliMotor:getBestGear( acceleration, wheelSpeedRpm, accSafeMo
 		if self.vehicle.mrGbMS.ReverseActive then
 			absWheelSpeedRpm = -wheelSpeedRpm
 		end		
-		absWheelSpeedRpm = math.max( absWheelSpeedRpm, mrGearboxMogli.eps )
+	--absWheelSpeedRpm = math.max( absWheelSpeedRpm, mrGearboxMogli.eps )
 		
 		local wheelRpm = absWheelSpeedRpm * bestGearRatio
 		
-		local factor1 = self.ratedRpm / math.max( wheelRpm, mrGearboxMogli.eps )
-		local factor2 = self.clutchPercent + ( 1 - self.clutchPercent ) * acc * factor1
-		bestGearRatio = math.min( bestGearRatio * math.max( factor2, mrGearboxMogli.eps ), maxGearRatio )
+--		local factor1 = self.ratedRpm / math.max( wheelRpm, mrGearboxMogli.eps )
+--		local factor2 = self.clutchPercent + ( 1 - self.clutchPercent ) * acc * factor1
+--		bestGearRatio = math.min( bestGearRatio * math.max( factor2, mrGearboxMogli.eps ), maxGearRatio )
+--		
+--		if bestGearRatio * absWheelSpeedRpm < self.idleRpm then
+--			bestGearRatio = math.min( self.idleRpm / absWheelSpeedRpm, maxGearRatio )
+--		end
+
+		local refRpm    = self.lastMotorRpm + self.tickDt * ( acc * ( self.rpmIncFactor + self.vehicle.mrGbMS.RpmDecFactor ) - self.vehicle.mrGbMS.RpmDecFactor )
+		local clutchRpm = self.clutchPercent * wheelRpm + ( 1 - self.clutchPercent ) * refRpm
 		
-		if bestGearRatio * absWheelSpeedRpm < self.idleRpm then
-			bestGearRatio = math.min( self.idleRpm / absWheelSpeedRpm, maxGearRatio )
+		if bestGearRatio * clutchRpm > maxGearRatio * wheelRpm then
+			bestGearRatio = maxGearRatio
+		else
+			bestGearRatio = bestGearRatio * clutchRpm / wheelRpm 
 		end
 		
 		if self.gearRatio ~= nil and mrGearboxMogli.smoothClutch < 1 and bestGearRatio > self.gearRatio then
 			bestGearRatio = self.gearRatio + mrGearboxMogli.smoothClutch * ( bestGearRatio - self.gearRatio )
 		end
 
-		--if self.vehicle.mrGbML.debugTimer ~= nil and g_currentMission.time < self.vehicle.mrGbML.debugTimer then
-		--	local gr = mrGearboxMogliMotor.getMogliGearRatio( self )
-		--	print(string.format("f1: %0.4f, f2: %0.4f, acc: %0.4f, cp: %0.4f, bg: %3.0f, gr: %3.0f, w: %4.0f, w2: %4.0f", factor1, factor2, acc, self.clutchPercent, bestGearRatio, gr, wheelRpm, wheelRpm*bestGearRatio/gr ))
-		--end
+		if self.vehicle.mrGbML.debugTimer ~= nil and g_currentMission.time < self.vehicle.mrGbML.debugTimer then
+			local gr = mrGearboxMogliMotor.getMogliGearRatio( self )
+			print(string.format("f1: %0.4f, f2: %0.4f, acc: %0.4f, cp: %0.4f, bg: %3.0f, gr: %3.0f, w: %4.0f, w2: %4.0f", factor1, factor2, acc, self.clutchPercent, bestGearRatio, gr, wheelRpm, wheelRpm*bestGearRatio/gr ))
+		end
 	end
 	
 	if self.vehicle.mrGbMS.ReverseActive then
