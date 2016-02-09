@@ -521,28 +521,35 @@
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
 		<gearboxMogli autoStartStop="true" soundMaxRpm="1900">
 			<realEngine idleRpm="1000" ratedRpm="2350" >
-        <!-- 2300: 190(190) | 2350: 190(190) | 1200..1200: 723(723) | 97 | 0 | 250 | 2.2 | 2500 | 1200: 207 -->
-        <torque rpm="100" motorTorque="179" motorTorqueEco="179" fuelUsageRatio="381.8"/>
-        <torque rpm="400" motorTorque="522" motorTorqueEco="522" fuelUsageRatio="299.4"/>
-        <torque rpm="700" motorTorque="664" motorTorqueEco="664" fuelUsageRatio="243.1"/>
-        <torque rpm="800" motorTorque="685" motorTorqueEco="685" fuelUsageRatio="230.1"/>
-        <torque rpm="900" motorTorque="701" motorTorqueEco="701" fuelUsageRatio="220"/>
-        <torque rpm="1000" motorTorque="713" motorTorqueEco="713" fuelUsageRatio="212.8"/>
-        <torque rpm="1100" motorTorque="721" motorTorqueEco="721" fuelUsageRatio="208.4"/>
-        <torque rpm="1200" motorTorque="723" motorTorqueEco="723" fuelUsageRatio="207"/>
-        <torque rpm="1300" motorTorque="722" motorTorqueEco="722" fuelUsageRatio="207.3"/>
-        <torque rpm="1400" motorTorque="718" motorTorqueEco="718" fuelUsageRatio="208.3"/>
-        <torque rpm="1500" motorTorque="712" motorTorqueEco="712" fuelUsageRatio="209.9"/>
-        <torque rpm="1600" motorTorque="704" motorTorqueEco="704" fuelUsageRatio="212.2"/>
-        <torque rpm="1700" motorTorque="693" motorTorqueEco="693" fuelUsageRatio="215.1"/>
-        <torque rpm="1800" motorTorque="680" motorTorqueEco="680" fuelUsageRatio="218.7"/>
-        <torque rpm="1900" motorTorque="665" motorTorqueEco="665" fuelUsageRatio="222.9"/>
-        <torque rpm="2000" motorTorque="647" motorTorqueEco="647" fuelUsageRatio="227.8"/>
-        <torque rpm="2100" motorTorque="627" motorTorqueEco="627" fuelUsageRatio="233.3"/>
-        <torque rpm="2200" motorTorque="605" motorTorqueEco="605" fuelUsageRatio="239.5"/>
-        <torque rpm="2300" motorTorque="580" motorTorqueEco="580" fuelUsageRatio="246.3"/>
-        <torque rpm="2400" motorTorque="551" motorTorqueEco="551" fuelUsageRatio="254.5"/>
-        <torque rpm="2500" motorTorque="383" motorTorqueEco="383" fuelUsageRatio="319.7"/>
+        <!-- 2300: 190(190) | 2350: 190(190) | 1200..1200: 723(723) | 95 | 0.5 | 249 | 1.7 | 2500 | 1200: 207 -->
+        <torque rpm="350" motorTorque="282" fuelUsageRatio="373.2"/>
+        <torque rpm="700" motorTorque="535" fuelUsageRatio="264.5"/>
+        <torque rpm="900" motorTorque="645" fuelUsageRatio="227.7"/>
+        <torque rpm="1000" motorTorque="687" fuelUsageRatio="216.2"/>
+        <torque rpm="1100" motorTorque="714" fuelUsageRatio="209.3"/>
+        <torque rpm="1200" motorTorque="723" fuelUsageRatio="207"/>
+        <torque rpm="1300" motorTorque="716" fuelUsageRatio="207.2"/>
+        <torque rpm="1400" motorTorque="708" fuelUsageRatio="207.7"/>
+        <torque rpm="1500" motorTorque="698" fuelUsageRatio="208.6"/>
+        <torque rpm="1600" motorTorque="688" fuelUsageRatio="209.8"/>
+        <torque rpm="1700" motorTorque="676" fuelUsageRatio="211.3"/>
+        <torque rpm="1800" motorTorque="663" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="656" fuelUsageRatio="214.3"/>
+        <torque rpm="1900" motorTorque="649" fuelUsageRatio="215.5"/>
+        <torque rpm="1950" motorTorque="641" fuelUsageRatio="216.8"/>
+        <torque rpm="2000" motorTorque="633" fuelUsageRatio="218.1"/>
+        <torque rpm="2050" motorTorque="625" fuelUsageRatio="219.6"/>
+        <torque rpm="2100" motorTorque="617" fuelUsageRatio="221.1"/>
+        <torque rpm="2150" motorTorque="608" fuelUsageRatio="222.7"/>
+        <torque rpm="2200" motorTorque="599" fuelUsageRatio="224.4"/>
+        <torque rpm="2250" motorTorque="590" fuelUsageRatio="226.2"/>
+        <torque rpm="2300" motorTorque="580" fuelUsageRatio="228"/>
+        <torque rpm="2350" motorTorque="568" fuelUsageRatio="230"/>
+        <torque rpm="2400" motorTorque="531" fuelUsageRatio="234.2"/>
+        <torque rpm="2450" motorTorque="447" fuelUsageRatio="253.5"/>
+        <torque rpm="2500" motorTorque="328" fuelUsageRatio="294.8"/>
+        <torque rpm="2550" motorTorque="177" fuelUsageRatio="363"/>
+        <torque rpm="2600" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
 			</realEngine>
 		
 			<gears defaultGear="4" shiftTimeMs="0">

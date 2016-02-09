@@ -1,19 +1,19 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="23">
 	<author>Mogli aka Biedens</author>
 	<title>
 		<en>Gearbox AddOn</en>
-		<de>Getriebe AddOn</de> 
+		<de>Getriebe AddOn</de>
 	</title>
 	<description>
-		<en>Gearbox: 
+		<en>Gearbox:
 			<![CDATA[Adds the specialization mrGearboxMogli to all condigured vehicles]]>
 		</en>
-		<de>Getriebe: 
+		<de>Getriebe:
 			<![CDATA[Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]>
 		</de>
 	</description>
-	<multiplayer supported="true"/>   
+	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
 	<version>1.3.0.6</version>
 	<l10n>
@@ -59,7 +59,7 @@
 		<text name="mrGearboxMogliDECTOLIMIT"><de>Getriebe: Bremsen</de><en>Gearbox: deceleration</en></text>
 		<text name="mrGearboxMogliECO"><de>Getriebe: Eco an/aus</de><en>Gearbox: eco on/off</en></text>
 		<text name="mrGearboxMogliKEEPSPEED"><de>Getriebe: Geschwindigkeit halten</de><en>Gearbox: keep speed</en></text>
-		
+
 		<text name="mrGearboxMogliTEXT_OFF">    <de>Motor aus</de>  <en>motor off</en></text>
 		<text name="mrGearboxMogliTEXT_AI">     <de>Helfer</de>     <en>AI</en></text>
 		<text name="mrGearboxMogliTEXT_BRAKE">  <de>Handbremse</de> <en>handbrake</en></text>
@@ -72,7 +72,7 @@
 		<text name="mrGearboxMogliTEXT_ALLAUTO"><de>Vereinfacht</de><en>simple</en></text>
 		<text name="mrGearboxMogliTEXT_ECO">    <de>Eco</de>   			<en>eco</en></text>
 	</l10n>
-	<inputBindings>		
+	<inputBindings>
 		<input name="mrGearboxMogliSHIFTGEARUP" 	  key1="KEY_leftbracket"     button="BUTTON_3" category="VEHICLE" />
 		<input name="mrGearboxMogliSHIFTGEARDOWN"   key1="KEY_quote"           button="BUTTON_4" category="VEHICLE" />
 		<input name="mrGearboxMogliSHIFTRANGEUP"    key1="KEY_rightbracket"             category="VEHICLE" />
@@ -112,5 +112,5 @@
 
 	<extraSourceFiles>
 		<sourceFile filename="register.lua" />
-	</extraSourceFiles>    
+	</extraSourceFiles>
 </modDesc>
