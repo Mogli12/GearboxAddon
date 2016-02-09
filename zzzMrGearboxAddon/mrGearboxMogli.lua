@@ -1257,8 +1257,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	if i > 0 then   
 		self.mrGbMS.Hydrostatic         = true
 		self.mrGbMS.HydrostaticMaxRpm   = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm"), self.mrGbMS.RatedRpm )
-		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), 5000 )
-		self.mrGbMS.HydrostaticStart    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), Utils.clamp( 2 - self.mrGbMS.HydrostaticMax, self.mrGbMS.HydrostaticMin, 1 )  )
+		self.mrGbMS.HydrostaticIncTime  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs"), 2000 )
+		self.mrGbMS.HydrostaticStart    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), 0.2 ) --Utils.clamp( 2 - self.mrGbMS.HydrostaticMax, self.mrGbMS.HydrostaticMin, 1 )  )
 		local sc = getXMLBool(xmlFile, xmlString .. ".hydrostatic#startWithClutch")
 		if sc == nil then
 			local smallestGearSpeed  = self.mrGbMS.Gears[1].speed 
@@ -1271,7 +1271,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			if smallestGearSpeed < 1 then
 			--print(string.format( "mrGearboxMogli: smallest gear speed id: %3.1f km/h => launch only with hydrostatic drive" ))
 				self.mrGbMS.HydrostaticLaunch      = true
-				self.mrGbMS.TorqueConverterOrHydro = false	
+			--self.mrGbMS.TorqueConverterOrHydro = false	
 			else
 				self.mrGbMS.HydrostaticLaunch      = false
 			end
@@ -5689,9 +5689,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 			
 		if     currentSpeed > speedLimit then
+			--print(string.format("too fast: %2.1f %2.1f", currentSpeed, speedLimit))
 			accelerationPedal = 0.01
-		elseif currentSpeed > speedLimit - 0.5 then
-			accelerationPedal = math.min( accelerationPedal, math.max( 0.01, 2 * ( speedLimit - currentSpeed ) ) )
+		--elseif currentSpeed > speedLimit - 0.2 then
+		--	--print(string.format("nearly too fast: %2.1f %2.1f", currentSpeed, speedLimit))
+		--	accelerationPedal = math.min( accelerationPedal, math.max( 0.01, 5 * ( speedLimit - currentSpeed ) ) )
 		end
 	end	
 	
@@ -5821,7 +5823,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		targetRpm = Utils.clamp( self.minRequiredRpm - accelerationPedal * mrGearboxMogli.ptoRpmThrottleDiff, self.stallRpm, self.ratedRpm )		
 	elseif getMaxPower then
 	-- get max power even with "drueckung"
-		targetRpm = math.min( self.maxPowerRpm+(1-mrGearboxMogli.rpmReduction)*self.ratedRpm, self.maxMaxPowerRpm )
+		targetRpm = self.maxMaxPowerRpm -- math.min( self.maxPowerRpm+(1-mrGearboxMogli.rpmReduction)*self.ratedRpm, self.maxMaxPowerRpm )
 	else
 	-- get RPM that fits best to requested power
 		targetRpm = Utils.clamp( self.rpmPowerCurve:get( requestedPower ), self.minRequiredRpm, self.ratedRpm )
@@ -6507,8 +6509,10 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			elseif self.hydrostaticFactor < self.vehicle.mrGbMS.HydrostaticMin then
 				self.hydrostaticFactor = self.vehicle.mrGbMS.HydrostaticMin 
 			end
-			
-			--print(string.format("s: %2.1f, t: %4.0f, m: %4.0f, n: %4.0f, c: %4.0f, n: %4.0f, %0.3f, %0.3f, %0.3f, %0.3f, %0.3f", currentSpeed, self.targetRpm, m, n, c, w / self.hydrostaticFactor, self.hydrostaticFactor, h, hMin, hMax, d ))
+
+			if mrGearboxMogli.debugGearShift then
+				print(string.format("s: %2.1f, t: %4.0f, m: %4.0f, n: %4.0f, c: %4.0f, n: %4.0f, %0.3f, %0.3f, %0.3f, %0.3f, %0.3f", currentSpeed, self.targetRpm, m, n, c, w / self.hydrostaticFactor, self.hydrostaticFactor, h, hMin, hMax, d ))
+			end		
 		end		
 	end
 	
