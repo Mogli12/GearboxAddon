@@ -9,6 +9,7 @@
 
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Kirovets_K-700A -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/kirovets701m.pdf -->
+		<!-- https://data.motor-talk.de/data/galleries/0/73/1160/47059283/kirovets-k-700-a-page-2-1630353563984878437.jpg -->
 		<gearboxMogli autoStartStop="false" speedLimiter="false">
 			<gears defaultGear="1" shiftTimeMs="0">
 				<gear speed="17.1"/>
@@ -30,23 +31,27 @@
 			
 			<reverse ratio="1" shiftTimeMs="1200" resetRange="true" resetGear="false"/>
 			
-			<realEngine idleRpm="800" ratedRpm="1800">
-				<torque rpm="0" motorTorque="0"/>
-				<torque rpm="700" motorTorque="766"/>
-				<torque rpm="800" motorTorque="839"/>
-				<torque rpm="900" motorTorque="891"/>
-				<torque rpm="1000" motorTorque="922"/>
-				<torque rpm="1100" motorTorque="932"/>
-				<torque rpm="1200" motorTorque="932"/>
-				<torque rpm="1300" motorTorque="932"/>
-				<torque rpm="1400" motorTorque="932"/>
-				<torque rpm="1500" motorTorque="930"/>
-				<torque rpm="1600" motorTorque="928"/>
-				<torque rpm="1700" motorTorque="925"/>
-				<torque rpm="1800" motorTorque="858"/>
-				<torque rpm="1900" motorTorque="763"/>
-				<torque rpm="2000" motorTorque="477"/>
-				<torque rpm="2100" motorTorque="0"/>
+			<realEngine idleRpm="800" ratedRpm="1900">
+        <!-- 1700: 225(225) | 1900: 220(220) | 1300..1300: 1108(1108) | 90 | 0.5 | 249 | 1.7 | 2000 | 1300: 175 -->
+        <torque rpm="350" motorTorque="570" fuelUsageRatio="218.9"/>
+        <torque rpm="700" motorTorque="879" fuelUsageRatio="192.5"/>
+        <torque rpm="900" motorTorque="997" fuelUsageRatio="182.8"/>
+        <torque rpm="1000" motorTorque="1046" fuelUsageRatio="179.4"/>
+        <torque rpm="1100" motorTorque="1080" fuelUsageRatio="176.9"/>
+        <torque rpm="1200" motorTorque="1101" fuelUsageRatio="175.5"/>
+        <torque rpm="1300" motorTorque="1108" fuelUsageRatio="175"/>
+        <torque rpm="1400" motorTorque="1080" fuelUsageRatio="175.5"/>
+        <torque rpm="1500" motorTorque="1041" fuelUsageRatio="177.2"/>
+        <torque rpm="1600" motorTorque="987" fuelUsageRatio="179.9"/>
+        <torque rpm="1700" motorTorque="929" fuelUsageRatio="183.6"/>
+        <torque rpm="1800" motorTorque="873" fuelUsageRatio="188.5"/>
+        <torque rpm="1850" motorTorque="843" fuelUsageRatio="191.3"/>
+        <torque rpm="1900" motorTorque="813" fuelUsageRatio="194.4"/>
+        <torque rpm="1950" motorTorque="760" fuelUsageRatio="198"/>
+        <torque rpm="2000" motorTorque="641" fuelUsageRatio="214.3"/>
+        <torque rpm="2050" motorTorque="470" fuelUsageRatio="249.2"/>
+        <torque rpm="2100" motorTorque="253" fuelUsageRatio="306.9"/>
+        <torque rpm="2150" motorTorque="0" fuelUsageRatio="388.9"/>
 			</realEngine>
 		</gearboxMogli>	
 	</vehicle>
