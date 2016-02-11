@@ -135,7 +135,8 @@ function mrGearboxMogliLoader.initXmlFiles()
 				local configFileName = getXMLString(xmlFile, baseName .. "#configFileName")
 				
 				local j = 0
-				local k = 0				
+				local k = 0		
+				local l = 0
 				while true do
 					local entry = { xmlName = baseName }
 					
@@ -150,10 +151,13 @@ function mrGearboxMogliLoader.initXmlFiles()
 							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.configFile(%d)#isPrefix", entry.xmlName, j ))
 							j = j + 1
 						else						
-							xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, j, k ))
+							xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, l, k ))
 							if xmlName == nil then
-								j = j + 1
-								xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(%d)#name", entry.xmlName, j, 0 ))
+								if k == 0 then
+									break
+								end
+								l = l + 1
+								xmlName = getXMLString(xmlFile, string.format( "%s.mod(%d).xmlFile(0)#name", entry.xmlName, l ))
 								if xmlName == nil then
 									break
 								end
@@ -162,8 +166,8 @@ function mrGearboxMogliLoader.initXmlFiles()
 								k = k + 1
 							end
 							
-							modName = getXMLString(xmlFile, string.format( "%s.mod(%d)#name", entry.xmlName, j ))
-							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.mod(%d)#isPrefix", entry.xmlName, j ))								
+							modName = getXMLString(xmlFile, string.format( "%s.mod(%d)#name", entry.xmlName, l ))
+							entry.configIsPrefix = getXMLBool(xmlFile, string.format( "%s.mod(%d)#isPrefix", entry.xmlName, l ))								
 						end
 
 						if modName ~= nil then

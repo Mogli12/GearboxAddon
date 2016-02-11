@@ -563,6 +563,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.StallRpm  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#stallRpm"), math.max( self.mrGbMS.IdleRpm  - mrGearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 	end
 	
+	self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString..".realEngine#boostMinSpeed"), 30 ) / 3600
+	
 	if self.mrGbMS.Engine.fuelUsageValues == nil then
 		local fuelUsageRatio = getXMLFloat(xmlFile, xmlString.."#minFuelUsageRatio")
 		if fuelUsageRatio == nil then
@@ -800,7 +802,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.MaxClutchPercentTC = self.mrGbMS.MaxClutchPercent
 			self.mrGbMS.MaxClutchPercent   = 1
 		else
-			self.mrGbMS.MaxClutchPercentTC = 0.91
+			self.mrGbMS.MaxClutchPercentTC = 0.9
 		end
 	end
 
@@ -836,9 +838,9 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	local clutchEngagingTimeMs          = getXMLFloat(xmlFile, xmlString .. "#clutchEngagingTimeMs")
 	if clutchEngagingTimeMs == nil then
 		if     self.mrGbMS.TorqueConverterOrHydro then
-			clutchEngagingTimeMs = 200
+			clutchEngagingTimeMs = 2000
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
-			clutchEngagingTimeMs = 500
+			clutchEngagingTimeMs = 1000
 		else
 			clutchEngagingTimeMs = 5000 -- 1000 = 1s
 		end
@@ -1486,7 +1488,7 @@ function mrGearboxMogli:update(dt)
 	
 	if      self.mrGbMS.WarningText ~= nil
 			and self.mrGbMS.WarningText ~= "" then
-		if self.mrGbMG.blinkingWarning then
+		if self.mrGbMG.blinkingWarning and self.isEntered then
 			g_currentMission:showBlinkingWarning(self.mrGbMS.WarningText, self.mrGbML.warningTimer - g_currentMission.time )
 			self.mrGbMS.WarningText = ""
 		elseif g_currentMission.time < self.mrGbML.warningTimer then
@@ -5260,6 +5262,8 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 	self.neededPtoTorque  = 0	
 	self.lastMissingTorque= 0
 	
+	local lastPtoTorque   = self.lastPtoTorque
+	
 	local acc             = math.max( math.abs( acceleration ), self.minThrottle )
 	local brakePedal      = 0
 	local rpm             = math.max( self.stallRpm, self.nonClampedMotorRpm )
@@ -5276,8 +5280,20 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and acc   < 1 then
 		limit               = self.minRequiredRpm + acc * ( self.maxAllowedRpm - self.minRequiredRpm )	
 	end
+
+	local pt = 0
+	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
+	if self.neededPtoTorque > 0 then
+	  pt = self.neededPtoTorque / self.ptoMotorRpmRatio
+	end
+
 	local currentTorqueCurve = self.torqueCurve
-	if self.vehicle.mrGbMS.EcoMode and self.ecoTorqueCurve ~= nil then
+	if      self.ecoTorqueCurve ~= nil
+			and ( self.vehicle.mrGbMS.EcoMode
+				 or ( self.neededPtoTorque                   <= 0
+					and self.motorLoadS                        <  0.99
+					and not ( self.vehicle.mrGbMS.IsCombine and self.vehicle:getIsTurnedOn() )
+					and math.abs( self.vehicle.lastSpeedReal ) < self.vehicle.mrGbMS.BoostMinSpeed ) ) then
 		currentTorqueCurve = self.ecoTorqueCurve
 	end
 	
@@ -5305,11 +5321,6 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 
 	self.lastMotorTorque  = torque
 	
-	local pt = 0
-	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
-	if self.neededPtoTorque > 0 then
-	  pt = self.neededPtoTorque / self.ptoMotorRpmRatio
-	end
 	
 	if self.vehicle.mrGbMS.IsCombine then
 		local combinePower    = 0
@@ -6634,7 +6645,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.clutchOverheatTimer == nil then
 				self.clutchOverheatTimer = 0
 			else
-				self.clutchOverheatTimer = self.clutchOverheatTimer + self.tickDt
+				self.clutchOverheatTimer = self.clutchOverheatTimer + self.tickDt * motorLoad
 			end
 
 			if self.vehicle.mrGbMS.ClutchOverheatMaxTime > 0 then
