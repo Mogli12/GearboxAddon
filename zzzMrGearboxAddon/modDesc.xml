@@ -15,11 +15,11 @@
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.3.0.6</version>
+	<version>1.3.0.7</version>
 	<l10n>
 		<text name="mrGearboxMogliVERSION">
-		<de>Getriebe v1.3 beta6 von Mogli</de>
-		 <en>Gearbox v1.3 beta6 by mogli</en></text>
+		<de>Getriebe v1.3 beta7 von Mogli</de>
+		 <en>Gearbox v1.3 beta7 by mogli</en></text>
 		<text name="mrGearboxMogliSHIFTGEARUP"><de>Getriebe: Gang hoch</de><en>Gearbox: Gear up</en></text>
 		<text name="mrGearboxMogliSHIFTGEARDOWN"><de>Getriebe: Gang runter</de><en>Gearbox: Gear down</en></text>
 		<text name="mrGearboxMogliSHIFTRANGEUP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en></text>
@@ -71,6 +71,7 @@
 		<text name="mrGearboxMogliTEXT_VARIO">  <de>Stufenlos</de>  <en>CVT</en></text>
 		<text name="mrGearboxMogliTEXT_ALLAUTO"><de>Vereinfacht</de><en>simple</en></text>
 		<text name="mrGearboxMogliTEXT_ECO">    <de>Eco</de>   			<en>eco</en></text>
+		<text name="mrGearboxMogliTEXT_AUTO_HOLD"><de>Auto Hold</de><en>auto hold</en></text>
 	</l10n>
 	<inputBindings>
 		<input name="mrGearboxMogliSHIFTGEARUP" 	  key1="KEY_leftbracket"     button="BUTTON_3" category="VEHICLE" />

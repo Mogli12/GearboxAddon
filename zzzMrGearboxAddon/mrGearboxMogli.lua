@@ -124,6 +124,7 @@ mrGearboxMogliGlobals.grindingMaxRpmSound   = 600
 mrGearboxMogliGlobals.grindingMaxRpmDelta   = mrGearboxMogli.huge
 mrGearboxMogliGlobals.hydroTransVolRatio    = 0.2
 mrGearboxMogliGlobals.defaultAIAllAuto      = false
+mrGearboxMogliGlobals.autoHold              = true
 
 
 --**********************************************************************************************************	
@@ -307,6 +308,7 @@ function mrGearboxMogli:initClient()
 	self.mrGbMGetRangeNumber       = mrGearboxMogli.mrGbMGetRangeNumber
 	self.mrGbMGetRange2Number      = mrGearboxMogli.mrGbMGetRange2Number
 	self.mrGbMGetHasAllAuto        = mrGearboxMogli.mrGbMGetHasAllAuto
+	self.mrGbMGetAutoHold          = mrGearboxMogli.mrGbMGetAutoHold
 	
 --**********************************************************************************************************	
 
@@ -401,7 +403,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 		self.mrGbMG.modifySound    = false
 		self.mrGbMG.modifyVolume   = true
-		self.mrGbMG.modifyTransVol = mrGearboxMogliLoader.testXMLProperty( xmlFile, xmlString ..".hydrostatic.efficiency(0)#ratio" )
+		self.mrGbMG.modifyTransVol = ( getXMLFloat( xmlFile, xmlString .. ".hydrostatic.efficiency(0)#ratio" ) ~= nil )
 		
 		self.mrGbMG.playGrindingSound = false
 		mrGearboxMogli.globalsLoad2( xmlFile, "vehicle.gearboxMogliGlobals", self.mrGbMG )	
@@ -1749,8 +1751,10 @@ function mrGearboxMogli:update(dt)
 		elseif not ( self.steeringEnabled ) then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_AI", "AI" )
 			text2 = text
-		elseif self.mrGbMS.HandBrake then
+		elseif driveControlHandBrake then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_BRAKE", "handbrake" )
+		elseif self.mrGbMS.HandBrake then
+			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_AUTO_HOLD", "auto hold" )
 		elseif self.mrGbML.gearShiftingNeeded < 0 then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_DC", "double clutch" ) .." "..tostring(-self.mrGbML.gearShiftingNeeded)
 			text2 = text
@@ -1819,6 +1823,25 @@ function mrGearboxMogli:update(dt)
 				and not ( driveControlHandBrake )
 				and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
 			self:mrGbMSetNeutralActive( false ) 
+		end
+		
+		if      self.mrGbMG.autoHold 
+				and self.dCcheckModule ~= nil
+				and self:dCcheckModule("handBrake")
+				and self.mrGbMS.NeutralActive
+				and not self.mrGbMS.HandBrake
+				and self.axisForward > 0.8 then
+			if self.mrGbML.autoHoldTimer == nil then
+				self.mrGbML.autoHoldTimer = 0
+			else
+				self.mrGbML.autoHoldTimer = self.mrGbML.autoHoldTimer + dt
+			end
+			if self.mrGbML.autoHoldTimer > 3000 then
+				self.mrGbML.autoHoldTimer = nil
+				self:mrGbMSetState( "HandBrake", true )
+			end
+		elseif self.mrGbML.autoHoldTimer ~= nil then
+			self.mrGbML.autoHoldTimer = nil
 		end
 
 		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
@@ -2054,6 +2077,7 @@ function mrGearboxMogli:update(dt)
 						end
 						if done then
 							self:mrGbMSetNeutralActive( false  )
+							self:mrGbMSetState( "HandBrake", false )
 						end
 						if self.mrGbMS.ReverseActive then
 							curGear = -curGear 
@@ -4247,6 +4271,16 @@ function mrGearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 		end
 	end 
 end 
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMOnSetNeutral
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMGetAutoHold( )
+	if self.dCcheckModule ~= nil and self:dCcheckModule("handBrake") then
+		return false
+	end
+	return self.mrGbMG.autoHold
+end
 		
 --**********************************************************************************************************	
 -- mrGearboxMogli:mrGbMOnSetNeutral
@@ -4268,7 +4302,9 @@ function mrGearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		
 		if not ( new ) then
 			self:mrGbMSetState( "HandBrake", false )
-		elseif self.lastSpeedReal < 0.0003 then
+		elseif  self.lastSpeedReal < 0.0003
+				and self:mrGbMGetAutoHold( self )
+				and self.mrGbMS.G27Mode <= 0 then
 			self:mrGbMSetState( "HandBrake", true )
 		end
 	end
@@ -4587,6 +4623,10 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 				acceleration = -self.axisForward 
 			end
 		end
+		
+		if acceleration < -0.001 then
+			brakeLights = true
+		end
 	elseif doHandbrake  then
 		self.motor.speedLimitS = 0
 		self:mrGbMSetNeutralActive( true )
@@ -4643,10 +4683,10 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		if math.abs(self.rotatedTime) < 0.01 or self.articulatedAxis == nil then
 			brakePedal = 1
 		end
+		
 	elseif acceleration < -0.001 then
 		-- braking 
 		brakePedal  = -acceleration
-		brakeLights = true		
 	elseif acceleration < 0.001 then
 		-- just rolling 
 		--if currentSpeed < self.mrGbMB.motor.lowBrakeForceSpeedLimit then
@@ -5903,7 +5943,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 	-- handbrake 
 		if      ( math.abs( currentSpeed ) < 0.5 or self.wheelRpm < 0 )
-				and self.vehicle.mrGbMS.NeutralActive then
+				and self.vehicle.mrGbMS.NeutralActive 
+				and self.vehicle:mrGbMGetAutoHold( ) then
 			self.vehicle:mrGbMSetState( "HandBrake", true )
 		end
 					
