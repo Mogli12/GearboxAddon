@@ -272,14 +272,14 @@
 		<!-- http://manuals.deere.com/omview/OMAL152891_29/?tM= -->
 		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200" speedLimiter="false">
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="22.2" name="1" />
 				<gear speed="26.8" name="2" />
 				<gear speed="32.1" name="3" />
 				<gear speed="39.3" name="4" />
 			</gears>
 
-			<ranges defaultRange="4" gearOffset="3">
+			<ranges defaultRange="4">
 				<range ratio="0.109" name="A" />
 				<range ratio="0.228" name="B" />
 				<range ratio="0.365" name="C" />
@@ -304,16 +304,16 @@
 		</mod>
 		
 		<!-- http://manuals.deere.com/omview/OMAL213126_19/?tM= -->
-		<gearboxMogli>
+		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false">
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" swapGearRangeKeys="true" speedLimiter="false">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="28.2" name="1" />
 				<gear speed="34.0" name="2" />
 				<gear speed="40.7" name="3" />
 				<gear speed="49.8" name="4" />
 			</gears>
 
-			<ranges defaultRange="4" gearOffset="3">
+			<ranges defaultRange="4">
 				<range ratio="0.066139995" name="A" />
 				<range ratio="0.15978375"  name="B" />
 				<range ratio="0.261285722" name="C" />
@@ -742,12 +742,12 @@
 			</realEngine>
 							
 			<!-- speed matching => use automatic shifting of "ranges" -> swap gears and ranges -->
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1" automatic="true">	
+			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1" automatic="true" speedMatching="true">	
 				<gear speed="35.14" name="L"/>
 				<gear speed="42.18" name="H"/>
 			</gears>
 
-			<ranges defaultRange="2" gearOffset="1">
+			<ranges defaultRange="2">
 				<range ratio="0.201" name="1"/>
 				<range ratio="0.357" name="2"/>
 				<range ratio="0.591" name="3"/>
@@ -836,14 +836,14 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 		
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
 				<gear speed="41.83" name="M"/>
 				<gear speed="50.00" name="H"/>
 			</gears>
 
-			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
+			<ranges defaultRange="4" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.1096" name="1" />
 				<range ratio="0.1972" name="2" />
 				<range ratio="0.3164" name="3" />
@@ -885,14 +885,14 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 			
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" speedMatching="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
 				<gear speed="41.83" name="M"/>
 				<gear speed="50.00" name="H"/>
 			</gears>
 
-			<ranges defaultRange="4" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
+			<ranges defaultRange="4" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.1096" name="1" />
 				<range ratio="0.1972" name="2" />
 				<range ratio="0.3164" name="3" />
@@ -931,14 +931,14 @@
 			</realEngine>
 
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="29.6" name="P1"/>
 				<gear speed="35.5" name="P2"/>
 				<gear speed="42.5" name="P3"/>
 				<gear speed="50.9" name="P4"/>
 			</gears>
 			
-			<ranges defaultRange="2" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
+			<ranges defaultRange="2" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.2"   name="1"/>
 				<range ratio="0.342" name="2"/>
 				<range ratio="0.585" name="3"/>
@@ -1132,7 +1132,7 @@
 				<torque rpm="2100" motorTorque="0"/>
 			</realEngine>
 		
-			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true" defaultGear="1"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
+			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true" defaultGear="1" speedMatching="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
 				<gear speed="37.53"  forwardOnly="true" name="1"/>
 				<gear speed="40.46"  reverseOnly="true" name="R1"/>
 				<gear speed="48.2"   forwardOnly="true" name="2"/>
@@ -1144,7 +1144,7 @@
 
 			</gears>
 			
-			<ranges clutchRatio="0.7" automatic="true" shiftTimeMs="800" reverseReset="true" defaultRange="2" gearOffset="7">
+			<ranges clutchRatio="0.7" automatic="true" shiftTimeMs="800" reverseReset="true" defaultRange="2">
 				<range ratio="0.219" name="L" />
 				<range ratio="1"     name="H" forwardOnly="true" />
 			</ranges>
@@ -1325,7 +1325,7 @@
 				<gear speed="50.67" />	
 			</gears>
 
-			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true" gearOffset="3">
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
 				<range ratio="0.375" name="L" />
 				<range ratio="1"   name="H" />
 			</ranges>
@@ -1385,7 +1385,7 @@
 				<gear speed="50.67" />	
 			</gears>
 
-			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true" gearOffset="3">
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
 				<range ratio="0.375" name="L" />
 				<range ratio="1"   name="H" />
 			</ranges>
@@ -1663,7 +1663,7 @@
 				<gear speed="23.5"  name="5" />
 				<gear speed="40.0"  name="6" />
 			</gears>
-			<ranges defaultRange="2" gearOffset="1" shiftTimeMs="1200">
+			<ranges defaultRange="2" shiftTimeMs="1200">
 				<range ratio="0.7825" name="A" />
 				<range ratio="1.0000" name="S" />
 			</ranges>
@@ -1708,7 +1708,7 @@
 				<gear speed="23.5"  name="5" />
 				<gear speed="40.0"  name="6" />
 			</gears>
-			<ranges defaultRange="2" gearOffset="1" shiftTimeMs="1200">
+			<ranges defaultRange="2" shiftTimeMs="1200">
 				<range ratio="0.7825" name="A" />
 				<range ratio="1.0000" name="S" />
 			</ranges>
@@ -2246,13 +2246,13 @@
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<!-- http://www.lamborghini-tractors.com/de-DE/weinberg-und-obstplantage/download/2618_de209aea3647557f5cfe006c19b4b317 -->
 		<gearboxMogli swapGearRangeKeys="true">
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="30.48" name="L"/>
 				<gear speed="36.57" name="M"/>
 				<gear speed="44.33" name="H"/>
 			</gears>
 
-			<ranges defaultRange="3" gearOffset="1" shiftTimeMs="800" clutchRatio="0.7">
+			<ranges defaultRange="3" shiftTimeMs="800" clutchRatio="0.7">
 				<range ratio="0.2123" name="1" />
 				<range ratio="0.3093" name="2" />
 				<range ratio="0.4597" name="3" />
@@ -2693,13 +2693,13 @@
 		<!-- AutoQuad -->
 		<!--
 		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false">
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
 				<gear speed="22.2" name="1" />
 				<gear speed="26.8" name="2" />
 				<gear speed="32.1" name="3" />
 				<gear speed="39.3" name="4" />
 			</gears>
-			<ranges defaultRange="4" shiftTimeMs="800" gearOffset="1">
+			<ranges defaultRange="4" shiftTimeMs="800">
 				<range ratio="0.109" name="A" />
 				<range ratio="0.228" name="B" />
 				<range ratio="0.365" name="C" />
@@ -4131,7 +4131,8 @@
 			<link href="http://www.two3d.eu/epages/78356386.sf/de_DE/?ObjectPath=/Shops/78356386/Products/Fendt1050" />
 			<xmlFile name="Fendt1050.xml"/>
 		</mod>
-		<mod name="Fendt1050">
+		<mod name="Fendt1050" isPrefix="true">
+			<link href="http://farming-simulator.com/mod.php?mod_id=35810" />
 			<xmlFile name="Fendt1050.xml"/>
 		</mod>
 		
@@ -4139,7 +4140,7 @@
 		<!-- http://youtu.be/FOg5EbLVqDU -->
 		<!-- http://www.deag.ch/assets/contentfiles/downloads/man-uebers-Fahrzeug.pdf -->
 		<!-- https://youtu.be/ojRzfKwCxTY -->
-		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpm="1577">
+		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpmEco="1577" ptoRpm="1900">
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
@@ -4151,30 +4152,33 @@
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="true" automatic="true">	
 				<gear name="" speed="22.75"/>
 				<gear name="" speed="53"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
+			<reverse ratio="0.714" shiftTimeMs="500" />
 
-			<realEngine idleRpm="800" ratedRpm="1800">		
-        <torque rpm="0" motorTorque="0" fuelUsageRatio="204"/><!-- 1800: 500 | 1800: 500 | 1100..1400: 2400 | 0.75 | 1 -->
-        <torque rpm="700" motorTorque="1333" fuelUsageRatio="204"/>
-        <torque rpm="800" motorTorque="1800" fuelUsageRatio="204"/>
-        <torque rpm="900" motorTorque="2133" fuelUsageRatio="200"/>
-        <torque rpm="1000" motorTorque="2333" fuelUsageRatio="197"/>
-        <torque rpm="1100" motorTorque="2400" fuelUsageRatio="195"/>
-        <torque rpm="1200" motorTorque="2400" fuelUsageRatio="194"/>
-        <torque rpm="1300" motorTorque="2400" fuelUsageRatio="194"/>
-        <torque rpm="1400" motorTorque="2400" fuelUsageRatio="196"/>
-        <torque rpm="1500" motorTorque="2288" fuelUsageRatio="198"/>
-        <torque rpm="1600" motorTorque="2175" fuelUsageRatio="203"/>
-        <torque rpm="1700" motorTorque="2063" fuelUsageRatio="208"/>
-        <torque rpm="1800" motorTorque="1951" fuelUsageRatio="215"/>
-        <torque rpm="1900" motorTorque="1791" fuelUsageRatio="233"/>
-        <torque rpm="2000" motorTorque="1314" fuelUsageRatio="285"/>
-        <torque rpm="2100" motorTorque="517" fuelUsageRatio="373"/>
-        <torque rpm="2200" motorTorque="0" fuelUsageRatio="0"/>
+			<realEngine idleRpm="800" ratedRpm="1900">		
+        <!-- 1900: 500(500) | 1900: 500(500) | 1050..1400: 2300(2300) | 95 | 0.7 | 249 | 1.7 | 2000 | 1230: 191 -->
+        <torque rpm="350" motorTorque="1452" fuelUsageRatio="226.6"/>
+        <torque rpm="700" motorTorque="2084" fuelUsageRatio="203.9"/>
+        <torque rpm="900" motorTorque="2259" fuelUsageRatio="196"/>
+        <torque rpm="1000" motorTorque="2295" fuelUsageRatio="193.4"/>
+        <torque rpm="1100" motorTorque="2300" fuelUsageRatio="191.8"/>
+        <torque rpm="1200" motorTorque="2300" fuelUsageRatio="191"/>
+        <torque rpm="1300" motorTorque="2300" fuelUsageRatio="191.2"/>
+        <torque rpm="1400" motorTorque="2300" fuelUsageRatio="192.4"/>
+        <torque rpm="1500" motorTorque="2231" fuelUsageRatio="194.4"/>
+        <torque rpm="1600" motorTorque="2152" fuelUsageRatio="197.5"/>
+        <torque rpm="1700" motorTorque="2061" fuelUsageRatio="201.4"/>
+        <torque rpm="1800" motorTorque="1951" fuelUsageRatio="206.4"/>
+        <torque rpm="1850" motorTorque="1898" fuelUsageRatio="209.2"/>
+        <torque rpm="1900" motorTorque="1848" fuelUsageRatio="212.2"/>
+        <torque rpm="1950" motorTorque="1727" fuelUsageRatio="216.1"/>
+        <torque rpm="2000" motorTorque="1456" fuelUsageRatio="233.9"/>
+        <torque rpm="2050" motorTorque="1067" fuelUsageRatio="272"/>
+        <torque rpm="2100" motorTorque="575" fuelUsageRatio="334.9"/>
+        <torque rpm="2150" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="424.4"/>
 			</realEngine>
 		</gearboxMogli>			
 	</vehicle>	

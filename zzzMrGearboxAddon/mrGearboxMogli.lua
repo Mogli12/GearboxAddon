@@ -8,7 +8,7 @@
 --
 --***************************************************************
 
-local mrGearboxMogliVersion=1.303
+local mrGearboxMogliVersion=1.308
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if mrGearboxMogli == nil or mrGearboxMogli.version == nil or mrGearboxMogli.version < mrGearboxMogliVersion then
@@ -96,6 +96,7 @@ mrGearboxMogliGlobals.shiftEffectTime			  = 251 -- ms
 mrGearboxMogliGlobals.modifySound           = true
 mrGearboxMogliGlobals.modifyVolume          = true
 mrGearboxMogliGlobals.modifyTransVol        = true
+mrGearboxMogliGlobals.indoorSoundFactor     = 0.6
 mrGearboxMogliGlobals.shiftTimeMsFactor     = 1
 mrGearboxMogliGlobals.playGrindingSound     = true
 mrGearboxMogliGlobals.defaultHudMode        = 1    -- 0: no HUD, 1: big HUD, 2: small HUD with gear name only
@@ -464,6 +465,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
 	self.mrGbMS.MinTargetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.6 * self.mrGbMS.IdleRpm + 0.3 * self.mrGbMS.RatedRpm )
 	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.15 )
+	self.mrGbMS.IndoorSoundFactor       = getXMLFloat(xmlFile, xmlString .. "#indoorSoundFactor")
 	
 	local indoorCameraIndexListString   = getXMLString(xmlFile, xmlString .. "#indoorCameraIndexList")
 	self.mrGbMS.IndoorCameraIndexList   = {}
@@ -842,16 +844,16 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		if     self.mrGbMS.TorqueConverterOrHydro then
 			clutchEngagingTimeMs = 2000
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
-			clutchEngagingTimeMs = 1000
+			clutchEngagingTimeMs = 500
 		else
-			clutchEngagingTimeMs = 5000 -- 1000 = 1s
+			clutchEngagingTimeMs = 1000 -- 1000 = 1s
 		end
 	end
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
-	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"),   math.max(clutchEngagingTimeMs, 1000)), 1 )
+	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"),   math.max(clutchEngagingTimeMs, 500)), 1 )
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
@@ -1237,6 +1239,13 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.AutoShiftGears = true
 	end
 	
+	self.mrGbMS.MatchRanges        = Utils.getNoNil(getXMLString(xmlFile, xmlString .. ".ranges(0)#speedMatching"), "" )
+	if self.mrGbMS.MatchRanges == "" and rangeGearOffset == 0 then
+	  self.mrGbMS.MatchGears       = Utils.getNoNil(getXMLString(xmlFile, xmlString .. ".gears#speedMatching"), "end" )
+	else
+		self.mrGbMS.MatchGears       = ""
+	end
+	
 	i = 0 
 	while true do
 		local baseName = xmlString .. string.format(".hydrostatic.efficiency(%d)", i) 		
@@ -1293,8 +1302,12 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end
 	
 	self.mrGbMS.AutoShiftTimeoutLong  = mrGearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftTimeout"),  self.mrGbMG.autoShiftTimeoutLong , 0, self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual )
-	self.mrGbMS.AutoShiftTimeoutShort = mrGearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftTimeout2"), self.mrGbMG.autoShiftTimeoutShort, 0, self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual )
+	self.mrGbMS.AutoShiftTimeoutShort = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftTimeout2"), self.mrGbMG.autoShiftTimeoutShort )
 	self.mrGbMS.AutoShiftMinClutch    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftMinClutch"), self.mrGbMS.MaxClutchPercent - 0.1 ) 
+
+	if self.mrGbMS.AutoShiftTimeoutShort > self.mrGbMS.AutoShiftTimeoutLong then
+		self.mrGbMS.AutoShiftTimeoutShort = self.mrGbMS.AutoShiftTimeoutLong
+	end
 
 	local enableAI = getXMLBool( xmlFile, xmlString .. "#enableAI" )
 	if enableAI == nil then
@@ -1609,7 +1622,9 @@ function mrGearboxMogli:update(dt)
 			self.mrGbMB.threshingVolume      = self.sampleThreshing.volume
 			self.mrGbMB.threshingPitchOffset = self.sampleThreshing.pitchOffset
 		end
-		if self.indoorSounds ~= nil and self.indoorSounds.sounds ~= nil then
+		if      self.mrGbMS.IndoorSoundFactor == nil
+				and self.indoorSounds             ~= nil 
+				and self.indoorSounds.sounds      ~= nil then
 			for i,s in pairs(self.indoorSounds.sounds) do
 				if s.outdoor ~= nil and s.indoor ~= nil and s.indoorFactor ~= nil then
 					if     s.name == "sampleMotor"    then
@@ -2075,7 +2090,7 @@ function mrGearboxMogli:update(dt)
 							done    = self:mrGbMSetCurrentGear(math.abs(gear), false, true)
 							curGear = self.mrGbMS.CurrentGear
 						end
-						if done then
+						if done or self.mrGbMS.NeutralActive then
 							self:mrGbMSetNeutralActive( false  )
 							self:mrGbMSetState( "HandBrake", false )
 						end
@@ -2344,12 +2359,14 @@ function mrGearboxMogli:update(dt)
 
 				local indoorFactor0 = 1				
 				if isIndoor then
-					if     self.dCcheckModule ~= nil and self:dCcheckModule("inDoorSound") then 
+					if     self.mrGbMS.IndoorSoundFactor ~= nil then
+						indoorFactor0 = self.mrGbMS.IndoorSoundFactor
+					elseif self.dCcheckModule ~= nil and self:dCcheckModule("inDoorSound") then 
 						indoorFactor0 = Utils.getNoNil( driveControl.inDoorSoundFactor, 0.45 )
 					elseif self.internalSound ~= nil then
 						indoorFactor0 = Utils.getNoNil( self.internalSound.factor, 0.5 )
 					else
-						indoorFactor0 = 0.6
+						indoorFactor0 = self.mrGbMG.indoorSoundFactor
 					end
 				end
 				
@@ -2362,7 +2379,7 @@ function mrGearboxMogli:update(dt)
 					self.sampleMotor.volume    = self.mrGbMB.soundVolume * ( self.mrGbMS.IdleVolumeFactor + motorLoad * self.mrGbMS.IdleVolumeFactorInc )
 					
 					local indoorFactor = indoorFactor0
-					if isIndoor and self.mrGbMB.soundIndoorIndex ~= nil then
+					if isIndoor and self.mrGbMB.soundIndoorIndex  ~= nil then
 						indoorFactor = Utils.getNoNil( self.indoorSounds.sounds[self.mrGbMB.soundIndoorIndex].indoorFactor, 0.4 )
 					end
 					
@@ -3261,11 +3278,65 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetRangeForNewGear( newGear )
 	local newRange = self.mrGbMS.CurrentRange
-	if     newGear > self.mrGbMS.CurrentGear and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset   ~= nil then 
-		newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset
-	elseif newGear < self.mrGbMS.CurrentGear and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset ~= nil then 
-		newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset
+	if      newGear ~= self.mrGbMS.CurrentGear
+			and self.mrGbMS.MatchRanges == "true" then
+		newRange = -1
+	elseif newGear > self.mrGbMS.CurrentGear then
+		if      self.mrGbMS.MatchRanges == "end"
+				and self.mrGbMS.CurrentRange == table.getn( self.mrGbMS.Gears ) then
+			newRange = -1
+		elseif  self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset   ~= nil then 
+			newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset
+		end
+	elseif newGear < self.mrGbMS.CurrentGear then
+		if      self.mrGbMS.MatchRanges == "end"
+				and self.mrGbMS.CurrentRange == 1 then
+			newRange = -1
+		elseif  self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset ~= nil then 
+			newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset
+		end
 	end
+
+	if newRange == -1 then
+		newRange = self.mrGbMS.CurrentRange
+		if newGear > self.mrGbMS.CurrentGear then
+			if self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset   ~= nil then 
+				newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].upRangeOffset
+			end
+		else
+			if self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset ~= nil then 
+				newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset
+			end
+		end
+		
+		local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
+		local delta = nil
+		for i,r in pairs(self.mrGbMS.Ranges) do
+			local skip = false
+			if self.mrGbMS.ReverseActive then
+				skip = g.forwardOnly
+			else
+				skip = g.reverseOnly
+			end
+			if not ( skip ) then			
+				local diff = self.mrGbMS.Gears[newGear].speed * r.ratio - speed 
+				if newGear < self.mrGbMS.CurrentGear then
+					if      diff < 0
+							and ( delta == nil or delta < diff ) then
+						delta = diff
+						newRange = i
+					end
+				else
+					if      diff > 0
+							and ( delta == nil or delta > diff ) then
+						delta = diff
+						newRange = i
+					end
+				end
+			end
+		end
+	end
+	
 	newRange = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, "range" )
 	return newRange
 end
@@ -3323,11 +3394,66 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetGearForNewRange( newRange )
 	local newGear  = self.mrGbMS.CurrentGear
-	if     newRange > self.mrGbMS.CurrentRange and self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset   ~= nil then 
-		newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset
-	elseif newRange < self.mrGbMS.CurrentRange and self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset ~= nil then  
-		newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset
+	
+	if      newRange ~= self.mrGbMS.CurrentRange
+			and self.mrGbMS.MatchGears == "true" then
+		newGear = -1
+	elseif  newRange > self.mrGbMS.CurrentRange then
+		if      self.mrGbMS.MatchGears == "end"
+				and self.mrGbMS.CurrentGear == table.getn( self.mrGbMS.Gears ) then
+			newGear = -1
+		elseif  self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset   ~= nil then 
+			newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset
+		end
+	elseif  newRange < self.mrGbMS.CurrentRange then
+		if      self.mrGbMS.MatchGears == "end"
+				and self.mrGbMS.CurrentGear == 1 then
+			newGear = -1
+		elseif  self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset ~= nil then  
+			newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset
+		end
 	end
+	
+	if newGear == -1 then
+		newGear = self.mrGbMS.CurrentGear
+		if newRange > self.mrGbMS.CurrentRange then
+			if  self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset   ~= nil then 
+				newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset
+			end
+		else
+			if  self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset   ~= nil then 
+				newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].upGearOffset
+			end
+		end
+		
+		local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
+		local delta = nil
+		for i,g in pairs(self.mrGbMS.Gears) do
+			local skip = false
+			if self.mrGbMS.ReverseActive then
+				skip = g.forwardOnly
+			else
+				skip = g.reverseOnly
+			end
+			if not ( skip ) then			
+				local diff = g.speed * self.mrGbMS.Ranges[newRange].ratio - speed 
+				if newRange < self.mrGbMS.CurrentRange then
+					if      diff < 0
+							and ( delta == nil or delta < diff ) then
+						delta = diff
+						newGear = i
+					end
+				else
+					if      diff > 0
+							and ( delta == nil or delta > diff ) then
+						delta = diff
+						newGear = i
+					end
+				end
+			end
+		end
+	end
+	
 	newGear = mrGearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears, self.mrGbMS.CurrentGear, newGear, "gear" )
 	return newGear 
 end
@@ -4028,13 +4154,11 @@ function mrGearboxMogli:mrGbMDoGearShift(increaseOnly)
 			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutLong 
 			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
 		elseif self.mrGbML.lastGearSpeed < self.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
-		--self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutLong 
-			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
+			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutLong 
 			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
 		elseif self.mrGbML.lastGearSpeed > self.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
 			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
-		--self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutLong 
-			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
+			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutLong 
 		else
 			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
 			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.AutoShiftTimeoutShort 
@@ -4276,7 +4400,11 @@ end
 -- mrGearboxMogli:mrGbMOnSetNeutral
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMGetAutoHold( )
-	if self.dCcheckModule ~= nil and self:dCcheckModule("handBrake") then
+	if not ( self.steeringEnabled ) then
+		return false
+	elseif self:mrGbMGetAutoStartStop() then
+		return true
+	elseif self.dCcheckModule ~= nil and self:dCcheckModule("handBrake") then
 		return false
 	end
 	return self.mrGbMG.autoHold
@@ -4325,9 +4453,9 @@ function mrGearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
 
 	--timer to shift the "range"
 	if self.isServer then
+		self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
+		self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
 		mrGearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftHl, self.mrGbMS.Range1DoubleClutch, self.mrGbMS.GearShiftEffectHl ) 
-		self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.ClutchAfterShiftHl + self.mrGbMS.AutoShiftTimeoutShort
-		self.mrGbML.autoShiftUpTimer   = g_currentMission.time +self.mrGbMS.ClutchAfterShiftHl  + self.mrGbMS.AutoShiftTimeoutShort
 	end 
 end 
 
@@ -4346,9 +4474,9 @@ function mrGearboxMogli:mrGbMOnSetRange2( old, new, noEventSend )
 
 	--timer to shift the "range 2"
 	if self.isServer then	
-		mrGearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftRanges2, self.mrGbMS.Range2DoubleClutch, self.mrGbMS.GearShiftEffectRanges2 ) 
 		self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
 		self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
+		mrGearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftRanges2, self.mrGbMS.Range2DoubleClutch, self.mrGbMS.GearShiftEffectRanges2 ) 		
 	end 
 end 
 
@@ -4359,27 +4487,19 @@ function mrGearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
 
 	local timeToShift = self.mrGbMS.GearTimeToShiftGear
 	
-	if     new > self.mrGbMS.CurrentGear then
-		if self.isServer then
-		--self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutLong 
-			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutShort
-			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutShort
-		end 
-	elseif new < self.mrGbMS.CurrentGear then                                              
-		if self.isServer then
-			self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutShort
-		--self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutLong 
-			self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.GearTimeToShiftGear + self.mrGbMS.AutoShiftTimeoutShort
-		end 
-		if mrGearboxMogli.superFastDownShift and timeToShift < 1 then
-			timeToShift = -1
-		end
+	if      new < self.mrGbMS.CurrentGear                                               
+			and mrGearboxMogli.superFastDownShift 
+			and timeToShift < 1 then
+		timeToShift = -1
 	end			
 	
 	self.mrGbMS.CurrentGear = new
 	self.mrGbMS.NewGear     = new
 	
 	if self.isServer then	
+		self.mrGbML.autoShiftDownTimer = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
+		self.mrGbML.autoShiftUpTimer   = g_currentMission.time + self.mrGbMS.ClutchAfterShiftRanges2 + self.mrGbMS.AutoShiftTimeoutShort
+		
 	-- adjust clutch % to fit rpm after gear shift	
 		local clutchPercent = self.mrGbMS.ClutchAfterShiftGear
 		if clutchPercent < 0 and self.mrGbML.motor ~= nil then
@@ -4706,12 +4826,11 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		accelerationPedal          =  acceleration
 	end
 	
-	if      brakePedal < 0.001 
-			and ( ( self.movingDirection * currentSpeed >  0.0003 and self.mrGbMS.ReverseActive )
-			   or ( self.movingDirection * currentSpeed < -0.0003 and not ( self.mrGbMS.ReverseActive ) ) ) then
+	if      self:mrGbMGetAutoHold()
+			and ( ( self.movingDirection * currentSpeed >  0.0001 and self.mrGbMS.ReverseActive )
+			   or ( self.movingDirection * currentSpeed < -0.0001 and not ( self.mrGbMS.ReverseActive ) ) ) then
 		-- wrong direction 
 		brakePedal  = 1
-		brakeLights = true
 	end
 
 	self.setBrakeLightsVisibility(self, brakeLights)
@@ -6070,7 +6189,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 				end
 			
-				if      accelerationPedal                    < mrGearboxMogli.accDeadZone
+				if      self.clutchOverheatTimer ~= nil 
+						and self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime - 100
+						and self.vehicle.mrGbMS.ClutchOverheatIncTime > 0 then
+					-- stop burning the clutch 
+					self.vehicle.mrGbML.autoShiftDownTimer = 0
+				elseif  accelerationPedal                    < mrGearboxMogli.accDeadZone
 						and self.vehicle.mrGbML.currentGearSpeed < self.vehicle.mrGbMS.LaunchGearSpeed - mrGearboxMogli.eps then
 					-- no down shift for small gears w/o throttle
 					self.vehicle.mrGbML.autoShiftDownTimer = math.max( self.vehicle.mrGbML.autoShiftDownTimer, g_currentMission.time + self.vehicle.mrGbMS.AutoShiftTimeoutLong )
@@ -6079,8 +6203,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						and self.nonClampedMotorRpm > self.ratedRpm
 						and self.nonClampedMotorRpm > 0.5 * ( self.ratedRpm + self.maxAllowedRpm ) then
 					-- allow immediate gear up if rpm is too high
-					self.vehicle.mrGbML.autoShiftUpTimer   = 0
-				elseif  self.autoClutchPercent <  self.vehicle.mrGbMS.AutoShiftMinClutch then
+					if self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
+						self.vehicle.mrGbML.autoShiftUpTimer = 0				
+					else
+						self.vehicle.mrGbML.autoShiftUpTimer = math.min( self.vehicle.mrGbML.autoShiftUpTimer, self.vehicle.mrGbML.autoShiftDownTimer )		
+					end
+				elseif  self.autoClutchPercent  <  self.vehicle.mrGbMS.AutoShiftMinClutch then
 					-- no gear up if clutch is open
 					self.vehicle.mrGbML.autoShiftUpTimer   = math.max( self.vehicle.mrGbML.autoShiftUpTimer, g_currentMission.time + self.vehicle.mrGbMS.AutoShiftTimeoutShort )
 				end
@@ -6199,15 +6327,14 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							end
 							
 							if isValidEntry and self.vehicle:mrGbMGetAutoShiftGears() and self.vehicle:mrGbMGetAutoShiftRange() then
-							--if      i2r ~= mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
-							--		and i2g ~= mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r ) then
 								if self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftHl + 10 then
 									if i2r ~= self.vehicle.mrGbMS.CurrentRange then
 										-- shifting gears is more expensive => avoid paradox up/down shifts
-										local ng = mrGearboxMogli.mrGbMGetGearForNewRange( self.vehicle, i2r )
-										if     spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps and i2g < ng then
+										if      spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps 
+												and i2g < self.vehicle.mrGbMS.CurrentGear then
 											isValidEntry = false
-										elseif spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps and i2g > ng then
+										elseif  spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps 
+												and i2g > self.vehicle.mrGbMS.CurrentGear then
 											isValidEntry = false
 										end
 									end
@@ -6215,10 +6342,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								else
 									if i2g ~= self.vehicle.mrGbMS.CurrentGear then
 										-- shifting ranges is more expensive => avoid up/paradox down shifts
-										local nr = mrGearboxMogli.mrGbMGetRangeForNewGear( self.vehicle, i2g )
-										if     spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps and i2r < nr then
+										if      spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps 
+												and i2r < self.vehicle.mrGbMS.CurrentRange then
 											isValidEntry = false
-										elseif spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps and i2r > nr then
+										elseif  spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps 
+												and i2r > self.vehicle.mrGbMS.CurrentRange then
 											isValidEntry = false
 										end
 									end
@@ -6236,14 +6364,15 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							end
 							
 							if isValidEntry then
-								local autoShiftTimeout = 2 * timeToShift
+								local autoShiftTimeout = math.max( 0, 2 * timeToShift )
 								local downTimeout = autoShiftTimeout
 								local upTimeout   = autoShiftTimeout
 								
 								if      accelerationPedal       > 0.5
 										and self.autoClutchPercent  > 0.95 * self.vehicle.mrGbMS.MaxClutchPercent
 										and self.nonClampedMotorRpm > self.ratedRpm         
-										and self.nonClampedMotorRpm > 0.5 * ( self.ratedRpm + self.maxAllowedRpm ) then
+										and self.nonClampedMotorRpm > 0.5 * ( self.ratedRpm + self.maxAllowedRpm ) 
+										and self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
 								-- allow immediate gear up if rpm is too high
 									upTimeout   = 0
 								end
@@ -6262,7 +6391,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 									autoShiftTimeout = autoShiftTimeout + math.min( self.vehicle.mrGbML.autoShiftDownTimer, self.vehicle.mrGbML.autoShiftUpTimer )
 								end
 
-								if g_currentMission.time <= autoShiftTimeout  then
+								if g_currentMission.time <= autoShiftTimeout then
 									isValidEntry = false
 								end
 							end
@@ -6387,21 +6516,42 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 					
 					if scoreRpm == nil then
-						if iMin == nil then
+						if     iMin == nil then
 							if self.vehicle.mrGbMG.debugPrint then
-								print("ERROR finding a new gear: (too small: "..tostring(tooSmall).." / too big: "..tostring(tooBig)..")")
+								print("ERROR finding a new gear: (too small: "..tostring(tooSmall).." / too big: "..tostring(tooBig).." / min: "..tostring(iMin).." / max: "..tostring(iMax)..")")
 							end
-						elseif tooBig   then
-							bestGear = iMin						
-						elseif tooSmall then
-							bestGear = iMax
+						elseif iMin > currentGear or currentGear > iMax then
+							if tooSmall and tooBig then						
+								if self.vehicle.mrGbMG.debugPrint then
+									print("ERROR finding a new gear: (too small: "..tostring(tooSmall).." / too big: "..tostring(tooBig).." / min: "..tostring(iMin).." / max: "..tostring(iMax)..")")
+								end
+								bestGear = Utils.clamp( currentGear, iMin, iMax )
+							elseif tooBig then
+								bestGear = iMin						
+							elseif tooSmall then
+								bestGear = iMax
+							end
 						end
 					end
 					
 					if currentGear ~= bestGear then
 						local i2g, i2r = mrGearboxMogliMotor.splitGear( self, bestGear )
-						self.vehicle:mrGbMSetCurrentGear( i2g ) 
-						self.vehicle:mrGbMSetCurrentRange( i2r ) 
+						
+						if self.vehicle.mrGbMG.debugPrint then
+							local d1 = math.max( 0, self.vehicle.mrGbML.autoShiftDownTimer - g_currentMission.time ) * 0.001
+							local d2 = math.max( 0, self.vehicle.mrGbML.autoShiftUpTimer   - g_currentMission.time ) * 0.001
+							local d3 = ( g_currentMission.time - self.vehicle.mrGbML.autoShiftTime ) * 0.001
+							print( string.format( "%d->%d (%d %d): down: %0.3fs / up: %0.3fs / last: %0.3fs", currentGear, bestGear, i2g, i2r, d1,d2,d3 ))
+							if self.vehicle.mrGbML.autoShiftUpTimer   <= 0 then print("after reset of up timer")   end
+							if self.vehicle.mrGbML.autoShiftDownTimer <= 0 then print("after reset of down timer") end
+						end
+						
+						if self.vehicle:mrGbMGetAutoShiftGears() then
+							self.vehicle:mrGbMSetCurrentGear( i2g ) 
+						end
+						if self.vehicle:mrGbMGetAutoShiftRange() then
+							self.vehicle:mrGbMSetCurrentRange( i2r ) 
+						end
 						clutchMode                           = 2
 						self.vehicle.mrGbML.manualClutchTime = 0
 					end										
@@ -6883,6 +7033,18 @@ function mrGearboxMogliMotor:splitGear( i )
 	elseif not self.vehicle:mrGbMGetAutoShiftGears() then 
 		i2g = self.vehicle.mrGbMS.CurrentGear
 		i2r = i
+	elseif self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftHl + 10 then
+		-- shifting gears is more expensive => avoid paradox up/down shifts
+		i2g = 1
+		i2r = i
+		local m = table.getn( self.vehicle.mrGbMS.Ranges )
+		while i2r > m do
+			i2g = i2g + 1
+			i2r = i2r - m
+		end
+		if i2r + m * ( i2g-1 ) ~= i then
+			print("ERROR in GEARBOX (2): "..tostring(i).." ~= "..tostring(i2r).." + "..tostring(m).." * ( "..tostring(i2g).." -1 )")
+		end
 	else
 		i2r = 1
 		i2g = i
@@ -6892,7 +7054,7 @@ function mrGearboxMogliMotor:splitGear( i )
 			i2g = i2g - m
 		end
 		if i2g + m * ( i2r-1 ) ~= i then
-			print("ERROR in GEARBOX: "..tostring(i).." ~= "..tostring(i2g).." + "..tostring(m).." * ( "..tostring(i2r).." -1 )")
+			print("ERROR in GEARBOX (1): "..tostring(i).." ~= "..tostring(i2g).." + "..tostring(m).." * ( "..tostring(i2r).." -1 )")
 		end
 	end
 	return i2g,i2r
