@@ -441,7 +441,7 @@
 				<torque rpm="2400" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="2" shiftTimeMs="800">
+			<gears defaultGear="2" shiftTimeMs="800" speedMatching="false">
 				<gear speed="10.0" upRangeOffset="-1" downRangeOffset="0" />
 				<gear speed="13.5" upRangeOffset="-1" downRangeOffset="0" />
 				<gear speed="17.0" upRangeOffset="-1" downRangeOffset="0" />
@@ -450,7 +450,7 @@
 				<gear speed="40.0" upRangeOffset="-1" downRangeOffset="0" />
 			</gears>
 
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1">
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" speedMatching="false">
 				<range ratio="0.8" name="I" />
 				<range ratio="1.0" name="II" />
 			</ranges>
@@ -494,7 +494,7 @@
 				<torque rpm="2500" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="1" shiftTimeMs="800">
+			<gears defaultGear="1" shiftTimeMs="800" speedMatching="true">
 				<gear speed="10.0"/>
 				<gear speed="13.5"/>
 				<gear speed="17.0"/>
@@ -3056,6 +3056,180 @@
 	</vehicle>
 	
 	<vehicle>
+		<mod name="MF_5712">
+			<link href="http://fs-uk.com/mods/view/37255/massey-ferguson-pack" />
+			<xmlFile name="MF7726.xml"/>
+		</mod>
+		
+		<!-- http://read.uberflip.com/i/596442-mf-5700-sl-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
+		<gearboxMogli maxBackwardSpeed="42" maxForwardSpeed="42" ptoRpm="2000" ptoRpmEco="1560">
+			<gears shiftTimeMs="800" defaultGear="3">	
+				<gear speed="4.5"/>
+				<gear speed="11"/>
+				<gear speed="23"/>
+				<gear speed="48"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
+				<range ratio="0.416" name="A" />
+				<range ratio="0.495" name="B" />
+				<range ratio="0.584" name="C" />
+				<range ratio="0.703" name="D" />
+				<range ratio="0.831" name="E" />
+				<range ratio="1"     name="F" />
+			</ranges>
+			
+			<reverse resetGear="false" resetRange="false" /> 
+
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 2000: 120(120) | 2200: 114(114) | 1600..1600: 502(502) | 85 | 0.8 | 249 | 1.7 | 2300 | 1360: 207 -->
+        <torque rpm="350" motorTorque="303" fuelUsageRatio="236.9"/>
+        <torque rpm="700" motorTorque="408" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="444" fuelUsageRatio="213.2"/>
+        <torque rpm="1000" motorTorque="460" fuelUsageRatio="210.8"/>
+        <torque rpm="1100" motorTorque="473" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="483" fuelUsageRatio="207.8"/>
+        <torque rpm="1300" motorTorque="491" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="497" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="501" fuelUsageRatio="207.6"/>
+        <torque rpm="1600" motorTorque="502" fuelUsageRatio="208.9"/>
+        <torque rpm="1700" motorTorque="485" fuelUsageRatio="210.8"/>
+        <torque rpm="1800" motorTorque="466" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="455" fuelUsageRatio="214.8"/>
+        <torque rpm="1900" motorTorque="443" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="432" fuelUsageRatio="218.3"/>
+        <torque rpm="2000" motorTorque="421" fuelUsageRatio="220.4"/>
+        <torque rpm="2050" motorTorque="410" fuelUsageRatio="222.5"/>
+        <torque rpm="2100" motorTorque="396" fuelUsageRatio="224.8"/>
+        <torque rpm="2150" motorTorque="381" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="364" fuelUsageRatio="230"/>
+        <torque rpm="2250" motorTorque="340" fuelUsageRatio="234.2"/>
+        <torque rpm="2300" motorTorque="287" fuelUsageRatio="253.5"/>
+        <torque rpm="2350" motorTorque="210" fuelUsageRatio="294.8"/>
+        <torque rpm="2400" motorTorque="113" fuelUsageRatio="363"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
+
+	<vehicle>
+		<mod name="MF_6613">
+			<link href="http://fs-uk.com/mods/view/37255/massey-ferguson-pack" />
+			<xmlFile name="MF7726.xml"/>
+		</mod>
+		
+		<!-- http://read.uberflip.com/i/338519-mf-6600-prospekt-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
+			<gears shiftTimeMs="800" defaultGear="3">	
+				<gear speed="5"/>
+				<gear speed="12.5"/>
+				<gear speed="27"/>
+				<gear speed="56.4"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
+				<range ratio="0.416" name="A" />
+				<range ratio="0.495" name="B" />
+				<range ratio="0.584" name="C" />
+				<range ratio="0.703" name="D" />
+				<range ratio="0.831" name="E" />
+				<range ratio="1"     name="F" />
+			</ranges>
+			
+			<reverse resetGear="false" resetRange="false" /> 
+
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 1950: 150(125) | 2200: 135(115) | 1500..1500: 648(553) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
+        <torque rpm="350" motorTorque="381" motorTorqueEco="325" fuelUsageRatio="236.9"/>
+        <torque rpm="700" motorTorque="524" motorTorqueEco="447" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="577" motorTorqueEco="492" fuelUsageRatio="213.2"/>
+        <torque rpm="1000" motorTorque="598" motorTorqueEco="511" fuelUsageRatio="210.8"/>
+        <torque rpm="1100" motorTorque="616" motorTorqueEco="526" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="630" motorTorqueEco="538" fuelUsageRatio="207.8"/>
+        <torque rpm="1300" motorTorque="640" motorTorqueEco="546" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="646" motorTorqueEco="551" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="648" motorTorqueEco="553" fuelUsageRatio="207.6"/>
+        <torque rpm="1600" motorTorque="633" motorTorqueEco="539" fuelUsageRatio="208.9"/>
+        <torque rpm="1700" motorTorque="613" motorTorqueEco="516" fuelUsageRatio="210.8"/>
+        <torque rpm="1800" motorTorque="585" motorTorqueEco="488" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="569" motorTorqueEco="474" fuelUsageRatio="214.8"/>
+        <torque rpm="1900" motorTorque="554" motorTorqueEco="462" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="540" motorTorqueEco="450" fuelUsageRatio="218.3"/>
+        <torque rpm="2000" motorTorque="525" motorTorqueEco="437" fuelUsageRatio="220.4"/>
+        <torque rpm="2050" motorTorque="506" motorTorqueEco="423" fuelUsageRatio="222.5"/>
+        <torque rpm="2100" motorTorque="484" motorTorqueEco="406" fuelUsageRatio="224.8"/>
+        <torque rpm="2150" motorTorque="459" motorTorqueEco="387" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="431" motorTorqueEco="367" fuelUsageRatio="230"/>
+        <torque rpm="2250" motorTorque="403" motorTorqueEco="343" fuelUsageRatio="234.2"/>
+        <torque rpm="2300" motorTorque="340" motorTorqueEco="289" fuelUsageRatio="253.5"/>
+        <torque rpm="2350" motorTorque="249" motorTorqueEco="212" fuelUsageRatio="294.8"/>
+        <torque rpm="2400" motorTorque="134" motorTorqueEco="114" fuelUsageRatio="363"/>
+        <torque rpm="2450" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
+
+	<vehicle>
+		<mod name="MF_7718">
+			<link href="http://fs-uk.com/mods/view/37255/massey-ferguson-pack" />
+			<xmlFile name="MF7726.xml"/>
+		</mod>
+		
+		<!-- http://read.uberflip.com/i/499335-mf-7700-prospekt-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
+			<gears shiftTimeMs="800" defaultGear="3">	
+				<gear speed="5"/>
+				<gear speed="12.5"/>
+				<gear speed="27"/>
+				<gear speed="56.4"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
+				<range ratio="0.416" name="A" />
+				<range ratio="0.495" name="B" />
+				<range ratio="0.584" name="C" />
+				<range ratio="0.703" name="D" />
+				<range ratio="0.831" name="E" />
+				<range ratio="1"     name="F" />
+			</ranges>
+			
+			<reverse resetGear="false" resetRange="false" /> 
+
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 1950: 200(175) | 2200: 180(155) | 1500..1500: 840(744) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
+        <torque rpm="350" motorTorque="493" motorTorqueEco="437" fuelUsageRatio="236.9"/>
+        <torque rpm="700" motorTorque="679" motorTorqueEco="601" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="747" motorTorqueEco="662" fuelUsageRatio="213.2"/>
+        <torque rpm="1000" motorTorque="776" motorTorqueEco="687" fuelUsageRatio="210.8"/>
+        <torque rpm="1100" motorTorque="799" motorTorqueEco="708" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="817" motorTorqueEco="724" fuelUsageRatio="207.8"/>
+        <torque rpm="1300" motorTorque="830" motorTorqueEco="735" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="837" motorTorqueEco="742" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="840" motorTorqueEco="744" fuelUsageRatio="207.6"/>
+        <torque rpm="1600" motorTorque="824" motorTorqueEco="729" fuelUsageRatio="208.9"/>
+        <torque rpm="1700" motorTorque="802" motorTorqueEco="707" fuelUsageRatio="210.8"/>
+        <torque rpm="1800" motorTorque="773" motorTorqueEco="681" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="757" motorTorqueEco="664" fuelUsageRatio="214.8"/>
+        <torque rpm="1900" motorTorque="739" motorTorqueEco="647" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="720" motorTorqueEco="630" fuelUsageRatio="218.3"/>
+        <torque rpm="2000" motorTorque="699" motorTorqueEco="612" fuelUsageRatio="220.4"/>
+        <torque rpm="2050" motorTorque="674" motorTorqueEco="588" fuelUsageRatio="222.5"/>
+        <torque rpm="2100" motorTorque="645" motorTorqueEco="561" fuelUsageRatio="224.8"/>
+        <torque rpm="2150" motorTorque="611" motorTorqueEco="530" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="575" motorTorqueEco="495" fuelUsageRatio="230"/>
+        <torque rpm="2250" motorTorque="537" motorTorqueEco="462" fuelUsageRatio="234.2"/>
+        <torque rpm="2300" motorTorque="453" motorTorqueEco="390" fuelUsageRatio="253.5"/>
+        <torque rpm="2350" motorTorque="332" motorTorqueEco="286" fuelUsageRatio="294.8"/>
+        <torque rpm="2400" motorTorque="179" motorTorqueEco="154" fuelUsageRatio="363"/>
+        <torque rpm="2450" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
+
+	<vehicle>
 		<mod name="CZMOD_MasseyFerguson_7626">
 			<link href="http://www.modhoster.de/mods/massey-ferguson-7626--2" />
 			<xmlFile name="claas1.xml"/>
@@ -3063,12 +3237,12 @@
 		
 		<!-- http://read.uberflip.com/i/338540-mf-7600-brochure-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
-		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1520">
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
 			<gears shiftTimeMs="800" defaultGear="3">	
-				<gear speed="2.70"/>
-				<gear speed="10.1"/>
-				<gear speed="20.4"/>
-				<gear speed="56.8"/>
+				<gear speed="5"/>
+				<gear speed="12.5"/>
+				<gear speed="27"/>
+				<gear speed="56.4"/>
 			</gears>
 
 			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
@@ -4182,6 +4356,116 @@
 			</realEngine>
 		</gearboxMogli>			
 	</vehicle>	
+
+	<vehicle>
+		<mod name="MF_6616">
+			<link href="http://fs-uk.com/mods/view/37255/massey-ferguson-pack" />
+			<xmlFile name="MF7726.xml"/>
+		</mod>
+		
+		<!-- http://read.uberflip.com/i/338519-mf-6600-prospekt-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
+		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1490" ptoRpm="1900" maxAIGear="1">
+			<hydrostatic>
+        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+		
+			<gears defaultGear="2" clutchRatio="1" shiftTimeMs="1000">	
+				<gear name="heavy duty" speed="27" />
+				<gear name="transport"  speed="50"/>
+			</gears>
+			<reverse ratio="0.714" shiftTimeMs="0" />
+
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 1950: 160(160) | 2200: 145(145) | 1500..1500: 677(677) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
+        <torque rpm="350" motorTorque="398" fuelUsageRatio="236.9"/>
+        <torque rpm="700" motorTorque="547" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="602" fuelUsageRatio="213.2"/>
+        <torque rpm="1000" motorTorque="625" fuelUsageRatio="210.8"/>
+        <torque rpm="1100" motorTorque="644" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="658" fuelUsageRatio="207.8"/>
+        <torque rpm="1300" motorTorque="669" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="675" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="677" fuelUsageRatio="207.6"/>
+        <torque rpm="1600" motorTorque="663" fuelUsageRatio="208.9"/>
+        <torque rpm="1700" motorTorque="645" fuelUsageRatio="210.8"/>
+        <torque rpm="1800" motorTorque="621" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="607" fuelUsageRatio="214.8"/>
+        <torque rpm="1900" motorTorque="591" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="576" fuelUsageRatio="218.3"/>
+        <torque rpm="2000" motorTorque="560" fuelUsageRatio="220.4"/>
+        <torque rpm="2050" motorTorque="540" fuelUsageRatio="222.5"/>
+        <torque rpm="2100" motorTorque="517" fuelUsageRatio="224.8"/>
+        <torque rpm="2150" motorTorque="491" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="463" fuelUsageRatio="230"/>
+        <torque rpm="2250" motorTorque="433" fuelUsageRatio="234.2"/>
+        <torque rpm="2300" motorTorque="365" fuelUsageRatio="253.5"/>
+        <torque rpm="2350" motorTorque="267" fuelUsageRatio="294.8"/>
+        <torque rpm="2400" motorTorque="144" fuelUsageRatio="363"/>
+        <torque rpm="2450" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
+
+	<vehicle>
+		<mod name="MF_7726">
+			<link href="http://fs-uk.com/mods/view/37255/massey-ferguson-pack" />
+			<xmlFile name="MF7726.xml"/>
+		</mod>
+		
+		<!-- http://read.uberflip.com/i/499335-mf-7700-prospekt-de -->
+		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
+		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1530" ptoRpm="1900" maxAIGear="1">
+			<hydrostatic>
+        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
+        <efficiency ratio="0.6" factor="0.88"/>
+        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.08" factor="0.96"/>
+        <efficiency ratio="1.4" factor="0.88"/>
+			</hydrostatic>
+		
+			<gears defaultGear="2" clutchRatio="1" shiftTimeMs="1000">	
+				<gear name="heavy duty" speed="27" />
+				<gear name="transport"  speed="50"/>
+			</gears>
+			<reverse ratio="0.714" shiftTimeMs="0" />
+
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 1950: 280(255) | 2200: 260(235) | 1500..1500: 1146(1050) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
+        <torque rpm="350" motorTorque="673" motorTorqueEco="617" fuelUsageRatio="236.9"/>
+        <torque rpm="700" motorTorque="926" motorTorqueEco="849" fuelUsageRatio="219.8"/>
+        <torque rpm="900" motorTorque="1020" motorTorqueEco="934" fuelUsageRatio="213.2"/>
+        <torque rpm="1000" motorTorque="1058" motorTorqueEco="970" fuelUsageRatio="210.8"/>
+        <torque rpm="1100" motorTorque="1090" motorTorqueEco="999" fuelUsageRatio="209"/>
+        <torque rpm="1200" motorTorque="1114" motorTorqueEco="1021" fuelUsageRatio="207.8"/>
+        <torque rpm="1300" motorTorque="1132" motorTorqueEco="1037" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="1142" motorTorqueEco="1047" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="1146" motorTorqueEco="1050" fuelUsageRatio="207.6"/>
+        <torque rpm="1600" motorTorque="1127" motorTorqueEco="1032" fuelUsageRatio="208.9"/>
+        <torque rpm="1700" motorTorque="1102" motorTorqueEco="1008" fuelUsageRatio="210.8"/>
+        <torque rpm="1800" motorTorque="1069" motorTorqueEco="977" fuelUsageRatio="213.3"/>
+        <torque rpm="1850" motorTorque="1051" motorTorqueEco="959" fuelUsageRatio="214.8"/>
+        <torque rpm="1900" motorTorque="1030" motorTorqueEco="939" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="1008" motorTorqueEco="918" fuelUsageRatio="218.3"/>
+        <torque rpm="2000" motorTorque="980" motorTorqueEco="893" fuelUsageRatio="220.4"/>
+        <torque rpm="2050" motorTorque="948" motorTorqueEco="863" fuelUsageRatio="222.5"/>
+        <torque rpm="2100" motorTorque="912" motorTorqueEco="829" fuelUsageRatio="224.8"/>
+        <torque rpm="2150" motorTorque="873" motorTorqueEco="791" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="830" motorTorqueEco="750" fuelUsageRatio="230"/>
+        <torque rpm="2250" motorTorque="776" motorTorqueEco="701" fuelUsageRatio="234.2"/>
+        <torque rpm="2300" motorTorque="654" motorTorqueEco="591" fuelUsageRatio="253.5"/>
+        <torque rpm="2350" motorTorque="479" motorTorqueEco="433" fuelUsageRatio="294.8"/>
+        <torque rpm="2400" motorTorque="258" motorTorqueEco="233" fuelUsageRatio="363"/>
+        <torque rpm="2450" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>			
+	</vehicle>
 
 
 <!-- ********** Default configuration ******************** -->	
