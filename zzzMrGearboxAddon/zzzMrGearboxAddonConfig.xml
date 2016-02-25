@@ -11,7 +11,7 @@
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/kirovets701m.pdf -->
 		<!-- https://data.motor-talk.de/data/galleries/0/73/1160/47059283/kirovets-k-700-a-page-2-1630353563984878437.jpg -->
 		<gearboxMogli autoStartStop="false" speedLimiter="false">
-			<gears defaultGear="1" shiftTimeMs="0">
+			<gears  shiftTimeMs="0">
 				<gear speed="17.1"/>
 				<gear speed="20.6"/>
 				<gear speed="24.7"/>
@@ -244,7 +244,7 @@
         <torque rpm="2200" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="9.7"  />
 				<gear speed="11.9" />
 				<gear speed="15.0" />
@@ -272,7 +272,7 @@
 		<!-- http://manuals.deere.com/omview/OMAL152891_29/?tM= -->
 		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200" speedLimiter="false">
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="22.2" name="1" />
 				<gear speed="26.8" name="2" />
 				<gear speed="32.1" name="3" />
@@ -306,7 +306,7 @@
 		<!-- http://manuals.deere.com/omview/OMAL213126_19/?tM= -->
 		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false">
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="28.2" name="1" />
 				<gear speed="34.0" name="2" />
 				<gear speed="40.7" name="3" />
@@ -364,7 +364,7 @@
 		<!-- http://www.dlg-test.de/tests/1212_JohnDeere_6210R.pdf -->
 		<!-- http://manuals.deere.com/omview/OMETN78900_19/?tM= -->
 		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="30" soundMaxRpm="1900">
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" autoRpmReduction="600">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" autoRpmReduction="600">	
 				<gear speed="16.5" name="1" />
 				<gear speed="20.0" name="2" />
 				<gear speed="24.5" name="3" />
@@ -420,7 +420,7 @@
 		<configFile xmlName="data/vehicles/steerable/deutz/deutzAgroStar661.xml"/>
 
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" maxAIRange2="3">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
 				<torque rpm="900"  motorTorque="510"/>
 				<torque rpm="1000" motorTorque="525"/>
@@ -494,7 +494,7 @@
 				<torque rpm="2500" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="1" shiftTimeMs="800" speedMatching="true">
+			<gears  shiftTimeMs="800" speedMatching="true">
 				<gear speed="10.0"/>
 				<gear speed="13.5"/>
 				<gear speed="17.0"/>
@@ -701,7 +701,7 @@
 		<gearboxMogli autoStartStop="false">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears defaultGear="3">
+			<gears>
 				<gear speed="10.125"  />
 				<gear speed="14.46"  />
 				<gear speed="20.72"/>
@@ -742,7 +742,7 @@
 			</realEngine>
 							
 			<!-- speed matching => use automatic shifting of "ranges" -> swap gears and ranges -->
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1" automatic="true" speedMatching="true">	
+			<gears  shiftTimeMs="0" clutchRatio="1" automatic="true" speedMatching="true">	
 				<gear speed="35.14" name="L"/>
 				<gear speed="42.18" name="H"/>
 			</gears>
@@ -836,7 +836,7 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 		
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
 				<gear speed="41.83" name="M"/>
@@ -885,7 +885,7 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 			
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  speedMatching="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
 				<gear speed="41.83" name="M"/>
@@ -931,7 +931,7 @@
 			</realEngine>
 
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="29.6" name="P1"/>
 				<gear speed="35.5" name="P2"/>
 				<gear speed="42.5" name="P3"/>
@@ -1034,7 +1034,7 @@
 		<gearboxMogli clutchOpenRpm="1150" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="500" defaultGear="1" automatic="true" reverseReset="true">	
+			<gears shiftTimeMs="500"  automatic="true" reverseReset="true">	
 				<gear speed="40"  forwardOnly="true" name="1"/>
 				<gear speed="50"  reverseOnly="true" name="R"/>			
 				<gear speed="60"  forwardOnly="true" name="2"/>
@@ -1132,7 +1132,7 @@
 				<torque rpm="2100" motorTorque="0"/>
 			</realEngine>
 		
-			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true" defaultGear="1" speedMatching="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
+			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true"  speedMatching="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
 				<gear speed="37.53"  forwardOnly="true" name="1"/>
 				<gear speed="40.46"  reverseOnly="true" name="R1"/>
 				<gear speed="48.2"   forwardOnly="true" name="2"/>
@@ -1178,7 +1178,7 @@
 				<torque rpm="2100" motorTorque="0"/>
 			</realEngine>
 		
-			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true" defaultGear="1"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
+			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true" > <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
 				<gear speed="37.53"  forwardOnly="true" name="1"/>
 				<gear speed="40.46"  reverseOnly="true" name="R1"/>
 				<gear speed="48.2"   forwardOnly="true" name="2"/>
@@ -1205,7 +1205,7 @@
 		</mod>
 		
 		<gearboxMogli   ratedRpm="2100" maxForwardSpeed="90" maxBackwardSpeed="16">
-			<gears clutchRatio="0.7" defaultGear="1" reverseReset="true" automatic="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
+			<gears clutchRatio="0.7"  reverseReset="true" automatic="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
 				<gear speed="15.1" forwardOnly="true"/>
 				<gear speed="16" reverseOnly="true" name="R"/>			
 				<gear speed="22.7" forwardOnly="true"/>
@@ -1286,7 +1286,7 @@
 		
 		<!-- http://www.mercedes-benz.de/content/media_library/hq/hq_mpc_reference_site/unimog/System_Unimog/Applications/brochures/unimog_systemunimog_applications_basicbrochure_u300-u500_01_2400_de_DE_05-2007_pdf.object-Single-MEDIA.download.tmp/Users/han/Desktop/broschuren_de/unimog_brochures_ugn_basic_de.pdf -->
 		<gearboxMogli   ratedRpm="2100">
-			<gears shiftTimeMs="500" clutchRatio="0.7" defaultGear="1" automatic="true" reverseReset="false">	
+			<gears shiftTimeMs="500" clutchRatio="0.7"  automatic="true" >	
 				<gear speed="6.98"/>
 				<gear speed="10"/>
 				<gear speed="14.4"/>
@@ -1437,7 +1437,7 @@
 		<gearboxMogli>
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="1200" clutchRatio="0.7" defaultGear="1" reverseReset="true" speedLimiter="false">	
+			<gears shiftTimeMs="1200" clutchRatio="0.7"  reverseReset="true" speedLimiter="false">	
 				<gear speed="30"  forwardOnly="true" />
 				<gear speed="45"  forwardOnly="true" />
 				<gear speed="67"  forwardOnly="true" />
@@ -1489,7 +1489,7 @@
 		<gearboxMogli>
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="1200" clutchRatio="0.7" defaultGear="1" reverseReset="true" speedLimiter="false">	
+			<gears shiftTimeMs="1200" clutchRatio="0.7"  reverseReset="true" speedLimiter="false">	
 				<gear speed="30"  forwardOnly="true" />
 				<gear speed="45"  forwardOnly="true" />
 				<gear speed="67"  forwardOnly="true" />
@@ -1537,7 +1537,7 @@
 		<gearboxMogli  clutchOpenRpm="1300" clutchCloseRpm="1800" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="500" defaultGear="1" automatic="true" reverseReset="true">	
+			<gears shiftTimeMs="500"  automatic="true" reverseReset="true">	
 				<gear speed="50"  forwardOnly="true" />
 				<gear speed="88"  forwardOnly="true" />
 
@@ -1841,7 +1841,7 @@
 		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="5000" ptoRpm="1676">
 			<blowOffVentilSound volume="0"/>
 
-			<gears defaultGear="1" reverseReset="true" shiftTimeMs="1000">	
+			<gears  reverseReset="true" shiftTimeMs="1000">	
 				<gear speed="24.2" forwardOnly="true" />
 				<gear speed="30.4" forwardOnly="true" />
 				<gear speed="37.8" forwardOnly="true" />		
@@ -1922,7 +1922,7 @@
 		
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/steyr-8080a.pdf -->
 		<gearboxMogli autoStartStop="false" shiftTimeMs="800">
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="8.9" />
 				<gear speed="15.1" />
 				<gear speed="23" />
@@ -1973,7 +1973,7 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" reverseReset="false">		
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" >		
 				<gear speed="2.07" forwardOnly="true"/>
 				<gear speed="2.49" forwardOnly="true"/>
 				<gear speed="2.99" forwardOnly="true"/>
@@ -2014,7 +2014,7 @@
 				<torque rpm="2300" ptoTorque="0"/>
 			</realEngine>
 
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="25.4"/>
 				<gear speed="30.4"/>
 				<gear speed="36.4"/>
@@ -2067,7 +2067,7 @@
 				<torque rpm="2500" motorTorque="0"/>
 			</realEngine>
 
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="25.4"/>
 				<gear speed="30.4"/>
 				<gear speed="36.4"/>
@@ -2120,7 +2120,7 @@
 				<torque rpm="2500" motorTorque="0"/>
 			</realEngine>
 
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="25.4"/>
 				<gear speed="30.4"/>
 				<gear speed="36.4"/>
@@ -2166,7 +2166,7 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" reverseReset="false">		
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" >		
 				<gear speed="1.61"/>
 				<gear speed="1.99"/>
 				<gear speed="2.46"/>
@@ -2213,7 +2213,7 @@
 				<torque rpm="2300" motorTorque="0"/>
 			</realEngine>
 
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" reverseReset="false">		
+			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true" >		
 				<gear speed="2.07" forwardOnly="true"/>
 				<gear speed="2.49" forwardOnly="true"/>
 				<gear speed="2.99" forwardOnly="true"/>
@@ -2246,7 +2246,7 @@
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<!-- http://www.lamborghini-tractors.com/de-DE/weinberg-und-obstplantage/download/2618_de209aea3647557f5cfe006c19b4b317 -->
 		<gearboxMogli swapGearRangeKeys="true">
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="1" automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="30.48" name="L"/>
 				<gear speed="36.57" name="M"/>
 				<gear speed="44.33" name="H"/>
@@ -2533,7 +2533,7 @@
         <torque rpm="6000" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="477.8"/>
 			</realEngine> 
 			
-			<gears defaultGear="1">
+			<gears >
 				<gear forwardOnly="true" name="1" speed="40"/>
 				<gear reverseOnly="true" name="R" speed="50"/>
 				<gear forwardOnly="true" name="2" speed="65"/>
@@ -2588,7 +2588,7 @@
         <torque rpm="8750" motorTorque="0" fuelUsageRatio="477.8"/>
 			</realEngine> 
 			
-			<!--gears defaultGear="1" shiftTimeMs="0" automatic="true">
+			<!--gears  shiftTimeMs="0" automatic="true">
 				<gear forwardOnly="true" name="1" speed="41.4"/>
 				<gear reverseOnly="true" name="R" speed="50"/>
 				<gear forwardOnly="true" name="2" speed="57"/>
@@ -2600,7 +2600,7 @@
 			</gears-->
 			
 			<!-- http://www.audi.de/dam/nemo/customer-area/more-information/predecessor-models/a4/pdf/s4av/Audi-RS4%2D%2D%2D4.2-FSI-331-kW-quattro-s-tronic-Avant-RS-Modell-2012.pdf -->
-			<gears tireWidth="265" tireRatio="35" rimDiameter="19" axleSpeed="4.375" defaultGear="1" shiftTimeMs="0" automatic="true">
+			<gears tireWidth="265" tireRatio="35" rimDiameter="19" axleSpeed="4.375"  shiftTimeMs="0" automatic="true">
 				<gear name="1" forwardOnly="true" inverseRatio="3.692"/>
 				<gear name="R" reverseOnly="true" inverseRatio="2.944"/>
 				<gear name="2" forwardOnly="true" inverseRatio="2.238"/>
@@ -2629,13 +2629,13 @@
         <efficiency ratio="1.166667" factor="0.93"/> <!-- 2.34 .. 43.8 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 2.68 .. 50 -->
       </hydrostatic>
-      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+      <gears automatic="true">
         <gear speed="4.69" name=""/> <!-- 0.05 1.34 3 6-->
         <gear speed="9.38" name=""/> <!-- 0.1 2.68 6 13-->
         <gear speed="18.75" name=""/> <!-- 0.2 5.36 13 25-->
         <gear speed="37.5" name=""/> <!-- 0.4 10.71 25 50-->
       </gears>
-      <reverse ratio="1" shiftTimeMs="1000" />
+      <reverse ratio="1"/>
 			
 			<realEngine idleRpm="850" ratedRpm="2100">
         <!-- 1900: 211(205) | 2100: 198(185) | 1500..1500: 835(834) | 90 | 0.5 | 150 | 2 | 2200 | 1380: 200 -->
@@ -2681,13 +2681,13 @@
         <efficiency ratio="1.066667" factor="0.936"/>
         <efficiency ratio="1.333333" factor="0.84"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="5"  name=""/>
 				<gear speed="10" name=""/>
 				<gear speed="20" name=""/>
 				<gear speed="40" name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 		-->
 			
 		<!-- AutoQuad -->
@@ -3287,7 +3287,7 @@
 
 		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1524">>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="3" reverseReset="false" automatic="true">	
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="3"  automatic="true">	
 				<gear speed="22.5"/>
 				<gear speed="27"/>
 				<gear speed="32"/>
@@ -3295,13 +3295,13 @@
 				<gear speed="48"/>
 				<gear speed="55"/>
 			</gears>
-			<ranges shiftTimeMs="600" clutchRatio="0.7" defaultRange="3" reverseReset="false" automatic="true">	
+			<ranges shiftTimeMs="600" clutchRatio="0.7" defaultRange="3"  automatic="true">	
 				<range ratio="0.073" name="A" upGearOffset="-5" downGearOffset="0"/>
 				<range ratio="0.2"   name="B" upGearOffset="-3" downGearOffset="5"/>
 				<range ratio="0.381" name="C" upGearOffset="-5" downGearOffset="3"/>
 				<range ratio="1"     name="D" upGearOffset="0"  downGearOffset="5"/>
 			</ranges>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 			
 			<realEngine idleRpm="800" ratedRpm="2150">
         <torque rpm="0" motorTorque="0" fuelUsageRatio="220"/><!-- 1800: 264 | 2150: 250 | 1400..1400: 1132 | 0.75 | 0 -->
@@ -3399,7 +3399,7 @@
 
 		<!--gearboxMogli clutchEngagingTimeMs="0" clutchOpenRpm="1850" clutchCloseRpm="2200" minClutchRatio="0.123" maxClutchRatio="0.95" maxBackwardSpeed="32">
 				
-			<gears shiftTimeMs="-1" clutchRatio="0.123" defaultGear="1" reverseReset="false" autoUpRpm="1900" autoDownRpm="1150" autoShiftMinClutch="0.123"-->	
+			<gears shiftTimeMs="-1" clutchRatio="0.123" defaultGear="1"  autoUpRpm="1900" autoDownRpm="1150" autoShiftMinClutch="0.123"-->	
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
 			<hydrostatic>
         <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm 
@@ -3409,13 +3409,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true" autoShiftTimeout="0" autoShiftTimeout2="0">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="800" ratedRpm="2100">		
         <!-- 1900: 263(238) | 2100: 258(236) | 1100..1650: 1000(932) | 95 | 0.5 | 100 | 3 | 2100 | 1320: 200 -->
@@ -3459,13 +3459,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true" autoShiftTimeout="0" autoShiftTimeout2="0">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="800" ratedRpm="2100">		
         <!-- 1900: 224(205) | 2100: 215(186) | 1100..1650: 883(806) | 95 | 0.5 | 100 | 3 | 2100 | 1320: 200 -->
@@ -3506,13 +3506,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="800" ratedRpm="2100">		
 				<torque rpm="800" motorTorque="750"/>
@@ -3543,13 +3543,11 @@
         <efficiency ratio="1.2" factor="0.93"/> <!-- 9.32 .. 50.8 -->
         <efficiency ratio="1.4" factor="0.88"/> <!-- 10.88 .. 59.2 -->
       </hydrostatic>
-      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
-        <gear speed="18.13" name=""/> <!-- 0.05 4.66 11 25-->
-        <gear speed="18.13" name=""/> <!-- 0.05 4.66 11 25-->
+      <gears  automatic="true">
         <gear speed="18.13" name=""/> <!-- 0.05 4.66 11 25-->
         <gear speed="42.3" name=""/> <!-- 0.12 10.88 25 59-->
       </gears>
-      <reverse ratio="1" shiftTimeMs="0" />
+      <reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2100">		
         <!-- 1900: 193(178) | 2100: 190(175) | 1200..1500: 840(795) | 95 | 0.5 | 220 | 2.3 | 2200 | 1350: 217 -->
@@ -3593,13 +3591,13 @@
         <efficiency ratio="1.1" factor="0.96"/> <!-- 2.72 .. 47.3 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.3 .. 57.3 -->
       </hydrostatic>
-      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+      <gears  automatic="true">
         <gear speed="5.5" name=""/> <!-- 0.05 1.65 4 7-->
         <gear speed="11" name=""/> <!-- 0.1 3.3 7 15-->
         <gear speed="22" name=""/> <!-- 0.2 6.6 15 29-->
         <gear speed="43" name=""/> <!-- 0.39 12.9 29 57-->
       </gears>
-      <reverse ratio="1" shiftTimeMs="0" />
+      <reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
 				<torque rpm="900" motorTorque="519"/>
@@ -3636,13 +3634,13 @@
         <efficiency ratio="1.1" factor="0.96"/> <!-- 2.7 .. 51.7 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.27 .. 62.7 -->
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
         <gear speed="6" name=""/> <!-- 0.05 4 8-->
         <gear speed="12" name=""/> <!-- 0.1 8 16-->
         <gear speed="24" name=""/> <!-- 0.2 16 32-->
         <gear speed="47" name=""/> <!-- 0.39 31 63-->
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2200">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="302"/><!-- 1800: 210(178.5) | 2200: 190(161.5) | 1500..1500: 875(787.5) | 85 | 0.5 -->
@@ -3688,13 +3686,13 @@
         <efficiency ratio="1.1" factor="0.96"/> <!-- 2.97 .. 52.8 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.6 .. 64 -->
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6"  name=""/>
 				<gear speed="12" name=""/>
 				<gear speed="24" name=""/>
 				<gear speed="48" name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
 				<torque rpm="900" motorTorque="777"/>
@@ -3733,13 +3731,13 @@
         <efficiency ratio="1.1" factor="0.96"/> <!-- 2.92 .. 58.3 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.55 .. 70.7 -->
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears  automatic="true">	
 				<gear speed="6.5" name=""/>
 				<gear speed="13"  name=""/>
 				<gear speed="26"  name=""/>
 				<gear speed="53"  name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/>
@@ -3777,13 +3775,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
 				<torque rpm="900" motorTorque="1444"/>
@@ -3824,13 +3822,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
 				<torque rpm="900" motorTorque="1261"/>
@@ -3871,13 +3869,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 			
 			<realEngine idleRpm="900" ratedRpm="2100">
 				<torque rpm="800" motorTorque="957"/>
@@ -3915,13 +3913,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="5.5" name=""/>
 				<gear speed="11"  name=""/>
 				<gear speed="22"  name=""/>
 				<gear speed="44"  name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 			
 			<realEngine idleRpm="900" ratedRpm="2000">
         <torque rpm="0" motorTorque="0"/>
@@ -3960,13 +3958,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 			
 			<realEngine idleRpm="1000" ratedRpm="2150">
         <torque rpm="0" motorTorque="0"/>
@@ -4006,13 +4004,13 @@
         <efficiency ratio="1.066667" factor="0.96"/>
         <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">	
+			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
 				<gear speed="25"   name=""/>
 				<gear speed="50"   name=""/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="0" />
+			<reverse ratio="1" />
 			
 			<!-- http://www.claas.de/produkte/traktoren/xerion5000-4000-hrc/motor-antrieb/motor MB OM 471 LA -->
 			<!-- https://de.wikipedia.org/wiki/Mercedes-Benz_OM_470/OM_471/OM_472/OM_473 -->
@@ -4053,13 +4051,13 @@
         <efficiency ratio="1.166667" factor="0.93"/> <!-- 3.33 .. 62.1 -->
         <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.8 .. 71 -->
       </hydrostatic>
-      <gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="false" automatic="true">
+      <gears automatic="true">
         <gear speed="6.65" name=""/> <!-- 0.05 1.9 4 9-->
         <gear speed="13.31" name=""/> <!-- 0.1 3.8 9 18-->
         <gear speed="26.62" name=""/> <!-- 0.2 7.61 18 35-->
         <gear speed="53.24" name=""/> <!-- 0.4 15.21 35 71-->
       </gears>
-      <reverse ratio="1" shiftTimeMs="0" />
+      <reverse ratio="1" />
 
 			<realEngine idleRpm="900" ratedRpm="2100">
         <!-- 1900: 336(308) | 2100: 316(284) | 1500..1500: 1372(1303) | 95 | 0 | 300 | 1.5 | 2200 | 1380: 200 -->
@@ -4107,11 +4105,11 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="1" reverseReset="false" shiftTimeMs="2000">	
+			<gears defaultGear="1"  shiftTimeMs="2000">	
 				<gear name="heavy duty" speed="17"/>
 				<gear name="transport"  speed="35"/>
 			</gears>
-			<reverse ratio="0.5" shiftTimeMs="0" />
+			<reverse ratio="0.5"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2200">	
 				<torque rpm="800" motorTorque="359"/>
@@ -4155,19 +4153,19 @@
 		<!-- http://www.dlg-test.de/tests/0912_Fendt_939_Vario.pdf -->
 		
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" clutchOpenRpm="800" clutchCloseRpm="1000" clutchTimeDecreaseMs="0" clutchTimeIncreaseMs="500" maxForwardSpeed="62" maxBackwardSpeed="33">
-      <hydrostatic>
-        <efficiency ratio="0.001609" factor="0.6"/> <!-- 0.02 .. 0.1 -->
-        <efficiency ratio="0.6" factor="0.88"/> <!-- 7.46 .. 30.9 -->
-        <efficiency ratio="0.8" factor="0.93"/> <!-- 9.94 .. 41.1 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 12.43 .. 51.4 -->
-        <efficiency ratio="1.2" factor="0.93"/> <!-- 14.91 .. 61.7 -->
-        <efficiency ratio="1.4" factor="0.88"/> <!-- 17.4 .. 72 -->
-      </hydrostatic>
-      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">
-        <gear speed="25" name="heavy duty"/> <!-- 0.23 6.43 15 35-->
-        <gear speed="51.43" name="transport"/> <!-- 0.47 13.22 31 72-->
-      </gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
+			<hydrostatic>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
+			</hydrostatic>
+		
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
+				<gear name="heavy duty" speed="27" />
+				<gear name="transport"  speed="50"/>
+			</gears>
 
 			<realEngine idleRpm="900" ratedRpm="2100">		
         <!-- 1900: 359(359) | 2100: 360(360) | 1400..1500: 1488(1488) | 85 | 0.5 | 300 | 1.8 | 2100 | 1380: 192 -->
@@ -4205,19 +4203,18 @@
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_926_Vario -->
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpm="1598">
 			<hydrostatic>
-        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
         <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears defaultGear="2" reverseReset="true" clutchRatio="1" shiftTimeMs="1000">	
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
 
 			<realEngine idleRpm="1000" ratedRpm="2250">		
         <torque rpm="0" motorTorque="0"/>
@@ -4259,19 +4256,18 @@
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_930_Vario -->
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpmEco="1598" ptoRpm="2031" maxAIGear="1">
 			<hydrostatic>
-        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
         <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears defaultGear="2" clutchRatio="1" shiftTimeMs="1000">	
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
 
 			<realEngine idleRpm="1000" ratedRpm="2250">		
         <!-- 1900: 300(300) | 2250: 270(270) | 1400..1400: 1240(1240) | 70 | 0.5 | 220 | 1.5 | 2200 | 1400: 194 -->
@@ -4318,19 +4314,18 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic>
-        <efficiency ratio="0.004945" factor="0.7"/> 0.05 km/h @ 800 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
         <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" reverseReset="true" automatic="true">	
-				<gear name="" speed="22.75"/>
-				<gear name="" speed="53"/>
+			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" automatic="true">	
+				<gear name="heavy duty" speed="27" />
+				<gear name="transport"  speed="50"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="500" />
 
 			<realEngine idleRpm="800" ratedRpm="1900">		
         <!-- 1900: 500(500) | 1900: 500(500) | 1050..1400: 2300(2300) | 95 | 0.7 | 249 | 1.7 | 2000 | 1230: 191 -->
@@ -4367,19 +4362,18 @@
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
 		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1490" ptoRpm="1900" maxAIGear="1">
 			<hydrostatic>
-        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
         <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears defaultGear="2" clutchRatio="1" shiftTimeMs="1000">	
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
 
 			<realEngine idleRpm="800" ratedRpm="2200">		
         <!-- 1950: 160(160) | 2200: 145(145) | 1500..1500: 677(677) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
@@ -4422,19 +4416,18 @@
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
 		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1530" ptoRpm="1900" maxAIGear="1">
 			<hydrostatic>
-        <efficiency ratio="0.003621" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
         <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
 			</hydrostatic>
 		
-			<gears defaultGear="2" clutchRatio="1" shiftTimeMs="1000">	
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
 			</gears>
-			<reverse ratio="0.714" shiftTimeMs="0" />
 
 			<realEngine idleRpm="800" ratedRpm="2200">		
         <!-- 1950: 280(255) | 2200: 260(235) | 1500..1500: 1146(1050) | 85 | 0.5 | 249 | 1.7 | 2300 | 1360: 207 -->
@@ -4476,14 +4469,14 @@
 
 		<gearboxMogli disableManual="true" speedLimiter="true" autoStartStop="true" enableAI="true">
 			<blowOffVentilSound volume="0"/>
-      <hydrostatic>
-        <efficiency ratio="0.006533" factor="0.73"/> <!-- 0.05 .. 0.3 -->
-        <efficiency ratio="0.6" factor="0.88"/> <!-- 4.59 .. 25 -->
-        <efficiency ratio="0.8" factor="0.93"/> <!-- 6.12 .. 33.3 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 7.65 .. 41.7 -->
-        <efficiency ratio="1.2" factor="0.93"/> <!-- 9.18 .. 50 -->
-        <efficiency ratio="1.4" factor="0.88"/> <!-- 10.71 .. 58.3 -->
-      </hydrostatic>
+			<hydrostatic>
+        <efficiency ratio="-1" factor="0.5"/> 
+        <efficiency ratio="0.666667" factor="0.88"/>
+        <efficiency ratio="0.833333" factor="0.95"/>
+        <efficiency ratio="1" factor="0.98"/>
+        <efficiency ratio="1.166667" factor="0.95"/> 
+        <efficiency ratio="1.333333" factor="0.88"/>
+			</hydrostatic>
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="Lo" maxForwardSpeedRatio="0.306122449" />
 				<gear name="Hi" maxForwardSpeedRatio="0.714285714" />
@@ -4517,7 +4510,7 @@
 				<gear name="R"   speed="12" reverseOnly="true"/>
 				<gear name="III" speed="20" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="0.8" shiftTimeMs="1000" />
+			<reverse ratio="0.8"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4542,7 +4535,7 @@
 				<gear name="R"   speed="12" reverseOnly="true"/>
 				<gear name="III" speed="16" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4570,7 +4563,7 @@
 				<gear name="R"   speed="12" reverseOnly="true"/>
 				<gear name="III" speed="16" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4592,12 +4585,12 @@
         <efficiency ratio="1.08" factor="0.96"/>
         <efficiency ratio="1.4" factor="0.88"/>
 			</hydrostatic>
-			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1000">
+			<gears defaultGear="2"  shiftTimeMs="1000">
 				<gear name="I"   speed="5" />
 				<gear name="II"  speed="9"/>
 				<gear name="III" speed="16"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4624,7 +4617,7 @@
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4647,7 +4640,7 @@
 				<gear name="work"   speed="17.5" />
 				<gear name="street" speed="35"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="800" ratedRpm="2000">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="326"/><!-- 1800: 1078(640.332) | 2000: 1048(576.4) | 1700..1700: 4280(2636.48) | 97 | 0.5 -->
@@ -4697,7 +4690,7 @@
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="1000" ratedRpm="2100">
         <torque rpm="0" motorTorque="0"/><!-- 1800: 824 | 2000: 824 | 1500..1500: 3584 | 0.95 | 0.5 -->
@@ -4744,7 +4737,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4770,7 +4763,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4796,7 +4789,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/engines-eu-v.object-Single-MEDIA.download.tmp/Brosch%C3%BCre_Motoren_Euro5_klassik_DE_mkr.pdf -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -4845,7 +4838,7 @@
 				<gear name="III" speed="13" forwardOnly="true"/>
 				<gear name="IV"  speed="20" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 330 | 2200: 330 | 1300..1300: 1250 | 0.97 | 0 -->
@@ -4895,7 +4888,7 @@
 				<gear name="work"   speed="17.5" />
 				<gear name="street" speed="35"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 
@@ -4923,7 +4916,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
 			<realEngine idleRpm="800" ratedRpm="2000">
@@ -4975,7 +4968,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5023,7 +5016,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="1900">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="280"/><!-- 1700: 431(370.229) | 1900: 390(313.95) | 1400..1400: 2020(1898.8) | 97 | 0.5 | 300 | 1.5 -->
@@ -5071,7 +5064,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5116,7 +5109,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5163,7 +5156,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5210,7 +5203,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 240 | 2200: 240 | 1600..1600: 960 | 0.93 | 0.9 -->
@@ -5259,7 +5252,7 @@
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 300 | 2200: 300 | 1600..1600: 1200 | 0.93 | 0.9 -->
@@ -5311,7 +5304,7 @@
         <gear speed="11.59" name="1/2"/> <!-- 0.1 2.94 8 15-->
         <gear speed="23.19" name="street"/> <!-- 0.2 5.89 15 31-->
       </gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		
 			<!-- CAT C12 engine in lexion 480 evo -->
 			<realEngine idleRpm="1000" ratedRpm="2200">
@@ -5398,7 +5391,7 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="22"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
@@ -5440,7 +5433,7 @@
 				<gear name="work"   speed="12" />
 				<gear name="street" speed="24"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 270(230.604545454545) | 2100: 271(218.155) | 1000..1550: 1173(1102.62) | 97 | 1 | 300 | 2.2 -->
@@ -5485,7 +5478,7 @@
 				<gear name="R"   speed="11"   reverseOnly="true"/>
 				<gear name="III" speed="21.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1000" />
+			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="1000" ratedRpm="2600">
         <!-- 2600: 180(180) | 2600: 180(180) | 1500..1500: 650(650) | 95 | 0.5 | 300 | 1.8 | 2700 | 1500: 207 -->
@@ -5533,11 +5526,11 @@
         <efficiency ratio="1.267442" factor="0.93"/> <!-- 6.81 .. 55.5 -->
         <efficiency ratio="1.534884" factor="0.88"/> <!-- 8.24 .. 67.2 -->
       </hydrostatic>
-      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" reverseReset="false">
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" >
         <gear speed="13.27" name="field"/> <!-- 0.25 2.5 6 20-->
         <gear speed="43.78" name="street"/> <!-- 0.83 8.24 20 67-->
       </gears>
-      <reverse ratio="1" shiftTimeMs="1000" /> 
+      <reverse ratio="1"/> 
 			
 			<realEngine idleRpm="850" ratedRpm="2100">
         <!-- 1800: 540(540) | 2100: 502(502) | 1500..1500: 2300(2300) | 90 | 0.5 | 220 | 1.8 | 2200 | 1350: 207 -->
@@ -5602,7 +5595,7 @@
 		
 		<gearboxMogli clutchShiftingTimeMs="400" indoorCameraIndexList="" autoStartStop="false">
 
-			<gears defaultGear="2" reverseReset="false" shiftTimeMs="1200">	
+			<gears defaultGear="2"  shiftTimeMs="1200">	
 				<gear speed="6.72"/>
 				<gear speed="11"/>
 				<gear speed="18.1"/>
@@ -5838,7 +5831,7 @@
 				<torque rpm="2400" motorTorque="0"/>
 			</realEngine>
 		
-			<gears defaultGear="1">	
+			<gears >	
 				<gear speed="9.7" />
 				<gear speed="11.9" />
 				<gear speed="15.0" />
