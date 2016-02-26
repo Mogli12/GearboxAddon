@@ -2621,14 +2621,7 @@
 		<!-- http://manuals.deere.com/omview/OMAL171363_19/?tM= -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/John_Deere_7530_0808.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1950" ptoRpmEco="1733">
-      <hydrostatic>
-        <efficiency ratio="0.024889" factor="0.68"/> <!-- 0.05 .. 0.9 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.34 .. 25 -->
-        <efficiency ratio="0.833333" factor="0.93"/> <!-- 1.67 .. 31.3 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.01 .. 37.5 -->
-        <efficiency ratio="1.166667" factor="0.93"/> <!-- 2.34 .. 43.8 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 2.68 .. 50 -->
-      </hydrostatic>
+      <hydrostatic profile="ZF"/>
       <gears automatic="true">
         <gear speed="4.69" name=""/> <!-- 0.05 1.34 3 6-->
         <gear speed="9.38" name=""/> <!-- 0.1 2.68 6 13-->
@@ -2673,14 +2666,7 @@
 		<!-- AutoPowr -->
 		<!--
 		<gearboxMogli maxBackwardSpeed="44">
-			<hydrostatic>
-        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.666667" factor="0.84"/>
-        <efficiency ratio="0.933333" factor="0.936"/>
-        <efficiency ratio="1" factor="0.96"/>
-        <efficiency ratio="1.066667" factor="0.936"/>
-        <efficiency ratio="1.333333" factor="0.84"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="5"  name=""/>
 				<gear speed="10" name=""/>
@@ -3401,21 +3387,14 @@
 				
 			<gears shiftTimeMs="-1" clutchRatio="0.123" defaultGear="1"  autoUpRpm="1900" autoDownRpm="1150" autoShiftMinClutch="0.123"-->	
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
-			<hydrostatic>
-        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-			<gears automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
-			</gears>
-			<reverse ratio="1"/>
+      <!-- 0.05..60 @1890 / 800..2100 / 2 -->
+      <hydrostatic profile="ZF"/>
+      <gears automatic="true">
+        <gear speed="6.25" name=""/> <!-- 0.05 1.59 4 8-->
+        <gear speed="12.5" name=""/> <!-- 0.1 3.17 8 17-->
+        <gear speed="25" name=""/> <!-- 0.2 6.35 17 33-->
+        <gear speed="50" name=""/> <!-- 0.4 12.7 33 67-->
+      </gears>
 			
 			<realEngine idleRpm="800" ratedRpm="2100">		
         <!-- 1900: 263(238) | 2100: 258(236) | 1100..1650: 1000(932) | 95 | 0.5 | 100 | 3 | 2100 | 1320: 200 -->
@@ -3451,14 +3430,7 @@
 		</mod>
 
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="32">
-			<hydrostatic>
-        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3498,14 +3470,7 @@
 		<configFile xmlName="data/vehicles/steerable/lamborghini/Mach230VRT.xml"/>
 
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.021" factor="0.7"/> 0.05 km/h @ 800 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3535,14 +3500,7 @@
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz-Fahr_Agrotron_6190 -->
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/939-series-6-ttv -->
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-      <hydrostatic>
-        <efficiency ratio="0.006435" factor="0.73"/> <!-- 0.05 .. 0.3 -->
-        <efficiency ratio="0.6" factor="0.88"/> <!-- 4.66 .. 25.4 -->
-        <efficiency ratio="0.8" factor="0.93"/> <!-- 6.22 .. 33.8 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 7.77 .. 42.3 -->
-        <efficiency ratio="1.2" factor="0.93"/> <!-- 9.32 .. 50.8 -->
-        <efficiency ratio="1.4" factor="0.88"/> <!-- 10.88 .. 59.2 -->
-      </hydrostatic>
+      <hydrostatic profile="ZF"/>
       <gears  automatic="true">
         <gear speed="18.13" name=""/> <!-- 0.05 4.66 11 25-->
         <gear speed="42.3" name=""/> <!-- 0.12 10.88 25 59-->
@@ -3583,14 +3541,7 @@
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
-      <hydrostatic>
-        <efficiency ratio="0.020202" factor="0.6"/> <!-- 0.05 .. 0.9 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.65 .. 28.7 -->
-        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.23 .. 38.7 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.48 .. 43 -->
-        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.72 .. 47.3 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.3 .. 57.3 -->
-      </hydrostatic>
+      <hydrostatic profile="ZF"/>
       <gears  automatic="true">
         <gear speed="5.5" name=""/> <!-- 0.05 1.65 4 7-->
         <gear speed="11" name=""/> <!-- 0.1 3.3 7 15-->
@@ -3626,14 +3577,7 @@
 	
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Case-IH_Puma_180_CVX -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600" soundMaxRpm="2000"> <!-- 1900 / 2200 = 0.86363636 --> 
-			<hydrostatic>
-        <efficiency ratio="0.02037" factor="0.6"/> <!-- 0.05 .. 1 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.64 .. 31.3 -->
-        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.21 .. 42.3 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.45 .. 47 -->
-        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.7 .. 51.7 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.27 .. 62.7 -->
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
         <gear speed="6" name=""/> <!-- 0.05 4 8-->
         <gear speed="12" name=""/> <!-- 0.1 8 16-->
@@ -3678,14 +3622,7 @@
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
-			<hydrostatic>
-        <efficiency ratio="0.018519" factor="0.6"/> <!-- 0.05 .. 0.9 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.8 .. 32 -->
-        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.43 .. 43.2 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.7 .. 48 -->
-        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.97 .. 52.8 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.6 .. 64 -->
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6"  name=""/>
 				<gear speed="12" name=""/>
@@ -3723,14 +3660,7 @@
 	
 		<!-- http://www.dlg-test.de/tests/CHNPuma_230CVX.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1900" ptoRpmEco="1600">
-			<hydrostatic>
-        <efficiency ratio="0.018803" factor="0.6"/> <!-- 0.05 .. 1 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.77 .. 35.3 -->
-        <efficiency ratio="0.9" factor="0.96"/> <!-- 2.39 .. 47.7 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.66 .. 53 -->
-        <efficiency ratio="1.1" factor="0.96"/> <!-- 2.92 .. 58.3 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.55 .. 70.7 -->
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears  automatic="true">	
 				<gear speed="6.5" name=""/>
 				<gear speed="13"  name=""/>
@@ -3767,14 +3697,7 @@
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandT8435.xml"/>
 
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3814,14 +3737,7 @@
 		<!-- http://assets.cnhindustrial.com/caseih/emea/EMEAASSETS/Products/Tractors/Magnum/Brochures/Magnum_new/14c0005doo_magnum_bro_low.pdf -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/CASE-IH-Magnum340.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3861,14 +3777,7 @@
 		<!-- http://www.blt.bmlfuw.gv.at/vero/veranst/005/18.pdf -->
 		<!-- http://www.dlg-test.de/tests/JohnDeere7280R_AutoPowr.pdf -->
 		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.017778" factor="0.7"/> 0.05 km/h @ 900 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3905,14 +3814,7 @@
 		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.020202" factor="0.7"/> 0.05 km/h @ 900 rpm 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="5.5" name=""/>
 				<gear speed="11"  name=""/>
@@ -3950,14 +3852,7 @@
 		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.0172" factor="0.7"/> 0.05 km/h @ 1000 rpm 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
+      <hydrostatic profile="ZF"/>
 			<gears automatic="true">	
 				<gear speed="6.25" name=""/>
 				<gear speed="12.5" name=""/>
@@ -3996,21 +3891,13 @@
 		</mod>
 
 		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" clutchEngagingTimeMs="500">
-			<hydrostatic>
-        <efficiency ratio="0.0172" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.933333" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.066667" factor="0.96"/>
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-			<gears automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
-			</gears>
-			<reverse ratio="1" />
+      <hydrostatic profile="ZF"/>
+      <gears automatic="true">
+        <gear speed="6.36" name=""/> <!-- 0.05 1.79 4 8-->
+        <gear speed="12.72" name=""/> <!-- 0.1 3.57 8 17-->
+        <gear speed="25.45" name=""/> <!-- 0.2 7.14 17 34-->
+        <gear speed="50.89" name=""/> <!-- 0.4 14.29 34 68-->
+      </gears>
 			
 			<!-- http://www.claas.de/produkte/traktoren/xerion5000-4000-hrc/motor-antrieb/motor MB OM 471 LA -->
 			<!-- https://de.wikipedia.org/wiki/Mercedes-Benz_OM_470/OM_471/OM_472/OM_473 -->
@@ -4043,21 +3930,13 @@
 		</mod>
 
 		<gearboxMogli maxBackwardSpeed="32">
-      <hydrostatic>
-        <efficiency ratio="0.017531" factor="0.68"/> <!-- 0.05 .. 0.9 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.9 .. 35.5 -->
-        <efficiency ratio="0.833333" factor="0.93"/> <!-- 2.38 .. 44.4 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.85 .. 53.2 -->
-        <efficiency ratio="1.166667" factor="0.93"/> <!-- 3.33 .. 62.1 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 3.8 .. 71 -->
-      </hydrostatic>
+      <hydrostatic profile="ZF"/>
       <gears automatic="true">
-        <gear speed="6.65" name=""/> <!-- 0.05 1.9 4 9-->
-        <gear speed="13.31" name=""/> <!-- 0.1 3.8 9 18-->
-        <gear speed="26.62" name=""/> <!-- 0.2 7.61 18 35-->
-        <gear speed="53.24" name=""/> <!-- 0.4 15.21 35 71-->
+        <gear speed="6.56" name=""/> <!-- 0.05 1.88 4 9-->
+        <gear speed="13.13" name=""/> <!-- 0.1 3.75 9 18-->
+        <gear speed="26.25" name=""/> <!-- 0.2 7.5 18 35-->
+        <gear speed="52.5" name=""/> <!-- 0.4 15 35 70-->
       </gears>
-      <reverse ratio="1" />
 
 			<realEngine idleRpm="900" ratedRpm="2100">
         <!-- 1900: 336(308) | 2100: 316(284) | 1500..1500: 1372(1303) | 95 | 0 | 300 | 1.5 | 2200 | 1380: 200 -->
@@ -4098,18 +3977,17 @@
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24">
 			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 0.05 km/h @ 900 rpm 
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
+        <efficiency ratio="-1"    factor="0.65"/> 
+        <efficiency ratio="-0.01" factor="0.82"/>
+        <efficiency ratio="0"     factor="0.6"/>
+        <efficiency ratio="0.01"  factor="0.825"/>
+        <efficiency ratio="1"     factor="0.98"/>
+        <efficiency ratio="1.4"   factor="0.92"/>
 			</hydrostatic>
 			<gears defaultGear="1"  shiftTimeMs="2000">	
 				<gear name="heavy duty" speed="17"/>
 				<gear name="transport"  speed="35"/>
 			</gears>
-			<reverse ratio="0.5"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2200">	
 				<torque rpm="800" motorTorque="359"/>
@@ -4153,15 +4031,7 @@
 		<!-- http://www.dlg-test.de/tests/0912_Fendt_939_Vario.pdf -->
 		
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" clutchOpenRpm="800" clutchCloseRpm="1000" clutchTimeDecreaseMs="0" clutchTimeIncreaseMs="500" maxForwardSpeed="62" maxBackwardSpeed="33">
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4202,15 +4072,7 @@
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/fendt-favorit926varioi.pdf -->
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_926_Vario -->
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpm="1598">
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4255,15 +4117,7 @@
 		<!-- http://www.dlg-test.de/tests/Fendt930VarioTMS_2004.pdf -->
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_930_Vario -->
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpmEco="1598" ptoRpm="2031" maxAIGear="1">
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4313,15 +4167,7 @@
 		<gearboxMogli maxBackwardSpeed="34" disableManual="true" ptoRpmEco="1577" ptoRpm="1900">
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="1" automatic="true">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4361,15 +4207,7 @@
 		<!-- http://read.uberflip.com/i/338519-mf-6600-prospekt-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
 		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1490" ptoRpm="1900" maxAIGear="1">
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4415,15 +4253,7 @@
 		<!-- http://read.uberflip.com/i/499335-mf-7700-prospekt-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_DynaVT.pdf -->
 		<gearboxMogli maxBackwardSpeed="34" maxForwardSpeed="52" disableManual="true" ptoRpmEco="1530" ptoRpm="1900" maxAIGear="1">
-			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
-			</hydrostatic>
-		
+			<hydrostatic profile="Fendt"/>		
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="heavy duty" speed="27" />
 				<gear name="transport"  speed="50"/>
@@ -4470,12 +4300,12 @@
 		<gearboxMogli disableManual="true" speedLimiter="true" autoStartStop="true" enableAI="true">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic>
-        <efficiency ratio="-1" factor="0.5"/> 
-        <efficiency ratio="0.666667" factor="0.88"/>
-        <efficiency ratio="0.833333" factor="0.95"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.166667" factor="0.95"/> 
-        <efficiency ratio="1.333333" factor="0.88"/>
+        <efficiency ratio="-1"    factor="0.65"/> 
+        <efficiency ratio="-0.01" factor="0.82"/>
+        <efficiency ratio="0"     factor="0.6"/>
+        <efficiency ratio="0.01"  factor="0.825"/>
+        <efficiency ratio="1"     factor="0.98"/>
+        <efficiency ratio="1.4"   factor="0.92"/>
 			</hydrostatic>
 			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
 				<gear name="Lo" maxForwardSpeedRatio="0.306122449" />
@@ -4496,21 +4326,13 @@
 			<combine defaultWidth="4.2"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
 				<gear name="R"   speed="12" reverseOnly="true"/>
 				<gear name="III" speed="20" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="0.8"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4521,14 +4343,7 @@
 			<combine defaultWidth="5.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
@@ -4549,21 +4364,13 @@
 			<combine defaultWidth="6.7"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="9"  forwardOnly="true"/>
 				<gear name="R"   speed="12" reverseOnly="true"/>
 				<gear name="III" speed="16" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4577,20 +4384,12 @@
 			<combine defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears defaultGear="2"  shiftTimeMs="1000">
 				<gear name="I"   speed="5" />
 				<gear name="II"  speed="9"/>
 				<gear name="III" speed="16"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4602,14 +4401,7 @@
 			<combine defaultWidth="13.7"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" reverseReset="true">	
 				<gear name="1" speed="5"    forwardOnly="true"/>
 				<gear name="2" speed="10"   forwardOnly="true"/>
@@ -4617,7 +4409,6 @@
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4628,19 +4419,11 @@
 			<combine defaultFruit="chaff" defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="17.5" />
 				<gear name="street" speed="35"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="800" ratedRpm="2000">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="326"/><!-- 1800: 1078(640.332) | 2000: 1048(576.4) | 1700..1700: 4280(2636.48) | 97 | 0.5 -->
@@ -4675,14 +4458,7 @@
 			<combine defaultFruit="chaff" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" reverseReset="true">	
 				<gear name="1" speed="5"    forwardOnly="true"/>
 				<gear name="2" speed="10"   forwardOnly="true"/>
@@ -4690,7 +4466,6 @@
 				<gear name="3" speed="22"   forwardOnly="true"/>
 				<gear name="4" speed="44.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="1000" ratedRpm="2100">
         <torque rpm="0" motorTorque="0"/><!-- 1800: 824 | 2000: 824 | 1500..1500: 3584 | 0.95 | 0.5 -->
@@ -4725,19 +4500,11 @@
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4751,19 +4518,11 @@
 			<combine defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 	
@@ -4777,19 +4536,11 @@
 			<combine defaultFruit="chaff" defaultWidth="7.5" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/engines-eu-v.object-Single-MEDIA.download.tmp/Brosch%C3%BCre_Motoren_Euro5_klassik_DE_mkr.pdf -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -4823,14 +4574,7 @@
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.022" factor="0.7"/> 0.05 km/h @ 1000 rpm
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears defaultGear="3" reverseReset="true" shiftTimeMs="1000">
 				<gear name="I"   speed="5"  forwardOnly="true"/>
 				<gear name="II"  speed="8"  forwardOnly="true"/>
@@ -4838,7 +4582,6 @@
 				<gear name="III" speed="13" forwardOnly="true"/>
 				<gear name="IV"  speed="20" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 330 | 2200: 330 | 1300..1300: 1250 | 0.97 | 0 -->
@@ -4876,19 +4619,11 @@
 			<combine defaultFruit="chaff" defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="17.5" />
 				<gear name="street" speed="35"/>
 			</gears>
-			<reverse ratio="1"/>
 		</gearboxMogli>
 	</vehicle> 
 
@@ -4904,20 +4639,12 @@
 			<combine defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
-
+	
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
 			<realEngine idleRpm="800" ratedRpm="2000">
         <!-- 1800: 517(517) | 2000: 462(462) | 1000..1200: 2400(2400) | 98 | 0.1 | 220 | 2.3 | 2100 | 1100: 215 -->
@@ -4956,19 +4683,11 @@
 			<combine defaultWidth="10.5" minRpm="1600" maxRpm="1800"/> 
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5004,19 +4723,11 @@
 			<combine defaultWidth="9" minRpm="1600" maxRpm="1900"/> 
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<realEngine idleRpm="900" ratedRpm="1900">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="280"/><!-- 1700: 431(370.229) | 1900: 390(313.95) | 1400..1400: 2020(1898.8) | 97 | 0.5 | 300 | 1.5 -->
@@ -5052,19 +4763,11 @@
 			<combine defaultWidth="9" minRpm="1600" maxRpm="1800"/> 
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5097,19 +4800,11 @@
 			<combine defaultWidth="12" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5144,19 +4839,11 @@
 			<combine defaultWidth="13.5" minRpm="1600" maxRpm="1800"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="33"/>
 			</gears>
-			<reverse ratio="1"/>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
 			<realEngine idleRpm="800" ratedRpm="1800">
@@ -5191,19 +4878,11 @@
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/>
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
 
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 240 | 2200: 240 | 1600..1600: 960 | 0.93 | 0.9 -->
@@ -5240,19 +4919,11 @@
 			<combine defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic>
-        <efficiency ratio="0.00719" factor="0.7"/> 
-        <efficiency ratio="0.6" factor="0.88"/>
-        <efficiency ratio="0.92" factor="0.96"/>
-        <efficiency ratio="1" factor="0.98"/>
-        <efficiency ratio="1.08" factor="0.96"/>
-        <efficiency ratio="1.4" factor="0.88"/>
-			</hydrostatic>
+			<hydrostatic profile="Combine"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
 				<gear name="work"   speed="8.6" />
 				<gear name="street" speed="22.8"/>
 			</gears>
-			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0"/><!-- 2200: 300 | 2200: 300 | 1600..1600: 1200 | 0.93 | 0.9 -->
@@ -5291,20 +4962,12 @@
 			<combine defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-      <hydrostatic>
-        <efficiency ratio="0.022642" factor="0.68"/> <!-- 0.05 .. 0.5 -->
-        <efficiency ratio="0.666667" factor="0.88"/> <!-- 1.47 .. 15.5 -->
-        <efficiency ratio="0.833333" factor="0.93"/> <!-- 1.84 .. 19.3 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 2.21 .. 23.2 -->
-        <efficiency ratio="1.166667" factor="0.93"/> <!-- 2.58 .. 27.1 -->
-        <efficiency ratio="1.333333" factor="0.88"/> <!-- 2.94 .. 30.9 -->
-      </hydrostatic>
+			<hydrostatic profile="Combine"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
         <gear speed="5.8" name="slow"/> <!-- 0.05 1.47 4 8-->
         <gear speed="11.59" name="1/2"/> <!-- 0.1 2.94 8 15-->
         <gear speed="23.19" name="street"/> <!-- 0.2 5.89 15 31-->
       </gears>
-			<reverse ratio="1"/>
 		
 			<!-- CAT C12 engine in lexion 480 evo -->
 			<realEngine idleRpm="1000" ratedRpm="2200">
@@ -5348,8 +5011,7 @@
 				<gear name="R"   speed="11"   reverseOnly="true"/>
 				<gear name="III" speed="21.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1" shiftTimeMs="1500" />
-			
+				
 			<realEngine idleRpm="1000" ratedRpm="2200">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="302"/><!-- 2200: 162(130.41) | 2200: 162(130.41) | 1400..1400: 662(622.28) | 97 | 0.5 -->
         <torque rpm="100" motorTorque="178" motorTorqueEco="168" fuelUsageRatio="287"/>
@@ -5391,7 +5053,6 @@
 				<gear name="work"   speed="11" />
 				<gear name="street" speed="22"/>
 			</gears>
-			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
@@ -5433,7 +5094,6 @@
 				<gear name="work"   speed="12" />
 				<gear name="street" speed="24"/>
 			</gears>
-			<reverse ratio="1"/>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 270(230.604545454545) | 2100: 271(218.155) | 1000..1550: 1173(1102.62) | 97 | 1 | 300 | 2.2 -->
@@ -5478,8 +5138,7 @@
 				<gear name="R"   speed="11"   reverseOnly="true"/>
 				<gear name="III" speed="21.5" forwardOnly="true"/>
 			</gears>
-			<reverse ratio="1"/>
-			
+	
 			<realEngine idleRpm="1000" ratedRpm="2600">
         <!-- 2600: 180(180) | 2600: 180(180) | 1500..1500: 650(650) | 95 | 0.5 | 300 | 1.8 | 2700 | 1500: 207 -->
         <torque rpm="100" motorTorque="168" motorTorqueEco="168" fuelUsageRatio="257.1"/>
@@ -5518,19 +5177,11 @@
 			<combine defaultFruit="chaff" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-      <hydrostatic>
-        <efficiency ratio="0.046554" factor="0.793"/><!-- 0.25 .. 2 -->
-        <efficiency ratio="0.465116" factor="0.88"/> <!-- 2.5 .. 20.4 -->
-        <efficiency ratio="0.732558" factor="0.93"/> <!-- 3.93 .. 32.1 -->
-        <efficiency ratio="1" factor="0.98"/> <!-- 5.37 .. 43.8 -->
-        <efficiency ratio="1.267442" factor="0.93"/> <!-- 6.81 .. 55.5 -->
-        <efficiency ratio="1.534884" factor="0.88"/> <!-- 8.24 .. 67.2 -->
-      </hydrostatic>
+			<hydrostatic profile="Combine"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" >
         <gear speed="13.27" name="field"/> <!-- 0.25 2.5 6 20-->
         <gear speed="43.78" name="street"/> <!-- 0.83 8.24 20 67-->
       </gears>
-      <reverse ratio="1"/> 
 			
 			<realEngine idleRpm="850" ratedRpm="2100">
         <!-- 1800: 540(540) | 2100: 502(502) | 1500..1500: 2300(2300) | 90 | 0.5 | 220 | 1.8 | 2200 | 1350: 207 -->
