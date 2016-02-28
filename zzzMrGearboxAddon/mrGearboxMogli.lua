@@ -8,7 +8,7 @@
 --
 --***************************************************************
 
-local mrGearboxMogliVersion=1.310
+local mrGearboxMogliVersion=1.311
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if mrGearboxMogli == nil or mrGearboxMogli.version == nil or mrGearboxMogli.version < mrGearboxMogliVersion then
@@ -35,7 +35,7 @@ mrGearboxMogli.ptoRpmFactorEco      = 0.667 -- 0.5  -- reduce PTO RPM in eco mod
 mrGearboxMogli.rpmMinusEco          = 0    -- reduce target RPM in eco mode
 mrGearboxMogli.autoShiftRpmDiff     = 50
 mrGearboxMogli.autoShiftPowerRatio  = 1.03
-mrGearboxMogli.autoShiftMaxDelta    = 1E-3
+mrGearboxMogli.autoShiftMaxDeltaRpm = 1E-3
 mrGearboxMogli.minClutchPercent     = 1E-3
 mrGearboxMogli.minClutchPercentTC   = 0.1
 mrGearboxMogli.clutchLoopTimes      = 200
@@ -6422,6 +6422,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local bestE     = -1
 				local bestH     = self.hydrostaticFactor
 				local bestG     = currentGear
+				local bestS     = 0
 				local first     = true
 				local tooBig    = false
 				local tooSmall  = false
@@ -6511,21 +6512,30 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					
 					if      self.vehicle:mrGbMGetAutomatic()
 							and isValidEntry 
-							and g ~= currentGear
-							and self.vehicle.mrGbMS.AutoShiftTimeoutLong > 0 then
+							and g ~= currentGear then
+						if self.vehicle.mrGbMS.AutoShiftTimeoutLong > 0 then								
+							local autoShiftTimeout = 0
+							if     spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
+								autoShiftTimeout = downTimer							
+							elseif spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
+								autoShiftTimeout = upTimer
+							else
+								autoShiftTimeout = math.min( downTimer, upTimer )
+							end
 							
-						local autoShiftTimeout = 0
-						if     spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
-							autoShiftTimeout = downTimer							
-						elseif spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
-							autoShiftTimeout = upTimer
-						else
-							autoShiftTimeout = math.min( downTimer, upTimer )
+							autoShiftTimeout = autoShiftTimeout + self.vehicle.mrGbMS.GearTimeToShiftGear
+							
+							if autoShiftTimeout > g_currentMission.time then
+								isValidEntry = false
+							end
 						end
 						
-						autoShiftTimeout = autoShiftTimeout + self.vehicle.mrGbMS.GearTimeToShiftGear
-						
-						if autoShiftTimeout > g_currentMission.time then
+						if      self.deltaRpm < -mrGearboxMogli.autoShiftMaxDeltaRpm
+								and spd           > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
+							isValidEntry = false
+						elseif  self.deltaRpm > mrGearboxMogli.autoShiftMaxDeltaRpm
+								and spd           < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps
+								and self.autoClutchPercent > self.vehicle.mrGbMS.AutoShiftMinClutch then
 							isValidEntry = false
 						end
 					end
@@ -6543,22 +6553,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 				
 					if isValidEntry or not self.vehicle:mrGbMGetAutomatic() then
-					--if currentSpeed < 10 and accelerationPedal < mrGearboxMogli.accDeadZone then
-					--	local hIdle = hMin
-					--	if g == currentGear then
-					--		hIdle = self.hydrostaticFactor
-					--	else
-					--		hIdle = self.hydrostaticFactor * self.vehicle.mrGbML.currentGearSpeed / spd
-					--	end
-					--	if hMin < hIdle and hIdle < hMax then
-					--		if mrGearboxMogli.accDeadZone > 0 and accelerationPedal > 0 then
-					--			hMin = hIdle + accelerationPedal / mrGearboxMogli.accDeadZone * ( hMin - hIdle )
-					--		else
-					--			hMin = hIdle 
-					--		end
-					--	end
-					--end
-					
 						if self.vehicle.mrGbMG.debugPrint then
 							local sInt = math.floor(0.5+3.6*spd)
 							if sMin == nil or sMin > sInt then
@@ -6632,11 +6626,21 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							print(string.format("g: %1d target: %4.0f c: %4.0f w: %4.0f r: %4.0f hMin: %0.3f hMax: %0.3f h: %0.3f hr: %0.3f e: %0.3f",g,self.targetRpm,c,w,r,hMin,hMax,h,hr,e))
 						end
 						
-						if self.vehicle:mrGbMGetAutomatic() then				
-							if bestE < e then
-								bestE = e
+						if self.vehicle:mrGbMGetAutomatic() then
+							local t = self:getRpmScore( w / h, n, m )
+		
+							if t <= 0 then
+								t = 1+e
+							else
+								t = 1-t
+							end
+							if     bestE < t 
+									or ( math.abs( bestE - t ) < 1e-4
+									 and math.abs( self.vehicle.mrGbML.currentGearSpeed - spd ) < math.abs( self.vehicle.mrGbML.currentGearSpeed - bestS ) ) then
+								bestE = t
 								bestG = g
 								bestH = h
+								bestS = spd
 							end
 						else
 							bestH = h
@@ -6672,6 +6676,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 																							.." speed: "..tostring(math.floor(0.5+3.6*self.vehicle.mrGbML.currentGearSpeed))
 																							.." eff: "..string.format("%0.3f",self:getHydroEff( self.hydrostaticFactor ))
 																							.." => best: "..tostring(bestG)
+																							.." speed: "..tostring(math.floor(0.5+3.6*bestS))
 																							.." eff: "..string.format("%0.3f",bestE)
 																							.."\nupTimer: "..tostring(math.floor(math.max(0, upTimer-g_currentMission.time)))
 																							.." downTimer: "..tostring(math.floor(math.max(0, downTimer-g_currentMission.time)))
@@ -6940,10 +6945,10 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						
 					if      isValidEntry 
 							and i ~= currentGear then							
-						if      self.deltaRpm < -mrGearboxMogli.autoShiftMaxDelta
+						if      self.deltaRpm < -mrGearboxMogli.autoShiftMaxDeltaRpm
 								and spd           > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
 							isValidEntry = false
-						elseif  self.deltaRpm > mrGearboxMogli.autoShiftMaxDelta
+						elseif  self.deltaRpm > mrGearboxMogli.autoShiftMaxDeltaRpm
 								and spd           < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps
 								and self.autoClutchPercent > self.vehicle.mrGbMS.AutoShiftMinClutch then
 							isValidEntry = false
