@@ -270,7 +270,7 @@
 		</mod>
 		
 		<!-- http://manuals.deere.com/omview/OMAL152891_29/?tM= -->
-		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200" speedLimiter="false">
+		<gearboxMogli swapGearRangeKeys="true" soundMaxRpm="1200" speedLimiter="false"  maxAIRange="3">
 
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="22.2" name="1" />
@@ -304,7 +304,7 @@
 		</mod>
 		
 		<!-- http://manuals.deere.com/omview/OMAL213126_19/?tM= -->
-		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false">
+		<gearboxMogli swapGearRangeKeys="true" speedLimiter="false" maxAIRange="4">
 
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="28.2" name="1" />
@@ -363,7 +363,7 @@
 
 		<!-- http://www.dlg-test.de/tests/1212_JohnDeere_6210R.pdf -->
 		<!-- http://manuals.deere.com/omview/OMETN78900_19/?tM= -->
-		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="30" soundMaxRpm="1900">
+		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="30" soundMaxRpm="1900" maxAIRange="2">
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" autoRpmReduction="600">	
 				<gear speed="16.5" name="1" />
 				<gear speed="20.0" name="2" />
@@ -472,7 +472,7 @@
 		</mod>
 
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" maxAIRange="3">
 			<realEngine idleRpm="1000" ratedRpm="2400" >
 				<torque rpm="900" motorTorque="445"/>
 				<torque rpm="1000" motorTorque="459"/>
@@ -635,7 +635,7 @@
 		</mod>
 		
 		<!-- http://www.deutz-traktoren.de/prospekte/d13006-prospekt.pdf -->
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" maxAIRange="2">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears defaultGear="4">
@@ -718,8 +718,66 @@
 	</vehicle>
 
 	<vehicle>
+		<mod name="HuerlimannH496" isPrefix="true">
+			<link href="https://www.modhoster.de/mods/hurlimann-h496-hpe"/>
+			<xmlFile name="Huerlimann.xml"/>
+		</mod>
+		
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1985_D.pdf -->
+		<gearboxMogli autoStartStop="false" ptoRpm="2125" ptoRpmEco="1957" globalRatioFactor="1.25" speedLimiter="false">>
+			<realEngine idleRpm="900" ratedRpm="2180">
+        <!-- 2150: 96(96) | 2200: 96(96) | 1300..1300: 360(360) | 92 | 0.5 | 215 | 2 | 2300 | 1300: 220 -->
+        <torque rpm="350" motorTorque="204" fuelUsageRatio="275.2"/>
+        <torque rpm="700" motorTorque="300" fuelUsageRatio="242"/>
+        <torque rpm="900" motorTorque="331" fuelUsageRatio="229.8"/>
+        <torque rpm="1000" motorTorque="344" fuelUsageRatio="225.5"/>
+        <torque rpm="1100" motorTorque="353" fuelUsageRatio="222.4"/>
+        <torque rpm="1200" motorTorque="358" fuelUsageRatio="220.6"/>
+        <torque rpm="1300" motorTorque="360" fuelUsageRatio="220"/>
+        <torque rpm="1400" motorTorque="357" fuelUsageRatio="220.3"/>
+        <torque rpm="1500" motorTorque="353" fuelUsageRatio="221.2"/>
+        <torque rpm="1600" motorTorque="349" fuelUsageRatio="222.7"/>
+        <torque rpm="1700" motorTorque="344" fuelUsageRatio="224.8"/>
+        <torque rpm="1800" motorTorque="338" fuelUsageRatio="227.5"/>
+        <torque rpm="1850" motorTorque="335" fuelUsageRatio="229.1"/>
+        <torque rpm="1900" motorTorque="332" fuelUsageRatio="230.9"/>
+        <torque rpm="1950" motorTorque="329" fuelUsageRatio="232.8"/>
+        <torque rpm="2000" motorTorque="325" fuelUsageRatio="234.8"/>
+        <torque rpm="2050" motorTorque="321" fuelUsageRatio="237"/>
+        <torque rpm="2100" motorTorque="318" fuelUsageRatio="239.3"/>
+        <torque rpm="2150" motorTorque="314" fuelUsageRatio="241.8"/>
+        <torque rpm="2200" motorTorque="306" fuelUsageRatio="244.4"/>
+        <torque rpm="2250" motorTorque="290" fuelUsageRatio="250.8"/>
+        <torque rpm="2300" motorTorque="240" fuelUsageRatio="280.5"/>
+        <torque rpm="2350" motorTorque="157" fuelUsageRatio="343.8"/>
+        <torque rpm="2400" motorTorque="41" fuelUsageRatio="448.5"/>
+        <torque rpm="2450" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="488.9"/>
+			</realEngine>
+				
+			<gears shiftTimeMs="800">
+				<gear speed="13.1"  />
+				<gear speed="18.5"/>
+				<gear speed="24"/>
+				<gear speed="30"/>
+			</gears>
+
+			<ranges shiftTimeMs="1200" defaultRange="3" doubleClutch="false">
+				<range ratio="0.11" name="L"/>
+				<range ratio="0.33" name="M"/>
+				<range ratio="1"    name="V"/>
+			</ranges>
+
+			<ranges shiftTimeMs="800" defaultRange="2" reverseReset="true">
+				<range ratio="0.85" name="lo" forwardOnly="true"/>
+				<range ratio="1"    name=""   forwardOnly="true"/>
+				<range ratio="1"    name=""   reverseOnly="true"/>
+			</ranges>			
+		</gearboxMogli>
+	</vehicle>
+
+	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/lindner/lindnerGeotrac94.xml"/>
-			<gearboxMogli  swapGearRangeKeys="true" >
+			<gearboxMogli  swapGearRangeKeys="true" maxAIRange2="1">
 			<realEngine idleRpm="800" ratedRpm="2200" >
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="800" motorTorque="360"/>
@@ -815,7 +873,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/same/sameFortis190.xml" />
 						
-		<gearboxMogli   swapGearRangeKeys="true">
+		<gearboxMogli   swapGearRangeKeys="true" maxAIRange="4">
 			<realEngine idleRpm="800" ratedRpm="2100" >
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="800" motorTorque="754"/>
@@ -857,7 +915,7 @@
 	</vehicle>
 	
 	<vehicle>
-		<mod name="DeutzFahr120MK3" isPrefix="true"> 
+		<mod name="DeutzFahr120MK3" isPrefix="true" maxAIRange="4"> 
 			<link href="https://www.facebook.com/ModdinggemeinschaftLs13" />
 			<link href="http://uploaded.net/file/e9vdghz1" />
 			<xmlFile name="DeutzMK3.xml"/>
@@ -906,11 +964,15 @@
 	</vehicle>
 	
 	<vehicle> 
+		<mod name="SteyrMulti4115" isPrefix="true"> 
+			<link href="http://www.modhoster.de/mods/steyr-4115-multi-hardpoint" />
+			<xmlFile name="xml/steyrMulti4115.xml" />
+		</mod>
 		<configFile xmlName="data/vehicles/steerable/steyr/steyrMulti4115.xml"/>
 		<configFile xmlName="data/vehicles/steerable/steyr/steyrMulti4115Forestry.xml"/>
 		
 		<!-- http://media.steyr-traktoren.com/Media/Flip_viewer/de_at/Multi/flipviewerxpress.html -->
-		<gearboxMogli   swapGearRangeKeys="true">
+		<gearboxMogli   swapGearRangeKeys="true" maxAIRange2="1">
 			<realEngine idleRpm="1000" ratedRpm="2200" >
 				<torque rpm="900" motorTorque="411"/>
 				<torque rpm="1000" motorTorque="425"/>
@@ -1285,7 +1347,7 @@
 		</mod>
 		
 		<!-- http://www.mercedes-benz.de/content/media_library/hq/hq_mpc_reference_site/unimog/System_Unimog/Applications/brochures/unimog_systemunimog_applications_basicbrochure_u300-u500_01_2400_de_DE_05-2007_pdf.object-Single-MEDIA.download.tmp/Users/han/Desktop/broschuren_de/unimog_brochures_ugn_basic_de.pdf -->
-		<gearboxMogli   ratedRpm="2100">
+		<gearboxMogli   ratedRpm="2100" maxAIRange="2">
 			<gears shiftTimeMs="500" clutchRatio="0.7"  automatic="true" >	
 				<gear speed="6.98"/>
 				<gear speed="10"/>
@@ -1312,7 +1374,7 @@
 			<xmlFile name="xml/MBTrac1600.xml"/>
 		</mod>
 
-		<gearboxMogli soundMaxRpm="2000" speedLimiter="false" autoStartStop="false">
+		<gearboxMogli soundMaxRpm="2000" speedLimiter="false" autoStartStop="false" maxAIRange="1">
 
 			<gears defaultGear="4" shiftTimeMs="800">
 				<gear speed="6.3" />
@@ -1372,7 +1434,7 @@
 			<xmlFile name="xml/MBTrac1800.xml"/>
 		</mod>
 
-		<gearboxMogli soundMaxRpm="1200" speedLimiter="false" autoStartStop="false">
+		<gearboxMogli soundMaxRpm="1200" speedLimiter="false" autoStartStop="false" maxAIRange="1">
 
 			<gears defaultGear="4" shiftTimeMs="800">
 				<gear speed="6.3" />
@@ -1654,7 +1716,7 @@
 			<xmlFile name="1455xl.xml" />
 		</mod>
 
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" maxAIRange="1">
 			<gears shiftTimeMs="800">	
 				<gear speed="3.9"  name="1" />
 				<gear speed="6.2"  name="2" />
@@ -1699,7 +1761,7 @@
 			<xmlFile name="IHC_1255A.xml" />
 		</mod>
 
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" maxAIRange="1">
 			<gears shiftTimeMs="800">	
 				<gear speed="3.9"  name="1" />
 				<gear speed="6.2"  name="2" />
@@ -1726,7 +1788,7 @@
 			<xmlFile name="IHC_955A.xml" />
 		</mod>
 
-		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
+		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96" maxAIRange2="1">
 			<realEngine idleRpm="850" ratedRpm="2200">
         <!-- 2200: 90(90) | 2200: 90(90) | 1400..1400: 334(334) | 90 | 0.5 | 300 | 1.8 | 2300 | 1400: 215 -->
         <torque rpm="100" motorTorque="68" fuelUsageRatio="279.6"/>
@@ -1781,7 +1843,7 @@
 			<xmlFile name="IHC_1055A.xml" />
 		</mod>
 
-		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96">
+		<gearboxMogli autoStartStop="false" idlePitchFactor="0.96" runPitchFactor="0.96" maxAIRange2="1">
 			<realEngine idleRpm="850" ratedRpm="2200">
         <!-- 2200: 100(100) | 2200: 100(100) | 1400..1400: 377.6(378) | 90 | 0.5 | 300 | 1.8 | 2300 | 1400: 220 -->
         <torque rpm="100" motorTorque="77" motorTorqueEco="77" fuelUsageRatio="286.1"/>
@@ -1841,6 +1903,7 @@
 		<gearboxMogli autoStartStop="false" clutchEngagingTimeMs="200" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true" revUpDownMs="5000" ptoRpm="1676">
 			<blowOffVentilSound volume="0"/>
 
+			<!--
 			<gears  reverseReset="true" shiftTimeMs="1000">	
 				<gear speed="24.2" forwardOnly="true" />
 				<gear speed="30.4" forwardOnly="true" />
@@ -1856,7 +1919,28 @@
 				<range ratio="0.481" name="HS" />
 				<range ratio="0.566" name="HH" upGearOffset="-2" />
 				<range ratio="1"     name="Overdrive" downGearOffset="2" forwardOnly="true" />
+			</ranges>-->
+			<gears>
+				<gear speed="14" name="1" />
+				<gear speed="17" name="2" />
+				<gear speed="20" name="3" />
+				<gear speed="25" name="Ov1" minRange="3" minRange2="2" forwardOnly="true" />
+				<gear speed="30" name="Ov2" minRange="3" minRange2="2" forwardOnly="true" />
+				<gear speed="40" name="Ov3" minRange="3" minRange2="2" forwardOnly="true" />
+			</gears>
+			
+			<ranges>
+				<range ratio="0.380" name="L" maxGear="3" />
+				<range ratio="0.625" name="M" maxGear="3" />
+				<range ratio="1.000" name="S" />
 			</ranges>
+			
+			<ranges>
+				<range ratio="0.4" name="-" maxGear="3"/>
+				<range ratio="1.0" name="" />
+			</ranges>
+			
+			<reverse ratio="1.04" />
 		</gearboxMogli>			
 	</vehicle>	
 	
@@ -1921,7 +2005,7 @@
 		</mod>
 		
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/steyr-8080a.pdf -->
-		<gearboxMogli autoStartStop="false" shiftTimeMs="800">
+		<gearboxMogli autoStartStop="false" shiftTimeMs="800" maxAIRange="1">
 			<gears >	
 				<gear speed="8.9" />
 				<gear speed="15.1" />
@@ -2043,7 +2127,7 @@
 		</mod>
 		
 		<!-- http://www.caseih.com/de_de/Products/Traktoren/Documents/JXU/9C0009DOO.pdf -->
-		<gearboxMogli ptoRpm="1600">
+		<gearboxMogli ptoRpm="1600" maxAIRange="2">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="700" motorTorque="254"/>
@@ -2096,7 +2180,7 @@
 		</mod>
 		
 		<!-- http://www.caseih.com/de_de/Products/Traktoren/Documents/JXU/9C0009DOO.pdf -->
-		<gearboxMogli ptoRpm="1600">
+		<gearboxMogli ptoRpm="1600" maxAIRange2="2">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="700" motorTorque="309"/>
@@ -2245,7 +2329,7 @@
 
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<!-- http://www.lamborghini-tractors.com/de-DE/weinberg-und-obstplantage/download/2618_de209aea3647557f5cfe006c19b4b317 -->
-		<gearboxMogli swapGearRangeKeys="true">
+		<gearboxMogli swapGearRangeKeys="true" maxAIRange="3">
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="30.48" name="L"/>
 				<gear speed="36.57" name="M"/>
@@ -2949,7 +3033,7 @@
 		</mod>
 		
 		<!-- http://www.daimler.com/Projects/c2c/channel/images/6787_9660_-1_-1_20399.pdf -->
-		<gearboxMogli defaultGear="5">
+		<gearboxMogli defaultGear="5" maxAIRange="1">
 			<gears>
 				<gear speed="6.4"/>
 				<gear speed="9.2"/>
@@ -2998,7 +3082,7 @@
 		</mod>
 		
 		<!-- http://www.daimler.com/Projects/c2c/channel/images/6787_9660_-1_-1_20399.pdf -->
-		<gearboxMogli defaultGear="5">
+		<gearboxMogli defaultGear="5" maxAIRange="1">
 			<gears>
 				<gear speed="6.4"/>
 				<gear speed="9.2"/>
@@ -3049,7 +3133,7 @@
 		
 		<!-- http://read.uberflip.com/i/596442-mf-5700-sl-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
-		<gearboxMogli maxBackwardSpeed="42" maxForwardSpeed="42" ptoRpm="2000" ptoRpmEco="1560">
+		<gearboxMogli maxBackwardSpeed="42" maxForwardSpeed="42" ptoRpm="2000" ptoRpmEco="1560" maxAIRange="3">
 			<gears shiftTimeMs="800" defaultGear="3">	
 				<gear speed="4.5"/>
 				<gear speed="11"/>
@@ -3107,7 +3191,7 @@
 		
 		<!-- http://read.uberflip.com/i/338519-mf-6600-prospekt-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
-		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570" maxAIRange="3">
 			<gears shiftTimeMs="800" defaultGear="3">	
 				<gear speed="5"/>
 				<gear speed="12.5"/>
@@ -3165,7 +3249,7 @@
 		
 		<!-- http://read.uberflip.com/i/499335-mf-7700-prospekt-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
-		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570" maxAIRange="3">
 			<gears shiftTimeMs="800" defaultGear="3">	
 				<gear speed="5"/>
 				<gear speed="12.5"/>
@@ -3223,7 +3307,7 @@
 		
 		<!-- http://read.uberflip.com/i/338540-mf-7600-brochure-de -->
 		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
-		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570">
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" ptoRpm="2030" ptoRpmEco="1570" maxAIRange="3">
 			<gears shiftTimeMs="800" defaultGear="3">	
 				<gear speed="5"/>
 				<gear speed="12.5"/>
@@ -3272,7 +3356,7 @@
 		</mod>
 
 		<!-- http://www.dlg-test.de/tests/Claas_AXION-850-Hexashift-de.pdf -->
-		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1524">>
+		<gearboxMogli maxBackwardSpeed="32" maxForwardSpeed="52" ptoRpm="1890" ptoRpmEco="1524" maxAIRange="3">
 			<gears shiftTimeMs="-1" clutchRatio="1" defaultGear="3"  automatic="true">	
 				<gear speed="22.5"/>
 				<gear speed="27"/>
@@ -5565,6 +5649,55 @@
 			</ranges>
 			
 			<reverse shiftTimeMs="0"/>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
+		<mod name="Hanomag55D">
+			<link href="http://www.modhoster.de/mods/hanomag-55d"/>
+			<xmlFile name="Hanomag55D.xml"/>
+		</mod>
+		
+		<!-- https://specs.lectura.de/datasheet-downloads/55D%289dd%29.pdf -->
+		<gearboxMogli maxForwardSpeed="61" maxBackwardSpeed="61" torqueConverter="true" minClutchRatio="0.3125">
+			<blowOffVentilSound volume="0"/>
+			
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <!-- 2200: 160(160) | 2200: 160(160) | 1500..1500: 623(623) | 95 | 0.4 | 49 | 1.7 | 2200 | 1420: 210 -->
+        <torque rpm="350" motorTorque="424" fuelUsageRatio="249.5"/>
+        <torque rpm="700" motorTorque="567" fuelUsageRatio="227.9"/>
+        <torque rpm="900" motorTorque="592" fuelUsageRatio="219.3"/>
+        <torque rpm="1000" motorTorque="601" fuelUsageRatio="216.1"/>
+        <torque rpm="1100" motorTorque="609" fuelUsageRatio="213.5"/>
+        <torque rpm="1200" motorTorque="615" fuelUsageRatio="211.7"/>
+        <torque rpm="1300" motorTorque="620" fuelUsageRatio="210.5"/>
+        <torque rpm="1400" motorTorque="622" fuelUsageRatio="210"/>
+        <torque rpm="1500" motorTorque="623" fuelUsageRatio="210.2"/>
+        <torque rpm="1600" motorTorque="615" fuelUsageRatio="211.2"/>
+        <torque rpm="1700" motorTorque="605" fuelUsageRatio="213"/>
+        <torque rpm="1800" motorTorque="591" fuelUsageRatio="215.5"/>
+        <torque rpm="1850" motorTorque="584" fuelUsageRatio="217.1"/>
+        <torque rpm="1900" motorTorque="575" fuelUsageRatio="218.8"/>
+        <torque rpm="1950" motorTorque="566" fuelUsageRatio="220.8"/>
+        <torque rpm="2000" motorTorque="557" fuelUsageRatio="222.9"/>
+        <torque rpm="2050" motorTorque="546" fuelUsageRatio="225.2"/>
+        <torque rpm="2100" motorTorque="535" fuelUsageRatio="227.7"/>
+        <torque rpm="2150" motorTorque="523" fuelUsageRatio="230.4"/>
+        <torque rpm="2200" motorTorque="511" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+			
+			<gears shiftTimeMs="1" clutchRatio="0.3125" speedMatching="false" defaultGear="3">
+				<gear speed="24"  name="1"/>
+				<gear speed="45"  name="2"/>
+				<gear speed="82"  name="3"/>
+			</gears>
+			
+			<ranges shiftTimeMs="100" clutchRatio="0.3125" speedMatching="false" defaultRange="1">
+				<range ratio="0.243" name="A"/>
+				<range ratio="1.000" name="S"/>
+			</ranges>
+			<reverse shiftTimeMs="100" clutchRatio="0.3125"/>
 		</gearboxMogli>	
 	</vehicle>
 	

@@ -15,11 +15,11 @@
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.3.1.1</version>
+	<version>1.3.1.2</version>
 	<l10n>
 		<text name="mrGearboxMogliVERSION">
-		<de>Getriebe v1.31 von Mogli</de>
-		 <en>Gearbox v1.31 by mogli</en></text>
+		<de>Getriebe v1.31 b2 von Mogli</de>
+		 <en>Gearbox v1.31 b2 by mogli</en></text>
 		<text name="mrGearboxMogliSHIFTGEARUP"><de>Getriebe: Gang hoch</de><en>Gearbox: Gear up</en></text>
 		<text name="mrGearboxMogliSHIFTGEARDOWN"><de>Getriebe: Gang runter</de><en>Gearbox: Gear down</en></text>
 		<text name="mrGearboxMogliSHIFTRANGEUP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en></text>
