@@ -6173,14 +6173,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		elseif self.vehicle.mrGbMS.EcoMode then
 			requestedPower = math.min( 0.9*rp, 1.11 * currentPower )
 		else
-			getMaxPower    = true
+		--getMaxPower    = true
 			requestedPower = rp
 		end
 	else
 		requestedPower = currentPower
 	end
 
-	if lastPtoOn ~= self.ptoOn then
+--print(string.format( "%3.0f%% %4.0f %4.0f %4.0f %4.0f => %4.0f ", self.lastThrottle*100, currentPower, pp, rp, self.currentMaxPower, requestedPower )..tostring(getMaxPower))
+	
+	if lastPtoOn ~= self.ptoOn or lastNoTransmission or lastNoTorque then
 		self.requestedPower1 = nil
 		self.motorLoadS1     = nil 
 		self.targetRpm1      = nil
@@ -6371,6 +6373,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			
 			if      self.hydroEff ~= nil
 					and self.vehicle.steeringEnabled
+					and not ( self.vehicle.axisForwardIsAnalog )
 					and currentAbsSpeed < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed then
 				if currentAbsSpeed <= 0 then
 					self.minThrottle = math.max( self.minThrottle, 0.5 )
