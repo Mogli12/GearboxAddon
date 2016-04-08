@@ -3892,6 +3892,51 @@
 	</vehicle>
 	
 	<vehicle>
+		<mod name="JohnDeere7930" isPrefix="true">
+			<link href="https://www.modhoster.de/mods/john-deere-7930--113" />
+			<xmlFile name="JohnDeere7930FH.xml" />
+		</mod>
+
+		<!-- http://manuals.deere.com/omview/OMRE314023_19/?tM=HO -->
+		<!-- http://johndeerem.uw.hu/index_elemei/prospektus_elemei/7030.PDF -->
+		<!-- http://www.dlg-test.de/pbdocs/traktoren/JohnDeere7920AutoPowr_2005.pdf -->
+		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500" ptoRpm="1950" ptoRpmEco="1750">
+      <hydrostatic profile="ZF"/>
+			<gears automatic="true">	
+				<gear speed="5.75" name=""/>
+				<gear speed="11.5" name=""/>
+				<gear speed="23"   name=""/>
+				<gear speed="46"   name=""/>
+			</gears>
+			<reverse ratio="1" />
+			
+			<realEngine idleRpm="875" ratedRpm="2100">
+        <!-- 1900: 260(243) | 2100: 245(220) | 1100..1600: 1025(1025) | 98 | 0.5 | 99 | 3.5 | 2100 | 1350: 207 -->
+        <torque rpm="350" motorTorque="705" fuelUsageRatio="247.8"/>
+        <torque rpm="700" motorTorque="961" fuelUsageRatio="224.2"/>
+        <torque rpm="900" motorTorque="1009" fuelUsageRatio="215.3"/>
+        <torque rpm="1000" motorTorque="1021" fuelUsageRatio="212"/>
+        <torque rpm="1100" motorTorque="1025" fuelUsageRatio="209.5"/>
+        <torque rpm="1200" motorTorque="1025" fuelUsageRatio="207.9"/>
+        <torque rpm="1300" motorTorque="1025" fuelUsageRatio="207.1"/>
+        <torque rpm="1400" motorTorque="1025" fuelUsageRatio="207.1"/>
+        <torque rpm="1500" motorTorque="1025" fuelUsageRatio="207.9"/>
+        <torque rpm="1600" motorTorque="1025" fuelUsageRatio="209.6"/>
+        <torque rpm="1700" motorTorque="1011" motorTorqueEco="997" fuelUsageRatio="212"/>
+        <torque rpm="1800" motorTorque="989" motorTorqueEco="948" fuelUsageRatio="215.3"/>
+        <torque rpm="1850" motorTorque="976" motorTorqueEco="922" fuelUsageRatio="217.2"/>
+        <torque rpm="1900" motorTorque="961" motorTorqueEco="898" fuelUsageRatio="219.4"/>
+        <torque rpm="1950" motorTorque="933" motorTorqueEco="870" fuelUsageRatio="221.7"/>
+        <torque rpm="2000" motorTorque="900" motorTorqueEco="833" fuelUsageRatio="224.3"/>
+        <torque rpm="2050" motorTorque="862" motorTorqueEco="788" fuelUsageRatio="227"/>
+        <torque rpm="2100" motorTorque="819" motorTorqueEco="736" fuelUsageRatio="230"/>
+        <torque rpm="2150" motorTorque="744" motorTorqueEco="668" fuelUsageRatio="271.7"/>
+        <torque rpm="2200" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="460"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
 		<mod name="CZMOD_CLAAS_Arion_650">
 			<xmlFile name="claas.xml"/>
 			<xmlFile name="claas1.xml"/>
@@ -3973,7 +4018,7 @@
 			<link href="http://www.modhoster.de/mods/claas-xerion-4500" />
 			<xmlFile name="claas1.xml"/>
 		</mod>
-
+		<!-- Xerion 4000 -->
 		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" clutchEngagingTimeMs="500">
       <hydrostatic profile="ZF"/>
       <gears automatic="true">
@@ -3987,22 +4032,112 @@
 			<!-- https://de.wikipedia.org/wiki/Mercedes-Benz_OM_470/OM_471/OM_472/OM_473 -->
 			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/Broschuere_Motoren_EU_VI_Englisch.object-Single-MEDIA.download.tmp/2013-07-31_MB-Motorensysteme_EuroVI_EN_tbu.pdf -->
 			<realEngine idleRpm="800" ratedRpm="1900">
-        <torque rpm="0" motorTorque="0" fuelUsageRatio="195"/><!-- 1800: 490 | 1900: 479 | 1100..1100: 2300 | 1 | 0 -->
-        <torque rpm="700" motorTorque="2300" fuelUsageRatio="195"/>
-        <torque rpm="800" motorTorque="2300" fuelUsageRatio="195"/>
-        <torque rpm="900" motorTorque="2300" fuelUsageRatio="189"/>
-        <torque rpm="1000" motorTorque="2300" fuelUsageRatio="185"/>
+        <!-- 1800: 435(435) | 1900: 419(419) | 1100..1100: 2100(2100) | 92 | 0 | 249 | 1.7 | 2000 | 1100: 184 -->
+        <torque rpm="350" motorTorque="740" fuelUsageRatio="299"/>
+        <torque rpm="700" motorTorque="1519" fuelUsageRatio="216.7"/>
+        <torque rpm="900" motorTorque="1932" fuelUsageRatio="192.2"/>
+        <torque rpm="1000" motorTorque="2058" fuelUsageRatio="186"/>
+        <torque rpm="1100" motorTorque="2100" fuelUsageRatio="184"/>
+        <torque rpm="1200" motorTorque="2092" fuelUsageRatio="184.3"/>
+        <torque rpm="1300" motorTorque="2067" fuelUsageRatio="185.3"/>
+        <torque rpm="1400" motorTorque="2026" fuelUsageRatio="186.9"/>
+        <torque rpm="1500" motorTorque="1968" fuelUsageRatio="189.1"/>
+        <torque rpm="1600" motorTorque="1894" fuelUsageRatio="192"/>
+        <torque rpm="1700" motorTorque="1797" fuelUsageRatio="195.5"/>
+        <torque rpm="1800" motorTorque="1697" fuelUsageRatio="199.7"/>
+        <torque rpm="1850" motorTorque="1636" fuelUsageRatio="202"/>
+        <torque rpm="1900" motorTorque="1549" fuelUsageRatio="204.4"/>
+        <torque rpm="1950" motorTorque="1447" fuelUsageRatio="208.1"/>
+        <torque rpm="2000" motorTorque="1220" fuelUsageRatio="225.3"/>
+        <torque rpm="2050" motorTorque="894" fuelUsageRatio="262"/>
+        <torque rpm="2100" motorTorque="482" fuelUsageRatio="322.7"/>
+        <torque rpm="2150" motorTorque="0" fuelUsageRatio="408.9"/>
+			</realEngine>			
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
+		<mod name="CZMOD_CLAAS_Xerion_4500">
+			<link href="http://www.modhoster.de/mods/claas-xerion-4500" />
+			<xmlFile name="claas2.xml"/>
+		</mod>
+		<!-- Xerion 4500 -->
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" clutchEngagingTimeMs="500">
+      <hydrostatic profile="ZF"/>
+      <gears automatic="true">
+        <gear speed="6.36" name=""/> <!-- 0.05 1.79 4 8-->
+        <gear speed="12.72" name=""/> <!-- 0.1 3.57 8 17-->
+        <gear speed="25.45" name=""/> <!-- 0.2 7.14 17 34-->
+        <gear speed="50.89" name=""/> <!-- 0.4 14.29 34 68-->
+      </gears>
+			
+			<!-- http://www.claas.de/produkte/traktoren/xerion5000-4000-hrc/motor-antrieb/motor MB OM 471 LA -->
+			<!-- https://de.wikipedia.org/wiki/Mercedes-Benz_OM_470/OM_471/OM_472/OM_473 -->
+			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/Broschuere_Motoren_EU_VI_Englisch.object-Single-MEDIA.download.tmp/2013-07-31_MB-Motorensysteme_EuroVI_EN_tbu.pdf -->
+			<realEngine idleRpm="800" ratedRpm="1900">
+        <!-- 1800: 490(490) | 1900: 479(479) | 1100..1100: 2300(2300) | 92 | 0 | 249 | 1.7 | 2000 | 1100: 184 -->
+        <torque rpm="350" motorTorque="810" fuelUsageRatio="299"/>
+        <torque rpm="700" motorTorque="1663" fuelUsageRatio="216.7"/>
+        <torque rpm="900" motorTorque="2116" fuelUsageRatio="192.2"/>
+        <torque rpm="1000" motorTorque="2254" fuelUsageRatio="186"/>
         <torque rpm="1100" motorTorque="2300" fuelUsageRatio="184"/>
-        <torque rpm="1200" motorTorque="2292" fuelUsageRatio="184"/>
-        <torque rpm="1300" motorTorque="2268" fuelUsageRatio="185"/>
-        <torque rpm="1400" motorTorque="2229" fuelUsageRatio="186"/>
-        <torque rpm="1500" motorTorque="2173" fuelUsageRatio="188"/>
-        <torque rpm="1600" motorTorque="2102" fuelUsageRatio="190"/>
-        <torque rpm="1700" motorTorque="2015" fuelUsageRatio="193"/>
-        <torque rpm="1800" motorTorque="1912" fuelUsageRatio="196"/>
-        <torque rpm="1900" motorTorque="1770" fuelUsageRatio="200"/>
-        <torque rpm="2000" motorTorque="1328" fuelUsageRatio="225"/>
-        <torque rpm="2100" motorTorque="0" fuelUsageRatio="400"/>
+        <torque rpm="1200" motorTorque="2292" fuelUsageRatio="184.3"/>
+        <torque rpm="1300" motorTorque="2268" fuelUsageRatio="185.3"/>
+        <torque rpm="1400" motorTorque="2229" fuelUsageRatio="186.9"/>
+        <torque rpm="1500" motorTorque="2173" fuelUsageRatio="189.1"/>
+        <torque rpm="1600" motorTorque="2102" fuelUsageRatio="192"/>
+        <torque rpm="1700" motorTorque="2015" fuelUsageRatio="195.5"/>
+        <torque rpm="1800" motorTorque="1912" fuelUsageRatio="199.7"/>
+        <torque rpm="1850" motorTorque="1849" fuelUsageRatio="202"/>
+        <torque rpm="1900" motorTorque="1770" fuelUsageRatio="204.4"/>
+        <torque rpm="1950" motorTorque="1655" fuelUsageRatio="208.1"/>
+        <torque rpm="2000" motorTorque="1395" fuelUsageRatio="225.3"/>
+        <torque rpm="2050" motorTorque="1022" fuelUsageRatio="262"/>
+        <torque rpm="2100" motorTorque="551" fuelUsageRatio="322.7"/>
+        <torque rpm="2150" motorTorque="0" fuelUsageRatio="408.9"/>
+			</realEngine>			
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
+		<mod name="CZMOD_CLAAS_Xerion_4500">
+			<link href="http://www.modhoster.de/mods/claas-xerion-4500" />
+			<xmlFile name="claas3.xml"/>
+		</mod>
+		<!-- Xerion 5000 -->
+		<gearboxMogli maxBackwardSpeed="52" maxForwardSpeed="52" clutchEngagingTimeMs="500">
+      <hydrostatic profile="ZF"/>
+      <gears automatic="true">
+        <gear speed="6.36" name=""/> <!-- 0.05 1.79 4 8-->
+        <gear speed="12.72" name=""/> <!-- 0.1 3.57 8 17-->
+        <gear speed="25.45" name=""/> <!-- 0.2 7.14 17 34-->
+        <gear speed="50.89" name=""/> <!-- 0.4 14.29 34 68-->
+      </gears>
+			
+			<!-- http://www.claas.de/produkte/traktoren/xerion5000-4000-hrc/motor-antrieb/motor MB OM 471 LA -->
+			<!-- https://de.wikipedia.org/wiki/Mercedes-Benz_OM_470/OM_471/OM_472/OM_473 -->
+			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/Broschuere_Motoren_EU_VI_Englisch.object-Single-MEDIA.download.tmp/2013-07-31_MB-Motorensysteme_EuroVI_EN_tbu.pdf -->
+			<realEngine idleRpm="800" ratedRpm="1900">
+        <!-- 1800: 530(530) | 1900: 520(520) | 1100..1100: 2450(2450) | 92 | 0 | 249 | 1.7 | 2000 | 1100: 184 -->
+        <torque rpm="350" motorTorque="863" fuelUsageRatio="299"/>
+        <torque rpm="700" motorTorque="1772" fuelUsageRatio="216.7"/>
+        <torque rpm="900" motorTorque="2254" fuelUsageRatio="192.2"/>
+        <torque rpm="1000" motorTorque="2401" fuelUsageRatio="186"/>
+        <torque rpm="1100" motorTorque="2450" fuelUsageRatio="184"/>
+        <torque rpm="1200" motorTorque="2442" fuelUsageRatio="184.3"/>
+        <torque rpm="1300" motorTorque="2419" fuelUsageRatio="185.3"/>
+        <torque rpm="1400" motorTorque="2380" fuelUsageRatio="186.9"/>
+        <torque rpm="1500" motorTorque="2325" fuelUsageRatio="189.1"/>
+        <torque rpm="1600" motorTorque="2255" fuelUsageRatio="192"/>
+        <torque rpm="1700" motorTorque="2169" fuelUsageRatio="195.5"/>
+        <torque rpm="1800" motorTorque="2068" fuelUsageRatio="199.7"/>
+        <torque rpm="1850" motorTorque="2002" fuelUsageRatio="202"/>
+        <torque rpm="1900" motorTorque="1922" fuelUsageRatio="204.4"/>
+        <torque rpm="1950" motorTorque="1796" fuelUsageRatio="208.1"/>
+        <torque rpm="2000" motorTorque="1514" fuelUsageRatio="225.3"/>
+        <torque rpm="2050" motorTorque="1110" fuelUsageRatio="262"/>
+        <torque rpm="2100" motorTorque="598" fuelUsageRatio="322.7"/>
+        <torque rpm="2150" motorTorque="0" fuelUsageRatio="408.9"/>
 			</realEngine>			
 		</gearboxMogli>	
 	</vehicle>
@@ -4143,6 +4278,51 @@
         <torque rpm="2200" motorTorque="1037" motorTorqueEco="1037" fuelUsageRatio="227"/>
         <torque rpm="2300" motorTorque="624" motorTorqueEco="624" fuelUsageRatio="290.7"/>
         <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="426.7"/>
+			</realEngine>		
+		</gearboxMogli>
+	</vehicle>	
+	
+	<vehicle>
+		<mod name="Fendt939" isPrefix="true">
+			<link href="https://ls-portal.eu/fendt-939-vario-washable-full/" />
+			<xmlFile name="Fendt936.xml"/>
+		</mod>
+		
+		<!-- http://www.fendt.com/download/900Vario_2014_TD_de.pdf -->
+		<!-- http://www.dlg-test.de/tests/0912_Fendt_939_Vario.pdf -->
+		
+		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" clutchOpenRpm="800" clutchCloseRpm="1000" clutchTimeDecreaseMs="0" clutchTimeIncreaseMs="500" maxForwardSpeed="62" maxBackwardSpeed="33">
+			<hydrostatic profile="Fendt"/>		
+			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
+				<gear name="heavy duty" speed="27" />
+				<gear name="transport"  speed="50"/>
+			</gears>
+
+			<realEngine idleRpm="900" ratedRpm="2100">		
+        <!-- 1900: 389(389) | 2100: 390(390) | 1400..1500: 1538(1538) | 92 | 0.5 | 249 | 1.7 | 2200 | 1380: 192 -->
+        <torque rpm="350" motorTorque="929" fuelUsageRatio="231.3"/>
+        <torque rpm="700" motorTorque="1308" fuelUsageRatio="209.1"/>
+        <torque rpm="900" motorTorque="1415" fuelUsageRatio="200.5"/>
+        <torque rpm="1000" motorTorque="1459" fuelUsageRatio="197.3"/>
+        <torque rpm="1100" motorTorque="1494" fuelUsageRatio="194.9"/>
+        <torque rpm="1200" motorTorque="1518" fuelUsageRatio="193.2"/>
+        <torque rpm="1300" motorTorque="1533" fuelUsageRatio="192.2"/>
+        <torque rpm="1400" motorTorque="1538" fuelUsageRatio="192"/>
+        <torque rpm="1500" motorTorque="1538" fuelUsageRatio="192.6"/>
+        <torque rpm="1600" motorTorque="1522" fuelUsageRatio="194"/>
+        <torque rpm="1700" motorTorque="1500" fuelUsageRatio="196.2"/>
+        <torque rpm="1800" motorTorque="1472" fuelUsageRatio="199.3"/>
+        <torque rpm="1850" motorTorque="1456" fuelUsageRatio="201.1"/>
+        <torque rpm="1900" motorTorque="1438" fuelUsageRatio="203.1"/>
+        <torque rpm="1950" motorTorque="1401" fuelUsageRatio="205.4"/>
+        <torque rpm="2000" motorTorque="1366" fuelUsageRatio="207.8"/>
+        <torque rpm="2050" motorTorque="1332" fuelUsageRatio="210.5"/>
+        <torque rpm="2100" motorTorque="1301" fuelUsageRatio="213.3"/>
+        <torque rpm="2150" motorTorque="1219" fuelUsageRatio="217.2"/>
+        <torque rpm="2200" motorTorque="1028" fuelUsageRatio="235.1"/>
+        <torque rpm="2250" motorTorque="753" fuelUsageRatio="273.4"/>
+        <torque rpm="2300" motorTorque="406" fuelUsageRatio="336.7"/>
+        <torque rpm="2350" motorTorque="0" fuelUsageRatio="426.7"/>
 			</realEngine>		
 		</gearboxMogli>
 	</vehicle>	
