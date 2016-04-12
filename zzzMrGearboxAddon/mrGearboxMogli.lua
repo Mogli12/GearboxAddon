@@ -130,7 +130,8 @@ mrGearboxMogliGlobals.hydroTransVolRatio    = 0.2
 mrGearboxMogliGlobals.defaultEnableAI       = mrGearboxMogli.AIPowerShift
 mrGearboxMogliGlobals.autoHold              = true
 mrGearboxMogliGlobals.minAutoGearSpeed      = 0.5
-mrGearboxMogliGlobals.minAbsSpeed           = 0.25 -- km/h
+mrGearboxMogliGlobals.minAbsSpeed           = 0.2  -- km/h
+mrGearboxMogliGlobals.brakeNeutralTimeout   = 1000 -- ms
 
 
 --**********************************************************************************************************	
@@ -376,6 +377,8 @@ function mrGearboxMogli:initClient()
 	self.mrGbMD.lastHydro  = 0
 	
 	self.mrGbMB.fuelUsage  = self.fuelUsage
+	
+	self.lastAcceleration  = 0
 end 
 
 --**********************************************************************************************************	
@@ -3820,6 +3823,27 @@ function mrGearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
 		return false
 	end
+	
+	local f = -1
+	if value then
+		f = 1
+	end
+	
+	--print( type( self.calculateDamageFromVelocity )
+	--.." "..tostring(self:mrGbMGetAutoStartStop())
+	--.." "..string.format( "%2.3f %1.1f %d => %f", self.lastSpeedReal * 1000, self.movingDirection, f, self.lastSpeedReal * self.movingDirection * f )
+	--.." "..tostring(self.mrGbMS.ReverseActive)
+	--.." "..tostring(value) )
+	
+	if      type( self.calculateDamageFromVelocity ) == "function"
+			and not self:mrGbMGetAutoStartStop()
+			and self.lastSpeedReal * self.movingDirection * f > 0.0005 -- 0.5 m/s
+			and self.mrGbMS.ReverseActive ~= value then
+		self:mrGbMSetState( "WarningText", "Not so fast!" )
+		self.mrGbMS.GrindingGearsVol = 0
+		self:mrGbMSetState( "GrindingGearsVol", 1 )
+		return false
+	end
 		
 	if      self.mrGbMS.ReverseActive ~= value 
 			and mrGearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) then
@@ -4649,7 +4673,7 @@ function mrGearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		if not ( new ) then
 			self:mrGbMSetState( "AutoHold", false )
 		elseif  self.lastSpeedReal < 0.0003
-				and self:mrGbMGetAutoHold( self )
+				and self:mrGbMGetAutoHold()
 				and self.mrGbMS.G27Mode <= 0 then
 			self:mrGbMSetState( "AutoHold", true )
 		end
@@ -5028,6 +5052,10 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 			   or ( self.movingDirection * currentSpeed < -0.0001 and not ( self.mrGbMS.ReverseActive ) ) ) then
 		-- wrong direction 
 		brakePedal  = 1
+		
+		if self:mrGbMGetAutoStartStop() then
+			self:mrGbMSetNeutralActive( true )
+		end
 	end
 
 	self.setBrakeLightsVisibility(self, brakeLights)
@@ -5396,6 +5424,7 @@ function mrGearboxMogliMotor:new( vehicle, motor )
 	self.autoClutchPercent       = 0
 	self.lastThrottle            = 0
 	self.lastClutchClosedTime    = 0
+	self.brakeNeutralTimer       = 0
 	if self.hydroEff ~= nil then
 		self.hydrostaticFactor     = 0
 	end
@@ -5460,37 +5489,38 @@ end
 function mrGearboxMogliMotor:getMogliGearRatio()
 	local ratio = mrGearboxMogli.gearSpeedToRatio( self.vehicle, self.vehicle.mrGbML.currentGearSpeed )
 	if self.hydroEff ~= nil then
-		if self.maxHydroGearRatio == nil then
-			self.maxHydroGearRatio = mrGearboxMogli.maxHydroGearRatio2
-		end
-		local mhgr = mrGearboxMogli.maxHydroGearRatio
-		if self.nonClampedMotorRpm <= self.stallRpm then
-			mhgr = mrGearboxMogli.maxHydroGearRatio2
-		elseif self.nonClampedMotorRpm < self.idleRpm then
-			mhgr = mrGearboxMogli.maxHydroGearRatio + ( self.nonClampedMotorRpm - self.stallRpm ) / ( self.idleRpm - self.stallRpm ) * ( mrGearboxMogli.maxHydroGearRatio2 - mrGearboxMogli.maxHydroGearRatio )
-		end   
-		local inv1 = 1 / self.maxHydroGearRatio
-		local inv2 = 1 / mhgr 
-		local inv3 = self.tickDt * 0.001 / mrGearboxMogli.maxHydroGearRatio
-		
-		self.maxHydroGearRatio = 1 / ( inv1 + Utils.clamp( inv2 - inv1, -inv3, inv3 ) )
-
 		if self.hydrostaticFactor < mrGearboxMogli.eps then
 			ratio = mrGearboxMogli.maxHydroGearRatio2
 		else
 			ratio = ratio / self.hydrostaticFactor
 		end
 		
-		if ratio > self.maxHydroGearRatio then
-			ratio = self.maxHydroGearRatio 
-		elseif ratio < mrGearboxMogli.maxHydroGearRatio then
-			self.maxHydroGearRatio = mrGearboxMogli.maxHydroGearRatio
-		else
-			self.maxHydroGearRatio = ratio
+		if self.maxHydroGearRatio == nil then
+			self.maxHydroGearRatio = mrGearboxMogli.maxHydroGearRatio2
 		end
 		
-		if self.noTransmission then
-			self.maxHydroGearRatio = mrGearboxMogli.maxHydroGearRatio
+		local mhgr = mrGearboxMogli.maxHydroGearRatio
+		
+		if     self.noTransmission then
+			mhgr = mrGearboxMogli.maxHydroGearRatio
+		elseif self.vehicle.lastAcceleration < 0.1 then
+			mhgr = mrGearboxMogli.maxHydroGearRatio2
+		elseif self.nonClampedMotorRpm <= self.stallRpm then
+			mhgr = mrGearboxMogli.maxHydroGearRatio2
+		elseif self.nonClampedMotorRpm < self.idleRpm then
+			mhgr = mrGearboxMogli.maxHydroGearRatio + ( self.nonClampedMotorRpm - self.stallRpm ) / ( self.idleRpm - self.stallRpm ) * ( mrGearboxMogli.maxHydroGearRatio2 - mrGearboxMogli.maxHydroGearRatio )
+		elseif ratio < mrGearboxMogli.maxHydroGearRatio then
+			mhgr = mrGearboxMogli.maxHydroGearRatio
+		end   
+		
+		local inv1 = 1 / self.maxHydroGearRatio
+		local inv2 = 1 / mhgr 
+		local inv3 = self.tickDt * 0.0005 / mrGearboxMogli.maxHydroGearRatio
+		
+		self.maxHydroGearRatio = 1 / ( inv1 + Utils.clamp( inv2 - inv1, -inv3, inv3 ) )
+
+		if ratio > self.maxHydroGearRatio then
+			ratio = self.maxHydroGearRatio 
 		end
 		
 		if mrGearboxMogli.debugGearShift and self.ptoWarningTimer ~= nil then
@@ -6347,35 +6377,62 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 --**********************************************************************************************************		
 -- no transmission / neutral 
 --**********************************************************************************************************		
+	local brakeNeutral   = false
+	local autoOpenClutch = self.vehicle:mrGbMGetAutoClutch() or ( self.hydroEff ~= nil and self.vehicle.mrGbMS.HydrostaticLaunch )
+	
+	if accelerationPedal >= -0.001 then
+		self.brakeNeutralTimer = g_currentMission.time + self.vehicle.mrGbMG.brakeNeutralTimeout
+	end
+	
 	if     self.vehicle.mrGbMS.NeutralActive
-			or self.vehicle.mrGbMS.G27Mode        == 1
-			or not ( self.vehicle.isMotorStarted )
-			or ( self.vehicle.cruiseControl.state == 0
-			 and self.vehicle:mrGbMGetAutoClutch()
-			 and ( ( accelerationPedal            < -0.001
-					 and ( self.lastMotorRpmS < minRpmReduced 
-							or currentAbsSpeed            <  self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
-							or ( self.lastMotorRpmS       < self.minRequiredRpm
-							 and self.minThrottle         > 0.2 ) ) )
-					or ( accelerationPedal            <  0.1
-					 and self.wheelRpm                <  0
-					 and self.vehicle:mrGbMGetAutoStartStop() 
-					 and self.vehicle.mrGbMS.G27Mode  <= 0 ) ) ) then
-
-	-- neutral
-		if not ( self.vehicle.mrGbMS.NeutralActive )
-				and self.vehicle:mrGbMGetAutoClutch() 
+			or self.vehicle.mrGbMS.G27Mode == 1
+			or not ( self.vehicle.isMotorStarted ) then
+	-- off or neutral
+		brakeNeutral = true
+	elseif self.vehicle.cruiseControl.state ~= 0 
+			or not autoOpenClutch then
+	-- no automatic stop or cruise control is on 
+		brakeNeutral = false
+	elseif accelerationPedal >= -0.001 then
+	-- not braking 
+		if      accelerationPedal      <  0.1
+				and self.wheelRpm          <  0
 				and self.vehicle:mrGbMGetAutoStartStop() 
+				and self.vehicle.mrGbMS.G27Mode  <= 0 then
+	-- idle
+			brakeNeutral = true 
+		else
+			brakeNeutral = false
+		end
+	elseif currentAbsSpeed        < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
+			or self.brakeNeutralTimer < g_currentMission.time 
+			or self.lastMotorRpmS     < minRpmReduced 
+			or ( self.lastMotorRpmS   < self.minRequiredRpm and self.minThrottle > 0.2 ) then
+	-- no transmission 
+		brakeNeutral = true 
+	else
+		brakeNeutral = true
+	end
+	
+--print(string.format("%1.3f %4d %s %2.1f", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed))
+	
+	if brakeNeutral then
+	-- neutral	
+		if  not ( self.vehicle.mrGbMS.NeutralActive ) 
+				and self.vehicle:mrGbMGetAutoStartStop()
 				and self.vehicle.mrGbMS.G27Mode <= 0
-				and ( currentAbsSpeed           <  self.vehicle.mrGbMG.minAbsSpeed 
-					 or ( self.lastMotorRpmS < minRpmReduced 
-					  and not self.vehicle:mrGbMGetAutomatic() ) ) then
+				and ( self.wheelRpm             < 0 
+					 or ( self.brakeNeutralTimer  < g_currentMission.time 
+					  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed )
+					 or ( self.lastMotorRpmS      < minRpmReduced and not self.vehicle:mrGbMGetAutomatic() ) ) then
 			self.vehicle:mrGbMSetNeutralActive( true ) 
 		end
 	-- handbrake 
-		if      ( currentAbsSpeed < self.vehicle.mrGbMG.minAbsSpeed or self.wheelRpm < 0 )
-				and self.vehicle.mrGbMS.NeutralActive 
-				and self.vehicle:mrGbMGetAutoHold( ) then
+		if      self.vehicle.mrGbMS.NeutralActive 
+				and self.vehicle:mrGbMGetAutoHold( )
+				and ( self.wheelRpm             < 0 
+					 or ( self.brakeNeutralTimer  < g_currentMission.time 
+					  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed ) ) then
 			self.vehicle:mrGbMSetState( "AutoHold", true )
 		end
 					
@@ -6400,9 +6457,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 
 		self.noTransmission = true
-		if self.hydroEff ~= nil then
-			self.hydrostaticFactor = 0
-		end
+	--if self.hydroEff ~= nil then
+	--	self.hydrostaticFactor = 0
+	--end
 		
 --**********************************************************************************************************		
 	else
@@ -6422,18 +6479,19 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.minThrottle = 0
 			end			
 			
-			if      self.hydroEff ~= nil
-					and self.vehicle.steeringEnabled
-					and not ( self.vehicle.axisForwardIsAnalog )
-					and currentAbsSpeed < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed then
-				if currentAbsSpeed <= 0 then
-					self.minThrottle = math.max( self.minThrottle, 0.5 )
-				else
-					self.minThrottle = math.max( self.minThrottle, math.min( 0.5, 1 - currentAbsSpeed / ( self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed ) ) )
-				end
-			end
+		--if      self.hydroEff ~= nil
+		--		and self.vehicle.steeringEnabled
+		--		and not ( self.vehicle.axisForwardIsAnalog )
+		--		and accelerationPedal >= -0.001
+		--		and currentAbsSpeed < self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed then
+		--	if currentAbsSpeed <= 0 then
+		--		self.minThrottle = math.max( self.minThrottle, 0.5 )
+		--	else
+		--		self.minThrottle = math.max( self.minThrottle, math.min( 0.5, 1 - currentAbsSpeed / ( self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed ) ) )
+		--	end
+		--end
 			
-			self.minThrottleS = Utils.clamp( self.minThrottleS + 0.1 * ( self.minThrottle - self.minThrottleS ), 0, 1 )
+			self.minThrottleS = Utils.clamp( self.minThrottleS + mrGearboxMogli.smoothFast * ( self.minThrottle - self.minThrottleS ), 0, 1 )
 		end
 		
 		self.lastThrottle = math.max( self.minThrottle, accelerationPedal )								
