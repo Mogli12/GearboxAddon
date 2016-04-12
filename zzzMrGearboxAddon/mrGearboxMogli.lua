@@ -132,6 +132,7 @@ mrGearboxMogliGlobals.autoHold              = true
 mrGearboxMogliGlobals.minAutoGearSpeed      = 0.5
 mrGearboxMogliGlobals.minAbsSpeed           = 0.2  -- km/h
 mrGearboxMogliGlobals.brakeNeutralTimeout   = 1000 -- ms
+mrGearboxMogliGlobals.brakeNeutralLimit     = -0.3
 
 
 --**********************************************************************************************************	
@@ -6405,13 +6406,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			brakeNeutral = false
 		end
 	elseif currentAbsSpeed        < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
-			or self.brakeNeutralTimer < g_currentMission.time 
 			or self.lastMotorRpmS     < minRpmReduced 
 			or ( self.lastMotorRpmS   < self.minRequiredRpm and self.minThrottle > 0.2 ) then
 	-- no transmission 
 		brakeNeutral = true 
 	else
-		brakeNeutral = true
+		brakeNeutral = false
 	end
 	
 --print(string.format("%1.3f %4d %s %2.1f", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed))
@@ -6547,6 +6547,13 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--**********************************************************************************************************		
 	-- normal drive with gear and clutch
 			self.noTransmission = false
+			
+			if      self.vehicle.cruiseControl.state == 0 
+					and autoOpenClutch 
+					and accelerationPedal < mrGearboxMogliGlobals.brakeNeutralLimit then
+				self.noTransmission = true
+			end
+		
 			clutchMode          = 1 -- calculate clutch percent respecting inc/dec time ms
 
 	--**********************************************************************************************************		
