@@ -6325,7 +6325,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--targetRpm = math.min( targetRpm, lastMaxPossibleRpm + 100 ) 
 	end
 
-	local minTarget
+	local minTarget = minRpmReduced
 	if minRpmReduced < self.vehicle.mrGbMS.MinTargetRpm then
 		if     currentAbsSpeed < mrGearboxMogli.eps then
 			minTarget = minRpmReduced
