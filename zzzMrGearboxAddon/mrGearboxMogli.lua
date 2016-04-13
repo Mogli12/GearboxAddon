@@ -77,7 +77,7 @@ mrGearboxMogli.AIPowerShift         = "P"
 mrGearboxMogli.AIGearboxOff         = "N"
 mrGearboxMogli.AIAllAuto            = "A"
 mrGearboxMogli.AIGearboxOn          = "Y"
-
+mrGearboxMogli.kmhTOms              = 0.2777777777777777777777777777778
 
 mrGearboxMogliGlobals                       = {}
 mrGearboxMogliGlobals.debugPrint            = false
@@ -131,7 +131,7 @@ mrGearboxMogliGlobals.defaultEnableAI       = mrGearboxMogli.AIPowerShift
 mrGearboxMogliGlobals.autoHold              = true
 mrGearboxMogliGlobals.minAutoGearSpeed      = 0.5
 mrGearboxMogliGlobals.minAbsSpeed           = 0.2  -- km/h
-mrGearboxMogliGlobals.brakeNeutralTimeout   = 1000 -- ms
+mrGearboxMogliGlobals.brakeNeutralTimeout   = 1500 -- ms
 mrGearboxMogliGlobals.brakeNeutralLimit     = -0.3
 
 
@@ -922,8 +922,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.RealMotorBrakeFx        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#motorBrakeFx"), self.motor.lowBrakeForceScale ) --0.1 )
 	self.mrGbMS.GlobalRatioFactor       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#globalRatioFactor"), 1.025 )
 
-	local revUpMs                       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  2000 ) 
-	local revDownMs                     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revDownMs"),0.5*revUpMs ) 
+	local revUpMs                       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  1500 ) 
+	local revDownMs                     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revDownMs"), revUpMs ) 
 	self.mrGbMS.RpmIncFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / revUpMs
 	self.mrGbMS.RpmDecFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / revDownMs
 	
@@ -1249,7 +1249,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end
 	self.mrGbMS.LaunchRange2       = self.mrGbMS.DefaultRange2
 	
-	local defaultLaunchSpeed       = 15
+	local defaultLaunchSpeed       = 20
 	if hasDefaultGear then
 		defaultLaunchSpeed           = self.mrGbMS.Gears[self.mrGbMS.LaunchGear].speed
 																 * self.mrGbMS.Ranges[self.mrGbMS.LaunchRange].ratio
@@ -1453,7 +1453,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		
 		local hit = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs")
 		if hit == nil then
-			self.mrGbMS.HydrostaticIncFactor = 0.002 -- 500 ms
+			self.mrGbMS.HydrostaticIncFactor = 0.001 -- 1000 ms
 		elseif hit < 1 then
 			self.mrGbMS.HydrostaticIncFactor = 1
 		else
@@ -1461,7 +1461,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 		local hdt = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxMinTimeMs")
 		if hdt == nil and hit == nil then
-			self.mrGbMS.HydrostaticDecFactor = 0.0001 -- 10000 ms
+			self.mrGbMS.HydrostaticDecFactor = 0.0002 -- 5000 ms
 		elseif hdt == nil then
 			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor -- compatibility
 		elseif hdt < 1 then
@@ -2041,24 +2041,24 @@ function mrGearboxMogli:update(dt)
 			self:mrGbMSetNeutralActive( false ) 
 		end
 		
-		if      self.mrGbMG.autoHold 
-				and self.dCcheckModule ~= nil
-				and self:dCcheckModule("handBrake")
-				and self.mrGbMS.NeutralActive
-				and not self.mrGbMS.AutoHold
-				and self.axisForward > 0.8 then
-			if self.mrGbML.autoHoldTimer == nil then
-				self.mrGbML.autoHoldTimer = 0
-			else
-				self.mrGbML.autoHoldTimer = self.mrGbML.autoHoldTimer + dt
-			end
-			if self.mrGbML.autoHoldTimer > 3000 then
-				self.mrGbML.autoHoldTimer = nil
-				self:mrGbMSetState( "AutoHold", true )
-			end
-		elseif self.mrGbML.autoHoldTimer ~= nil then
-			self.mrGbML.autoHoldTimer = nil
-		end
+	--if      self.mrGbMG.autoHold 
+	--		and self.dCcheckModule ~= nil
+	--		and self:dCcheckModule("handBrake")
+	--		and self.mrGbMS.NeutralActive
+	--		and not self.mrGbMS.AutoHold
+	--		and self.axisForward > 0.8 then
+	--	if self.mrGbML.autoHoldTimer == nil then
+	--		self.mrGbML.autoHoldTimer = 0
+	--	else
+	--		self.mrGbML.autoHoldTimer = self.mrGbML.autoHoldTimer + dt
+	--	end
+	--	if self.mrGbML.autoHoldTimer > 3000 then
+	--		self.mrGbML.autoHoldTimer = nil
+	--		self:mrGbMSetState( "AutoHold", true )
+	--	end
+	--elseif self.mrGbML.autoHoldTimer ~= nil then
+	--	self.mrGbML.autoHoldTimer = nil
+	--end
 
 		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
@@ -4673,10 +4673,10 @@ function mrGearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		
 		if not ( new ) then
 			self:mrGbMSetState( "AutoHold", false )
-		elseif  self.lastSpeedReal < 0.0003
-				and self:mrGbMGetAutoHold()
-				and self.mrGbMS.G27Mode <= 0 then
-			self:mrGbMSetState( "AutoHold", true )
+	--elseif  self.lastSpeedReal < 0.0003
+	--		and self:mrGbMGetAutoHold()
+	--		and self.mrGbMS.G27Mode <= 0 then
+	--	self:mrGbMSetState( "AutoHold", true )
 		end
 	end
 end 
@@ -5053,10 +5053,6 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 			   or ( self.movingDirection * currentSpeed < -0.0001 and not ( self.mrGbMS.ReverseActive ) ) ) then
 		-- wrong direction 
 		brakePedal  = 1
-		
-		if self:mrGbMGetAutoStartStop() then
-			self:mrGbMSetNeutralActive( true )
-		end
 	end
 
 	self.setBrakeLightsVisibility(self, brakeLights)
@@ -5587,10 +5583,10 @@ function mrGearboxMogliMotor:getCurMaxRpm()
 	end
 				
 	if not ( self.noTransmission ) then		
-		local speedLimit = self.speedLimit*0.277778
+		local speedLimit = self.speedLimit * mrGearboxMogli.kmhTOms
 
 		if self.vehicle.mrGbMS.SpeedLimiter or self.ptoSpeedLimit ~= nil or self.vehicle.cruiseControl.state > 0 then
-			speedLimit = math.min( speedLimit, self.vehicle.cruiseControl.speed*0.277778 )
+			speedLimit = math.min( speedLimit, self.vehicle.cruiseControl.speed * mrGearboxMogli.kmhTOms )
 			if self.ptoSpeedLimit ~= nil then
 				speedLimit = math.min( speedLimit, self.ptoSpeedLimit )
 			end
@@ -5599,13 +5595,13 @@ function mrGearboxMogliMotor:getCurMaxRpm()
 				self.speedLimitS = math.abs( self.vehicle.lastSpeedReal*1000 )
 			end
 			-- limit speed limiter change to given km/h per second
-			local limitMax   =  0.000277778 * self.vehicle.mrGbMS.AccelerateToLimit * self.tickDt
+			local limitMax   =  0.001 * mrGearboxMogli.kmhTOms * self.vehicle.mrGbMS.AccelerateToLimit * self.tickDt
 			local decToLimit = self.vehicle.mrGbMS.DecelerateToLimit
 			---- avoid to much brake force => limit to 7 km/h/s if difference below 2.77778 km/h difference
 			if self.speedLimitS - 1 < speedLimit and speedLimit < self.speedLimitS and decToLimit > 7 then
 				decToLimit     = 7
 			end
-			local limitMin   = -0.000277778 * decToLimit * self.tickDt
+			local limitMin   = -0.001 * mrGearboxMogli.kmhTOms * decToLimit * self.tickDt
 			self.speedLimitS = self.speedLimitS + Utils.clamp( math.min( speedLimit, self.maxForwardSpeed ) - self.speedLimitS, limitMin, limitMax )
 			if speedLimit < self.maxForwardSpeed or self.speedLimitS < 0.97 * self.maxForwardSpeed then
 				speedLimit = self.speedLimitS
@@ -6329,7 +6325,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--targetRpm = math.min( targetRpm, lastMaxPossibleRpm + 100 ) 
 	end
 
-	local minTarget = math.max( self.vehicle.mrGbMS.MinTargetRpm, minRpmReduced )
+	local minTarget
+	if minRpmReduced < self.vehicle.mrGbMS.MinTargetRpm then
+		if     currentAbsSpeed < mrGearboxMogli.eps then
+			minTarget = minRpmReduced
+		elseif currentAbsSpeed < 3 then
+			minTarget = minRpmReduced + ( self.vehicle.mrGbMS.MinTargetRpm - minRpmReduced ) * currentAbsSpeed / 3 
+		else
+			minTarget = self.vehicle.mrGbMS.MinTargetRpm
+		end
+	end
 	if targetRpm < minTarget then
 		targetRpm = minTarget		
 	end
@@ -6390,6 +6395,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			or not ( self.vehicle.isMotorStarted ) then
 	-- off or neutral
 		brakeNeutral = true
+	elseif currentAbsSpeed < -1.8 then
+	-- wrong direction 
+		brakeNeutral = true 
 	elseif self.vehicle.cruiseControl.state ~= 0 
 			or not autoOpenClutch then
 	-- no automatic stop or cruise control is on 
@@ -6421,18 +6429,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		if  not ( self.vehicle.mrGbMS.NeutralActive ) 
 				and self.vehicle:mrGbMGetAutoStartStop()
 				and self.vehicle.mrGbMS.G27Mode <= 0
-				and ( self.wheelRpm             < 0 
-					 or ( self.brakeNeutralTimer  < g_currentMission.time 
-					  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed )
-					 or ( self.lastMotorRpmS      < minRpmReduced and not self.vehicle:mrGbMGetAutomatic() ) ) then
+				and self.brakeNeutralTimer  < g_currentMission.time
+				and ( currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed
+					 or ( self.lastMotorRpmS  < minRpmReduced and not self.vehicle:mrGbMGetAutomatic() ) ) then
 			self.vehicle:mrGbMSetNeutralActive( true ) 
 		end
 	-- handbrake 
 		if      self.vehicle.mrGbMS.NeutralActive 
 				and self.vehicle:mrGbMGetAutoHold( )
-				and ( self.wheelRpm             < 0 
-					 or ( self.brakeNeutralTimer  < g_currentMission.time 
-					  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed ) ) then
+				and self.brakeNeutralTimer  < g_currentMission.time 
+			  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed then
 			self.vehicle:mrGbMSetState( "AutoHold", true )
 		end
 					
@@ -6457,9 +6463,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 
 		self.noTransmission = true
-	--if self.hydroEff ~= nil then
-	--	self.hydrostaticFactor = 0
-	--end
+		if self.hydroEff ~= nil then
+			self.hydrostaticFactor = 0
+		end
 		
 --**********************************************************************************************************		
 	else
@@ -6479,17 +6485,17 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.minThrottle = 0
 			end			
 			
-		--if      self.hydroEff ~= nil
-		--		and self.vehicle.steeringEnabled
-		--		and not ( self.vehicle.axisForwardIsAnalog )
-		--		and accelerationPedal >= -0.001
-		--		and currentAbsSpeed < self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed then
-		--	if currentAbsSpeed <= 0 then
-		--		self.minThrottle = math.max( self.minThrottle, 0.5 )
-		--	else
-		--		self.minThrottle = math.max( self.minThrottle, math.min( 0.5, 1 - currentAbsSpeed / ( self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed ) ) )
-		--	end
-		--end
+			if      self.hydroEff ~= nil
+					and self.vehicle.steeringEnabled
+					and not ( self.vehicle.axisForwardIsAnalog )
+					and accelerationPedal >= -0.001
+					and currentAbsSpeed < self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed then
+				if currentAbsSpeed <= 0 then
+					self.minThrottle = math.max( self.minThrottle, 0.5 )
+				else
+					self.minThrottle = math.max( self.minThrottle, math.min( 0.5, 1 - currentAbsSpeed / ( self.vehicle.mrGbMG.minAutoGearSpeed + self.vehicle.mrGbMG.minAutoGearSpeed ) ) )
+				end
+			end
 			
 			self.minThrottleS = Utils.clamp( self.minThrottleS + mrGearboxMogli.smoothFast * ( self.minThrottle - self.minThrottleS ), 0, 1 )
 		end
@@ -6548,13 +6554,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- normal drive with gear and clutch
 			self.noTransmission = false
 			
+	--**********************************************************************************************************		
+	-- no transmission while braking 
 			if      self.vehicle.cruiseControl.state == 0 
 					and autoOpenClutch 
-					and accelerationPedal < mrGearboxMogliGlobals.brakeNeutralLimit then
+					and accelerationPedal < mrGearboxMogliGlobals.brakeNeutralLimit 
+					and self.nonClampedMotorRpm < self.minRequiredRpm then
 				self.noTransmission = true
 			end
 		
-			clutchMode          = 1 -- calculate clutch percent respecting inc/dec time ms
+			clutchMode = 1 -- calculate clutch percent respecting inc/dec time ms
 
 	--**********************************************************************************************************		
 	-- hydrostatic drive
@@ -6671,7 +6680,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local c = self.nonClampedMotorRpm
 					
 					if self.vehicle.cruiseControl.state > 0 then
-						hMax = Utils.clamp( self.vehicle.cruiseControl.speed * 0.277778 * mrGearboxMogli.factor30pi * r / self.idleRpm, hMin, hMax )
+						hMax = Utils.clamp( self.vehicle.cruiseControl.speed * mrGearboxMogli.kmhTOms * mrGearboxMogli.factor30pi * r / self.idleRpm, hMin, hMax )
 					end
 					
 					if      self.vehicle:mrGbMGetAutomatic()
