@@ -7625,7 +7625,8 @@ function mrGearboxMogliMotor:getRpmScore( rpm, downRpm, upRpm )
 		return ( rpm - upRpm ) / ( self.maxAllowedRpm - upRpm ) 
 	end
 	-- error
-	return
+	print("warning: invalid parameters in mrGearboxMogliMotor:getRpmScore( "..tostring(rpm)..", "..tostring(downRpm)..", "..tostring(upRpm).." )")
+	return 1
 end
 
 --**********************************************************************************************************	
