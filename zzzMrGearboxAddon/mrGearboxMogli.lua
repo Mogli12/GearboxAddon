@@ -165,6 +165,7 @@ end
 function mrGearboxMogli.resetSampleVolume( sound )
 	if sound ~= nil and sound.sample ~= nil then
 		mrGearboxMogli.disabledVolumes[sound.sample] = false
+		mrGearboxMogli.builtInSetSampleVolume( sound.sample, sound.volume )
 	end
 end
 
@@ -1725,9 +1726,6 @@ function mrGearboxMogli:update(dt)
 			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
 		end
 		
-		mrGearboxMogli.resetSampleVolume( self.sampleMotor )
-		mrGearboxMogli.resetSampleVolume( self.sampleMotorRun )
-		
 		self.mrGbMB.soundModified        = false
 		self.motorSoundPitchScale        = self.mrGbMB.soundPitchScale     
 		self.motorSoundPitchMax          = self.mrGbMB.soundPitchMax       
@@ -1741,11 +1739,15 @@ function mrGearboxMogli:update(dt)
 		self.sampleMotorRun.pitchOffset  = self.mrGbMB.soundRunPitchOffset 
 		self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset
 		
+		mrGearboxMogli.resetSampleVolume( self.sampleMotor )
+		mrGearboxMogli.resetSampleVolume( self.sampleMotorRun )
+		
 		if self.mrGbMS.IsCombine and self.sampleThreshing.sample ~= nil then
 			self.sampleThreshing.volume      = self.mrGbMB.threshingVolume
 			self.sampleThreshing.pitchOffset = self.mrGbMB.threshingPitchOffset
 			Utils.setSamplePitch( self.sampleThreshing, self.sampleThreshing.pitchOffset )
-			Utils.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
+		--Utils.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
+			mrGearboxMogli.resetSampleVolume( self.sampleThreshing )
 		end		
 		
 		if      self.mrGbMG.modifyVolume
@@ -1793,11 +1795,13 @@ function mrGearboxMogli:update(dt)
 			and self.isMotorStarted
 			and g_currentMission.time > self.motorStartTime
 			and self.mrGbML.motor ~= nil
-			and ( self.mrGbMB.soundPitchScale == nil or self.mrGbMB.soundRunPitchScale == nil ) then
+			and not ( self.mrGbMB.soundDefaultsLoaded ) then
 		self.mrGbMB.soundModified        = false
 		
 		mrGearboxMogli.resetSampleVolume( self.sampleMotor )
 		mrGearboxMogli.resetSampleVolume( self.sampleMotorRun )
+		
+		self.mrGbMB.soundDefaultsLoaded  = true
 		
 		self.mrGbMB.soundPitchScale      = self.motorSoundPitchScale
 		self.mrGbMB.soundPitchMax        = self.motorSoundPitchMax
@@ -1813,6 +1817,7 @@ function mrGearboxMogli:update(dt)
 		if self.mrGbMS.IsCombine then
 			self.mrGbMB.threshingVolume      = self.sampleThreshing.volume
 			self.mrGbMB.threshingPitchOffset = self.sampleThreshing.pitchOffset
+			mrGearboxMogli.resetSampleVolume( self.sampleThreshing )
 		end
 		if      self.mrGbMS.IndoorSoundFactor == nil
 				and self.indoorSounds             ~= nil 
@@ -2508,23 +2513,25 @@ function mrGearboxMogli:update(dt)
 				end
 			end
 				
-			if self.mrGbMG.modifyVolume then -- and self.internalSound == nil then	
+			if self.mrGbMG.modifyVolume then
 			
 				local isIndoor = false
-				if g_currentMission.controlledVehicle ~= nil and g_currentMission.controlledVehicle.cameras ~= nil then
-					for i,camera in pairs(g_currentMission.controlledVehicle.cameras) do
-						if camera.isActivated then
-							if      g_currentMission.controlledVehicle.mrGbMS ~= nil 
-									and type( g_currentMission.controlledVehicle.mrGbMS.IndoorCameraIndexList ) == "table" then
-								if g_currentMission.controlledVehicle.mrGbMS.IndoorCameraIndexList[i] then
-									isIndoor = true
-									break
-								end
-							elseif camera.isInside then
-								isIndoor = true
-								break
-							end
+				if      g_currentMission.controlledVehicle          ~= nil 
+						and g_currentMission.controlledVehicle.cameras  ~= nil
+						and g_currentMission.controlledVehicle.camIndex ~= nil 
+						and g_currentMission.controlledVehicle.cameras[g_currentMission.controlledVehicle.camIndex] ~= nil then
+						
+					local vehicle = g_currentMission.controlledVehicle
+					local i       = vehicle.camIndex
+					local camera  = vehicle.cameras[i]
+						
+					if      vehicle.mrGbMS ~= nil 
+							and type( vehicle.mrGbMS.IndoorCameraIndexList ) == "table" then
+						if vehicle.mrGbMS.IndoorCameraIndexList[i] then
+							isIndoor = true
 						end
+					elseif camera.isInside then
+						isIndoor = true
 					end
 				end
 				
@@ -2598,10 +2605,7 @@ function mrGearboxMogli:update(dt)
 						indoorFactor = Utils.getNoNil( self.indoorSounds.sounds[self.mrGbMB.soundRunIndoorIndex].indoorFactor, 0.4 )
 					end
 					
-					self.sampleMotorRun.volume = rpmRunVolume * self.mrGbMB.soundRunVolume
-					rpmRunVolume = rpmRunVolume * indoorFactor
-					
-					mrGearboxMogli.setSampleVolume(self.sampleMotorRun, rpmRunVolume * self.mrGbMB.soundRunVolume )					
+					mrGearboxMogli.setSampleVolume(self.sampleMotorRun, self.sampleMotorRun.volume * indoorFactor )		
 				end
 			end
 		end
