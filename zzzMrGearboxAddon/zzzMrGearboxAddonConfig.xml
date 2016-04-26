@@ -863,7 +863,7 @@
 	</vehicle>
 	
 	<vehicle>
-		<mod name="Same_Fortis_190_FL">
+		<mod name="Same_Fortis_190" isPrefix="true">
 			<link href="http://www.modhoster.de/mods/same-fortis-190--2" />
 			<xmlFile name="sameFortis190.xml" />
 		</mod>
@@ -875,23 +875,80 @@
 						
 		<gearboxMogli   swapGearRangeKeys="true" maxAIRange="4">
 			<realEngine idleRpm="800" ratedRpm="2100" >
-				<torque rpm="0" motorTorque="0"/>
-				<torque rpm="800" motorTorque="754"/>
-				<torque rpm="900" motorTorque="767"/>
-				<torque rpm="1000" motorTorque="777"/>
-				<torque rpm="1100" motorTorque="786"/>
-				<torque rpm="1200" motorTorque="794"/>
-				<torque rpm="1300" motorTorque="800"/>
-				<torque rpm="1400" motorTorque="804"/>
-				<torque rpm="1500" motorTorque="806"/>
-				<torque rpm="1600" motorTorque="807"/>
-				<torque rpm="1700" motorTorque="760"/>
-				<torque rpm="1800" motorTorque="718"/>
-				<torque rpm="1900" motorTorque="680"/>
-				<torque rpm="2000" motorTorque="646"/>
-				<torque rpm="2100" motorTorque="615"/>
-				<torque rpm="2200" motorTorque="461"/>
-				<torque rpm="2300" motorTorque="0"/>
+        <!-- 1900: 193(193) | 2100: 184(184) | 1100..1600: 820(820) | 95 | 0.5 | 149 | 2 | 2200 | 1320: 204 -->
+        <torque rpm="350" motorTorque="546" fuelUsageRatio="235.5"/>
+        <torque rpm="700" motorTorque="750" fuelUsageRatio="216.9"/>
+        <torque rpm="900" motorTorque="802" fuelUsageRatio="209.9"/>
+        <torque rpm="1000" motorTorque="815" fuelUsageRatio="207.4"/>
+        <torque rpm="1100" motorTorque="820" fuelUsageRatio="205.6"/>
+        <torque rpm="1200" motorTorque="820" fuelUsageRatio="204.5"/>
+        <torque rpm="1300" motorTorque="820" fuelUsageRatio="204"/>
+        <torque rpm="1400" motorTorque="820" fuelUsageRatio="204.2"/>
+        <torque rpm="1500" motorTorque="820" fuelUsageRatio="205.2"/>
+        <torque rpm="1600" motorTorque="820" fuelUsageRatio="206.9"/>
+        <torque rpm="1700" motorTorque="796" fuelUsageRatio="209.4"/>
+        <torque rpm="1800" motorTorque="753" fuelUsageRatio="212.6"/>
+        <torque rpm="1850" motorTorque="733" fuelUsageRatio="214.5"/>
+        <torque rpm="1900" motorTorque="713" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="693" fuelUsageRatio="218.8"/>
+        <torque rpm="2000" motorTorque="670" fuelUsageRatio="221.2"/>
+        <torque rpm="2050" motorTorque="644" fuelUsageRatio="223.9"/>
+        <torque rpm="2100" motorTorque="615" fuelUsageRatio="226.7"/>
+        <torque rpm="2150" motorTorque="546" fuelUsageRatio="241.5"/>
+        <torque rpm="2200" motorTorque="338" fuelUsageRatio="310.3"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="453.3"/>
+			</realEngine>
+		
+			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
+				<gear speed="29.15" name="S"/>
+				<gear speed="34.95" name="L"/>
+				<gear speed="41.83" name="M"/>
+				<gear speed="50.00" name="H"/>
+			</gears>
+
+			<ranges defaultRange="4" shiftTimeMs="800" clutchRatio="0.7">
+				<range ratio="0.1096" name="1" />
+				<range ratio="0.1972" name="2" />
+				<range ratio="0.3164" name="3" />
+				<range ratio="0.4766" name="4" />
+				<range ratio="0.6554" name="5" />
+				<range ratio="1"      name="6" />
+			</ranges>
+
+			<reverse ratio="1" shiftTimeMs="500" clutchRatio="1" resetRange="false" resetGear="false"/>
+		</gearboxMogli>		
+	</vehicle>
+	
+	<vehicle>
+		<mod name="Same_Fortis_210" isPrefix="true">
+			<link href="https://www.modhoster.de/mods/same-fortis-210-hpe" />
+			<xmlFile name="sameFortis210.xml" />
+		</mod>
+						
+		<gearboxMogli swapGearRangeKeys="true" maxAIRange="4">
+			<realEngine idleRpm="800" ratedRpm="2100" >
+        <!-- 1900: 210(210) | 2100: 209(209) | 1100..1600: 890(890) | 95 | 0.5 | 149 | 2.2 | 2200 | 1320: 204 -->
+        <torque rpm="350" motorTorque="593" fuelUsageRatio="235.5"/>
+        <torque rpm="700" motorTorque="814" fuelUsageRatio="216.9"/>
+        <torque rpm="900" motorTorque="870" fuelUsageRatio="209.9"/>
+        <torque rpm="1000" motorTorque="885" fuelUsageRatio="207.4"/>
+        <torque rpm="1100" motorTorque="890" fuelUsageRatio="205.6"/>
+        <torque rpm="1200" motorTorque="890" fuelUsageRatio="204.5"/>
+        <torque rpm="1300" motorTorque="890" fuelUsageRatio="204"/>
+        <torque rpm="1400" motorTorque="890" fuelUsageRatio="204.2"/>
+        <torque rpm="1500" motorTorque="890" fuelUsageRatio="205.2"/>
+        <torque rpm="1600" motorTorque="890" fuelUsageRatio="206.9"/>
+        <torque rpm="1700" motorTorque="865" fuelUsageRatio="209.4"/>
+        <torque rpm="1800" motorTorque="819" fuelUsageRatio="212.6"/>
+        <torque rpm="1850" motorTorque="797" fuelUsageRatio="214.5"/>
+        <torque rpm="1900" motorTorque="776" fuelUsageRatio="216.5"/>
+        <torque rpm="1950" motorTorque="756" fuelUsageRatio="218.8"/>
+        <torque rpm="2000" motorTorque="736" fuelUsageRatio="221.2"/>
+        <torque rpm="2050" motorTorque="717" fuelUsageRatio="223.9"/>
+        <torque rpm="2100" motorTorque="699" fuelUsageRatio="226.7"/>
+        <torque rpm="2150" motorTorque="636" fuelUsageRatio="241.5"/>
+        <torque rpm="2200" motorTorque="408" fuelUsageRatio="310.3"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="453.3"/>
 			</realEngine>
 		
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	

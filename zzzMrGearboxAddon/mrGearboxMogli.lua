@@ -4264,14 +4264,17 @@ function mrGearboxMogli:mrGbMGetAutoShiftGears()
 	elseif  self.mrGbMS.Automatic 
 			and self.mrGbMS.AutoShiftGears then
 		return true
-	elseif  not ( self.steeringEnabled )
-			and self.mrGbMS.EnableAI == mrGearboxMogli.AIAllAuto
-			and self:mrGbMGetHasAllAuto() then
-		return true
-	elseif  not ( self.steeringEnabled )
-			and self.mrGbMS.EnableAI == mrGearboxMogli.AIPowerShift
-			and self.mrGbMS.GearShiftEffectGear then
-		return true
+	elseif not ( self.steeringEnabled ) then
+		if      self.mrGbMS.EnableAI == mrGearboxMogli.AIAllAuto
+				and self:mrGbMGetHasAllAuto() then
+			return true
+		elseif  self.mrGbMS.AutoShiftGears
+		    or  self.mrGbMS.AutoShiftHl then
+			return false
+		elseif  self.mrGbMS.EnableAI == mrGearboxMogli.AIPowerShift
+				and self.mrGbMS.GearShiftEffectGear then
+			return true
+		end
 	end
 	return false
 end
@@ -4286,14 +4289,17 @@ function mrGearboxMogli:mrGbMGetAutoShiftRange()
 	elseif  self.mrGbMS.Automatic 
 			and self.mrGbMS.AutoShiftHl then
 		return true
-	elseif  not ( self.steeringEnabled )
-			and self.mrGbMS.EnableAI == mrGearboxMogli.AIAllAuto
-			and self:mrGbMGetHasAllAuto() then
-		return true
-	elseif  not ( self.steeringEnabled )
-			and self.mrGbMS.EnableAI == mrGearboxMogli.AIPowerShift
-			and self.mrGbMS.GearShiftEffectHl then
-		return true
+	elseif not ( self.steeringEnabled ) then
+		if      self.mrGbMS.EnableAI == mrGearboxMogli.AIAllAuto
+				and self:mrGbMGetHasAllAuto() then
+			return true
+		elseif  self.mrGbMS.AutoShiftGears
+		    or  self.mrGbMS.AutoShiftHl then
+			return false
+		elseif  self.mrGbMS.EnableAI == mrGearboxMogli.AIPowerShift
+				and self.mrGbMS.GearShiftEffectHl then
+			return true
+		end
 	end
 	return false
 end
@@ -6967,9 +6973,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 				
 				if self.ptoOn then
-					upRpm   = Utils.clamp( self.targetRpm, downRpm, upRpm- mrGearboxMogli.autoShiftRpmDiff )
-					downRpm = upRpm - mrGearboxMogli.autoShiftRpmDiff
-					upRpm   = upRpm + mrGearboxMogli.autoShiftRpmDiff
+					upRpm   = Utils.clamp( self.minRequiredRpm + mrGearboxMogli.autoShiftRpmDiff, downRpm, upRpm )
+					downRpm = Utils.clamp( math.max( self.minRequiredRpm - mrGearboxMogli.autoShiftRpmDiff, minRpmReduced ), downRpm, upRpm )
 				end
 				
 				local currentGearPower = self.absWheelSpeedRpmS * gearRatio
