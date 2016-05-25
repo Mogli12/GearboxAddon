@@ -2267,77 +2267,91 @@ function mrGearboxMogli:update(dt)
 			elseif mrGearboxMogli.mbIsInputPressed( "mrGearboxMogliGEARR" ) then gear=self.mrGbMS.G27Gears[7]
 			end
 			
-			if not self:mrGbMGetAutomatic() and ( self.mrGbMS.G27Mode > 0 or gear ~= 0 ) then		
-				local manClutch = self.mrGbMS.ManualClutchGear
-				local curGear   = self.mrGbMS.CurrentGear
-				
-				if self.mrGbMS.SwapGearRangeKeys then
-					manClutch = self.mrGbMS.ManualClutchHl
-					curGear   = self.mrGbMS.CurrentRange
+		--self.mrGbML.G27Gear = tostring(gear)
+			
+			local noAutomatic = true
+			if self.mrGbMS.SwapGearRangeKeys then
+				noAutomatic = not self:mrGbMGetAutoShiftRange()
+			else
+				noAutomatic = not self:mrGbMGetAutoShiftGears()
+			end
+			
+		--self.mrGbML.G27Gear = self.mrGbML.G27Gear ..", "..tostring(noAutomatic)..", "..tostring(self.mrGbMS.G27Mode)
+			
+			if noAutomatic and ( self.mrGbMS.G27Mode > 0 or gear ~= 0 ) then		
+				if self.mrGbMS.G27Mode <= 0 then
+					if self.mrGbMS.NeutralActive then
+						self:mrGbMSetState( "G27Mode", 1 ) 
+					else
+						self:mrGbMSetState( "G27Mode", 2 ) 
+					end
 				end
+			
+				local curGear = 0
+				if self.mrGbMS.G27Mode >= 2  then
+					if self.mrGbMS.SwapGearRangeKeys then
+						curGear   = self.mrGbMS.CurrentRange
+					else
+						curGear   = self.mrGbMS.CurrentGear
+					end					
+					if self.mrGbMS.ReverseActive then
+						curGear = -curGear 
+					end				
+					if self.mrGbMS.G27Gears[7] >= 0 then
+						curGear = math.abs( curGear )
+					end											
+				end											
 
-				if     self.mrGbMS.NeutralActive then
-					curGear = 0
-				elseif self.mrGbMS.ReverseActive then
-					curGear = -curGear 
-				end
+			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => "..tostring(curGear)..", "..tostring(gear)
 				
-				if self.mrGbMS.G27Gears[7] >= 0 then
-					curGear = math.abs( curGear )
-				end
-				
-				if self:mrGbMGetAutoClutch() then
-					manClutch = false
-				elseif curGear == 0 or gear == 0 then
-					manClutch = self.mrGbMS.ManualClutchReverse --not ( self.mrGbMS.AutoStartStop )
-				elseif ( curGear>0 and gear<0 ) or ( curGear<0 and gear>0 ) then
-					manClutch = self.mrGbMS.ManualClutchReverse
-				end
-				
-				if curGear ~= gear then
-					if gear == 0 then
-						self:mrGbMSetNeutralActive( true  )						
+				if curGear ~= gear then					
+					local manClutch = self.mrGbMS.ManualClutchGear
+					if self:mrGbMGetAutoClutch() then
+						manClutch = false
+					elseif ( curGear>0 and gear<0 ) or ( curGear<0 and gear>0 ) then
+						manClutch = self.mrGbMS.ManualClutchReverse
+					elseif self.mrGbMS.SwapGearRangeKeys then
+						manClutch = self.mrGbMS.ManualClutchHl
+					end
+	
+				--self.mrGbML.G27Gear = self.mrGbML.G27Gear ..", "..tostring(manClutch)
+	
+					if mrGearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
+					-- do nothing 
+					elseif gear == 0 then
+						self:mrGbMSetNeutralActive( true, false, true )	
+						self:mrGbMSetState( "G27Mode", 1 ) 
 					else
 						if self.mrGbMS.G27Gears[7] < 0 then
 							self:mrGbMSetReverseActive( (gear < 0) )
 						end
 						
-						local done = false
 						if self.mrGbMS.SwapGearRangeKeys then
-							done    = self:mrGbMSetCurrentRange(math.abs(gear), false, true)
-							curGear = self.mrGbMS.currentRange
+							self:mrGbMSetCurrentRange(math.abs(gear), false, true)
+							curGear = self.mrGbMS.CurrentRange
 						else
-							done    = self:mrGbMSetCurrentGear(math.abs(gear), false, true)
+							self:mrGbMSetCurrentGear(math.abs(gear), false, true)
 							curGear = self.mrGbMS.CurrentGear
 						end
-						if done or self.mrGbMS.NeutralActive then
-							self:mrGbMSetNeutralActive( false  )
-							self:mrGbMSetState( "AutoHold", false )
-						end
+						
 						if self.mrGbMS.ReverseActive then
 							curGear = -curGear 
+						end			
+
+						self:mrGbMSetState( "G27Mode", 2 ) 
+						if not self:mrGbMGetAutoStartStop() then
+							self:mrGbMSetNeutralActive( false, false, true )
+							self:mrGbMSetState( "AutoHold", false )											
 						end
 					end
-					
-					if self.mrGbMS.NeutralActive then
-						self:mrGbMSetState( "G27Mode", 1 ) 
-					elseif curGear == self.mrGbMS.G27Gears[1]
-							or curGear == self.mrGbMS.G27Gears[2]
-							or curGear == self.mrGbMS.G27Gears[3]
-							or curGear == self.mrGbMS.G27Gears[4]
-							or curGear == self.mrGbMS.G27Gears[5]
-							or curGear == self.mrGbMS.G27Gears[6]
-							or curGear == self.mrGbMS.G27Gears[7] then
-						self:mrGbMSetState( "G27Mode", 2 ) 
-					else
-						self:mrGbMSetState( "G27Mode", 1 ) 
-					end
-
-				elseif self.mrGbMS.G27Mode < 1 then
-					self:mrGbMSetState( "G27Mode", 2 ) 
 				end
+				
+			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => "..tostring(self.mrGbMS.G27Mode)
+				
 			elseif self.mrGbMS.G27Mode > 0 then
 				self:mrGbMSetState( "G27Mode", 0 ) 
+
+			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => off"				
 			end
 		end
 	end
@@ -2372,19 +2386,36 @@ function mrGearboxMogli:update(dt)
 				local v = self.mrGbMS.GrindingGearsVol
 				self.mrGbMS.GrindingGearsVol = 0
 
+				local sample = nil
+				
 				if self.mrGbMS.GrindingSoundFile == nil then
 					if mrGearboxMogli.GrindingSample == nil then
 						mrGearboxMogli.GrindingSample = createSample("mrGearboxMogliGrindingSample")
 						local fileName = Utils.getFilename( "grinding.wav", mrGearboxMogli.baseDirectory )
 						loadSample(mrGearboxMogli.GrindingSample, fileName, false)
 					end
-					playSample(mrGearboxMogli.GrindingSample, 1, v * self.mrGbMS.GrindingSoundVolume, 0)	
+					sample = mrGearboxMogli.GrindingSample
 				else
 					if self.mrGbML.grindingSample == nil then
 						self.mrGbML.grindingSample = createSample("mrGearboxMogliGrindingSample")
 						loadSample(self.mrGbML.grindingSample, self.mrGbMS.GrindingSoundFile, false)
 					end
-					playSample(self.mrGbML.grindingSample, 1, v * self.mrGbMS.GrindingSoundVolume, 0)	
+					sample = self.mrGbML.grindingSample
+				end
+				
+				
+				if sample ~= nil then
+					if     v <= 0 then
+						self.mrGbML.grindingSampleEnd = nil
+						self.mrGbML.grindingSampleVol = nil
+						stopSample( sample )
+					elseif self.mrGbML.grindingSampleEnd == nil 
+							or self.mrGbML.grindingSampleEnd < g_currentMission.time
+							or self.mrGbML.grindingSampleVol < v then
+						self.mrGbML.grindingSampleEnd = g_currentMission.time + getSampleDuration( sample )
+						self.mrGbML.grindingSampleVol = v
+						playSample( sample, 1, v * self.mrGbMS.GrindingSoundVolume, 0 )	
+					end
 				end
 			end
 		end
@@ -3598,7 +3629,8 @@ end
 -- mrGearboxMogli:mrGbMSetCurrentGear
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend ) then
+	if      not ( self.mrGbMS.NeutralActive )
+			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend ) then
 		return false
 	end
 	
@@ -3705,7 +3737,8 @@ end
 -- mrGearboxMogli:mrGbMSetCurrentRange
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend ) then
+	if      not ( self.mrGbMS.NeutralActive )
+			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend ) then
 		return false
 	end
 
@@ -3753,7 +3786,8 @@ end
 -- mrGearboxMogli:mrGbMSetCurrentRange2
 --**********************************************************************************************************	
 function mrGearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
-	if mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchRanges2, noEventSend ) then
+	if      not ( self.mrGbMS.NeutralActive )
+			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchRanges2, noEventSend ) then
 		return 
 	end
 
@@ -3825,7 +3859,8 @@ function mrGearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 --end
 
 	if      not ( value )
-			and mrGearboxMogli.mrGbMCheckGrindingGears( self, not ( noCheck ) and self.mrGbMS.ManualClutchReverse, noEventSend ) then
+			and not ( noCheck )
+			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
 		return false
 	end
 
@@ -3840,6 +3875,7 @@ end
 function mrGearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 	if      self.mrGbMS.ReverseActive ~= nil
 			and self.mrGbMS.ReverseActive ~= value 
+			and not ( self.mrGbMS.NeutralActive )
 			and mrGearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
 		return false
 	end
@@ -4122,6 +4158,10 @@ function mrGearboxMogli:mrGbMGetGearText()
 		return ""
 	end
 
+	if self.mrGbMS.G27Mode       == 1 then
+		return mrGearboxMogli.getText( "mrGearboxMogliTEXT_NOGEAR", "no gear" )
+	end
+	
 	local gearText = Utils.getNoNil( self.mrGbMS.Gears[self.mrGbMS.CurrentGear].name, "" )
 	if self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].name ~= nil and self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].name ~= "" then
 		if self.mrGbMS.SwapGearRangeKeys then
