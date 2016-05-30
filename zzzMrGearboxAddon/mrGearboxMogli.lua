@@ -1991,6 +1991,9 @@ function mrGearboxMogli:update(dt)
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_BRAKE", "handbrake" )
 		elseif self.mrGbMS.AutoHold then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_AUTO_HOLD", "auto hold" )
+			if self:mrGbMGetAutomatic() then
+				text = text .. " (A)"
+			end
 		elseif self.mrGbML.gearShiftingNeeded < 0 then
 			text = mrGearboxMogli.getText( "mrGearboxMogliTEXT_DC", "double clutch" ) .." "..tostring(-self.mrGbML.gearShiftingNeeded)
 			text2 = text
@@ -2050,35 +2053,14 @@ function mrGearboxMogli:update(dt)
 -- inputs	
 	if mrGearboxMogli.mbIsActiveForInput( self, false ) then					
 		-- auto start/stop
-		if      self:mrGbMGetAutoStartStop()
-				and self:mrGbMGetAutoClutch()
-				and self.mrGbMS.NeutralActive
+		if      self.mrGbMS.NeutralActive
 				and self.isMotorStarted
-				and self.steeringEnabled
+				and self:mrGbMGetAutoHold()
 				and g_currentMission.time > self.motorStartTime
 				and not ( driveControlHandBrake )
 				and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
 			self:mrGbMSetNeutralActive( false ) 
 		end
-		
-	--if      self.mrGbMG.autoHold 
-	--		and self.dCcheckModule ~= nil
-	--		and self:dCcheckModule("handBrake")
-	--		and self.mrGbMS.NeutralActive
-	--		and not self.mrGbMS.AutoHold
-	--		and self.axisForward > 0.8 then
-	--	if self.mrGbML.autoHoldTimer == nil then
-	--		self.mrGbML.autoHoldTimer = 0
-	--	else
-	--		self.mrGbML.autoHoldTimer = self.mrGbML.autoHoldTimer + dt
-	--	end
-	--	if self.mrGbML.autoHoldTimer > 3000 then
-	--		self.mrGbML.autoHoldTimer = nil
-	--		self:mrGbMSetState( "AutoHold", true )
-	--	end
-	--elseif self.mrGbML.autoHoldTimer ~= nil then
-	--	self.mrGbML.autoHoldTimer = nil
-	--end
 
 		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
@@ -2339,10 +2321,10 @@ function mrGearboxMogli:update(dt)
 						end			
 
 						self:mrGbMSetState( "G27Mode", 2 ) 
-						if not self:mrGbMGetAutoStartStop() then
-							self:mrGbMSetNeutralActive( false, false, true )
-							self:mrGbMSetState( "AutoHold", false )											
-						end
+					--if not self:mrGbMGetAutoStartStop() then
+						self:mrGbMSetNeutralActive( false, false, true )
+						self:mrGbMSetState( "AutoHold", false )											
+					--end
 					end
 				end
 				
@@ -2779,9 +2761,11 @@ function mrGearboxMogli:onLeave()
 	if      self.steeringEnabled 
 			and self.mrGbMS.IsOn 
 			and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_OFF
-			and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
+			and ( self:mrGbMGetAutoClutch() or self:mrGbMGetAutomatic() or self:mrGbMGetAutoStartStop() ) then 
 		self:mrGbMSetNeutralActive( true, false, true )
-		self:mrGbMSetState( "AutoHold", true )
+		if self:mrGbMGetAutoHold() then
+			self:mrGbMSetState( "AutoHold", true )
+		end
 		self:mrGbMSetState( "IsNeutral", true )
 	end
 end
@@ -3865,6 +3849,10 @@ function mrGearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 	end
 
 	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
+	
+	if not ( value ) and self.mrGbMS.AutoHold then
+		self:mrGbMSetState( "AutoHold", false, noEventSend ) 
+	end
 	
 	return true
 end 
@@ -6286,7 +6274,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	self.deltaRpm           = self.deltaRpm + mrGearboxMogli.smoothMedium * ( deltaRpm - self.deltaRpm )
 
 	if not ( lastNoTransmission ) then
-		self.currentRpmS  = self.lastMotorRpmS --self.currentRpmS + 0.1 * ( self.nonClampedMotorRpm - self.currentRpmS )
+		self.currentRpmS  = self.lastMotorRpm --self.currentRpmS + 0.1 * ( self.nonClampedMotorRpm - self.currentRpmS )
 	end
 
 	local currentPower    = ( self.motorLoad + self.lastPtoTorque + self.lastLostTorque ) * math.max( self.prevNonClampedMotorRpm, self.idleRpm )

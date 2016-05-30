@@ -4436,11 +4436,15 @@
 			<xmlFile name="data/vehicles/steerable/fendt/fendt936variozwu.xml"/>
 		</mod>
 		
-		<mod name="Fendt936" isPrefix="true" xmlName="Fendt936.xml"/>
-
 		<mod name="CZMOD_FENDT_900_Series">
 			<link href="http://www.modhoster.de/mods/fendt-900-series" />
 			<xmlFile name="fendt_936.xml"/>
+		</mod>
+		
+		<mod name="Fendt936" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/fendt-936-vario-pack--10" />
+			<xmlFile name="Fendt936.xml"/>
+			<xmlFile name="Fendt936BB.xml"/>
 		</mod>
 		
 		<!-- http://www.fendt.com/download/900Vario_2014_TD_de.pdf -->
@@ -4453,7 +4457,7 @@
 				<gear name="transport"  speed="50"/>
 			</gears>
 
-			<realEngine idleRpm="900" ratedRpm="2100">		
+			<realEngine idleRpm="800" ratedRpm="2100">		
         <!-- 1900: 359(359) | 2100: 360(360) | 1400..1500: 1488(1488) | 85 | 0.5 | 300 | 1.8 | 2100 | 1380: 192 -->
         <torque rpm="100" motorTorque="236" motorTorqueEco="236" fuelUsageRatio="252.7"/>
         <torque rpm="400" motorTorque="750" motorTorqueEco="750" fuelUsageRatio="227.6"/>
@@ -4500,7 +4504,7 @@
 				<gear name="transport"  speed="50"/>
 			</gears>
 
-			<realEngine idleRpm="900" ratedRpm="2100">		
+			<realEngine idleRpm="800" ratedRpm="2100">		
         <!-- 1900: 389(389) | 2100: 390(390) | 1400..1500: 1538(1538) | 92 | 0.5 | 249 | 1.7 | 2200 | 1380: 192 -->
         <torque rpm="350" motorTorque="929" fuelUsageRatio="231.3"/>
         <torque rpm="700" motorTorque="1308" fuelUsageRatio="209.1"/>
@@ -4544,7 +4548,7 @@
 				<gear name="transport"  speed="50"/>
 			</gears>
 
-			<realEngine idleRpm="1000" ratedRpm="2250">		
+			<realEngine idleRpm="950" ratedRpm="2250">		
         <torque rpm="0" motorTorque="0"/>
         <torque rpm="700" motorTorque="534"/>
         <torque rpm="800" motorTorque="654"/>
@@ -4589,7 +4593,7 @@
 				<gear name="transport"  speed="50"/>
 			</gears>
 
-			<realEngine idleRpm="1000" ratedRpm="2250">		
+			<realEngine idleRpm="950" ratedRpm="2250">		
         <!-- 1900: 300(300) | 2250: 270(270) | 1400..1400: 1240(1240) | 70 | 0.5 | 220 | 1.5 | 2200 | 1400: 194 -->
         <torque rpm="100" motorTorque="162" fuelUsageRatio="252.3"/>
         <torque rpm="400" motorTorque="333" fuelUsageRatio="228.5"/>
@@ -5633,6 +5637,50 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+	<vehicle> 
+		<mod name="JohnDeere_670">
+			<xmlFile name="JohnDeere_S670.xml" />
+		</mod>
+		
+		<gearboxMogli disableManual="true" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="12.1"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" >
+        <gear speed="13.27" name="field"/> <!-- 0.25 2.5 6 20-->
+        <gear speed="43.78" name="street"/> <!-- 0.83 8.24 20 67-->
+      </gears>
+			
+			<realEngine idleRpm="850" ratedRpm="2200">
+        <!-- 2000: 455(421) | 2200: 431(397) | 1600..1600: 1749(1748) | 98 | 0.5 | 149 | 2 | 2300 | 1600: 204 -->
+        <torque rpm="350" motorTorque="1015" motorTorqueEco="1015" fuelUsageRatio="292.5"/>
+        <torque rpm="700" motorTorque="1507" motorTorqueEco="1506" fuelUsageRatio="249.9"/>
+        <torque rpm="900" motorTorque="1633" motorTorqueEco="1632" fuelUsageRatio="231.8"/>
+        <torque rpm="1000" motorTorque="1670" motorTorqueEco="1669" fuelUsageRatio="224.4"/>
+        <torque rpm="1100" motorTorque="1695" motorTorqueEco="1694" fuelUsageRatio="218.2"/>
+        <torque rpm="1200" motorTorque="1714" motorTorqueEco="1713" fuelUsageRatio="213.1"/>
+        <torque rpm="1300" motorTorque="1729" motorTorqueEco="1728" fuelUsageRatio="209.1"/>
+        <torque rpm="1400" motorTorque="1740" motorTorqueEco="1739" fuelUsageRatio="206.3"/>
+        <torque rpm="1500" motorTorque="1747" motorTorqueEco="1746" fuelUsageRatio="204.6"/>
+        <torque rpm="1600" motorTorque="1749" motorTorqueEco="1748" fuelUsageRatio="204"/>
+        <torque rpm="1700" motorTorque="1725" motorTorqueEco="1706" fuelUsageRatio="204.6"/>
+        <torque rpm="1800" motorTorque="1692" motorTorqueEco="1642" fuelUsageRatio="206.5"/>
+        <torque rpm="1850" motorTorque="1672" motorTorqueEco="1598" fuelUsageRatio="207.9"/>
+        <torque rpm="1900" motorTorque="1650" motorTorqueEco="1556" fuelUsageRatio="209.7"/>
+        <torque rpm="1950" motorTorque="1625" motorTorqueEco="1516" fuelUsageRatio="211.7"/>
+        <torque rpm="2000" motorTorque="1598" motorTorqueEco="1478" fuelUsageRatio="214.1"/>
+        <torque rpm="2050" motorTorque="1553" motorTorqueEco="1437" fuelUsageRatio="216.8"/>
+        <torque rpm="2100" motorTorque="1501" motorTorqueEco="1388" fuelUsageRatio="219.7"/>
+        <torque rpm="2150" motorTorque="1442" motorTorqueEco="1331" fuelUsageRatio="223"/>
+        <torque rpm="2200" motorTorque="1376" motorTorqueEco="1267" fuelUsageRatio="226.7"/>
+        <torque rpm="2250" motorTorque="1221" motorTorqueEco="1124" fuelUsageRatio="241.5"/>
+        <torque rpm="2300" motorTorque="756" motorTorqueEco="696" fuelUsageRatio="310.3"/>
+        <torque rpm="2350" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="453.3"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+		
 	<vehicle> 
 		<mod name="JohnDeere_8400i" isPrefix="true">
 			<!--link href="http://www.mediafire.com/download/ezoomz6tbt9fs8t/JohnDeere_8400i_Pack_EXTRACT.zip"/-->
