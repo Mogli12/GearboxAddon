@@ -51,7 +51,7 @@ mrGearboxMogli.smoothFast           = 0.1
 mrGearboxMogli.smoothMedium         = 0.05
 mrGearboxMogli.smoothSlow           = 0.02
 mrGearboxMogli.absWheelSpeedRpmMin  = 10
-mrGearboxMogli.hydroEffDiff         = 25
+mrGearboxMogli.hydroEffDiff         = 50
 mrGearboxMogli.hydroEffDiffInc      = 1000
 mrGearboxMogli.ptoRpmThrottleDiff   = 75
 mrGearboxMogli.powerFactor0         = 0.1424083769633507853403141361257
@@ -79,6 +79,8 @@ mrGearboxMogli.AIGearboxOff         = "N"
 mrGearboxMogli.AIAllAuto            = "A"
 mrGearboxMogli.AIGearboxOn          = "Y"
 mrGearboxMogli.kmhTOms              = 0.2777777777777777777777777777778
+mrGearboxMogli.extraSpeedLimit      = 0.3
+mrGearboxMogli.extraSpeedLimitMs    = 0.0833333333333333333333333333333
 
 mrGearboxMogliGlobals                       = {}
 mrGearboxMogliGlobals.debugPrint            = false
@@ -90,7 +92,7 @@ mrGearboxMogliGlobals.defaultOn             = true
 mrGearboxMogliGlobals.noDisable             = false
 mrGearboxMogliGlobals.disableManual         = false
 mrGearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
-mrGearboxMogliGlobals.minTimeToShift			  = 0    -- ms
+mrGearboxMogliGlobals.minTimeToShift			  = 8    -- ms
 mrGearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 mrGearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
 mrGearboxMogliGlobals.autoShiftTimeoutShort = 1000 -- ms
@@ -167,6 +169,40 @@ function mrGearboxMogli.resetSampleVolume( sound )
 	if sound ~= nil and sound.sample ~= nil then
 		mrGearboxMogli.disabledVolumes[sound.sample] = false
 		mrGearboxMogli.builtInSetSampleVolume( sound.sample, sound.volume )
+	end
+end
+
+--**********************************************************************************************************	
+-- setSamplePitch
+--**********************************************************************************************************	
+mrGearboxMogli.builtInSetSamplePitch = setSamplePitch
+mrGearboxMogli.disabledPitches       = {}
+setSamplePitch = function( sample, pitch )
+	if mrGearboxMogli.disabledPitches[sample] then
+		return 
+	else
+		mrGearboxMogli.builtInSetSamplePitch( sample, pitch )
+	end
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli.setSamplePitch 
+--**********************************************************************************************************	
+function mrGearboxMogli.setSamplePitch( sound, pitch )
+	if sound ~= nil and sound.sample ~= nil then
+		mrGearboxMogli.disabledPitches[sound.sample] = true
+		sound.pitch = pitch 
+		mrGearboxMogli.builtInSetSamplePitch( sound.sample, pitch )
+	end
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli.resetSamplePitch 
+--**********************************************************************************************************	
+function mrGearboxMogli.resetSamplePitch( sound )
+	if sound ~= nil and sound.sample ~= nil then
+		mrGearboxMogli.disabledPitches[sound.sample] = false
+		mrGearboxMogli.builtInSetSamplePitch( sound.sample, sound.pitch )
 	end
 end
 
@@ -1254,6 +1290,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.LaunchRange2       = self.mrGbMS.DefaultRange2
 	
 	local defaultLaunchSpeed       = 20
+	
 	if hasDefaultGear then
 		defaultLaunchSpeed           = self.mrGbMS.Gears[self.mrGbMS.LaunchGear].speed
 																 * self.mrGbMS.Ranges[self.mrGbMS.LaunchRange].ratio
@@ -1261,6 +1298,9 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 																 * self.mrGbMS.GlobalRatioFactor
 																 * 3.6
   end	
+	if hasHydrostat then
+		defaultLaunchSpeed           = 10
+	end
 	self.mrGbMS.LaunchGearSpeed    = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. "#launchGearSpeed"), defaultLaunchSpeed ) / 3.6
 	if not hasDefaultGear then
 		local r = self.mrGbMS.Ranges[self.mrGbMS.LaunchRange].ratio
@@ -1455,23 +1495,38 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.HydrostaticStart  = self.mrGbMS.HydrostaticMin
 		end
 		
+		local dft = 5000
 		local hit = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs")
 		if hit == nil then
-			self.mrGbMS.HydrostaticIncFactor = 0.001 -- 1000 ms
-		elseif hit < 1 then
+			-- 2000 ms
+			self.mrGbMS.HydrostaticSmIFactor = 100/dft
+			self.mrGbMS.HydrostaticIncFactor = 1/(dft+dft+dft)
+		elseif hit < 100 then
+			-- do not smooth 
+			self.mrGbMS.HydrostaticSmIFactor = 1
 			self.mrGbMS.HydrostaticIncFactor = 1
 		else
-			self.mrGbMS.HydrostaticIncFactor = 1 / hit
+			-- see Documents/smooth.xlsx
+			self.mrGbMS.HydrostaticSmIFactor = 100 / hit 
+			self.mrGbMS.HydrostaticIncFactor = 1 / (hit+hit+hit)
 		end
 		local hdt = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxMinTimeMs")
 		if hdt == nil and hit == nil then
-			self.mrGbMS.HydrostaticDecFactor = 0.0002 -- 5000 ms
+			-- 2000 ms
+			self.mrGbMS.HydrostaticSmDFactor = 100/dft
+			self.mrGbMS.HydrostaticDecFactor = 1/(dft+dft+dft)
 		elseif hdt == nil then
-			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor -- compatibility
-		elseif hdt < 1 then
+			-- compatibility
+			self.mrGbMS.HydrostaticSmDFactor = self.mrGbMS.HydrostaticSmIFactor
+			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor
+		elseif hdt < 100 then
+			-- do not smooth 
+			self.mrGbMS.HydrostaticSmDFactor = 1
 			self.mrGbMS.HydrostaticDecFactor = 1
 		else
-			self.mrGbMS.HydrostaticDecFactor = 1 / hdt
+			-- see Documents/smooth.xlsx
+			self.mrGbMS.HydrostaticSmDFactor = 100 / hdt 
+			self.mrGbMS.HydrostaticDecFactor = 1 / (hdt+hdt+hdt)
 		end
 		
 		local sc = getXMLBool(xmlFile, xmlString .. ".hydrostatic#startWithClutch")
@@ -5636,10 +5691,10 @@ function mrGearboxMogliMotor:getCurMaxRpm()
 	end
 				
 	if not ( self.noTransmission ) then		
-		local speedLimit = self.speedLimit * mrGearboxMogli.kmhTOms
+		local speedLimit = ( self.speedLimit + mrGearboxMogli.extraSpeedLimit ) * mrGearboxMogli.kmhTOms
 
 		if self.vehicle.mrGbMS.SpeedLimiter or self.ptoSpeedLimit ~= nil or self.vehicle.cruiseControl.state > 0 then
-			speedLimit = math.min( speedLimit, self.vehicle.cruiseControl.speed * mrGearboxMogli.kmhTOms )
+			speedLimit = math.min( speedLimit, ( self.vehicle.cruiseControl.speed + mrGearboxMogli.extraSpeedLimit ) * mrGearboxMogli.kmhTOms )
 			if self.ptoSpeedLimit ~= nil then
 				speedLimit = math.min( speedLimit, self.ptoSpeedLimit )
 			end
@@ -5665,9 +5720,9 @@ function mrGearboxMogliMotor:getCurMaxRpm()
 		  
 		if self.vehicle.mrGbMS.MaxSpeedLimiter then
 			if self.vehicle.mrGbMS.ReverseActive then
-				speedLimit = math.min( speedLimit, self.maxBackwardSpeed )
+				speedLimit = math.min( speedLimit, self.maxBackwardSpeed + mrGearboxMogli.extraSpeedLimitMs )
 			else
-				speedLimit = math.min( speedLimit, self.maxForwardSpeed )
+				speedLimit = math.min( speedLimit, self.maxForwardSpeed  + mrGearboxMogli.extraSpeedLimitMs )
 			end
 		end
 							
@@ -5729,12 +5784,13 @@ end
 -- mrGearboxMogliMotor:increaseHyroLaunchRpm
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:increaseHyroLaunchRpm()
---if      self.hydroEff ~= nil
---	--and self.ptoOn
---		and self.vehicle.mrGbMS.HydrostaticLaunch
---		and self:getMogliGearRatio() + 1 > mrGearboxMogli.maxHydroGearRatio then
---	return true
---end
+	if      self.hydroEff ~= nil
+			and self.nonClampedMotorRpm < self.stallRpm 
+			and self.hydrostaticFactor  < 1
+			and self.hydrostaticFactor * self.vehicle.mrGbML.currentGearSpeed < self.vehicle.mrGbMS.LaunchGearSpeed 
+			then
+		return true
+	end
 	return false
 end
 
@@ -6131,6 +6187,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	self.debugEffectiveRpmGraph       = nil
 
 	local acceleration = math.max( accelerationPedal, 0 )
+
+	local dtSmoothBase   = 0.3 * ( self.tickDt * 0.06 + math.sqrt( self.tickDt * 0.06 ) )
+	local dtSmoothFast   = mrGearboxMogli.smoothFast   * dtSmoothBase -- 0.1  @ 30 FPS
+	local dtSmoothMedium = mrGearboxMogli.smoothMedium * dtSmoothBase -- 0.05 @ 30 FPS
+	local dtSmoothSlow   = mrGearboxMogli.smoothSlow   * dtSmoothBase -- 0.02 @ 30 FPS
 	
 	if self == nil or self.vehicle == nil then
 		local i = 1
@@ -6240,6 +6301,16 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		if self.vehicle.cruiseControl.state > 0 then
 			speedLimit = math.min( speedLimit, self.vehicle.cruiseControl.speed )
 		end
+		
+		if self.vehicle.mrGbMS.MaxSpeedLimiter then
+			if self.vehicle.mrGbMS.ReverseActive then
+				speedLimit = math.min( speedLimit, self.maxBackwardSpeed * 3.6 )
+			else
+				speedLimit = math.min( speedLimit, self.maxForwardSpeed  * 3.6 )
+			end
+		end
+		
+		speedLimit = speedLimit + mrGearboxMogli.extraSpeedLimit
 			
 		if currentAbsSpeed > speedLimit - 1 then
 			if     requestedTorque <= 0 then
@@ -6269,9 +6340,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 
 	self.absWheelSpeedRpm   = math.max( self.absWheelSpeedRpm, 0 )	
-	self.absWheelSpeedRpmS  = self.absWheelSpeedRpmS + mrGearboxMogli.smoothFast * ( self.absWheelSpeedRpm - self.absWheelSpeedRpmS )
+	self.absWheelSpeedRpmS  = self.absWheelSpeedRpmS + dtSmoothFast * ( self.absWheelSpeedRpm - self.absWheelSpeedRpmS )
 	local deltaRpm          = ( self.absWheelSpeedRpm - prevWheelSpeedRpm ) / self.tickDt         
-	self.deltaRpm           = self.deltaRpm + mrGearboxMogli.smoothMedium * ( deltaRpm - self.deltaRpm )
+	self.deltaRpm           = self.deltaRpm + dtSmoothMedium * ( deltaRpm - self.deltaRpm )
 
 	if not ( lastNoTransmission ) then
 		self.currentRpmS  = self.lastMotorRpm --self.currentRpmS + 0.1 * ( self.nonClampedMotorRpm - self.currentRpmS )
@@ -6298,7 +6369,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.targetRpmC == nil or self.targetRpmC < targetRpmC then
 				self.targetRpmC   = targetRpmC 
 			else
-				self.targetRpmC   = self.targetRpmC + mrGearboxMogli.smoothSlow * ( targetRpmC - self.targetRpmC )		
+				self.targetRpmC   = self.targetRpmC + dtSmoothSlow * ( targetRpmC - self.targetRpmC )		
 			end
 			self.minRequiredRpm = self.targetRpmC
 		else
@@ -6396,7 +6467,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	if self.wheelLoadS == nil then
 		self.wheelLoadS = wheelLoad
 	else
-		self.wheelLoadS = self.wheelLoadS + mrGearboxMogli.smoothSlow * ( wheelLoad - self.wheelLoadS )		
+		self.wheelLoadS = self.wheelLoadS + dtSmoothSlow * ( wheelLoad - self.wheelLoadS )		
   end		
 	
 	local targetRpm 
@@ -6517,7 +6588,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 	
 --print(string.format("%1.3f %4d %s %2.1f", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed))
-	
+		
 	if brakeNeutral then
 	-- neutral	
 		if  not ( self.vehicle.mrGbMS.NeutralActive ) 
@@ -6568,8 +6639,15 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 
 		-- acceleration for idle/minimum rpm		
 		if lastNoTransmission then
-			self.minThrottle  = 0.3
+			self.minThrottle  = 0.3		
 			self.minThrottleS = 0.3
+			
+			if self.hydroEff ~= nil then
+				self.hydrostaticFactor = Utils.clamp( self.vehicle.mrGbMS.LaunchGearSpeed / self.vehicle.mrGbML.currentGearSpeed, 
+				                                      math.max( 0, self.vehicle.mrGbMS.HydrostaticMin ),
+																							math.min( 1, self.vehicle.mrGbMS.HydrostaticMax ) )
+			--print(string.format("%3.0f %3.0f %0.5f", self.vehicle.mrGbMS.LaunchGearSpeed, self.vehicle.mrGbML.currentGearSpeed, self.hydrostaticFactor ))
+			end
 		else
 			if self.nonClampedMotorRpm <= minRpmReduced then
 				self.minThrottle  = 1
@@ -6591,7 +6669,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 			end
 			
-			self.minThrottleS = Utils.clamp( self.minThrottleS + mrGearboxMogli.smoothFast * ( self.minThrottle - self.minThrottleS ), 0, 1 )
+			self.minThrottleS = Utils.clamp( self.minThrottleS + dtSmoothFast * ( self.minThrottle - self.minThrottleS ), 0, 1 )
 		end
 		
 		self.lastThrottle = math.max( self.minThrottle, accelerationPedal )								
@@ -6662,7 +6740,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	--**********************************************************************************************************		
 	-- hydrostatic drive
 			if self.hydroEff ~= nil then
-			
 				local gearMaxSpeed = self.vehicle.mrGbMS.Ranges2[self.vehicle.mrGbMS.CurrentRange2].ratio
 													 * self.vehicle.mrGbMS.GlobalRatioFactor
 				if self.vehicle.mrGbMS.ReverseActive then	
@@ -6714,20 +6791,28 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 				end		
 				
-				-- min RPM
-				local n = minTarget --self.idleRpm
-				if getMaxPower then
-					n = math.max( n, self.targetRpm )
+				-- target RPM
+				local t = self.targetRpm 
+				if 0.8 < motorLoad and motorLoad < 1 then
+					local d = 1 - 10 * math.abs( motorLoad - 0.9 )
+					t = t + d * 100
 				end
 				
+				-- min RPM
+				local n = minTarget --self.idleRpm
+			--if getMaxPower then
+			--	n = math.max( n, self.targetRpm )
+			--end
+				
 				-- max RPM
-				local m = self.maxAllowedRpm			
-				if self.vehicle.mrGbMS.AutoShiftUpRpm ~= nil and m > self.vehicle.mrGbMS.AutoShiftUpRpm then
-					m = self.vehicle.mrGbMS.AutoShiftUpRpm 
+				local m0 = self.maxAllowedRpm			
+				if self.vehicle.mrGbMS.AutoShiftUpRpm ~= nil    and m0 > self.vehicle.mrGbMS.AutoShiftUpRpm then
+					m0 = self.vehicle.mrGbMS.AutoShiftUpRpm 
 				end
-				if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and m > self.vehicle.mrGbMS.HydrostaticMaxRpm then
-					m = self.vehicle.mrGbMS.HydrostaticMaxRpm
+				if self.vehicle.mrGbMS.HydrostaticMaxRpm ~= nil and m0 > self.vehicle.mrGbMS.HydrostaticMaxRpm then
+					m0= self.vehicle.mrGbMS.HydrostaticMaxRpm
 				end
+				local m = m0
 				
 				-- min / max RPM with PTO
 				local d = mrGearboxMogli.hydroEffDiff + ( 1 - accelerationPedal ) * mrGearboxMogli.hydroEffDiffInc
@@ -6735,8 +6820,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					d = mrGearboxMogli.ptoRpmThrottleDiff
 				end
 				
-				n = math.max( n, self.targetRpm - d )
-				m = math.min( m, self.targetRpm + d )
+				n = math.max( n, t - d )
+				m = math.min( m, t + d )
 				
 				-- boundaries hStart, hMin & hMax
 				local hMax0 = self.vehicle.mrGbMS.HydrostaticMax			
@@ -6788,7 +6873,23 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					if      self.vehicle:mrGbMGetAutomatic()
 							and isValidEntry 
 							and g ~= currentGear then
-						if self.vehicle.mrGbMS.AutoShiftTimeoutLong > 0 then								
+					--if     w < hMin * self.nonClampedMotorRpm
+					--		or w > hMax * self.nonClampedMotorRpm then
+					--	isValidEntry = false
+					--end
+						if     spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
+							if self.hydrostaticFactor > hMin + mrGearboxMogli.eps then
+							isValidEntry = false
+							end
+						elseif spd > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
+							if self.hydrostaticFactor < hMax - mrGearboxMogli.eps then
+							isValidEntry = false
+							end
+						end
+						
+						if not isValidEntry then
+						-- nothing 
+						elseif self.vehicle.mrGbMS.AutoShiftTimeoutLong > 0 then								
 							local autoShiftTimeout = 0
 							if     spd < self.vehicle.mrGbML.currentGearSpeed - mrGearboxMogli.eps then
 								autoShiftTimeout = downTimer							
@@ -6805,7 +6906,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							end
 						end
 						
-						if      self.deltaRpm < -mrGearboxMogli.autoShiftMaxDeltaRpm
+						if not isValidEntry then
+						--nothing
+						elseif  self.deltaRpm < -mrGearboxMogli.autoShiftMaxDeltaRpm
 								and spd           > self.vehicle.mrGbML.currentGearSpeed + mrGearboxMogli.eps then
 							isValidEntry = false
 						elseif  self.deltaRpm > mrGearboxMogli.autoShiftMaxDeltaRpm
@@ -6841,11 +6944,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						local h = self.hydrostaticFactor
 						local lastH = self.hydrostaticFactor
 						
-						-- smooth shifting 
-						if g ~= currentGear and self.nonClampedMotorRpm > 1 then
-							lastH = Utils.clamp( w / self.nonClampedMotorRpm, hMin, hMax )  
-						--c = w / self.hydrostaticFactor
-						end
+					---- smooth shifting 
+					--if g ~= currentGear and self.nonClampedMotorRpm > 1 then
+					--	lastH = Utils.clamp( w / self.nonClampedMotorRpm, hMin, hMax )  
+					----c = w / self.hydrostaticFactor
+					--end
 						
 						-- calculated target hydrostatic factor w/o HydrostaticIncFactor
 						if     hMin >= hMax then
@@ -6895,22 +6998,48 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						
 						-- now apply HydrostaticIncFactor
 						local hr = h
-						if     h > lastH then
-							h = lastH + math.min( h - lastH,  self.tickDt * self.vehicle.mrGbMS.HydrostaticIncFactor )				
+						if      self.vehicle.mrGbMS.GearTimeToShiftGear < self.vehicle.mrGbMG.shiftEffectTime
+								and not lastNoTransmission
+								and ( clutchMode > 1 or ( g ~= currentGear and self.nonClampedMotorRpm > 1 ) ) then
+						-- after gear shift
+						elseif h > lastH then
+							h = math.max( lastH + dtSmoothBase * ( h - lastH )      * self.vehicle.mrGbMS.HydrostaticSmIFactor,
+							              lastH + math.min( h - lastH,  self.tickDt * self.vehicle.mrGbMS.HydrostaticIncFactor ) )				
 						elseif h < lastH then
-							local f = self.vehicle.mrGbMS.HydrostaticDecFactor
-							if     c < self.stallRpm then
-								f = 1
-							elseif self.vehicle.mrGbMS.HydrostaticDecFactor < self.vehicle.mrGbMS.HydrostaticIncFactor then
-								if self.vehicle.steeringEnabled then
-									f = accelerationPedal * ( self.vehicle.mrGbMS.HydrostaticIncFactor - self.vehicle.mrGbMS.HydrostaticDecFactor ) + self.vehicle.mrGbMS.HydrostaticDecFactor
-								else
-									f = self.vehicle.mrGbMS.HydrostaticIncFactor
-								end
-							end
-							h = lastH + math.max( h - lastH, -self.tickDt * f )
+							h = math.min( lastH + dtSmoothBase * ( h - lastH )      * self.vehicle.mrGbMS.HydrostaticSmDFactor,
+														lastH + math.max( h - lastH, -self.tickDt * self.vehicle.mrGbMS.HydrostaticDecFactor ) )
 						end
 						
+						if g == currentGear and math.abs( h - hr ) > mrGearboxMogli.eps then
+							local urgency = 0
+							local newRpm  = w
+							if     w < mrGearboxMogli.eps      then
+								newRpm = 0
+							elseif w > mrGearboxMogli.huge * h then
+								newRpm = mrGearboxMogli.huge
+							else
+								newRpm = w / h
+							end
+							
+							if     newRpm <= minRpmReduced then
+								urgency = 1
+							elseif newRpm >= m0 then
+								urgency = 1 
+							elseif newRpm < n then
+								urgency = ( n - newRpm ) / ( n - minRpmReduced ) 
+							elseif newRpm > m then
+								urgency = ( newRpm - m ) / ( m0 - m ) 
+							end
+														
+							if urgency > mrGearboxMogli.eps then
+							--print(string.format("%1.3f, %1.3f, %4.1f, check: %4.1f, %4.1f <= %4.1f <= %4.1f, %4.1f urgency: %1.3f",h, hr, w, minRpmReduced, n, newRpm, m, m0, urgency ))
+								h = h + urgency * ( hr - h )
+							end
+						end
+						
+					--if g == currentGear and self.stallRpm > 10 then
+					--	h = math.min( h, math.max( w / self.stallRpm, hMin ) )
+					--end
 						
 						local e = 0
 						if      ( self.vehicle:mrGbMGetAutomatic() 
@@ -6919,7 +7048,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						end
 												
 						if mrGearboxMogli.debugGearShift then
-							print(string.format("g: %1d target: %4.0f c: %4.0f w: %4.0f r: %4.0f hMin: %0.3f hMax: %0.3f h: %0.3f hr: %0.3f e: %0.3f",g,self.targetRpm,c,w,r,hMin,hMax,h,hr,e))
+							print(string.format("g: %1d target: %4.0f c: %4.0f w: %4.0f r: %4.0f hMin: %0.3f hMax: %0.3f h: %0.3f hr: %0.3f hl: %0.3f e: %0.3f cm: %d lnt: ",g,t,c,w,r,hMin,hMax,h,hr,lastH,e,clutchMode)..tostring(lastNoTransmission))
 						end
 						
 						if self.vehicle:mrGbMGetAutomatic() then
