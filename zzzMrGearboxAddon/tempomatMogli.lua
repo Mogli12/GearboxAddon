@@ -7,7 +7,7 @@
 --
 --***************************************************************
 
-local tempomatMogliVersion=1.300
+local tempomatMogliVersion=1.400
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version < tempomatMogliVersion then
@@ -16,20 +16,22 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	if _G[g_currentModName..".mogliBase"] == nil then
 		source(Utils.getFilename("mogliBase.lua", g_currentModDirectory))
 	end
-	_G[g_currentModName..".mogliBase"].newClass( "tempomatMogli", "tempomatMogli" )
+	_G[g_currentModName..".mogliBase"].newClass( "tempomatMogli", "tempomatMogliV14" )
 --***************************************************************
 	
 	tempomatMogli.version = tempomatMogliVersion
+	local l_currentModName = g_currentModName
 	
 	--**********************************************************************************************************	
 	-- tempomatMogli:load
 	--**********************************************************************************************************	
 	function tempomatMogli:load(xmlFile) 
 		-- state
-		self.tempomatMogli = {}
-		tempomatMogli.registerState( self, "SpeedLimit2", 10 )
+		self.tempomatMogliV14 = {}
+		tempomatMogli.registerState( self, "SpeedLimit2",    10 )
 		tempomatMogli.registerState( self, "KeepSpeed",   false )
-	
+		self.tempomatMogliV14.modName = l_currentModName
+		
 		self.tempomatMogliSetSpeedLimit  = tempomatMogli.tempomatMogliSetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit  = tempomatMogli.tempomatMogliGetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit2 = tempomatMogli.tempomatMogliGetSpeedLimit2
@@ -57,44 +59,158 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		else
 			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
 		end
+		
+		if self.isServer then
+			if     self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE 
+					or ( self.movingDirection   <= 0 
+					 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) ) then
+				self.tempomatMogliV14.keepSpeedLimit = nil		
+			elseif self.tempomatMogliV14.KeepSpeed then
+				if     self.tempomatMogliV14.keepSpeedLimit == nil then
+					self.tempomatMogliV14.lastAxisFoward = 0
+					self.tempomatMogliV14.keepSpeedLimit = math.max( self.lastSpeedReal*3600, tempomatMogli.getMinSpeed( self, true ) )
+				end
+			elseif self.tempomatMogliV14.keepSpeedLimit ~= nil then
+				self.tempomatMogliV14.keepSpeedLimit = nil		
+			end
+		end
+	end
+	
+	--**********************************************************************************************************	
+	-- tempomatMogli:getMinSpeed
+	--**********************************************************************************************************	
+	function tempomatMogli:getMinSpeed( inKmH )
+		local minSpeed = 2
+		
+		if      self.mrGbMS          ~= nil
+				and self.mrGbMD          ~= nil
+				and not ( self.mrGbMS.Hydrostatic ) 
+				and self.mrGbMD.Speed    ~= nil
+				and self.mrGbMD.Speed     > 0
+				and self.mrGbMS.IdleRpm	 ~= nil
+				and self.mrGbMS.RatedRpm ~= nil then
+			minSpeed = math.max( minSpeed, self.mrGbMD.Speed ) * self.mrGbMS.IdleRpm	/ self.mrGbMS.RatedRpm
+		end
+		
+		if not ( inKmH ) then
+			minSpeed = minSpeed / 3.6
+		end
+		
+		return minSpeed 
+	end
+	
+	--**********************************************************************************************************	
+	-- tempomatMogli:getMaxSpeed
+	--**********************************************************************************************************	
+	function tempomatMogli:getMaxSpeed( inKmH )
+		if self.motor == nil then
+			return math.huge
+		end
+	
+		local isRev    = false
+		
+		if      self.mrGbMS ~= nil
+				and self.mrGbMS.IsOn then
+			isRev = self.mrGbMS.ReverseActive
+			if self.isReverseDriving then isRev = not ( isRev ) end
+		elseif  g_currentMission.driveControl ~= nil
+				and g_currentMission.driveControl.useModules ~= nil
+				and g_currentMission.driveControl.useModules.shuttle 
+				and self.driveControl ~= nil 
+				and self.driveControl.shuttle ~= nil 
+				and self.driveControl.shuttle.direction ~= nil 
+				and self.driveControl.shuttle.isActive then
+			if self.driveControl.shuttle.direction < 0 then
+				isRev = true
+			end
+		else
+			if self.movingDirection < 0 then
+				isRev = true
+			end
+		end
+		
+		local maxSpeed = self.motor.maxForwardSpeed
+		if iRev then
+			maxSpeed = self.motor.maxBackwardSpeed 
+		end		
+		maxSpeed = maxSpeed + 0.0833333333333333333333333333333
+		if inKmH then
+			maxSpeed = maxSpeed * 3.6
+		end
+		
+		return maxSpeed 
 	end
 	
 	--**********************************************************************************************************	
 	-- tempomatMogli:newUpdateVehiclePhysics
 	--**********************************************************************************************************	
 	function tempomatMogli:newUpdateVehiclePhysics( superFunc, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
-		if self.tempomatMogli == nil then
+		if     self.tempomatMogliV14                == nil 
+				or self.tempomatMogliV14.keepSpeedLimit == nil
+				or self.tempomatMogliV14.modName        == nil
+				or self.tempomatMogliV14.modName        ~= l_currentModName then
 			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		end
 		
-		local tempState   = self.cruiseControl.state
-		local tempSpeed1 = self.motor.speedLimit
-		local tempSpeed2 = self.cruiseControl.speed
+		if type( self.mrGbMSetNeutralActive ) == "function" then
+			self:mrGbMSetNeutralActive( false )
+		end
 		
-		if     self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE 
-				or ( self.movingDirection   <= 0 
-				 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) ) then
-			self.tempomatMogli.keepSpeedLimit = nil		
-		elseif self.tempomatMogli.KeepSpeed then
-			if     self.tempomatMogli.keepSpeedLimit == nil 
-					or math.abs( axisForward )           >  0.3 then
-				self.tempomatMogli.keepSpeedLimit = math.max( 2, self.lastSpeedReal*3600 - axisForward * dt * 5 * math.max( 0.001, self.lastSpeedReal - 0.002 ) )
+		local currentSpeed  = self.lastSpeedReal*3600
+		local inAxisForward = axisForward
+		if     axisForward <= -0.2 then
+		-- accelerate by 1 m/s^2
+			if self.tempomatMogliV14.keepSpeedLimit < currentSpeed + 2 then
+				self.tempomatMogliV14.keepSpeedLimit = math.min( math.max( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0036, tempomatMogli.getMaxSpeed( self, true ) )
 			end
-			self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_ACTIVE
-			self.motor.speedLimit    = self.tempomatMogli.keepSpeedLimit
-			self.cruiseControl.speed = self.tempomatMogli.keepSpeedLimit
-			axisForward              = 0
-		elseif self.tempomatMogli.keepSpeedLimit ~= nil then
-			self.tempomatMogli.keepSpeedLimit = nil		
+		elseif axisForward >= 0.2 then	
+		-- decelerate by 2 m/s^2 
+			if self.tempomatMogliV14.keepSpeedLimit > currentSpeed - 2 then
+				self.tempomatMogliV14.keepSpeedLimit = math.max( math.min( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0072, 1 )
+			end
+		end
+	
+		axisForwardIsAnalog      = true
+		axisForward              = 0
+		
+		local delta = currentSpeed - self.tempomatMogliV14.keepSpeedLimit
+		if math.abs( delta ) < 0.3 then
+			if inAxisForward >=  0.2 then
+				axisForward = 0.01
+			else
+				axisForward = 0
+			end
+		elseif delta < -2 then
+			axisForward = -1
+			self.tempomatMogliV14.lastAxisFoward = axisForward
+		elseif delta >  2 then
+			axisForward = 1
+			self.tempomatMogliV14.lastAxisFoward = axisForward
+		elseif delta <  0 then
+			axisForward = 0.5 * delta
+			self.tempomatMogliV14.lastAxisFoward = math.min( self.tempomatMogliV14.lastAxisFoward, 0 )
+		else
+			axisForward = 0.5 * delta
+			self.tempomatMogliV14.lastAxisFoward = math.max( self.tempomatMogliV14.lastAxisFoward, 0 )
+		end
+		
+		local dtSmoothBase   = 0.3 * ( dt * 0.06 + math.sqrt( dt * 0.06 ) )
+		
+		self.tempomatMogliV14.lastAxisFoward = self.tempomatMogliV14.lastAxisFoward + 0.1 * dtSmoothBase * ( axisForward - self.tempomatMogliV14.lastAxisFoward )
+		
+		if     inAxisForward <= -0.2 and axisForward > 0 then
+			axisForward = 0
+		elseif inAxisForward >=  0.2 and axisForward < 0 then
+			axisForward = 0
+	--else
+	--	axisForward = self.tempomatMogliV14.lastAxisFoward
 		end
 		
 		superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
 		
-		self.cruiseControl.state = tempState
-		self.motor.speedLimit    = tempSpeed1
-		self.cruiseControl.speed = tempSpeed2
-		
-		return 
+		if inAxisForward <= 0.2 and 0 < axisForward and axisForward < 0.5 then
+			self.setBrakeLightsVisibility(self, false)
+		end
 	end
 	
 	function tempomatMogli:newDrivableOnLeave( superFunc )
@@ -132,14 +248,14 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	-- tempomatMogli:tempomatMogliSetSpeedLimit2
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliGetSpeedLimit2( )
-		return self.tempomatMogli.SpeedLimit2
+		return self.tempomatMogliV14.SpeedLimit2
 	end 
 	
 	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSwapSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliSwapSpeedLimit( noEventSend )
-		local speed1 = self.tempomatMogli.SpeedLimit2
+		local speed1 = self.tempomatMogliV14.SpeedLimit2
 		local speed2 = self.cruiseControl.speed
 		self:setCruiseControlMaxSpeed(speed1)
 		tempomatMogli.mbSetState( self, "SpeedLimit2", speed2, noEventSend ) 		
@@ -152,9 +268,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	
 		local attributes = ""
 	
-		if self.tempomatMogli ~= nil then
-			if self.tempomatMogli.SpeedLimit2 <= 9 or self.tempomatMogli.SpeedLimit2 >= 11 then
-				attributes = attributes.." mrGbMSpeed2=\"" .. tostring( self.tempomatMogli.SpeedLimit2 ) .. "\""     
+		if self.tempomatMogliV14 ~= nil then
+			if self.tempomatMogliV14.SpeedLimit2 <= 9 or self.tempomatMogliV14.SpeedLimit2 >= 11 then
+				attributes = attributes.." mrGbMSpeed2=\"" .. tostring( self.tempomatMogliV14.SpeedLimit2 ) .. "\""     
 			end
 		end 
 		
@@ -167,10 +283,10 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		local i
 		
-		if self.tempomatMogli ~= nil then
+		if self.tempomatMogliV14 ~= nil then
 			i = getXMLInt(xmlFile, key .. "#mrGbMSpeed2" )
 			if i ~= nil then
-				self.tempomatMogli.SpeedLimit2 = i
+				self.tempomatMogliV14.SpeedLimit2 = i
 			end
 		end
 		
