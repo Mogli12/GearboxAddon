@@ -83,6 +83,7 @@ mrGearboxMogli.extraSpeedLimitMs    = 5 / 72
 mrGearboxMogli.speedLimiterMode     = "A" -- "A"ccelerate / max "R"PM
 mrGearboxMogli.deltaLimitMax        = 10
 mrGearboxMogli.deltaLimitFactor     = 0.5
+mrGearboxMogli.deltaLimitClutch     = 100
 
 mrGearboxMogliGlobals                       = {}
 mrGearboxMogliGlobals.debugPrint            = false
@@ -6040,12 +6041,36 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		
 	if     self.noTorque       then
 		torque         = 0
-		self.torqueS   = nil	
+		self.torqueS   = nil
+		
 	elseif torque <= 0 then
 		self.lastMissingTorque = self.lastMissingTorque - torque
 		torque = 0
-		
+	elseif acc    <= 0 then
+		torque = 0
 	else
+		local t0 = torque 
+		
+		if self.vehicle.mrGbMS.PowerManagement then
+			local p1 = rpm * ( self.lastMotorTorque - self.lastPtoTorque )
+			local p0 = 0
+			if self.vehicle.mrGbMS.EcoMode then
+				p0 = self.currentMaxPower
+			else
+				p0 = self.maxPower
+			end
+			p0 = acc * ( p0 - rpm * self.lastPtoTorque )
+			
+			if     0  >= p0 then
+				acc = acc
+			elseif p0 >= p1 then
+				acc = 1
+			elseif p1 * acc < p0 then
+				acc = p0 / p1
+			end
+		end
+			
+		torque = torque * acc	
 	
 		local limit = self.maxPossibleRpm
 		if      not self.noTransmission 
@@ -6059,7 +6084,10 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 		
 		local deltaLimit = 0 
 		if self.maxRpmIncrease > 0 then
-			delltaLimit = math.min( mrGearboxMogli.deltaLimitFactor * self.maxRpmIncrease, mrGearboxMogli.deltaLimitMax )
+			deltaLimit = math.min( mrGearboxMogli.deltaLimitFactor * self.maxRpmIncrease, mrGearboxMogli.deltaLimitMax )
+		end
+		if 0 <= self.clutchPercent and self.clutchPercent < 1 then
+			deltaLimit = math.max( deltaLimit, mrGearboxMogli.deltaLimitClutch * ( 1-self.clutchPercent ) )
 		end
 		
 		if     deltaLimit              <= mrGearboxMogli.eps then
@@ -6074,39 +6102,17 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.lastLimitDeltaTorque = torque 
 		else                                 --   980                    + 10         - 990 =>  0 / 20 => 0
 		                                     --  1000                    + 10         - 990 => 20 / 20 => 1
-			self.lastLimitDeltaTorque = torque * ( self.nonClampedMotorRpm + deltaLimit - limit ) / ( deltaLimit + deltaLimit )
+			self.lastLimitDeltaTorque = t0 * ( self.nonClampedMotorRpm + deltaLimit - limit ) / ( deltaLimit + deltaLimit )
+		end
+		
+		if self.lastLimitDeltaTorque > torque then
+			self.lastLimitDeltaTorque = torque
 		end
 		
 		if self.lastLimitDeltaTorque > 0 then
-			torque               = torque               - self.lastLimitDeltaTorque 
 			self.lastMotorTorque = self.lastMotorTorque - self.lastLimitDeltaTorque
-		end
-		
-		if torque  <= 0 then
-		elseif acc <= 0 then
-			torque = 0
-		else
-			if self.vehicle.mrGbMS.PowerManagement then
-				local p1 = rpm * ( self.lastMotorTorque - self.lastPtoTorque )
-				local p0 = 0
-				if self.vehicle.mrGbMS.EcoMode then
-					p0 = self.currentMaxPower
-				else
-					p0 = self.maxPower
-				end
-				p0 = acc * ( p0 - rpm * self.lastPtoTorque )
-				
-				if     0  >= p0 then
-					acc = acc
-				elseif p0 >= p1 then
-					acc = 1
-				elseif p1 * acc < p0 then
-					acc = p0 / p1
-				end
-			end
-			
-			torque = torque * acc
-		end
+			torque               = torque               - self.lastLimitDeltaTorque 
+		end		
 	end
 	
 	if limitRpm then
@@ -7798,7 +7804,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	else
 		self.maxRpmIncrease = self.tickDt * self.vehicle.mrGbMS.RpmIncFactor
 
-	--local m = self.nonClampedMotorRpm --math.max( self.nonClampedMotorRpm, self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * self.maxAllowedRpm )
 		local m = self.lastMotorRpm
 		if m > lastMaxPossibleRpm then
 			m = lastMaxPossibleRpm
@@ -7809,6 +7814,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		if m < self.idleRpm then
 			m = self.idleRpm 
 		end
+		
 		self.maxPossibleRpm = m + self.maxRpmIncrease
 		if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect then
 			if self.maxPossibleRpm > self.vehicle.mrGbML.afterShiftRpm then
