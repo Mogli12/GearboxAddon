@@ -2002,6 +2002,67 @@
 	</vehicle>	
 	
 	<vehicle>
+		<mod name="FendtFavorit_512C">
+			<xmlFile name="Fendt512C.xml"/>
+		</mod>
+		
+		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Fendt_Favorit_512_C -->
+		<gearboxMogli speedLimiter="false" autoStartStop="true" ptoRpm="2100" ptoRpmEco="1600" clutchOpenRpm="1300" clutchCloseRpm="1400" torqueConverter="true">
+			<gears defaultGear="1" clutchRatio="1" shiftTimeMs="0">	
+				<gear speed="25.63" name="I" />
+				<gear speed="30.69" name="II" />
+				<gear speed="36.90" name="III" />
+				<gear speed="44.18" name="IV" />
+			</gears>
+			
+			<ranges defaultRange="5" shiftTimeMs="800" clutchRatio="0.3125">
+				<range ratio="0.121521663" name="1" />
+				<range ratio="0.200774921" name="2" />
+				<range ratio="0.306093695" name="3" />
+				<range ratio="0.452624163" name="4" />
+				<range ratio="0.705882353" name="5" />
+				<range ratio="1"           name="6" />
+			</ranges>
+			
+			<ranges defaultRange="2" clutchRatio="0.3125">
+				<range ratio="0.139" name="Kriechgang" maxRange="5"/>
+				<range ratio="1.0"   name="" />
+			</ranges>
+			
+			<reverse ratio="0.97778" shiftTimeMs="500" clutchRatio="0.3125" resetRange="false" resetGear="false"/>
+			
+			<realEngine idleRpm="900" ratedRpm="2300">		
+        <!-- 2200: 126(126) | 2300: 125(125) | 1500..1500: 496(496) | 93 | 0.7 | 149 | 2 | 2400 | 1460: 220 -->
+        <torque rpm="350" motorTorque="320" fuelUsageRatio="258.4"/>
+        <torque rpm="700" motorTorque="435" fuelUsageRatio="238"/>
+        <torque rpm="900" motorTorque="461" fuelUsageRatio="229.8"/>
+        <torque rpm="1000" motorTorque="472" fuelUsageRatio="226.6"/>
+        <torque rpm="1100" motorTorque="481" fuelUsageRatio="224"/>
+        <torque rpm="1200" motorTorque="487" fuelUsageRatio="222.1"/>
+        <torque rpm="1300" motorTorque="492" fuelUsageRatio="220.8"/>
+        <torque rpm="1400" motorTorque="495" fuelUsageRatio="220.1"/>
+        <torque rpm="1500" motorTorque="496" fuelUsageRatio="220.1"/>
+        <torque rpm="1600" motorTorque="486" fuelUsageRatio="220.7"/>
+        <torque rpm="1700" motorTorque="475" fuelUsageRatio="222"/>
+        <torque rpm="1800" motorTorque="463" fuelUsageRatio="224"/>
+        <torque rpm="1850" motorTorque="456" fuelUsageRatio="225.3"/>
+        <torque rpm="1900" motorTorque="449" fuelUsageRatio="226.7"/>
+        <torque rpm="1950" motorTorque="442" fuelUsageRatio="228.3"/>
+        <torque rpm="2000" motorTorque="435" fuelUsageRatio="230.1"/>
+        <torque rpm="2050" motorTorque="427" fuelUsageRatio="232.1"/>
+        <torque rpm="2100" motorTorque="419" fuelUsageRatio="234.2"/>
+        <torque rpm="2150" motorTorque="411" fuelUsageRatio="236.5"/>
+        <torque rpm="2200" motorTorque="402" fuelUsageRatio="239"/>
+        <torque rpm="2250" motorTorque="392" fuelUsageRatio="241.6"/>
+        <torque rpm="2300" motorTorque="382" fuelUsageRatio="244.4"/>
+        <torque rpm="2350" motorTorque="339" fuelUsageRatio="260.4"/>
+        <torque rpm="2400" motorTorque="210" fuelUsageRatio="334.6"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="488.9"/>
+			</realEngine>			
+		</gearboxMogli>			
+	</vehicle>				
+	
+	<vehicle>
 		<mod name="Fendt611">
 			<xmlFile name="Fendt611LSA.xml"/>
 		</mod>
@@ -2062,10 +2123,10 @@
 	
 		<gearboxMogli autoStartStop="true" clutchOpenRpm="1300" clutchCloseRpm="1500" torqueConverter="true" minClutchRatio="0.3125" ptoRpm="2031" ptoRpmEco="1598" maxForwardSpeed="51" maxBackwardSpeed="41">
 			<gears defaultGear="1" shiftTimeMs="0" speedMatching="true" clutchRatio="1.0">	
-				<gear speed="28.39" />
-				<gear speed="34.06" />
-				<gear speed="40.86" />
-				<gear speed="49.02" />
+				<gear speed="28.39" name="I"/>
+				<gear speed="34.06" name="II"/>
+				<gear speed="40.86" name="III"/>
+				<gear speed="49.02" name="IV"/>
 			</gears>
 			
 			<ranges defaultRange="5" shiftTimeMs="800" clutchRatio="0.3125">
@@ -2082,7 +2143,7 @@
 				<range ratio="1.0"   name="" />
 			</ranges>
 			
-			<reverse ratio="1" shiftTimeMs="500" clutchRatio="0.3125" resetRange="false" resetGear="false"/>
+			<reverse ratio="0.97778" shiftTimeMs="500" clutchRatio="0.3125" resetRange="false" resetGear="false"/>
 			
 			<realEngine idleRpm="900" ratedRpm="2200">
         <!-- 2000: 240(240) | 2200: 230(230) | 1400..1400: 947(947) | 65 | 0.5 | 149 | 2 | 2300 | 1400: 210 -->
@@ -5217,7 +5278,7 @@
 
 		<mod name="Claas_Lexion600_Pack" xmlName="claasLexion600.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="32" maxBackwardSpeed="32" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="10.5" minRpm="1600" maxRpm="1800"/> 
 			<blowOffVentilSound volume="0"/>
 			

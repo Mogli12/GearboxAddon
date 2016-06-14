@@ -169,48 +169,11 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				self.tempomatMogliV14.keepSpeedLimit = math.max( math.min( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0072, 1 )
 			end
 		end
-	
-		axisForwardIsAnalog      = true
-		axisForward              = 0
-		
-		local delta = currentSpeed - self.tempomatMogliV14.keepSpeedLimit
-		if math.abs( delta ) < 0.3 then
-			if inAxisForward >=  0.2 then
-				axisForward = 0.01
-			else
-				axisForward = 0
-			end
-		elseif delta < -2 then
-			axisForward = -1
-			self.tempomatMogliV14.lastAxisFoward = axisForward
-		elseif delta >  2 then
-			axisForward = 1
-			self.tempomatMogliV14.lastAxisFoward = axisForward
-		elseif delta <  0 then
-			axisForward = 0.5 * delta
-			self.tempomatMogliV14.lastAxisFoward = math.min( self.tempomatMogliV14.lastAxisFoward, 0 )
-		else
-			axisForward = 0.5 * delta
-			self.tempomatMogliV14.lastAxisFoward = math.max( self.tempomatMogliV14.lastAxisFoward, 0 )
-		end
-		
-		local dtSmoothBase   = 0.3 * ( dt * 0.06 + math.sqrt( dt * 0.06 ) )
-		
-		self.tempomatMogliV14.lastAxisFoward = self.tempomatMogliV14.lastAxisFoward + 0.1 * dtSmoothBase * ( axisForward - self.tempomatMogliV14.lastAxisFoward )
-		
-		if     inAxisForward <= -0.2 and axisForward > 0 then
-			axisForward = 0
-		elseif inAxisForward >=  0.2 and axisForward < 0 then
-			axisForward = 0
-	--else
-	--	axisForward = self.tempomatMogliV14.lastAxisFoward
-		end
-		
-		superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
-		
-		if inAxisForward <= 0.2 and 0 < axisForward and axisForward < 0.5 then
-			self.setBrakeLightsVisibility(self, false)
-		end
+
+		local temp = self.motor.speedLimit 
+		self.motor.speedLimit = math.min( temp, self.tempomatMogliV14.keepSpeedLimit )
+		superFunc( self, -1, false, axisSide, axisSideIsAnalog, dt, ... )
+		self.motor.speedLimit = temp
 	end
 	
 	function tempomatMogli:newDrivableOnLeave( superFunc )

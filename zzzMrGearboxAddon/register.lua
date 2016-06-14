@@ -38,7 +38,8 @@ function mrGearboxMogliRegister:add()
 
 	local searchTable  = { "mrGearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox", "gearboxMogli" };	
 	local searchTable2 = { "tempomat", "tempomatMogli" };	
-	local replObj      = SpecializationUtil.getSpecialization("mrGearboxMogli")
+	local replObj1     = SpecializationUtil.getSpecialization("mrGearboxMogli")
+	local replObj2     = SpecializationUtil.getSpecialization("tempomatMogli")
 	
 	local updatedMods  = 0
 	local insertedMods = 0
@@ -49,30 +50,30 @@ function mrGearboxMogliRegister:add()
 	
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
 		local modName            = string.match(k, "([^.]+)");
-		local addSpecialization  = true;
+		local addSpecialization1 = true;
 		local addSpecialization2 = true;
 		local correctLocation    = false;
 		
 		if modName ~= nil and modName ~= "" and modName.mrGearboxMogli ~= nil then
-			addSpecialization = false;
+			addSpecialization1 = false;
 			
 		else
 			for _, search in pairs(searchTable) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
-					addSpecialization = false;
+					addSpecialization1 = false;
 					print(string.format("zzzMrGearboxAddon: %s already has a gearbox (2)", modName))
 					
 					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
 					
 					if     obj == nil then
 						print("zzzMrGearboxAddon: obj is nil")
-					elseif obj.version ~= nil and obj.version >= replObj.version then
-						print("zzzMrGearboxAddon: obj.version >= replObj.version")
+					elseif obj.version ~= nil and obj.version >= replObj1.version then
+						print("zzzMrGearboxAddon: obj.version >= replObj1.version")
 					else
-				--if obj ~= nil and obj.version ~= nil and obj.version < replObj.version then
+				--if obj ~= nil and obj.version ~= nil and obj.version < replObj1.version then
 						for i,o in pairs(v.specializations) do
 							if o == obj then
-								v.specializations[i] = replObj 
+								v.specializations[i] = replObj1 
 								print(string.format("zzzMrGearboxAddon: !!!updating gearbox in %s!!!", modName))
 								
 								updatedMods = updatedMods + 1
@@ -85,11 +86,30 @@ function mrGearboxMogliRegister:add()
 			end;
 		end;
 		
-		if addSpecialization then
+		if addSpecialization1 then
 			for _, search in pairs(searchTable2) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
 					addSpecialization2 = false;
-					print(string.format("tempomatMogli: %s already has cruise control", modName))
+					print(string.format("zzzMrGearboxAddon: %s already has cruise control", modName))
+
+					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
+					
+					if     obj == nil then
+						print("zzzMrGearboxAddon: obj2 is nil")
+					elseif obj.version ~= nil and obj.version >= replObj2.version then
+						print("zzzMrGearboxAddon: obj2.version >= replObj2.version")
+					else
+				--if obj ~= nil and obj.version ~= nil and obj.version < replObj1.version then
+						for i,o in pairs(v.specializations) do
+							if o == obj then
+								v.specializations[i] = replObj2
+								print(string.format("zzzMrGearboxAddon: !!!updating cruise control in %s!!!", modName))
+								
+							--updatedMods2 = updatedMods2 + 1
+							end
+						end
+					end
+
 					break;
 				end;
 			end;
@@ -104,7 +124,7 @@ function mrGearboxMogliRegister:add()
 			end;
 		end;
 		
-		if addSpecialization and correctLocation then
+		if addSpecialization1 and correctLocation then
 		--print("adding: "..tostring(modName))
 			
 			table.insert(v.specializations, SpecializationUtil.getSpecialization("mrGearboxMogliLoader"));			
