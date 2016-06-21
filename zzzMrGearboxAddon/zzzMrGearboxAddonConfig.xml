@@ -517,6 +517,9 @@
 		<mod name="LS15DeutzAgroStarReihe_PumaFBM">
 			<xmlFile name="deutzAgroStar681.xml"/>
 		</mod>
+		<mod name="Deutz_AgroStar_681_HPE_by_HoFFi">
+			<xmlFile name="deutzAgroStar681.xml"/>
+		</mod>
 
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
 		<gearboxMogli autoStartStop="true" soundMaxRpm="1900">
