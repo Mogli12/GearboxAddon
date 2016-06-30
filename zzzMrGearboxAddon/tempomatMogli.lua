@@ -170,10 +170,10 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			end
 		end
 
-		local temp = self.motor.speedLimit 
-		self.motor.speedLimit = math.min( temp, self.tempomatMogliV14.keepSpeedLimit )
+		local temp1 = self.motor.speedLimit 
+		self.motor.speedLimit    = math.min( temp1, self.tempomatMogliV14.keepSpeedLimit )
 		superFunc( self, -1, false, axisSide, axisSideIsAnalog, dt, ... )
-		self.motor.speedLimit = temp
+		self.motor.speedLimit    = temp1
 	end
 	
 	function tempomatMogli:newDrivableOnLeave( superFunc )

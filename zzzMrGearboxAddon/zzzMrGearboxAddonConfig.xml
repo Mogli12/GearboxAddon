@@ -2555,31 +2555,145 @@
 	<vehicle>
 		<mod name="peterbilt_379" isPrefix="true">
 			<link href="http://americaneaglesmodding.com/index.php?action=downloads;sa=view;down=1098" />
-			<xmlFile name="Peterbilt379Daycab.xml"/>
 			<xmlFile name="Peterbilt379Daycab_LOG.xml"/>
 		</mod>
+
+		<gearboxMogli maxForwardSpeed="110" maxBackwardSpeed="30" soundMaxRpm="1400">
+			<!-- https://origin-www.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
+			<!-- https://www.youtube.com/watch?v=FTEXLzPjPXw -->
+			<realEngine idleRpm="600" ratedRpm="2100">
+        <!-- 1600: 545(545) | 2100: 550(550) | 1000..1400: 2509(2509) | 60 | 1 | 149 | 2 | 2200 | 1200: 210 -->
+        <torque rpm="350" motorTorque="518" fuelUsageRatio="228.7"/>
+        <torque rpm="700" motorTorque="1944" fuelUsageRatio="216.5"/>
+        <torque rpm="900" motorTorque="2446" fuelUsageRatio="212.3"/>
+        <torque rpm="1000" motorTorque="2509" fuelUsageRatio="211"/>
+        <torque rpm="1100" motorTorque="2509" fuelUsageRatio="210.3"/>
+        <torque rpm="1200" motorTorque="2509" fuelUsageRatio="210"/>
+        <torque rpm="1300" motorTorque="2509" fuelUsageRatio="210.3"/>
+        <torque rpm="1400" motorTorque="2509" fuelUsageRatio="211.2"/>
+        <torque rpm="1500" motorTorque="2450" fuelUsageRatio="212.6"/>
+        <torque rpm="1600" motorTorque="2392" fuelUsageRatio="214.6"/>
+        <torque rpm="1700" motorTorque="2252" fuelUsageRatio="217.2"/>
+        <torque rpm="1800" motorTorque="2129" fuelUsageRatio="220.4"/>
+        <torque rpm="1850" motorTorque="2073" fuelUsageRatio="222.2"/>
+        <torque rpm="1900" motorTorque="2021" fuelUsageRatio="224.1"/>
+        <torque rpm="1950" motorTorque="1971" fuelUsageRatio="226.2"/>
+        <torque rpm="2000" motorTorque="1925" fuelUsageRatio="228.4"/>
+        <torque rpm="2050" motorTorque="1881" fuelUsageRatio="230.8"/>
+        <torque rpm="2100" motorTorque="1839" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="1632" fuelUsageRatio="248.6"/>
+        <torque rpm="2200" motorTorque="1011" fuelUsageRatio="319.4"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine> 
+			
+			<!-- http://www.eaton.com/ecm/idcplg?IdcService=GET_FILE&dID=961900 -->
+			<gears defaultGear="8" automatic="true">	
+				<gear speed="7.28" name="LO" forwardOnly="true"/>
+				<gear speed="7.28" name="RL" reverseOnly="true"/>
+				<gear speed="10.5" name="1"  forwardOnly="true"/>
+				<gear speed="14.6" name="2"  forwardOnly="true"/>
+				<gear speed="20.4" name="3"  forwardOnly="true"/>
+				<gear speed="28.3" name="4"  forwardOnly="true"/>
+				<gear speed="27.5" name="RH" reverseOnly="true"/>
+				<gear speed="39.7" name="5L" forwardOnly="true"/>
+				<gear speed="47"   name="5H" forwardOnly="true"/>
+				<gear speed="55.2" name="6L" forwardOnly="true"/>
+				<gear speed="65.3" name="6H" forwardOnly="true"/>
+				<gear speed="77.1" name="7L" forwardOnly="true"/>
+				<gear speed="90.8" name="7H" forwardOnly="true"/>
+				<gear speed="107"  name="8L" forwardOnly="true"/>
+				<gear speed="126"  name="8H"  forwardOnly="true"/>
+			</gears>
+		</gearboxMogli>		
+	</vehicle>
+
+	<vehicle>
+		<mod name="peterbilt_379" isPrefix="true">
+			<link href="http://americaneaglesmodding.com/index.php?action=downloads;sa=view;down=1098" />
+			<xmlFile name="Peterbilt379Daycab.xml"/>
+		</mod>
+
+		<gearboxMogli maxForwardSpeed="110" maxBackwardSpeed="30" soundMaxRpm="1400">
+			<!-- https://origin-www.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
+			<!-- https://www.youtube.com/watch?v=FTEXLzPjPXw -->
+			<realEngine idleRpm="600" ratedRpm="2100">
+        <!-- 2000: 450(450) | 2100: 435(435) | 1000..1400: 2238(2238) | 60 | 1 | 149 | 2 | 2200 | 1200: 210 -->
+        <torque rpm="350" motorTorque="462" fuelUsageRatio="228.7"/>
+        <torque rpm="700" motorTorque="1734" fuelUsageRatio="216.5"/>
+        <torque rpm="900" motorTorque="2182" fuelUsageRatio="212.3"/>
+        <torque rpm="1000" motorTorque="2238" fuelUsageRatio="211"/>
+        <torque rpm="1100" motorTorque="2238" fuelUsageRatio="210.3"/>
+        <torque rpm="1200" motorTorque="2238" fuelUsageRatio="210"/>
+        <torque rpm="1300" motorTorque="2238" fuelUsageRatio="210.3"/>
+        <torque rpm="1400" motorTorque="2238" fuelUsageRatio="211.2"/>
+        <torque rpm="1500" motorTorque="2096" fuelUsageRatio="212.6"/>
+        <torque rpm="1600" motorTorque="1967" fuelUsageRatio="214.6"/>
+        <torque rpm="1700" motorTorque="1853" fuelUsageRatio="217.2"/>
+        <torque rpm="1800" motorTorque="1752" fuelUsageRatio="220.4"/>
+        <torque rpm="1850" motorTorque="1706" fuelUsageRatio="222.2"/>
+        <torque rpm="1900" motorTorque="1661" fuelUsageRatio="224.1"/>
+        <torque rpm="1950" motorTorque="1620" fuelUsageRatio="226.2"/>
+        <torque rpm="2000" motorTorque="1580" fuelUsageRatio="228.4"/>
+        <torque rpm="2050" motorTorque="1529" fuelUsageRatio="230.8"/>
+        <torque rpm="2100" motorTorque="1455" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="1291" fuelUsageRatio="248.6"/>
+        <torque rpm="2200" motorTorque="799" fuelUsageRatio="319.4"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine> 
+			
+			<!-- http://www.eaton.com/ecm/idcplg?IdcService=GET_FILE&dID=961900 -->
+			<gears defaultGear="8" automatic="true">	
+				<gear speed="7.28" name="LO" forwardOnly="true"/>
+				<gear speed="7.28" name="RL" reverseOnly="true"/>
+				<gear speed="10.5" name="1"  forwardOnly="true"/>
+				<gear speed="14.6" name="2"  forwardOnly="true"/>
+				<gear speed="20.4" name="3"  forwardOnly="true"/>
+				<gear speed="28.3" name="4"  forwardOnly="true"/>
+				<gear speed="27.5" name="RH" reverseOnly="true"/>
+				<gear speed="39.7" name="5L" forwardOnly="true"/>
+				<gear speed="47"   name="5H" forwardOnly="true"/>
+				<gear speed="55.2" name="6L" forwardOnly="true"/>
+				<gear speed="65.3" name="6H" forwardOnly="true"/>
+				<gear speed="77.1" name="7L" forwardOnly="true"/>
+				<gear speed="90.8" name="7H" forwardOnly="true"/>
+				<gear speed="107"  name="8L" forwardOnly="true"/>
+				<gear speed="126"  name="8H"  forwardOnly="true"/>
+			</gears>
+		</gearboxMogli>		
+	</vehicle>
+
+	<vehicle>
 		<mod name="pete378">
-			<link href="http://www.modhoster.de/mods/peterbilt-3782D2D2" />
+			<link href="http://www.modhoster.de/mods/peterbilt-378--2" />
 			<xmlFile name="Peterbilt378.xml" />
 		</mod>
 
-		<gearboxMogli transmissionEfficiency="0.93" maxForwardSpeed="110" maxBackwardSpeed="30">
-			<!-- http://pdf.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
-			<realEngine idleRpm="1000" ratedRpm="2100">
-				<torque rpm="1000" motorTorque="2508"/>
-				<torque rpm="1100" motorTorque="2508"/>
-				<torque rpm="1200" motorTorque="2508"/>
-				<torque rpm="1300" motorTorque="2508"/>
-				<torque rpm="1400" motorTorque="2454"/>
-				<torque rpm="1500" motorTorque="2291"/>
-				<torque rpm="1600" motorTorque="2149"/>
-				<torque rpm="1700" motorTorque="2023"/>
-				<torque rpm="1800" motorTorque="1912"/>
-				<torque rpm="1900" motorTorque="1790"/>
-				<torque rpm="2000" motorTorque="1695"/>
-				<torque rpm="2100" motorTorque="1600"/>
-				<torque rpm="2200" motorTorque="678"/>
-				<torque rpm="2300" motorTorque="0"/>
+		<gearboxMogli maxForwardSpeed="110" maxBackwardSpeed="30" soundMaxRpm="1400">
+			<!-- https://origin-www.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
+			<!-- https://www.youtube.com/watch?v=FTEXLzPjPXw -->
+			<realEngine idleRpm="600" ratedRpm="2100">
+        <!-- 2000: 490(490) | 2100: 475(475) | 1000..1400: 2509(2509) | 60 | 1 | 149 | 2 | 2200 | 1200: 210 -->
+        <torque rpm="350" motorTorque="518" fuelUsageRatio="228.7"/>
+        <torque rpm="700" motorTorque="1944" fuelUsageRatio="216.5"/>
+        <torque rpm="900" motorTorque="2446" fuelUsageRatio="212.3"/>
+        <torque rpm="1000" motorTorque="2509" fuelUsageRatio="211"/>
+        <torque rpm="1100" motorTorque="2509" fuelUsageRatio="210.3"/>
+        <torque rpm="1200" motorTorque="2509" fuelUsageRatio="210"/>
+        <torque rpm="1300" motorTorque="2509" fuelUsageRatio="210.3"/>
+        <torque rpm="1400" motorTorque="2443" fuelUsageRatio="211.2"/>
+        <torque rpm="1500" motorTorque="2282" fuelUsageRatio="212.6"/>
+        <torque rpm="1600" motorTorque="2142" fuelUsageRatio="214.6"/>
+        <torque rpm="1700" motorTorque="2018" fuelUsageRatio="217.2"/>
+        <torque rpm="1800" motorTorque="1908" fuelUsageRatio="220.4"/>
+        <torque rpm="1850" motorTorque="1857" fuelUsageRatio="222.2"/>
+        <torque rpm="1900" motorTorque="1809" fuelUsageRatio="224.1"/>
+        <torque rpm="1950" motorTorque="1764" fuelUsageRatio="226.2"/>
+        <torque rpm="2000" motorTorque="1720" fuelUsageRatio="228.4"/>
+        <torque rpm="2050" motorTorque="1666" fuelUsageRatio="230.8"/>
+        <torque rpm="2100" motorTorque="1588" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="1409" fuelUsageRatio="248.6"/>
+        <torque rpm="2200" motorTorque="873" fuelUsageRatio="319.4"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
 			</realEngine> 
 			
 			<!-- http://www.eaton.com/ecm/idcplg?IdcService=GET_FILE&dID=961900 -->
@@ -2612,7 +2726,7 @@
 		<!-- Cummins ISX 600 -->
 		<gearboxMogli speedLimiter="false">
 			<!-- http://cumminsengines.com/uploads/docs/4103999.pdf -->
-			<realEngine idleRpm="1000" ratedRpm="2100">
+			<realEngine idleRpm="600" ratedRpm="2100">
         <torque rpm="0" motorTorque="0"/>
         <torque rpm="700" motorTorque="-695"/>
         <torque rpm="800" motorTorque="556"/>
@@ -5103,9 +5217,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 		</gearboxMogli>
 	</vehicle> 
@@ -5121,9 +5236,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 		</gearboxMogli>
 	</vehicle> 
@@ -5139,9 +5255,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="33"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="11" />
+				<gear name="1/2"    speed="19"/>
+				<gear name="rabbit" speed="33"/>
 			</gears>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/media_library/powertrain/mpc_powertrain/brochures/engines-eu-v.object-Single-MEDIA.download.tmp/Brosch%C3%BCre_Motoren_Euro5_klassik_DE_mkr.pdf -->
@@ -5242,9 +5359,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 	
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
@@ -5286,9 +5404,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-v/heavy-duty/om-503-la.fb0004.html -->
@@ -5326,9 +5445,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="33"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="11" />
+				<gear name="1/2"    speed="19"/>
+				<gear name="rabbit" speed="33"/>
 			</gears>
 			
 			<realEngine idleRpm="900" ratedRpm="1900">
@@ -5366,9 +5486,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="33"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="11" />
+				<gear name="1/2"    speed="19"/>
+				<gear name="rabbit" speed="33"/>
 			</gears>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
@@ -5403,9 +5524,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="33"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="11" />
+				<gear name="1/2"    speed="19"/>
+				<gear name="rabbit" speed="33"/>
 			</gears>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
@@ -5442,9 +5564,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="33"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="11" />
+				<gear name="1/2"    speed="19"/>
+				<gear name="rabbit" speed="33"/>
 			</gears>
 			
 			<!-- http://www.powertrain.mercedes-benz.com/content/powertrain/mpc/mpc_powertrain_website/de/home_mpc/powertrain/home/engines/euro-vi/heavy-duty/om-470.fb0006.html -->
@@ -5481,9 +5604,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 
 			<realEngine idleRpm="1000" ratedRpm="2200">
@@ -5522,9 +5646,10 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
-				<gear name="work"   speed="8.6" />
-				<gear name="street" speed="22.8"/>
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">	
+				<gear name="turtle" speed="8.6" />
+				<gear name="1/2 "   speed="14" />
+				<gear name="rabbit" speed="22.8"/>
 			</gears>
 		
 			<realEngine idleRpm="1000" ratedRpm="2200">
@@ -5566,9 +5691,9 @@
 			
 			<hydrostatic profile="Combine"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
-        <gear speed="5.8" name="slow"/> <!-- 0.05 1.47 4 8-->
+        <gear speed="5.8" name="turtle"/> <!-- 0.05 1.47 4 8-->
         <gear speed="11.59" name="1/2"/> <!-- 0.1 2.94 8 15-->
-        <gear speed="23.19" name="street"/> <!-- 0.2 5.89 15 31-->
+        <gear speed="23.19" name="rabbit"/> <!-- 0.2 5.89 15 31-->
       </gears>
 		
 			<!-- CAT C12 engine in lexion 480 evo -->
@@ -5647,14 +5772,16 @@
 			<xmlFile name="ClaasMega208.xml"/>
 		</mod>
 		
-		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
+		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="1000" defaultGear="2">	
-				<gear name="work"   speed="11" />
-				<gear name="street" speed="22"/>
-			</gears>
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
+        <gear speed="6.67" name="turtle"/> <!-- 0.05 1.52 4 9-->
+        <gear speed="10"   name="1/2"/> <!-- 0.08 2.29 6 14-->
+        <gear speed="15"   name="rabbit"/> <!-- 0.11 3.43 9 21-->
+      </gears>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
@@ -5688,14 +5815,16 @@
 			<xmlFile name="ClaasMega218.xml"/>
 		</mod>
 		
-		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="1" torqueConverter="true">
+		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="2">
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="1000" defaultGear="2">	
-				<gear name="work"   speed="12" />
-				<gear name="street" speed="24"/>
-			</gears>
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
+        <gear speed="7.62"  name="turtle"/> <!-- 0.05 1.74 5 11-->
+        <gear speed="11.43" name="1/2"/> <!-- 0.08 2.61 7 16-->
+        <gear speed="17.14" name="rabbit"/> <!-- 0.11 3.92 10 24-->
+      </gears>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
         <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 270(230.604545454545) | 2100: 271(218.155) | 1000..1550: 1173(1102.62) | 97 | 1 | 300 | 2.2 -->
