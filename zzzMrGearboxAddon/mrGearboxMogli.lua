@@ -6257,7 +6257,7 @@ function mrGearboxMogliMotor:updateMotorRpm( dt )
 		end
 	end
 
-	if math.abs( self:getMogliGearRatio() - math.abs(self.gearRatio) ) < mrGearboxMogli.eps then
+	if     math.abs( self:getMogliGearRatio() - math.abs(self.gearRatio) ) < mrGearboxMogli.eps then
 		self.wheelRpm = self.clutchRpm
 	elseif math.abs(self.gearRatio) < mrGearboxMogli.minGearRatio then
 		self.wheelRpm = self.vehicle.lastSpeedReal*self.vehicle.movingDirection*1000*mrGearboxMogli.factor30pi * self:getMogliGearRatio()
@@ -6465,13 +6465,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	self.absWheelSpeedRpmS  = self.absWheelSpeedRpmS + self.vehicle.mrGbML.smoothFast * ( self.absWheelSpeedRpm - self.absWheelSpeedRpmS )
 	local deltaRpm          = ( self.absWheelSpeedRpm - prevWheelSpeedRpm ) / self.tickDt         
 	self.deltaRpm           = self.deltaRpm + self.vehicle.mrGbML.smoothMedium * ( deltaRpm - self.deltaRpm )
-
-	if not ( lastNoTransmission ) then
-		self.currentRpmS  = self.lastMotorRpm --self.currentRpmS + 0.1 * ( self.nonClampedMotorRpm - self.currentRpmS )
-	end
-
-	local currentPower    = ( self.motorLoad + self.lastPtoTorque + self.lastLostTorque ) * math.max( self.prevNonClampedMotorRpm, self.idleRpm )
-	local getMaxPower     = ( self.lastMissingTorque > 0 )
+	self.currentRpmS        = self.lastMotorRpm
+	local currentPower      = ( self.motorLoad + self.lastPtoTorque + self.lastLostTorque ) * math.max( self.prevNonClampedMotorRpm, self.idleRpm )
+	local getMaxPower       = ( self.lastMissingTorque > 0 )
 	
 	if currentAbsSpeed > 3 and requestedTorque > self.lastMotorTorque - mrGearboxMogli.eps then
 		getMaxPower = true
@@ -7898,8 +7894,10 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			tab = self.lastMaxRpmTab
 		end
 		
-		local m = self.nonClampedMotorRpm
-		if type( self.lastMotorRpm ) ~= "number" then
+		local m 
+		if type( self.lastMotorRpm ) == "number" then
+			m = self.lastMotorRpm
+		else
 			print( 'ERROR in mrGearboxMogli.lua(7838): type( self.lastMotorRpm ) ~= "number"' )
 			m = self.nonClampedMotorRpm
 		end
@@ -7988,7 +7986,6 @@ end
 -- mrGearboxMogliMotor:getMotorRpm
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:getMotorRpm( )
-
 	return Utils.clamp( self.clutchPercent * self.wheelRpm + ( 1-self.clutchPercent ) * self:getThrottleRpm(),
 											self.lastMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor,
 											self.maxPossibleRpm )
