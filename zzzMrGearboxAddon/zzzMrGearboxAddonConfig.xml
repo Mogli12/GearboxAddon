@@ -5776,11 +5776,11 @@
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine"/>
+			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0.14"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
-        <gear speed="6.67" name="turtle"/> <!-- 0.05 1.52 4 9-->
-        <gear speed="10"   name="1/2"/> <!-- 0.08 2.29 6 14-->
-        <gear speed="15"   name="rabbit"/> <!-- 0.11 3.43 9 21-->
+        <gear speed="9"  name="turtle"/> 
+        <gear speed="14" name="1/2"/> 
+        <gear speed="21" name="rabbit"/>
       </gears>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
@@ -5819,11 +5819,11 @@
 			<combine defaultWidth="6.6"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine"/>
+			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0.14"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
-        <gear speed="7.62"  name="turtle"/> <!-- 0.05 1.74 5 11-->
-        <gear speed="11.43" name="1/2"/> <!-- 0.08 2.61 7 16-->
-        <gear speed="17.14" name="rabbit"/> <!-- 0.11 3.92 10 24-->
+        <gear speed="11" name="turtle"/> 
+        <gear speed="16" name="1/2"/> 
+        <gear speed="24" name="rabbit"/> 
       </gears>
 		
 			<realEngine idleRpm="900" ratedRpm="2100">
