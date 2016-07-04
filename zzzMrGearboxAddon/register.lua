@@ -123,6 +123,17 @@ function mrGearboxMogliRegister:add()
 				break;
 			end;
 		end;
+		if correctLocation then
+			correctLocation = false
+			for i = 1, table.maxn(v.specializations) do
+				local vs = v.specializations[i];
+				if      vs ~= nil 
+						and vs == SpecializationUtil.getSpecialization("motorized") then
+					correctLocation = true;
+					break;
+				end;
+			end;
+		end
 		
 		if addSpecialization1 and correctLocation then
 		--print("adding: "..tostring(modName))

@@ -60,7 +60,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
 		end
 		
-		if self.isServer then
+		if self.isServer and self.cruiseControl ~= nil then
 			if     self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE 
 					or ( self.movingDirection   <= 0 
 					 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) ) then
@@ -73,6 +73,8 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			elseif self.tempomatMogliV14.keepSpeedLimit ~= nil then
 				self.tempomatMogliV14.keepSpeedLimit = nil		
 			end
+		else
+			self.tempomatMogliV14.keepSpeedLimit = nil		
 		end
 	end
 	
