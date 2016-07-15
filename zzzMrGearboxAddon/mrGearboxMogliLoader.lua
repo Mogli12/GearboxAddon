@@ -331,8 +331,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 		
 		xmlFile = mrGearboxMogliLoader.xmlFileExt
 		entry   = mrGearboxMogliLoader.defaultConfigE[defaultConfigName]		
-		if      entry ~= nil
-				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
+		if entry ~= nil then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
 			if state and message then
 				print(string.format( "zzzMrGearboxAddon: %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
@@ -344,8 +343,7 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 
 		xmlFile = mrGearboxMogliLoader.xmlFileInt
 		entry   = mrGearboxMogliLoader.defaultConfigI[defaultConfigName]
-		if      entry ~= nil
-				and mrGearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
+		if entry ~= nil then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
 			if state and message then
 				print(string.format( "zzzMrGearboxAddon: %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
