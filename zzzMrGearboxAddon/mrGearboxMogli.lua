@@ -320,6 +320,7 @@ function mrGearboxMogli:initClient()
 	mrGearboxMogli.registerState( self, "WarningText",   "",    mrGearboxMogli.mrGbMOnSetWarningText )
 	mrGearboxMogli.registerState( self, "InfoText",      "",    mrGearboxMogli.mrGbMOnSetInfoText )
 	mrGearboxMogli.registerState( self, "MotorBrake",    false )
+	mrGearboxMogli.registerState( self, "ConstantRpm",   false )
 	
 --**********************************************************************************************************	
 -- state variables with setter methods	
@@ -805,7 +806,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			print(string.format("pwr: %4.3f sqm: %3.0f du0: %4.3f dp0: %4.3f dpi: %3.3f dc0: %4.3f dci: %3.3f || %4.3f   %4.3f ||", pwr, sqm, du0, dp0, dpi, dc0, dci, pwr/width, dp0/width ))
 		end			
 			
-		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.4 * self.mrGbMS.IdleRpm + 0.6 * self.mrGbMS.RatedRpm )
+		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.5 * self.mrGbMS.IdleRpm + 0.5 * self.mrGbMS.RatedRpm )
 		self.mrGbMS.ThreshingMaxRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm")                      , self.mrGbMS.RatedRpm )
 		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 ) * f
 		
@@ -833,7 +834,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.CruiseControlBrake      = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#cruiseControlBrake" ), self.mrGbMS.AutoStartStop)
 	
 	self.mrGbMS.OnlyHandThrottle        = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#onlyHandThrottle" ), false)
-	self.mrGbMS.MinHandThrottle         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minHandThrottle" ), 0.4)
+	self.mrGbMS.MinHandThrottle         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minHandThrottle" ), 0.5)
 	self.mrGbMS.PtoSpeedLimit	          = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#ptoSpeedLimit"), self.mrGbMG.ptoSpeedLimit )
 	
 	self.mrGbMS.MaxForwardSpeed         = getXMLFloat(xmlFile, xmlString .. "#maxForwardSpeed")
@@ -881,7 +882,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	end
 	
 	if self.mrGbMS.MaxClutchPercent > 1 then 
-		self.mrGbMS.MaxClutchPercent      = 1 
+		self.mrGbMS.MaxClutchPercent   = 1 
 	end	
 	
 	self.mrGbMS.TorqueConverterOrHydro  = false
@@ -1368,6 +1369,8 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		end
 	end
 		
+	-- start with 7 km/h with "drueckung" 15% => 8 km/h
+	self.mrGbMS.LaunchPtoSpeed     = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. "#ptolaunchSpeed"), 8 ) / 3.6 
 	self.mrGbMS.MatchRanges        = getXMLString(xmlFile, xmlString .. ".ranges(0)#speedMatching")
   self.mrGbMS.MatchGears         = getXMLString(xmlFile, xmlString .. ".gears#speedMatching")
 	
@@ -3043,7 +3046,7 @@ function mrGearboxMogli:updateTick(dt)
 						end
 						if self.motor.hydroEff ~= nil and not ( self.motor.noTransmission ) then
 							if self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin > mrGearboxMogli.eps then
-								self.mrGbMD.Hydro = 200 * ( self.motor.hydrostaticFactor - self.mrGbMS.HydrostaticMin ) / ( self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin )
+								self.mrGbMD.Hydro = 200 * Utils.clamp( ( self.motor.hydrostaticFactor - self.mrGbMS.HydrostaticMin ) / ( self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin ), 0, 1 )
 							else
 								self.mrGbMD.Hydro = 200
 							end
@@ -3060,17 +3063,6 @@ function mrGearboxMogli:updateTick(dt)
 							speed = speed * self.mrGbMS.HydrostaticMax
 						end
 						
-						if self.mrGbMS.MaxSpeedLimiter then
-							if self.mrGbMS.ReverseActive then
-								if self.motor.maxBackwardSpeed ~= nil and speed > self.motor.maxBackwardSpeed then
-									speed = self.motor.maxBackwardSpeed
-								end
-							else
-								if self.motor.maxForwardSpeed ~= nil and speed > self.motor.maxForwardSpeed then
-									speed = self.motor.maxForwardSpeed
-								end
-							end
-						end					
 						self.mrGbMD.Speed  = tonumber( Utils.clamp( math.floor( speed * 3.6 + 0.5 ), 0, 255 ))	
 					end
 					
@@ -3223,22 +3215,21 @@ function mrGearboxMogli:draw()
 			--==============================================
 			local ovRows   = 0
 			local infos    = {}
-			if gearText ~= "" and self.mrGbMD.Speed > 0 then
-				ovRows = ovRows + 1 infos[ovRows] = "gearSpeed"
+			if     self.mrGbMD.Speed > 0 then
+				if self.mrGbMS.Hydrostatic and self.mrGbMS.ConstantRpm then
+					ovRows = ovRows + 1 infos[ovRows] = "target1"		
+					ovRows = ovRows + 1 infos[ovRows] = "target2"
+				else
+					ovRows = ovRows + 1 infos[ovRows] = "speed"
+				end
 			elseif gearText ~= "" then			
 				ovRows = ovRows + 1 infos[ovRows] = "gear"
-			elseif self.mrGbMD.Speed > 0 then
-				ovRows = ovRows + 1 infos[ovRows] = "speed"
-			end
-			if self.mrGbMS.OnlyHandThrottle then
-				ovRows = ovRows + 1 infos[ovRows] = "target2"
-			end
-			if self.mrGbMS.HandThrottle > 0 then
-				ovRows = ovRows + 1 infos[ovRows] = "hand"
 			end
 			ovRows = ovRows + 1 infos[ovRows] = "rpm"
 			if self.mrGbMG.drawTargetRpm then
 				ovRows = ovRows + 1 infos[ovRows] = "target"
+			elseif self.mrGbMS.OnlyHandThrottle or self.mrGbMS.HandThrottle > 0 then
+				ovRows = ovRows + 1 infos[ovRows] = "hand"
 			end
 			if self.mrGbMG.drawReqPower  then
 				ovRows = ovRows + 1 infos[ovRows] = "power"
@@ -3275,10 +3266,17 @@ function mrGearboxMogli:draw()
 			local drawY
 			
 			local speed = self.mrGbMD.Speed
-			if self.mrGbMS.OnlyHandThrottle then
-				local ir = self.mrGbMS.IdleRpm / self.mrGbMS.RatedRpm
-				speed = speed * ( ir + self.mrGbMS.HandThrottle * ( 1 - ir ) )
-			end
+			if self.mrGbMS.MaxSpeedLimiter then
+				if self.mrGbMS.ReverseActive then
+					if self.motor.maxBackwardSpeed ~= nil then
+						speed = math.min( speed, 3.6 * self.motor.maxBackwardSpeed )
+					end
+				else
+					if self.motor.maxForwardSpeed ~= nil then
+						speed = math.min( speed, 3.6 * self.motor.maxForwardSpeed )
+					end
+				end
+			end					
 			
 			
 			for col=1,2 do
@@ -3298,71 +3296,33 @@ function mrGearboxMogli:draw()
 						end
 					elseif info == "speed" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Gear speed............")
-						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", speed ))
-						end
-					elseif info == "gearSpeed" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, gearText) 	
-						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", speed ))
-						end
-					elseif info == "rpm" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Current rpm...........")
-						else
-							local rpm = self.motor.lastMotorRpm
-							if self.isServer then
-								rpm = self.motor.lastMotorRpmS
+							local t
+							if gearText == "" then
+								t = "Max. speed"
+							else
+								t = gearText
 							end
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( rpm * 0.1 +0.5)*10)) 		
-						end
-					elseif info == "target" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Target rpm............")
+							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( self:mrGbMGetTargetRPM() * 0.1 +0.5)*10)) 		
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", speed ))
 						end
-					elseif info == "power" then
+					elseif info == "target1" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Power.................")
+							local t
+							if gearText == "" then
+								t = "Max. speed"
+							else
+								t = gearText
+							end
+							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f HP", self:mrGbMGetUsedPower() ))
-						end
-					elseif info == "load" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Load..................")
-						else
-							renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Load )) 
-						end
-					elseif info == "fuel" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Fuel used.............")
-						else
-							renderText(ovRight, drawY, deltaY, string.format("%3d l/h", self.mrGbMD.Fuel ))
-						end
-					elseif info == "clutch" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Clutch................")
-						else
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
-						end
-					elseif info == "clutch2" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Auto clutch...........")
-						else
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
-						end
-					elseif info == "hand" then
-						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Hand throttle.........")	
-						else
-							renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMS.HandThrottle * 100 + 0.5 ) ))
+							local ir = self.mrGbMS.IdleRpm / self.mrGbMS.RatedRpm
+							local sp = self.mrGbMD.Speed * ( ir + self.mrGbMS.HandThrottle * ( 1 - ir ) )
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", sp ))
 						end
 					elseif info == "target2" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Target speed..........")	
+							renderText(ovLeft, drawY, deltaY, "Target speed")	
 						else
 							local s = self.mrGbMD.Speed * self:mrGbMGetTargetRPM() / self.mrGbMS.RatedRpm
 							if self.mrGbMS.Hydrostatic then
@@ -3372,15 +3332,69 @@ function mrGearboxMogli:draw()
 						end
 					elseif info == "target3" then
 						renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMD.Hydro * 0.5 + 0.5 ) ))  		
+					elseif info == "rpm" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Current rpm")
+						else
+							local rpm = self.motor.lastMotorRpm
+							if self.isServer then
+								rpm = self.motor.lastMotorRpmS
+							end
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( rpm * 0.1 +0.5)*10)) 		
+						end
+					elseif info == "target" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Target rpm")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( self:mrGbMGetTargetRPM() * 0.1 +0.5)*10)) 		
+						end
+					elseif info == "power" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Power")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f HP", self:mrGbMGetUsedPower() ))
+						end
+					elseif info == "load" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Load")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Load )) 
+						end
+					elseif info == "fuel" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Fuel used")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3d l/h", self.mrGbMD.Fuel ))
+						end
+					elseif info == "clutch" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Clutch")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
+						end
+					elseif info == "clutch2" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Auto clutch")
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
+						end
+					elseif info == "hand" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Hand throttle")	
+						else
+						--renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMS.HandThrottle * 100 + 0.5 ) ))
+							local r = self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm )
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( r * 0.1 +0.5)*10)) 		
+						end
 					elseif info == "combine" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Combine...............")	
+							renderText(ovLeft, drawY, deltaY, "Combine")	
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3.0f t/h", self.mrGbMD.Rate ) )
 						end
 					elseif info == "pto" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "PTO Debug.............")	
+							renderText(ovLeft, drawY, deltaY, "PTO Debug")	
 						else
 							local f = math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm ) 
 							local p = f*self.motor.motorLoad     
@@ -4694,6 +4708,12 @@ function mrGearboxMogli:setLaunchGear( noEventSend, init )
 	local oldRange  = self.mrGbMS.CurrentRange
 	local gearSpeed = self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio * self.mrGbMS.GlobalRatioFactor	
 	local maxSpeed  = self.mrGbMS.LaunchGearSpeed
+	if self.mrGbMS.ConstantRpm then
+		maxSpeed      = self.mrGbMS.LaunchPtoSpeed
+		if self.mrGbMS.HandThrottle > 0 then
+			maxSpeed    = maxSpeed * self.mrGbMS.IdleRpm / ( self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) )
+		end
+	end
 	
 	if self.mrGbMS.ReverseActive then
 		gearSpeed = gearSpeed * self.mrGbMS.ReverseRatio 
@@ -4722,7 +4742,7 @@ function mrGearboxMogli:setLaunchGear( noEventSend, init )
 		end
 	end
 	
-	local dist = math.abs( self.mrGbML.currentGearSpeed - self.mrGbMS.LaunchGearSpeed )
+	local dist = math.abs( self.mrGbML.currentGearSpeed - maxSpeed )
 		
   if skip then			
 		if self:mrGbMGetAutoShiftRange() then
@@ -6516,9 +6536,11 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		handThrottle = self.vehicle.mrGbMS.HandThrottle
 	end
 	
+	local handThrottleRpm = self.idleRpm 
 	if handThrottle >= 0 then
 		self.ptoOn = true
-		self.minRequiredRpm = math.max( self.minRequiredRpm, self.idleRpm + handThrottle * math.max( 0, self.ratedRpm - self.idleRpm ) )
+		handThrottleRpm     = self.idleRpm + handThrottle * math.max( 0, self.ratedRpm - self.idleRpm )
+		self.minRequiredRpm = math.max( self.minRequiredRpm, handThrottleRpm )
 	end
 	
 	local ptoTq = self.neededPtoTorque --PowerConsumer.getTotalConsumedPtoTorque(self.vehicle)
@@ -6545,6 +6567,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.minRequiredRpm = p1
 		end
 	end
+	
+	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
 	
 	-- acceleration pedal and speed limit
 	local requestedTorque   = self.motorLoad + self.lastPtoTorque + self.lastLostTorque + self.lastMissingTorque
@@ -6601,11 +6625,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if self.vehicle.steeringEnabled and handThrottle >= 0 then
 			--targetRpmC        = math.max( self.vehicle.mrGbMS.ThreshingMinRpm, self.idleRpm + handThrottle * math.max( 0, self.ratedRpm - self.idleRpm ) )
 				targetRpmC        = self.idleRpm + handThrottle * math.max( 0, self.ratedRpm - self.idleRpm )
-				if      handThrottle  > 0
-						and targetRpmC    < self.vehicle.mrGbMS.ThreshingMinRpm 
-						and self.ratedRpm > self.idleRpm then
-					self.vehicle:mrGbMSetHandThrottle( ( self.vehicle.mrGbMS.ThreshingMinRpm - self.idleRpm ) / ( self.ratedRpm - self.idleRpm ) )
-				end
 			elseif self.lastMissingTorque > 0 then
 			--targetRpmC        = math.min( self.vehicle.mrGbMS.ThreshingMaxRpm, self.maxMaxPowerRpm )
 				targetRpmC        = self.vehicle.mrGbMS.ThreshingMaxRpm
@@ -6627,6 +6646,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		else
 			self.targetRpmC     = nil
 		end
+	end
+
+	if      handThrottle    >= 0
+			and handThrottleRpm < self.minRequiredRpm 
+			and self.ratedRpm   > self.idleRpm + mrGearboxMogli.eps then
+		self.vehicle:mrGbMSetHandThrottle( ( self.minRequiredRpm - self.idleRpm ) / ( self.ratedRpm - self.idleRpm ) )
 	end
 	
 	local minRpmReduced = Utils.clamp( self.minRequiredRpm * mrGearboxMogli.rpmReduction, self.stallRpm, self.ratedRpm * mrGearboxMogli.rpmReduction )		
@@ -6888,8 +6913,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 
 		-- acceleration for idle/minimum rpm		
 		if lastNoTransmission then
-			self.minThrottle  = 0.3		
-			self.minThrottleS = 0.3
+			self.minThrottle  = math.max( 0.3, handThrottle )
+			self.minThrottleS = math.max( 0.3, handThrottle )
 			
 			if self.hydroEff ~= nil then
 				self.hydrostaticFactor = Utils.clamp( self.vehicle.mrGbMS.LaunchGearSpeed / self.vehicle.mrGbML.currentGearSpeed, 
@@ -6898,10 +6923,14 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			--print(string.format("%3.0f %3.0f %0.5f", self.vehicle.mrGbMS.LaunchGearSpeed, self.vehicle.mrGbML.currentGearSpeed, self.hydrostaticFactor ))
 			end
 		else
-			if self.nonClampedMotorRpm <= minRpmReduced then
+			local minThrottleRpm = minRpmReduced 
+			if handThrottle > 0 then
+				minThrottleRpm = Utils.clamp( handThrottleRpm - mrGearboxMogli.ptoRpmThrottleDiff, minRpmReduced, self.minRequiredRpm )
+			end
+			if self.nonClampedMotorRpm <= minThrottleRpm then
 				self.minThrottle  = 1
 			elseif self.nonClampedMotorRpm < self.minRequiredRpm then
-				self.minThrottle = ( self.minRequiredRpm - self.nonClampedMotorRpm ) / ( self.minRequiredRpm - minRpmReduced )
+				self.minThrottle = ( self.minRequiredRpm - self.nonClampedMotorRpm ) / ( self.minRequiredRpm - minThrottleRpm )
 			else
 				self.minThrottle = 0
 			end			
@@ -7222,7 +7251,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							self.hydrostaticTarget = math.max( 0, self.hydrostaticTarget + accelerationPedal * 0.0004 * self.tickDt )
 						elseif accelerationPedal >=  mrGearboxMogli.accDeadZone then						
 							-- 3.33 seconds 
-							self.hydrostaticTarget = Utils.clamp( self.hydrostaticTarget + accelerationPedal * 0.0003 * self.tickDt, 0, 1 )							
+							local h1 = self.hydrostaticTarget + accelerationPedal * 0.0003 * self.tickDt
+							local h2 = math.max( ( hMin1 - hMin ) / ( hMax - hMin ), self.hydrostaticTarget )
+							self.hydrostaticTarget = Utils.clamp( math.min( h1, h2 ) , 0, 1 )							
 						end
 										
 						if     hMin >= hMax then
@@ -8101,8 +8132,13 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		if self.maxPossibleRpm < minRpmReduced then
 			self.maxPossibleRpm = minRpmReduced
 		end
-		if      ( ( self.ptoOn and ( self.hydroEff ~= nil or self.vehicle.mrGbMS.PowerManagement ) )
-					 or handThrottle >= 0 )
+	--if      ( ( self.ptoOn and ( self.hydroEff ~= nil or self.vehicle.mrGbMS.PowerManagement ) )
+	--			 or handThrottle >= 0 )
+		if      ( self.vehicle.OnlyHandThrottle
+					 or ( handThrottle >= 0 
+						and self.hydrostaticFactor ~= nil 
+					--and self.hydrostaticFactor < self.vehicle.mrGbMS.HydrostaticMax - mrGearboxMogli.eps ) )
+						) )
 				and self.maxPossibleRpm > self.minRequiredRpm + mrGearboxMogli.ptoRpmThrottleDiff then
 			self.maxPossibleRpm = self.minRequiredRpm + mrGearboxMogli.ptoRpmThrottleDiff
 		end

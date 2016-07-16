@@ -2505,7 +2505,7 @@
 			<link href="http://www.modhoster.de/mods/deutz-serie-5-ttv" />
 			<xmlFile name="huerlimannXM4Ti.xml" />
 		</mod>
-
+		
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<!-- http://www.lamborghini-tractors.com/de-DE/weinberg-und-obstplantage/download/2618_de209aea3647557f5cfe006c19b4b317 -->
 		<gearboxMogli swapGearRangeKeys="true" maxAIRange="3">
@@ -3830,6 +3830,10 @@
 			<link href="https://www.modhoster.de/mods/deutz-fahr-ttv-7250--13" />
 			<xmlFile name="deutzFahr7250.xml"/>
 		</mod>
+		<mod name="DeutzTTV">
+			<link href="http://www.modhoster.de/mods/deutzfahr_pack" />
+			<xmlFile name="deutzFahr7250.xml"/>
+		</mod>
 		<configFile xmlName="data/vehicles/steerable/deutz/deutzFahr7250.xml"/>
 
 		<!--gearboxMogli clutchEngagingTimeMs="0" clutchOpenRpm="1850" clutchCloseRpm="2200" minClutchRatio="0.123" maxClutchRatio="0.95" maxBackwardSpeed="32">
@@ -3987,18 +3991,71 @@
 	</vehicle>
 	
 	<vehicle>
-		<mod name="FS15_DeutzTTV6190" isPrefix="true">
-			<link href="http://www.modhoster.de/mods/deutz-fahr-agrotron-6190ttv" />
-			<xmlFile name="Agrotron6190ttv.xml" />
+		<mod name="DeutzTTV">
+			<link href="http://www.modhoster.de/mods/deutzfahr_pack" />
+			<xmlFile name="deutzTTV6140.4.xml"/>
 		</mod>
 
 		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz-Fahr_Agrotron_6190 -->
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/939-series-6-ttv -->
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="32" clutchEngagingTimeMs="500">
       <hydrostatic profile="ZF"/>
-      <gears  automatic="true">
-        <gear speed="18.13" name=""/> <!-- 0.05 4.66 11 25-->
-        <gear speed="42.3" name=""/> <!-- 0.12 10.88 25 59-->
+      <gears automatic="true">
+        <gear speed="5.76" name=""/> <!-- 0 1.4 4 8-->
+        <gear speed="11.52" name=""/> <!-- 0 2.79 8 15-->
+        <gear speed="23.04" name=""/> <!-- 0 5.59 15 31-->
+        <gear speed="46.09" name=""/> <!-- 0 11.17 31 61-->
+      </gears>
+      <reverse ratio="1"/>
+			
+			<realEngine idleRpm="800" ratedRpm="2200">		
+        <!-- 1900: 144(140) | 2200: 135(131) | 1400..1400: 638(608) | 70 | 1 | 149 | 2 | 2300 | 1360: 215 -->
+        <torque rpm="350" motorTorque="194" fuelUsageRatio="246.1"/><!-- manDataEco: 194.406201171875-->
+        <torque rpm="700" motorTorque="385" fuelUsageRatio="228.3"/><!-- manDataEco: 385.250651041667-->
+        <torque rpm="900" motorTorque="505" motorTorqueEco="500" fuelUsageRatio="221.4"/><!-- manDataEco: 500-->
+        <torque rpm="1000" motorTorque="553" motorTorqueEco="530" fuelUsageRatio="218.9"/><!-- manDataEco: 530-->
+        <torque rpm="1100" motorTorque="590" motorTorqueEco="562" fuelUsageRatio="217.1"/>
+        <torque rpm="1200" motorTorque="617" motorTorqueEco="588" fuelUsageRatio="215.8"/>
+        <torque rpm="1300" motorTorque="633" motorTorqueEco="603" fuelUsageRatio="215.1"/>
+        <torque rpm="1400" motorTorque="638" motorTorqueEco="608" fuelUsageRatio="215.1"/>
+        <torque rpm="1500" motorTorque="617" motorTorqueEco="590" fuelUsageRatio="215.7"/>
+        <torque rpm="1600" motorTorque="596" motorTorqueEco="572" fuelUsageRatio="217"/>
+        <torque rpm="1700" motorTorque="575" motorTorqueEco="554" fuelUsageRatio="218.9"/>
+        <torque rpm="1800" motorTorque="553" motorTorqueEco="536" fuelUsageRatio="221.6"/>
+        <torque rpm="1850" motorTorque="543" motorTorqueEco="526" fuelUsageRatio="223.1"/>
+        <torque rpm="1900" motorTorque="532" motorTorqueEco="517" fuelUsageRatio="224.9"/>
+        <torque rpm="1950" motorTorque="518" motorTorqueEco="503" fuelUsageRatio="226.8"/>
+        <torque rpm="2000" motorTorque="502" motorTorqueEco="488" fuelUsageRatio="228.9"/>
+        <torque rpm="2050" motorTorque="486" motorTorqueEco="472" fuelUsageRatio="231.1"/>
+        <torque rpm="2100" motorTorque="468" motorTorqueEco="455" fuelUsageRatio="233.5"/>
+        <torque rpm="2150" motorTorque="450" motorTorqueEco="437" fuelUsageRatio="236.1"/>
+        <torque rpm="2200" motorTorque="431" motorTorqueEco="418" fuelUsageRatio="238.9"/>
+        <torque rpm="2250" motorTorque="382" motorTorqueEco="371" fuelUsageRatio="254.5"/>
+        <torque rpm="2300" motorTorque="237" motorTorqueEco="230" fuelUsageRatio="327"/>
+        <torque rpm="2350" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
+		<mod name="FS15_DeutzTTV6190" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/deutz-fahr-agrotron-6190ttv" />
+			<xmlFile name="Agrotron6190ttv.xml" />
+		</mod>
+		<mod name="DeutzTTV">
+			<link href="http://www.modhoster.de/mods/deutzfahr_pack" />
+			<xmlFile name="deutzTTV6190.xml"/>
+		</mod>
+
+		<!-- https://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz-Fahr_Agrotron_6190 -->
+		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/939-series-6-ttv -->
+		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="32" clutchEngagingTimeMs="500">
+      <hydrostatic profile="ZF"/>
+      <gears automatic="true">
+        <gear speed="5.76" name=""/> <!-- 0 1.4 4 8-->
+        <gear speed="11.52" name=""/> <!-- 0 2.79 8 15-->
+        <gear speed="23.04" name=""/> <!-- 0 5.59 15 31-->
+        <gear speed="46.09" name=""/> <!-- 0 11.17 31 61-->
       </gears>
       <reverse ratio="1"/>
 			
