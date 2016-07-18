@@ -6,6 +6,10 @@
 			<link href="http://farming-simulator.com/mod.php?lang=de&amp;mod_id=11689&amp;title=fs2015" />
 			<xmlFile name="kirovets/KirovetsK700A.xml" />
 		</mod>
+		<mod name="Pack_K_701_PKU_K_700">
+			<xmlFile name="kirovets_ml.xml" />
+			<xmlFile name="K_700.xml" />
+		</mod>
 
 		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Kirovets_K-700A -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/kirovets701m.pdf -->
@@ -3882,6 +3886,10 @@
 			<xmlFile name="deutzFahr7250.xml"/>
 			<xmlFile name="deutzFahr7250_Krone.xml"/>
 			<xmlFile name="deutzFahr7250_Warrior.xml"/>
+		</mod>
+		<mod name="FS15_DeutzTTV7250" isPrefix="true"> 
+			<link href="http://www.modhoster.de/mods/deutz-fahr-7250ttv-warrior-limited-edition" />
+			<xmlFile name="deutzFahr7250Warrior.xml"/>
 		</mod>
 
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
