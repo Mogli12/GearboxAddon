@@ -2907,8 +2907,9 @@ function mrGearboxMogli:addCutterArea( cutter, area, realArea, inputFruitType, f
 			timeAdd = 500 + ( 1 - self.mrGbML.currentRealArea / self.mrGbML.maxRealArea ) * ( timeAdd - 500 )
 		end
 		
-		self.mrGbML.currentCuttersArea = self.mrGbML.currentCuttersArea + area
-		self.mrGbML.currentFruitType   = fruitType 
+		self.mrGbML.currentCuttersArea    = self.mrGbML.currentCuttersArea + area
+		self.mrGbML.currentInputFruitType = inputFruitType 
+		self.mrGbML.currentFruitType      = fruitType 
 		if self.mrGbML.strawDisableTime == nil then
 			self.mrGbML.strawDisableTime = g_currentMission.time + timeAdd 
 		else
@@ -4243,8 +4244,14 @@ function mrGearboxMogli:mrGbMGetCombineLS()
 		
 		sqm = sqm * g_currentMission:getFruitPixelsToSqm()
 
-		local fruitType = FruitUtil.FRUITTYPE_UNKNOWN  
-		if self.mrGbML.currentFruitType ~= nil then
+		local fruitType
+		if      self.mrGbML.currentFruitType == nil then
+			fruitType = FruitUtil.FRUITTYPE_UNKNOWN  
+		elseif  self.mrGbML.currentFruitType      == FruitUtil.FRUITTYPE_CHAFF
+				and self.mrGbML.currentInputFruitType ~= nil
+		    and self.mrGbML.currentInputFruitType ~= FruitUtil.FRUITTYPE_MAIZE then
+			fruitType = self.mrGbML.currentInputFruitType
+		else
 			fruitType = self.mrGbML.currentFruitType
 		end			
 
