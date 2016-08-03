@@ -288,6 +288,9 @@ end
 -- mrGearboxMogli:initClient
 --**********************************************************************************************************	
 function mrGearboxMogli:initClient()		
+
+	print("mrGearboxMogli: Initialization of client...")
+
 	-- state
 	self.mrGbMS = {}
 	-- locals used for calculations
@@ -327,6 +330,8 @@ function mrGearboxMogli:initClient()
 	mrGearboxMogli.registerState( self, "InfoText",      "",    mrGearboxMogli.mrGbMOnSetInfoText )
 	mrGearboxMogli.registerState( self, "MotorBrake",    false )
 	mrGearboxMogli.registerState( self, "ConstantRpm",   false )
+	mrGearboxMogli.registerState( self, "NoUpdateStream",false, mrGearboxMogli.mrGbMOnSetNoUpdateStream )
+	mrGearboxMogli.registerState( self, "NUSMessage",    {},    mrGearboxMogli.mrGbMOnSetNUSMessage )
 	
 --**********************************************************************************************************	
 -- state variables with setter methods	
@@ -409,6 +414,8 @@ function mrGearboxMogli:initClient()
 	self.mrGbML.maxRealArea          = 0
 	self.mrGbML.cutterAreaPerSecond  = 0
 	self.mrGbML.realAreaPerSecond    = 0
+	self.mrGbML.updateStreamErrors   = 0
+
 	
 	if mrGearboxMogli.ovArrowUpWhite == nil then
 		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth;
@@ -1871,6 +1878,14 @@ end
 -- mrGearboxMogli:update
 --**********************************************************************************************************	
 function mrGearboxMogli:update(dt)
+
+	if self.mrGbMS == nil then
+		return
+	end
+
+	if self.mrGbML.updateStreamErrors > 10 and not self.mrGbMS.NoUpdateStream then
+		self:mrGbMSetState( "NoUpdateStream", true )
+	end
 	
 	self.mrGbML.smoothBase   = mrGearboxMogli.getSmoothBase( dt )
 	self.mrGbML.smoothSlow   = Utils.clamp( mrGearboxMogli.smoothSlow   * self.mrGbML.smoothBase, 0, 1 )
@@ -1966,9 +1981,8 @@ function mrGearboxMogli:update(dt)
 		self.lastRoundPerMinute = 0
 	end
 	
-	if self.isMotorStarted and self.motor.minRpm > 0 then
-		if      self.mrGbMS.IsOnOff 
-				and self.mrGbML.motor == nil then 
+	if self.isMotorStarted and self.motor.minRpm > 0 and self.mrGbMS.IsOnOff then
+		if self.mrGbML.motor == nil then 
 	-- initialize as late as possible 			
 			if not ( self.mbClientInitDone30 ) then return end
 			if self.motor == nil then return end
@@ -1989,8 +2003,6 @@ function mrGearboxMogli:update(dt)
 			self:mrGbMSetState( "IsOn", false ) 	
 			return
 		end
---elseif self.mrGbMB.motor ~= nil then 
---	self.motor = self.mrGbMB.motor
 	end
 	
 	if      self.mrGbMG.modifySound 
@@ -3065,7 +3077,12 @@ function mrGearboxMogli:updateTick(dt)
 		if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then	
 			self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
 					
-			if self.mrGbML.lastSumDt > 333 then
+			local maxSumDt = 333
+			if self.mrGbMS.NoUpdateStream then
+				maxSumDt = 1000
+			end
+			
+			if self.mrGbML.lastSumDt > maxSumDt then
 				if self.isServer then
 					self.mrGbMD.Rpm    = 0
 					self.mrGbMD.Clutch = 0
@@ -3115,8 +3132,6 @@ function mrGearboxMogli:updateTick(dt)
 							or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
 							or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
 							then
-						self:raiseDirtyFlags(self.mrGbML.dirtyFlag) 
-					
 						self.mrGbMD.lastRpm    = self.mrGbMD.Rpm
 						self.mrGbMD.lastClutch = self.mrGbMD.Clutch
 						self.mrGbMD.lastLoad   = self.mrGbMD.Load   
@@ -3124,6 +3139,22 @@ function mrGearboxMogli:updateTick(dt)
 						self.mrGbMD.lastPower  = self.mrGbMD.Power 
 						self.mrGbMD.lastRate   = self.mrGbMD.Rate
 						self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
+
+						if self.mrGbMS.NoUpdateStream then					
+							local message = {}
+							message.Clutch = self.mrGbMD.Clutch
+							message.Load   = self.mrGbMD.Load  
+							message.Speed  = self.mrGbMD.Speed 	 			
+							
+							if self.mrGbMS.sendHydro     then message.Hydro = self.mrGbMD.Hydro end		 
+							if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Rpm   end			
+							if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
+							if self.mrGbMS.IsCombine     then message.Rate  = self.mrGbMD.Rate  end		
+							
+							self:mrGbMSetState( "NUSMessage", message )
+						else
+							self:raiseDirtyFlags(self.mrGbML.dirtyFlag) 
+						end 
 					end 
 				end
 				
@@ -3153,8 +3184,13 @@ end
 -- mrGearboxMogli:readUpdateStream
 --**********************************************************************************************************	
 function mrGearboxMogli:readUpdateStream(streamId, timestamp, connection)
-  if connection:getIsServer() then
-		if streamReadBool( streamId ) then
+  if connection:getIsServer() and not ( self.mrGbMS.NoUpdateStream ) then
+	--if streamReadBool( streamId ) then
+		local checkId = streamReadUInt8( streamId )
+		if checkId ~= nil and checkId == 178 then
+			if self.mrGbMD == nil then
+				self.mrGbMD = {}
+			end
 			self.mrGbMD.Clutch = streamReadUInt8( streamId ) 
 			self.mrGbMD.Load   = streamReadUInt8( streamId )  
 			self.mrGbMD.Speed  = streamReadUInt8( streamId ) 			 			
@@ -3162,7 +3198,12 @@ function mrGearboxMogli:readUpdateStream(streamId, timestamp, connection)
 			if self.mrGbMS.sendHydro     then self.mrGbMD.Hydro  = streamReadUInt8( streamId  ) end		 
 			if self.mrGbMS.sendTargetRpm then self.mrGbMD.Rpm    = streamReadUInt8( streamId  ) end			
 			if self.mrGbMS.sendReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
-			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end			
+			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end		
+		elseif checkId == nil or checkId ~= 142 then
+			print("mrGearboxMogli: there is another specialization with incorrect readUpdateStream implementation ("..tostring(checkId)..")")
+			if self.mrGbMD ~= nil then
+				self.mrGbML.updateStreamErrors = self.mrGbML.updateStreamErrors + 1
+			end
 		end 
   end 
 end 
@@ -3171,19 +3212,47 @@ end
 -- mrGearboxMogli:writeUpdateStream
 --**********************************************************************************************************	
 function mrGearboxMogli:writeUpdateStream(streamId, connection, dirtyMask)
-  if not connection:getIsServer() then
-		if streamWriteBool(streamId, bitAND(dirtyMask, self.mrGbML.dirtyFlag) ~= 0) then				
+  if not connection:getIsServer() and not ( self.mrGbMS.NoUpdateStream ) then
+		if bitAND(dirtyMask, self.mrGbML.dirtyFlag) ~= 0 then			
+			streamWriteUInt8(streamId, 178 )
 			streamWriteUInt8(streamId, self.mrGbMD.Clutch ) 
 			streamWriteUInt8(streamId, self.mrGbMD.Load   ) 
 			streamWriteUInt8(streamId, self.mrGbMD.Speed  ) 	
 			
 			if self.mrGbMS.sendHydro     then streamWriteUInt8(streamId, self.mrGbMD.Hydro  ) end		 
 			if self.mrGbMS.sendTargetRpm then streamWriteUInt8(streamId, self.mrGbMD.Rpm    ) end			
-			if self.mrGbMS.sendReqPower  then streamWriteUInt16(streamId, self.mrGbMD.Power ) end			
+			if self.mrGbMS.sendReqPower  then streamWriteUInt16(streamId,self.mrGbMD.Power ) end			
 			if self.mrGbMS.IsCombine     then streamWriteUInt8(streamId, self.mrGbMD.Rate   ) end
+		else
+			streamWriteUInt8(streamId, 142 )
 		end 
 	end 
 end 
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMOnSetNoUpdateStream
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMOnSetNoUpdateStream( old, new, noEventSend )
+	self.mrGbMS.NoUpdateStream = new
+	if new and not ( old ) then
+		print("mrGearboxMogli: there is another specialization with incorrect readUpdateStream implementation => turning off update stream")
+		self.mrGbML.lastSumDt  = 1001
+		self.mrGbMD.lastClutch = -1
+	elseif old and not ( new ) then 
+	end
+end
+
+--**********************************************************************************************************	
+-- mrGearboxMogli:mrGbMOnSetNUSMessage
+--**********************************************************************************************************	
+function mrGearboxMogli:mrGbMOnSetNUSMessage( old, new, noEventSend )
+	self.mrGbMS.NUSMessage = new
+	if type( new ) == "table" then
+		for n,v in pairs( new ) do
+			self.mrGbMD[n] = v
+		end
+	end			
+end
 
 --**********************************************************************************************************	
 -- mrGearboxMogli:delete
