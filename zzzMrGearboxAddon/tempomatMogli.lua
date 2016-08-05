@@ -28,13 +28,30 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:load(xmlFile) 
 		-- state
 		self.tempomatMogliV14 = {}
-		tempomatMogli.registerState( self, "SpeedLimit2",    10 )
+		
+		self.tempomatMogliV14.baseSpeed1 = 50
+		self.tempomatMogliV14.baseSpeed2 = 10
+		self.tempomatMogliV14.baseSpeed3 = 30
+		
+		if self.motor ~= nil and self.motor.maxForwardSpeed ~= nil then
+			self.tempomatMogliV14.baseSpeed1 = math.floor( self.motor.maxForwardSpeed * 3.6 + 0.5 )
+			if     self.tempomatMogliV14.baseSpeed1 < 20 then
+				self.tempomatMogliV14.baseSpeed2 = math.floor( self.motor.maxForwardSpeed * 1.25 + 0.5 )
+				self.tempomatMogliV14.baseSpeed3 = math.floor( self.motor.maxForwardSpeed * 1.80 + 0.5 )
+			elseif self.tempomatMogliV14.baseSpeed1 < 30 then
+				self.tempomatMogliV14.baseSpeed3 = 20
+			end
+		end
+		
+		tempomatMogli.registerState( self, "SpeedLimit2", self.tempomatMogliV14.baseSpeed2 )
+		tempomatMogli.registerState( self, "SpeedLimit3", self.tempomatMogliV14.baseSpeed3 )
 		tempomatMogli.registerState( self, "KeepSpeed",   false )
 		self.tempomatMogliV14.modName = l_currentModName
 		
 		self.tempomatMogliSetSpeedLimit  = tempomatMogli.tempomatMogliSetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit  = tempomatMogli.tempomatMogliGetSpeedLimit 
 		self.tempomatMogliGetSpeedLimit2 = tempomatMogli.tempomatMogliGetSpeedLimit2
+		self.tempomatMogliGetSpeedLimit3 = tempomatMogli.tempomatMogliGetSpeedLimit3
 		self.tempomatMogliSwapSpeedLimit = tempomatMogli.tempomatMogliSwapSpeedLimit 
 	end	
 	
@@ -199,7 +216,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	-- tempomatMogli:tempomatMogliSetSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliSetSpeedLimit( noEventSend )
-		self:setCruiseControlMaxSpeed(self.lastSpeedReal*3600)
+		self:setCruiseControlMaxSpeed(math.floor( self.lastSpeedReal*3600 + 0.5 ))
 	end 
 	
 	--**********************************************************************************************************	
@@ -217,13 +234,22 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	end 
 	
 	--**********************************************************************************************************	
+	-- tempomatMogli:tempomatMogliSetSpeedLimit2
+	--**********************************************************************************************************	
+	function tempomatMogli:tempomatMogliGetSpeedLimit3( )
+		return self.tempomatMogliV14.SpeedLimit3
+	end 
+	
+	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSwapSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliSwapSpeedLimit( noEventSend )
 		local speed1 = self.tempomatMogliV14.SpeedLimit2
-		local speed2 = self.cruiseControl.speed
+		local speed2 = self.tempomatMogliV14.SpeedLimit3
+		local speed3 = self.cruiseControl.speed
 		self:setCruiseControlMaxSpeed(speed1)
 		tempomatMogli.mbSetState( self, "SpeedLimit2", speed2, noEventSend ) 		
+		tempomatMogli.mbSetState( self, "SpeedLimit3", speed3, noEventSend ) 		
 	end 
 	
 	--**********************************************************************************************************	
@@ -234,8 +260,11 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		local attributes = ""
 	
 		if self.tempomatMogliV14 ~= nil then
-			if self.tempomatMogliV14.SpeedLimit2 <= 9 or self.tempomatMogliV14.SpeedLimit2 >= 11 then
+			if math.abs( self.tempomatMogliV14.SpeedLimit2 - self.tempomatMogliV14.baseSpeed2 ) < 1 then
 				attributes = attributes.." mrGbMSpeed2=\"" .. tostring( self.tempomatMogliV14.SpeedLimit2 ) .. "\""     
+			end
+			if math.abs( self.tempomatMogliV14.SpeedLimit3 - self.tempomatMogliV14.baseSpeed3 ) < 1 then
+				attributes = attributes.." mrGbMSpeed3=\"" .. tostring( self.tempomatMogliV14.SpeedLimit3 ) .. "\""     
 			end
 		end 
 		
@@ -252,6 +281,20 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			i = getXMLInt(xmlFile, key .. "#mrGbMSpeed2" )
 			if i ~= nil then
 				self.tempomatMogliV14.SpeedLimit2 = i
+			end
+			i = getXMLInt(xmlFile, key .. "#mrGbMSpeed3" )
+			if i ~= nil then
+				self.tempomatMogliV14.SpeedLimit3 = i
+			end
+		end
+		
+		if self.tempomatMogliV14.baseSpeed1 ~= nil then
+			if     math.abs( self.cruiseControl.speed - self.tempomatMogliV14.baseSpeed2 ) < 1 then
+				self.tempomatMogliV14.SpeedLimit2 = self.tempomatMogliV14.SpeedLimit3
+				self.tempomatMogliV14.SpeedLimit3 = self.tempomatMogliV14.baseSpeed1
+			elseif math.abs( self.cruiseControl.speed - self.tempomatMogliV14.baseSpeed3 ) < 1 then
+				self.tempomatMogliV14.SpeedLimit3 = self.tempomatMogliV14.SpeedLimit2
+				self.tempomatMogliV14.SpeedLimit2 = self.tempomatMogliV14.baseSpeed1
 			end
 		end
 		

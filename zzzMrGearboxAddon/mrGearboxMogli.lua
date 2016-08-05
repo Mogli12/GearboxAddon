@@ -153,7 +153,7 @@ mrGearboxMogliGlobals.brakeNeutralLimit     = -0.3
 mrGearboxMogliGlobals.DefaultRevUpMs0       = 1000  -- ms
 mrGearboxMogliGlobals.DefaultRevUpMs1       = 10000 -- ms
 mrGearboxMogliGlobals.DefaultRevDownMs      = 2000  -- ms
-mrGearboxMogliGlobals.HydroSpeedIdleRedux   = 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
+mrGearboxMogliGlobals.HydroSpeedIdleRedux   = 0.02  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.2   -- make some noise with motor brake 
 mrGearboxMogliGlobals.motorLoadVolumeFrom   = 0     -- this is for scaling motorLoad to volume
 mrGearboxMogliGlobals.motorLoadVolumeTo     = 1     -- this is for scaling motorLoad to volume
@@ -1894,7 +1894,15 @@ function mrGearboxMogli:update(dt)
 	self.mrGbML.smoothLittle = Utils.clamp( mrGearboxMogli.smoothLittle * self.mrGbML.smoothBase, 0, 1 )
 	                          
 	local processInput = true
-	if     self.mrGbMS.NoDisable then
+	
+	if     self.hasChangedGearBoxAddon then
+	-- IncreaseRPMWhileTipping.lua
+		if not self.mrGbMS.IsOnOff then
+			self:mrGbMSetState( "IsOn", false ) 		
+			self.mrGbML.turnedOffByIncreaseRPMWhileTipping = true
+		end
+		processInput = false
+	elseif self.mrGbMS.NoDisable then
 		self:mrGbMSetIsOnOff( true ) 
 	elseif mrGearboxMogli.mbIsActiveForInput(self, false) and mrGearboxMogli.mbHasInputEvent( "mrGearboxMogliON_OFF" ) then
 		if      self.isMotorStarted
@@ -1932,12 +1940,19 @@ function mrGearboxMogli:update(dt)
 	end
 	
 	if self.mrGbMB.soundModified and not ( self.mrGbMS.IsOn ) then
-	--Utils.stopSample( self.sampleMotor )
-	--Utils.stopSample( self.sampleMotorRun )
-	--Utils.stopSample( self.sampleMotorRun2 )
 		if self.isMotorStarted then
-			self:stopMotor()
-			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+			if self.mrGbML.turnedOffByIncreaseRPMWhileTipping then
+				Utils.stopSample( self.sampleMotor )
+				Utils.stopSample( self.sampleMotorRun )
+				Utils.stopSample( self.sampleMotorRun2 )
+				if self.mrGbML.motor ~= nil and self.mrGbMB.motor ~= nil then
+					mrGearboxMogliMotor.copyRuntimeValues( self.mrGbML.motor, self.mrGbMB.motor )
+					self.motor = self.mrGbMB.motor
+				end				
+			else
+				self:stopMotor()
+				self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+			end
 		end
 		
 		self.mrGbMB.soundModified        = false
@@ -1979,6 +1994,12 @@ function mrGearboxMogli:update(dt)
 			end
 		end
 		self.lastRoundPerMinute = 0
+	end
+	
+	if      self.mrGbMS.IsOnOff 
+			and self.mrGbML.turnedOffByIncreaseRPMWhileTipping
+			and not ( self.hasChangedGearBoxAddon ) then
+		self.mrGbML.turnedOffByIncreaseRPMWhileTipping = false
 	end
 	
 	if self.isMotorStarted and self.motor.minRpm > 0 and self.mrGbMS.IsOnOff then
@@ -5373,8 +5394,22 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 			local decHts = Utils.clamp( ( 1.4142 * math.min( 0, acceleration ) )^2, self.mrGbMG.HydroSpeedIdleRedux, 1 )			
 			local newHts = math.min( math.max( acceleration * m, oldHts - decHts * 0.001 * dt * self.mrGbMS.DecelerateToLimit ), oldHts + 0.001 * dt * self.mrGbMS.AccelerateToLimit )
 
-			if -0.7071 <= acceleration and acceleration <= 0 then
-				acceleration = 0
+			if acceleration < 0 then
+				if self.axisForwardIsAnalog then
+					self.mrGbML.hydroTargetTimer = nil
+					if acceleration > -0.7071 then
+						acceleration = 0
+					end
+				else
+					if self.mrGbML.hydroTargetTimer == nil then
+						self.mrGbML.hydroTargetTimer = g_currentMission.time + 2000
+					end
+					if g_currentMission.time < self.mrGbML.hydroTargetTimer then
+						acceleration = 0
+					end
+				end
+			elseif self.mrGbML.hydroTargetTimer ~= nil then
+				self.mrGbML.hydroTargetTimer = nil
 			end
 			
 			self.mrGbML.hydroTargetSpeed = Utils.clamp( newHts, 0, m )
@@ -6731,8 +6766,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 	end
 	
-	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
-	
 	-- acceleration pedal and speed limit
 	local requestedTorque   = self.motorLoad + self.lastPtoTorque + self.lastLostTorque + self.lastMissingTorque
 	local currentSpeedLimit = self.currentSpeedLimit
@@ -6811,6 +6844,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 	end
 
+	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
+	
+	
 --if      handThrottle    >= 0
 --		and handThrottleRpm < self.minRequiredRpm 
 --		and self.ratedRpm   > self.idleRpm + mrGearboxMogli.eps then

@@ -5483,6 +5483,12 @@
 	</vehicle> 
 	
 	<vehicle>
+		<mod name="FS15_newHollandCR_Pack">
+			<xmlFile name="newHollandCR790.xml"/>
+			<xmlFile name="newHollandCR890.xml"/>
+			<xmlFile name="newHollandCR990.xml"/>
+			<xmlFile name="newHollandCR9075.xml"/>	
+		</mod>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH9230Crawler.xml" />
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
 		
@@ -5935,6 +5941,9 @@
 			<xmlFile name="Lexion780.xml"/>
 			<xmlFile name="Lexion780TT.xml"/>
 		</mod>
+		<mod name="lexion795" isPrefix="true">
+			<xmlFile name="claasLexion780TT.xml"/>
+		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
 			<combine defaultWidth="13.5" minRpm="1600" maxRpm="1800"/>
@@ -6372,6 +6381,50 @@
         <torque rpm="2250" motorTorque="1221" motorTorqueEco="1124" fuelUsageRatio="241.5"/>
         <torque rpm="2300" motorTorque="756" motorTorqueEco="696" fuelUsageRatio="310.3"/>
         <torque rpm="2350" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="453.3"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+		
+	<vehicle> 
+		<mod name="JD_s690i" isPrefix="true">
+			<xmlFile name="JohnDeere_S690.xml" />
+			<xmlFile name="JohnDeere_S690TT.xml" />
+		</mod>
+		
+		<gearboxMogli disableManual="true" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1">
+			<combine defaultWidth="13.5"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" automatic="true">
+        <gear speed="13.27" name="field"/> <!-- 0.25 2.5 6 20-->
+        <gear speed="43.78" name="street"/> <!-- 0.83 8.24 20 67-->
+      </gears>
+			
+			<!-- http://www.npsdiesel.com/en/industry/john-deere/industrial-diesel-engines/model-6135/specifications-interim-tier-4/ -->
+			<realEngine idleRpm="850" ratedRpm="2200">
+        <!-- 1900: 616(616) | 2100: 550(550) | 1500..1500: 2635(2635) | 65 | 0.5 | 149 | 2 | 2200 | 1320: 200 -->
+        <torque rpm="350" motorTorque="722" fuelUsageRatio="230.9"/>
+        <torque rpm="700" motorTorque="1462" fuelUsageRatio="212.6"/>
+        <torque rpm="900" motorTorque="1957" fuelUsageRatio="205.8"/>
+        <torque rpm="1000" motorTorque="2164" fuelUsageRatio="203.4"/>
+        <torque rpm="1100" motorTorque="2334" fuelUsageRatio="201.6"/>
+        <torque rpm="1200" motorTorque="2466" fuelUsageRatio="200.5"/>
+        <torque rpm="1300" motorTorque="2560" fuelUsageRatio="200"/>
+        <torque rpm="1400" motorTorque="2616" fuelUsageRatio="200.2"/>
+        <torque rpm="1500" motorTorque="2635" fuelUsageRatio="201.2"/>
+        <torque rpm="1600" motorTorque="2579" fuelUsageRatio="202.9"/>
+        <torque rpm="1700" motorTorque="2501" fuelUsageRatio="205.3"/>
+        <torque rpm="1800" motorTorque="2400" fuelUsageRatio="208.4"/>
+        <torque rpm="1850" motorTorque="2337" fuelUsageRatio="210.3"/>
+        <torque rpm="1900" motorTorque="2277" fuelUsageRatio="212.3"/>
+        <torque rpm="1950" motorTorque="2203" fuelUsageRatio="214.5"/>
+        <torque rpm="2000" motorTorque="2105" fuelUsageRatio="216.9"/>
+        <torque rpm="2050" motorTorque="1983" fuelUsageRatio="219.5"/>
+        <torque rpm="2100" motorTorque="1839" fuelUsageRatio="222.2"/>
+        <torque rpm="2150" motorTorque="1632" fuelUsageRatio="236.7"/>
+        <torque rpm="2200" motorTorque="1011" fuelUsageRatio="304.2"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="444.4"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
