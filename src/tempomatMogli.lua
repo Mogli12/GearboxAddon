@@ -104,6 +104,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		if      self.mrGbMS          ~= nil
 				and self.mrGbMD          ~= nil
 				and not ( self.mrGbMS.Hydrostatic ) 
+				and not ( self:mrGbMGetAutomatic( ) )
 				and self.mrGbMD.Speed    ~= nil
 				and self.mrGbMD.Speed     > 0
 				and self.mrGbMS.IdleRpm	 ~= nil

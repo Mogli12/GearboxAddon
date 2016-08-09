@@ -1453,6 +1453,63 @@
 		</gearboxMogli>
 	</vehicle>
 	
+	<vehicle>
+		<!-- actros 4163 SLT with G280-16 VIAB -->
+		<mod name="MB_NG_1632" isPrefix="true">
+			<link href="http://www.modhoster.de/mods/mb-ng-1632-4x4"/>
+			<xmlFile name="Mercedes_Benz_NG_1632_4x4.xml"/>
+		</mod>
+	
+		<gearboxMogli speedLimiter="false" launchGearSpeed="30">
+			<!-- http://kds.vsb.cz/mhd/konstrukce-prevodovky_soubory/image012.jpg -->
+			<gears axleSpeed="5.25" tireWidth="315" tireRatio="80" rimDiameter="22.5" automatic="false" shiftTimeMs="800">
+				<gear name="C" forwardOnly="true" inverseRatio="13.09"/>
+				<gear name="R" reverseOnly="true" inverseRatio="11.06"/>
+				<gear name="1" forwardOnly="true" inverseRatio="8.68"/>
+				<gear name="2" forwardOnly="true" inverseRatio="6.37"/>
+				<gear name="3" forwardOnly="true" inverseRatio="4.65"/>
+				<gear name="4" forwardOnly="true" inverseRatio="3.43"/>
+				<gear name="5" forwardOnly="true" inverseRatio="2.53"/>
+				<gear name="6" forwardOnly="true" inverseRatio="1.86"/>
+				<gear name="7" forwardOnly="true" inverseRatio="1.36"/>
+				<gear name="8" forwardOnly="true" inverseRatio="1.00"/>
+			</gears>
+
+			<realEngine idleRpm="600" ratedRpm="2500">
+        <!-- 2500: 320(320) | 2500: 320(320) | 1500..1500: 1030(1030) | 75 | 0.5 | 149 | 2 | 2600 | 1360: 210 -->
+        <torque rpm="350" motorTorque="622" fuelUsageRatio="226.5"/>
+        <torque rpm="700" motorTorque="827" fuelUsageRatio="217"/>
+        <torque rpm="900" motorTorque="916" fuelUsageRatio="213.4"/>
+        <torque rpm="1000" motorTorque="951" fuelUsageRatio="212.1"/>
+        <torque rpm="1100" motorTorque="979" fuelUsageRatio="211.1"/>
+        <torque rpm="1200" motorTorque="1001" fuelUsageRatio="210.4"/>
+        <torque rpm="1300" motorTorque="1017" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="1027" fuelUsageRatio="210"/>
+        <torque rpm="1500" motorTorque="1030" fuelUsageRatio="210.4"/>
+        <torque rpm="1600" motorTorque="1023" fuelUsageRatio="211"/>
+        <torque rpm="1700" motorTorque="1014" fuelUsageRatio="212.1"/>
+        <torque rpm="1800" motorTorque="1004" fuelUsageRatio="213.5"/>
+        <torque rpm="1850" motorTorque="999" fuelUsageRatio="214.3"/>
+        <torque rpm="1900" motorTorque="993" fuelUsageRatio="215.2"/>
+        <torque rpm="1950" motorTorque="987" fuelUsageRatio="216.2"/>
+        <torque rpm="2000" motorTorque="981" fuelUsageRatio="217.4"/>
+        <torque rpm="2050" motorTorque="974" fuelUsageRatio="218.5"/>
+        <torque rpm="2100" motorTorque="967" fuelUsageRatio="219.8"/>
+        <torque rpm="2150" motorTorque="960" fuelUsageRatio="221.2"/>
+        <torque rpm="2200" motorTorque="952" fuelUsageRatio="222.7"/>
+        <torque rpm="2250" motorTorque="944" fuelUsageRatio="224.2"/>
+        <torque rpm="2300" motorTorque="936" fuelUsageRatio="225.9"/>
+        <torque rpm="2350" motorTorque="927" fuelUsageRatio="227.6"/>
+        <torque rpm="2400" motorTorque="918" fuelUsageRatio="229.4"/>
+        <torque rpm="2450" motorTorque="908" fuelUsageRatio="231.3"/>
+        <torque rpm="2500" motorTorque="899" fuelUsageRatio="233.3"/>
+        <torque rpm="2550" motorTorque="798" fuelUsageRatio="248.6"/>
+        <torque rpm="2600" motorTorque="494" fuelUsageRatio="319.4"/>
+        <torque rpm="2650" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
 	
 	<vehicle>
 		<mod name="Unimog_U400_WB">

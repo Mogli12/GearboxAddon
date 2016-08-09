@@ -6082,11 +6082,17 @@ end
 function mrGearboxMogliMotor:updateSpeedLimit( dt )
 	self.currentSpeedLimit = math.huge
 	
-	local speedLimit = self.vehicle:getSpeedLimit(true) * mrGearboxMogli.kmhTOms
+	local speedLimit = self.vehicle:getSpeedLimit(true)
+	
+	if not ( self.vehicle.steeringEnabled ) then
+		speedLimit = math.min( speedLimit, self.speedLimit )
+	end
 	
 	if self.vehicle.tempomatMogliV14.keepSpeedLimit ~= nil then
-		speedLimit = math.min( speedLimit, self.vehicle.tempomatMogliV14.keepSpeedLimit * mrGearboxMogli.kmhTOms )
+		speedLimit = math.min( speedLimit, self.vehicle.tempomatMogliV14.keepSpeedLimit )
 	end
+
+	speedLimit = speedLimit * mrGearboxMogli.kmhTOms
 
 	if     self.vehicle.mrGbMS.SpeedLimiter 
 			or self.vehicle.cruiseControl.state > 0 
