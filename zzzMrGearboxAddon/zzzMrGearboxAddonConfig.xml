@@ -4563,35 +4563,51 @@
 		<!-- http://manuals.deere.com/omview/OMRE346524_19/?tM= -->
 		<!-- http://www.blt.bmlfuw.gv.at/vero/veranst/005/18.pdf -->
 		<!-- http://www.dlg-test.de/tests/JohnDeere7280R_AutoPowr.pdf -->
-		<gearboxMogli maxBackwardSpeed="32" clutchEngagingTimeMs="500">
-      <hydrostatic profile="ZF"/>
-			<gears automatic="true">	
-				<gear speed="6.25" name=""/>
-				<gear speed="12.5" name=""/>
-				<gear speed="25"   name=""/>
-				<gear speed="50"   name=""/>
-			</gears>
-			<reverse ratio="1" />
-			
-			<realEngine idleRpm="900" ratedRpm="2100">
-				<torque rpm="800" motorTorque="957"/>
-				<torque rpm="900" motorTorque="1011"/>
-				<torque rpm="1000" motorTorque="1064"/>
-				<torque rpm="1100" motorTorque="1144"/>
-				<torque rpm="1200" motorTorque="1191"/>
-				<torque rpm="1300" motorTorque="1223"/>
-				<torque rpm="1400" motorTorque="1277"/>
-				<torque rpm="1500" motorTorque="1298"/>
-				<torque rpm="1600" motorTorque="1305"/>
-				<torque rpm="1700" motorTorque="1260"/>
-				<torque rpm="1800" motorTorque="1198"/>
-				<torque rpm="1900" motorTorque="1146"/>
-				<torque rpm="2000" motorTorque="1053"/>
-				<torque rpm="2100" motorTorque="936"/>
-				<torque rpm="2200" motorTorque="800"/>
-				<torque rpm="2300" motorTorque="0"/>
+		<gearboxMogli maxBackwardSpeed="21" maxForwardSpeed="50" ptoRpm="1950" ptoRpmEco="1750">
+      <hydrostatic>
+        <efficiency ratio="0" factor="0.6"/> 
+        <efficiency ratio="0.22" factor="0.68"/>
+        <efficiency ratio="0.67" factor="0.87"/>
+        <efficiency ratio="0.8" factor="0.93"/> 
+        <efficiency ratio="0.9" factor="0.97"/> 
+        <efficiency ratio="0.95" factor="0.978"/>
+        <efficiency ratio="1" factor="0.98"/>   
+        <efficiency ratio="1.04" factor="0.97"/>
+        <efficiency ratio="1.1" factor="0.945"/>
+        <efficiency ratio="1.2" factor="0.92"/> 
+        <efficiency ratio="1.3333333" factor="0.89"/>
+      </hydrostatic>
+			<gears shiftTimeMs="-1" automatic="true">	
+        <gear speed="5.78" name=""/> <!-- 0 1.57 4 8-->
+        <gear speed="11.56" name=""/> <!-- 0 3.14 8 15-->
+        <gear speed="23.12" name=""/> <!-- 0 6.27 15 31-->
+        <gear speed="46.24" name=""/> <!-- 0 12.54 31 62-->
+      </gears>
+			<reverse ratio="1" />	
+			<realEngine idleRpm="850" ratedRpm="2100">
+        <!-- 1900: 319(308) | 2100: 310(280) | 1500..1500: 1305(1305) | 85 | 0 | 99 | 3 | 2100 | 1350: 203 -->
+        <torque rpm="350" motorTorque="712" motorTorqueEco="712" fuelUsageRatio="239.1"/>
+        <torque rpm="700" motorTorque="1020" motorTorqueEco="1020" fuelUsageRatio="218.2"/>
+        <torque rpm="900" motorTorque="1138" motorTorqueEco="1138" fuelUsageRatio="210.3"/>
+        <torque rpm="1000" motorTorque="1189" motorTorqueEco="1189" fuelUsageRatio="207.4"/>
+        <torque rpm="1100" motorTorque="1231" motorTorqueEco="1231" fuelUsageRatio="205.3"/>
+        <torque rpm="1200" motorTorque="1263" motorTorqueEco="1263" fuelUsageRatio="203.8"/>
+        <torque rpm="1300" motorTorque="1286" motorTorqueEco="1286" fuelUsageRatio="203.1"/>
+        <torque rpm="1400" motorTorque="1300" motorTorqueEco="1300" fuelUsageRatio="203.1"/>
+        <torque rpm="1500" motorTorque="1305" motorTorqueEco="1305" fuelUsageRatio="203.9"/>
+        <torque rpm="1600" motorTorque="1297" motorTorqueEco="1295" fuelUsageRatio="205.5"/>
+        <torque rpm="1700" motorTorque="1273" motorTorqueEco="1263" fuelUsageRatio="207.9"/>
+        <torque rpm="1800" motorTorque="1234" motorTorqueEco="1200" fuelUsageRatio="211.1"/>
+        <torque rpm="1850" motorTorque="1209" motorTorqueEco="1168" fuelUsageRatio="213"/>
+        <torque rpm="1900" motorTorque="1179" motorTorqueEco="1138" fuelUsageRatio="215.1"/>
+        <torque rpm="1950" motorTorque="1147" motorTorqueEco="1103" fuelUsageRatio="217.4"/>
+        <torque rpm="2000" motorTorque="1112" motorTorqueEco="1057" fuelUsageRatio="219.9"/>
+        <torque rpm="2050" motorTorque="1075" motorTorqueEco="1001" fuelUsageRatio="222.6"/>
+        <torque rpm="2100" motorTorque="1037" motorTorqueEco="936" fuelUsageRatio="225.6"/>
+        <torque rpm="2150" motorTorque="903" motorTorqueEco="816" fuelUsageRatio="266.4"/>
+        <torque rpm="2200" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="451.1"/>
 			</realEngine>
-		</gearboxMogli>	
+		</gearboxMogli>
 	</vehicle>
 	
 	<vehicle>

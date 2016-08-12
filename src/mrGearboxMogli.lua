@@ -540,7 +540,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
-	self.mrGbMS.MinTargetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.6 * self.mrGbMS.IdleRpm + 0.3 * self.mrGbMS.RatedRpm )
+	self.mrGbMS.MinTargetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm )
 	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.15 )
 	self.mrGbMS.IndoorSoundFactor       = getXMLFloat(xmlFile, xmlString .. "#indoorSoundFactor")
 	
@@ -6088,7 +6088,8 @@ function mrGearboxMogliMotor:updateSpeedLimit( dt )
 		speedLimit = math.min( speedLimit, self.speedLimit )
 	end
 	
-	if self.vehicle.tempomatMogliV14.keepSpeedLimit ~= nil then
+	if      self.vehicle.tempomatMogliV14 ~= nil 
+			and self.vehicle.tempomatMogliV14.keepSpeedLimit ~= nil then
 		speedLimit = math.min( speedLimit, self.vehicle.tempomatMogliV14.keepSpeedLimit )
 	end
 
