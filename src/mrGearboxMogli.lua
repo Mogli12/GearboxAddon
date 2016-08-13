@@ -157,6 +157,7 @@ mrGearboxMogliGlobals.HydroSpeedIdleRedux   = 0.02  -- 0.04  -- default reduce b
 mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.2   -- make some noise with motor brake 
 mrGearboxMogliGlobals.motorLoadVolumeFrom   = 0     -- this is for scaling motorLoad to volume
 mrGearboxMogliGlobals.motorLoadVolumeTo     = 1     -- this is for scaling motorLoad to volume
+mrGearboxMogliGlobals.minClutchTimeManual   = 1000  -- ms; time from 0% to 100% for the digital manual clutch
 
 --**********************************************************************************************************	
 -- setSampleVolume
@@ -919,7 +920,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
-	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"),   math.max(clutchEngagingTimeMs, 500)), 1 )
+	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), clutchEngagingTimeMs ), self.mrGbMG.minClutchTimeManual )
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
