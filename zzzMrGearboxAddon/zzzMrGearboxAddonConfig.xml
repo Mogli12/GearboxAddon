@@ -1460,9 +1460,9 @@
 			<xmlFile name="Mercedes_Benz_NG_1632_4x4.xml"/>
 		</mod>
 	
-		<gearboxMogli speedLimiter="false" launchGearSpeed="30">
+		<gearboxMogli speedLimiter="false" autoStartStop="false" launchGearSpeed="30" soundMaxRpm="1500">
 			<!-- http://kds.vsb.cz/mhd/konstrukce-prevodovky_soubory/image012.jpg -->
-			<gears axleSpeed="5.25" tireWidth="315" tireRatio="80" rimDiameter="22.5" automatic="false" shiftTimeMs="800">
+			<gears axleSpeed="5.25" tireWidth="315" tireRatio="80" rimDiameter="22.5" automatic="false" shiftTimeMs="800" defaultGear="3">
 				<gear name="C" forwardOnly="true" inverseRatio="13.09"/>
 				<gear name="R" reverseOnly="true" inverseRatio="11.06"/>
 				<gear name="1" forwardOnly="true" inverseRatio="8.68"/>

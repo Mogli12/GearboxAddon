@@ -154,10 +154,10 @@ mrGearboxMogliGlobals.DefaultRevUpMs0       = 1000  -- ms
 mrGearboxMogliGlobals.DefaultRevUpMs1       = 10000 -- ms
 mrGearboxMogliGlobals.DefaultRevDownMs      = 2000  -- ms
 mrGearboxMogliGlobals.HydroSpeedIdleRedux   = 0.02  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
-mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.2   -- make some noise with motor brake 
+mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.5   -- make some noise with motor brake 
 mrGearboxMogliGlobals.motorLoadVolumeFrom   = 0     -- this is for scaling motorLoad to volume
 mrGearboxMogliGlobals.motorLoadVolumeTo     = 1     -- this is for scaling motorLoad to volume
-mrGearboxMogliGlobals.minClutchTimeManual   = 1000  -- ms; time from 0% to 100% for the digital manual clutch
+mrGearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 
 --**********************************************************************************************************	
 -- setSampleVolume
@@ -882,6 +882,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ClutchMaxTargetRpm      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchMaxTargetRpm"), math.min( self.mrGbMS.RatedRpm, self.mrGbMS.CloseRpm + 0.1 * self.mrGbMS.RatedRpm ) )
 	
 	local clutchEngagingTimeMs          = getXMLFloat(xmlFile, xmlString .. "#clutchEngagingTimeMs")
+	local clutchTimeManualDefault      
 	if clutchEngagingTimeMs == nil then
 		if     hasHydrostat then
 			clutchEngagingTimeMs = 1
@@ -920,7 +921,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
-	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), clutchEngagingTimeMs ), self.mrGbMG.minClutchTimeManual )
+	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
@@ -2339,11 +2340,21 @@ function mrGearboxMogli:update(dt)
 			end
 		end
 
-		if  self:mrGbMGetAutoClutch() and self.mrGbML.oneButtonClutchTimer > g_currentMission.time + 500 then
-			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
-		end
-		if self.mrGbMS.ManualClutch < 1 and g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
-			self:mrGbMSetManualClutch( math.min( 1, self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeManual ))
+		if     self.mrGbML.oneButtonClutchTimer == nil
+				or self.mrGbMS.ClutchTimeManual     < dt
+				or g_currentMission.time >= self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ClutchTimeManual then
+			if self.mrGbMS.ManualClutch < 1 then
+				self:mrGbMSetManualClutch( 1 )
+			end
+		elseif g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
+			local mi = ( g_currentMission.time - self.mrGbML.oneButtonClutchTimer ) / self.mrGbMS.ClutchTimeManual
+			local ma = math.min( 1, self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeInc )
+			if self.motor.targetRpm == nil then
+				self:mrGbMSetManualClutch( mi )
+			else
+				self:mrGbMSetManualClutch( self.motor:getClutchPercent( self.motor.targetRpm, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, ma ) )
+			end
+		--print(string.format("%d, %5.2f%% <= %5.2f%% <= %5.2f%%",g_currentMission.time - self.mrGbML.oneButtonClutchTimer, mi*100,self.mrGbMS.ManualClutch*100,ma*100))
 		end
 		
 		if InputBinding.mrGearboxMogliMINRPM ~= nil then
@@ -2799,25 +2810,30 @@ function mrGearboxMogli:update(dt)
 				local indoorFactor = 1				
 					
 				local motorLoad 
-				if     self.mrGbMS.MotorBrake then
-					motorLoad = self.mrGbMG.motorLoadVolumeBrake
+				if self.isServer then 
+					motorLoad = Utils.getNoNil( self.motor.motorLoadS1, self.motor.motorLoadP )
 				else
-					if self.isServer then 
-						motorLoad = Utils.getNoNil( self.motor.motorLoadS1, self.motor.motorLoadP )
-					else
-						motorLoad = Utils.getNoNil( self:mrGbMGetMotorLoad(), 0.5 )
-					end
-					if self.mrGbMG.motorLoadVolumeFrom ~= 0 or self.mrGbMG.motorLoadVolumeTo ~= 1 then
-						motorLoad = self.mrGbMG.motorLoadVolumeFrom + motorLoad( self.mrGbMG.motorLoadVolumeTo - self.mrGbMG.motorLoadVolumeFrom )
-					end
+					motorLoad = Utils.getNoNil( self:mrGbMGetMotorLoad(), 0.5 )
+				end
+				if self.mrGbMG.motorLoadVolumeFrom ~= 0 or self.mrGbMG.motorLoadVolumeTo ~= 1 then
+					motorLoad = self.mrGbMG.motorLoadVolumeFrom + motorLoad( self.mrGbMG.motorLoadVolumeTo - self.mrGbMG.motorLoadVolumeFrom )
 				end
 				
-				if self.mrGbML.motorLoadVolume == nil then
-					self.mrGbML.motorLoadVolume = motorLoad
+				if self.mrGbML.motorLoadVolRun == nil then
+					self.mrGbML.motorLoadVolRun = motorLoad
 				else
-					self.mrGbML.motorLoadVolume = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolume-0.001*dt, self.mrGbML.motorLoadVolume+0.001*dt ) 
+					self.mrGbML.motorLoadVolRun = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolRun-0.001*dt, self.mrGbML.motorLoadVolRun+0.001*dt ) 
 				end
-				motorLoad = self.mrGbML.motorLoadVolume
+				
+				if self.mrGbMS.MotorBrake then
+					motorLoad = self.mrGbMG.motorLoadVolumeBrake
+				end
+				
+				if self.mrGbML.motorLoadVolIdle == nil then
+					self.mrGbML.motorLoadVolIdle = motorLoad
+				else
+					self.mrGbML.motorLoadVolIdle = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolIdle-0.001*dt, self.mrGbML.motorLoadVolIdle+0.001*dt ) 
+				end
 				
 				local indoorFactor0 = 1				
 				if isIndoor then
@@ -2837,8 +2853,8 @@ function mrGearboxMogli:update(dt)
 					mrGearboxMogli.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
 				end
 				
-				if self.sampleMotor.sample ~= nil then					
-					self.sampleMotor.volume    = self.mrGbMB.soundVolume * ( self.mrGbMS.IdleVolumeFactor + self.mrGbMS.IdleVolumeFactorInc * ( motorLoad ^ self.mrGbMS.IdleVolumeExponent ) )
+				if self.sampleMotor.sample ~= nil then			
+					self.sampleMotor.volume    = self.mrGbMB.soundVolume * ( self.mrGbMS.IdleVolumeFactor + self.mrGbMS.IdleVolumeFactorInc * ( self.mrGbML.motorLoadVolIdle ^ self.mrGbMS.IdleVolumeExponent ) )
 					
 					local indoorFactor = indoorFactor0
 					if isIndoor and self.mrGbMB.soundIndoorIndex  ~= nil then
@@ -2854,7 +2870,7 @@ function mrGearboxMogli:update(dt)
 					self.sampleMotorRun.volume = f0 * self.mrGbMB.soundRunVolume
 					
 					local indoorFactor = indoorFactor0				
-					local rpmRunVolume = f0 * self.mrGbMS.RunVolumeFactor + self.mrGbMS.RunVolumeFactorInc * ( motorLoad ^ self.mrGbMS.RunVolumeExponent )
+					local rpmRunVolume = f0 * self.mrGbMS.RunVolumeFactor + self.mrGbMS.RunVolumeFactorInc * ( self.mrGbML.motorLoadVolRun ^ self.mrGbMS.RunVolumeExponent )
 					
 					if isIndoor and self.mrGbMB.soundRunIndoorIndex ~= nil then
 						indoorFactor = Utils.getNoNil( self.indoorSounds.sounds[self.mrGbMB.soundRunIndoorIndex].indoorFactor, 0.4 )
@@ -8129,16 +8145,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 															toClutchPercent*100 ))
 				end
 				
-			--if clutchMode > 1 then
-					self.autoClutchPercent = c
-			--else
-			--	self.autoClutchPercent = self.autoClutchPercent + self.vehicle.mrGbML.smoothLittle * ( c - self.autoClutchPercent )
-			--end
+				self.autoClutchPercent = c
 			end
 			
-			if not ( self.vehicle:mrGbMGetAutoClutch() ) then
-				self.vehicle.mrGbMS.ManualClutch = math.min( self.vehicle.mrGbMS.ManualClutch, self.autoClutchPercent )
-			end
 		else
 			self.autoClutchPercent   = self.vehicle.mrGbMS.MaxClutchPercent
 		end 		
