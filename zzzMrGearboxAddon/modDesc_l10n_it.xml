@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Cambio]]>
+</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="mrGearboxMogliSHIFTGEARUP"     text="Cambio: marcia su"/>
+		<text name="mrGearboxMogliSHIFTGEARDOWN"   text="Cambio: marcia giù"/>
+		<text name="mrGearboxMogliSHIFTRANGEUP"    text="Cambio: gruppo su"/>
+		<text name="mrGearboxMogliSHIFTRANGE2UP"   text="Cambio: gruppo 2 su"/>
+		<text name="mrGearboxMogliSHIFTRANGEDOWN"  text="Cambio: gruppo giù"/>
+		<text name="mrGearboxMogliSHIFTRANGE2DOWN" text="Cambio: gruppo 2 giù"/>
+		<text name="mrGearboxMogliNEUTRAL"         text="Cambio: folle"/>
+		<text name="mrGearboxMogliOFF"             text="Cambio manuale: [disattivo]"/>
+		<text name="mrGearboxMogliON"              text="Cambio manuale: [attivo]"/>
+		<text name="mrGearboxMogliON_OFF"          text="Cambio: attivo/disattivo"/>
+		<text name="mrGearboxMogliHUD"             text="Cambio: HUD attivo/disattivo"/>
+		<text name="mrGearboxMogliAllAuto"         text="Cambio: realtà attivo/disattivo"/>
+		<text name="mrGearboxMogliAllAutoON"       text="Cambio: [semplificato]"/>
+		<text name="mrGearboxMogliAllAutoOFF"      text="Cambio: [realistico]"/>
+		<text name="mrGearboxMogliREVERSE"         text="Cambio: retromarcia"/>
+		<text name="mrGearboxMogliAUTOCLUTCH2"     text="Cambio: frizione automatica"/>
+		<text name="mrGearboxMogliCLUTCH"          text="Cambio: frizione"/>
+		<text name="mrGearboxMogliCLUTCH_1"        text="Cambio: frizione aperta"/>
+		<text name="mrGearboxMogliCLUTCH_2"        text="Cambio: frizione chiusa"/>
+		<text name="mrGearboxMogliCLUTCH_3"        text="Cambio: frizione"/>
+		<text name="mrGearboxMogliMINRPM"          text="Cambio: accelleratore a mano"/>
+		<text name="mrGearboxMogliMINRPM_1"        text="Cambio: accelleratore a mano giù"/>
+		<text name="mrGearboxMogliMINRPM_2"        text="Cambio: accelleratore a mano su"/>
+		<text name="mrGearboxMogliGEAR1"           text="Cambio: G27 1"/>
+		<text name="mrGearboxMogliGEAR2"           text="Cambio: G27 2"/>
+		<text name="mrGearboxMogliGEAR3"           text="Cambio: G27 3"/>
+		<text name="mrGearboxMogliGEAR4"           text="Cambio: G27 4"/>
+		<text name="mrGearboxMogliGEAR5"           text="Cambio: G27 5"/>
+		<text name="mrGearboxMogliGEAR6"           text="Cambio: G27 6"/>
+		<text name="mrGearboxMogliGEARR"           text="Cambio: G27 R"/>
+		<text name="mrGearboxMogliGEARFWD"         text="Cambio: avanti"/> 
+		<text name="mrGearboxMogliGEARBACK"        text="Cambio: indietro"/>
+		<text name="mrGearboxMogliSPEEDLIMIT"      text="Cambio: limitatore"/>
+		<text name="mrGearboxMogliSWAPSPEED"       text="Cambio: limitatore 2"/>
+		<text name="mrGearboxMogliSETSPEED"        text="Cambio: imposta limite"/>
+		<text name="mrGearboxMogliACCTOLIMIT"      text="Cambio: accellera"/>
+		<text name="mrGearboxMogliDECTOLIMIT"      text="Cambio: decellera"/>
+		<text name="mrGearboxMogliECO"             text="Cambio: Eco attivo/disattivo"/>
+		<text name="mrGearboxMogliKEEPSPEED"       text="Cambio: mantieni la velocità"/>
+		<text name="mrGearboxMogliTEXT_OFF"        text="Motore: spento"/>
+		<text name="mrGearboxMogliTEXT_AI"         text="Operaio"/>
+		<text name="mrGearboxMogliTEXT_BRAKE"      text="Freno a mano"/>
+		<text name="mrGearboxMogliTEXT_DC"         text="Doppia frizione"/>
+		<text name="mrGearboxMogliTEXT_NEUTRAL"    text="Folle"/>
+		<text name="mrGearboxMogliTEXT_AUTO"       text="Automatico"/>
+		<text name="mrGearboxMogliTEXT_MANUAL"     text="Manuale"/>
+		<text name="mrGearboxMogliTEXT_NOGEAR"     text="Senza marce"/>
+		<text name="mrGearboxMogliTEXT_VARIO"      text="Variatore"/>
+		<text name="mrGearboxMogliTEXT_ALLAUTO"    text="Semplificato"/>
+		<text name="mrGearboxMogliTEXT_ECO"        text="Eco"/>
+		<text name="mrGearboxMogliTEXT_AUTO_HOLD"  text="Attesa automatica"/>
+	</texts>
+</l10n>

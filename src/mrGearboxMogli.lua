@@ -8,7 +8,7 @@
 --
 --***************************************************************
 
-local mrGearboxMogliVersion=1.329
+local mrGearboxMogliVersion=1.404
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if mrGearboxMogli == nil or mrGearboxMogli.version == nil or mrGearboxMogli.version < mrGearboxMogliVersion then
@@ -118,13 +118,13 @@ mrGearboxMogliGlobals.shiftTimeMsFactor     = 1
 mrGearboxMogliGlobals.playGrindingSound     = true
 mrGearboxMogliGlobals.defaultHudMode        = 1    -- 0: no HUD, 1: big HUD, 2: small HUD with gear name only
 mrGearboxMogliGlobals.hudPositionX          = 0.84
-mrGearboxMogliGlobals.hudPositionY          = 0.65
+mrGearboxMogliGlobals.hudPositionY          = 0.7
 mrGearboxMogliGlobals.hudTextSize           = 0.02
 mrGearboxMogliGlobals.hudTitleSize          = 0.03
 mrGearboxMogliGlobals.hudBorder             = 0.005
 mrGearboxMogliGlobals.hudWidth              = 0.15
-mrGearboxMogliGlobals.stallWarningTime      = 100
-mrGearboxMogliGlobals.stallMotorOffTime     = 1000
+mrGearboxMogliGlobals.stallWarningTime      = 250
+mrGearboxMogliGlobals.stallMotorOffTime     = 3000
 mrGearboxMogliGlobals.realFuelUsage         = true
 mrGearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 mrGearboxMogliGlobals.combineDefaultSpeed   = 11 -- km/h
@@ -8155,6 +8155,9 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.torqueConverterLockupMs = nil
 	end 					
 	
+	local lastStallWarningTimer = self.stallWarningTimer
+	self.stallWarningTimer = nil
+	
 	if     self.noTransmission then
 		self.clutchPercent = 0
 	elseif self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverterOrHydro then
@@ -8164,20 +8167,21 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.vehicle.mrGbML.debugTimer = math.max( g_currentMission.time + 200, self.vehicle.mrGbML.debugTimer )
 		end
 	else
-		local stallRpm = math.min( 100, 0.5 * self.stallRpm ) --math.max( 0.5 * self.stallRpm, self.stallRpm - 100 )
+	--local stallRpm = math.min( 100, 0.5 * self.stallRpm ) --math.max( 0.5 * self.stallRpm, self.stallRpm - 100 )
+		local stallRpm = math.max( 0.5 * self.stallRpm, self.stallRpm - 100 )
 		if not ( self.noTransmission ) and self.vehicle.mrGbMS.ManualClutch > self.vehicle.mrGbMS.MinClutchPercent and self.nonClampedMotorRpm < stallRpm then
-			if self.stallWarningTimer == nil then
+			if lastStallWarningTimer == nil then
 				self.stallWarningTimer = g_currentMission.time
-			end
-			if      g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallMotorOffTime then
-				self.stallWarningTimer = nil
-				self:motorStall( string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ),
-												 string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ) )
-			elseif  g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallWarningTime then
-				self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
+			else
+				self.stallWarningTimer = lastStallWarningTimer
+				if     g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallMotorOffTime then
+					self.stallWarningTimer = nil
+					self:motorStall( string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ),
+													 string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ) )
+				elseif g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallWarningTime then
+					self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, stallRpm ))
+				end		
 			end		
-		else
-			self.stallWarningTimer = nil
 		end
 		
 		self.clutchPercent = self.vehicle.mrGbMS.ManualClutch

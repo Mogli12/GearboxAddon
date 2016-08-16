@@ -8,73 +8,26 @@
 	</title>
 	<description>
 		<en>Gearbox:
-			<![CDATA[Adds the specialization mrGearboxMogli to all condigured vehicles]]>
+<![CDATA[Gearbox:
+Adds the specialization mrGearboxMogli to all condigured vehicles]]>
 		</en>
-		<de>Getriebe:
-			<![CDATA[Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]>
+		<de>
+<![CDATA[Getriebe: 
+Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]>
 		</de>
-		<it>Cambio
+		<it>
+<![CDATA[Cambio]]>
 		</it>
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.4.0.3</version>
-	<l10n>
+	<version>1.4.0.4</version>
+	
+	<l10n filenamePrefix="modDesc_l10n">
 		<text name="mrGearboxMogliVERSION">
-		<de>Getriebe v1.5 beta 3 von Mogli</de>
-		 <en>Gearbox v1.5 beta 3 by mogli</en></text>
-		  <it>Cambio v1.5 beta 3 by mogli</it>
-		<text name="mrGearboxMogliSHIFTGEARUP"><de>Getriebe: Gang hoch</de><en>Gearbox: Gear up</en><it>Cambio: marcia su</it></text>
-		<text name="mrGearboxMogliSHIFTGEARDOWN"><de>Getriebe: Gang runter</de><en>Gearbox: Gear down</en><it>Cambio: marcia giù</it></text>
-		<text name="mrGearboxMogliSHIFTRANGEUP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en><it>Cambio: gruppo su</it></text>
-		<text name="mrGearboxMogliSHIFTRANGE2UP"><de>Getriebe: Gruppe hoch</de><en>Gearbox: Range up</en><it>Cambio: gruppo giù</it></text>
-		<text name="mrGearboxMogliSHIFTRANGEDOWN"><de>Getriebe: Gruppe 2 runter</de><en>Gearbox: Range 2 down</en><it>Cambio: gruppo 2 giù</it></text>
-		<text name="mrGearboxMogliSHIFTRANGE2DOWN"><de>Getriebe: Gruppe 2 runter</de><en>Gearbox: Range 2 down</en><it>Cambio: gruppo 2 giù</it></text>
-		<text name="mrGearboxMogliNEUTRAL"><de>Getriebe: Neutral</de><en>Gearbox: Neutral</en><it>Cambio: folle</it></text>
-		<text name="mrGearboxMogliOFF"><de>Manuelles Getriebe [aus]</de><en>manual gearbox [off]</en><it>Cambio manuale: [disattivo]</it></text>
-		<text name="mrGearboxMogliON"><de>Manuelles Getriebe [an]</de><en>manual gearbox [on]</en><it>Cambio manuale: [attivo]</it></text>
-		<text name="mrGearboxMogliON_OFF"><de>Getriebe: An/Aus</de><en>Gearbox: On/Off</en><it>Cambio: attivo/disattivo</it></text>
-		<text name="mrGearboxMogliHUD"><de>Getriebe: HUD an/aus</de><en>Gearbox: HUD on/off</en><it>Cambio: HUD attivo/disattivo</it></text>
-		<text name="mrGearboxMogliAllAuto"><de>Getriebe: Realismus-Schalter</de><en>Gearbox: reality switch</en><it>Cambio: realtà attivo/disattivo</it></text>
-		<text name="mrGearboxMogliAllAutoON"><de>Getriebe [einfach]</de><en>Gearbox [simplified]</en><it>Cambio: [semplificato]</it></text>
-		<text name="mrGearboxMogliAllAutoOFF"><de>Getriebe [realistisch]</de><en>Gearbox [realistic]</en><it>Cambio: [realistico]</it></text>
-		<text name="mrGearboxMogliREVERSE"><de>Getriebe: Rückwärts</de><en>Gearbox: Reverse</en><it>Cambio: retromarcia</it></text>
-		<text name="mrGearboxMogliAUTOCLUTCH2"><de>Getriebe: Autom.Kupplung</de><en>Gearbox: auto clutch</en><it>Cambio: frizione automatica</it></text>
-		<text name="mrGearboxMogliCLUTCH"><de>Getriebe: Kupplung</de><en>Gearbox: clutch</en><it>Cambio: frizione</it></text>
-		<text name="mrGearboxMogliCLUTCH_1"><de>Getriebe: Kupplung öffnen</de><en>Gearbox: clutch open</en><it>Cambio: frizione aperta</it></text>
-		<text name="mrGearboxMogliCLUTCH_2"><de>Getriebe: Kupplung schliessen</de><en>Gearbox: clutch close</en><it>Cambio: frizione chiusa</it></text>
-		<text name="mrGearboxMogliCLUTCH_3"><de>Getriebe: Kupplung</de><en>Gearbox: clutch</en><it>Cambio: frizione</it></text>
-		<text name="mrGearboxMogliMINRPM"><de>Getriebe: Handgas</de><en>Gearbox: hand throttle</en><it>Cambio: accelleratore a mano</it></text>
-		<text name="mrGearboxMogliMINRPM_1"><de>Getriebe: Handgas runter</de><en>Gearbox: hand throttle</en><it>Cambio: accelleratore a mano giù</it></text>
-		<text name="mrGearboxMogliMINRPM_2"><de>Getriebe: Handgas rauf</de><en>Gearbox: hand throttle</en><it>Cambio: accelleratore a mano su</it></text>
-		<text name="mrGearboxMogliGEAR1"><de>Getriebe: G27 1</de><en>Gearbox: G27 1</en><it>Cambio: G27 1</it></text>
-		<text name="mrGearboxMogliGEAR2"><de>Getriebe: G27 2</de><en>Gearbox: G27 2</en><it>Cambio: G27 2</it></text>
-		<text name="mrGearboxMogliGEAR3"><de>Getriebe: G27 3</de><en>Gearbox: G27 3</en><it>Cambio: G27 3</it></text>
-		<text name="mrGearboxMogliGEAR4"><de>Getriebe: G27 4</de><en>Gearbox: G27 4</en><it>Cambio: G27 4</it></text>
-		<text name="mrGearboxMogliGEAR5"><de>Getriebe: G27 5</de><en>Gearbox: G27 5</en><it>Cambio: G27 5</it></text>
-		<text name="mrGearboxMogliGEAR6"><de>Getriebe: G27 6</de><en>Gearbox: G27 6</en><it>Cambio: G27 6</it></text>
-		<text name="mrGearboxMogliGEARR"><de>Getriebe: G27 R</de><en>Gearbox: G27 R</en><it>Cambio: G27 R</it></text>
-		<text name="mrGearboxMogliGEARFWD"><de>Getriebe: forwärts</de><en>Gearbox: fwd</en><it>Cambio: avanti</it></text>
-		<text name="mrGearboxMogliGEARBACK"><de>Getriebe: rückwärts</de><en>Gearbox: back</en><it>Cambio: indietro</it></text>
-		<text name="mrGearboxMogliSPEEDLIMIT"><de>Getriebe: Begrenzer</de><en>Gearbox: limiter</en><it>Cambio: limitatore</it></text>
-		<text name="mrGearboxMogliSWAPSPEED"><de>Getriebe: Tempomat 2</de><en>Gearbox: limiter 2</en><it>Cambio: limitatore 2</it></text>
-		<text name="mrGearboxMogliSETSPEED"><de>Getriebe: Setze Begrenzer</de><en>Gearbox: set limit</en><it>Cambio: imposta limite</it></text>
-		<text name="mrGearboxMogliACCTOLIMIT"><de>Getriebe: Beschleunigung</de><en>Gearbox: acceleration</en><it>Cambio: accellera</it></text>
-		<text name="mrGearboxMogliDECTOLIMIT"><de>Getriebe: Bremsen</de><en>Gearbox: deceleration</en><it>Cambio: decellera</it></text>
-		<text name="mrGearboxMogliECO"><de>Getriebe: Eco an/aus</de><en>Gearbox: eco on/off</en><it>Cambio: Eco attivo/disattivo</it></text>
-		<text name="mrGearboxMogliKEEPSPEED"><de>Getriebe: Geschwindigkeit halten</de><en>Gearbox: keep speed</en><it>Cambio: mantieni la velocità</it></text>
-		<text name="mrGearboxMogliTEXT_OFF"><de>Motor aus</de><en>motor off</en><it>Motore: spento</it></text>
-		<text name="mrGearboxMogliTEXT_AI"><de>Helfer</de><en>AI</en><it>Operaio</it></text>
-		<text name="mrGearboxMogliTEXT_BRAKE"><de>Handbremse</de><en>handbrake</en><it>Freno a mano</it></text>
-		<text name="mrGearboxMogliTEXT_DC"><de>Zwischengas</de><en>double clutch</en><it>Doppia frizione</it></text>
-		<text name="mrGearboxMogliTEXT_NEUTRAL"><de>Neutral</de><en>neutral</en><it>Folle</it></text>
-		<text name="mrGearboxMogliTEXT_AUTO"><de>Automatik</de><en>automatic</en><it>Automatico</it></text>
-		<text name="mrGearboxMogliTEXT_MANUAL"><de>Manuell</de><en>manual</en><it>Manuale</it></text>
-		<text name="mrGearboxMogliTEXT_NOGEAR"><de>Kein Gang</de><en>no gear</en><it>Senza marce</it></text>
-		<text name="mrGearboxMogliTEXT_VARIO"><de>Stufenlos</de><en>CVT</en><it>Variatore</it></text>
-		<text name="mrGearboxMogliTEXT_ALLAUTO"><de>Vereinfacht</de><en>simple</en><it>Semplificato</it></text>
-		<text name="mrGearboxMogliTEXT_ECO"><de>Eco</de><en>eco</en><it>Eco</it></text>
-		<text name="mrGearboxMogliTEXT_AUTO_HOLD"><de>Auto Hold</de><en>auto hold</en><it>Attesa automatica</it></text>
+		<de>Getriebe v1.5 beta 4 von Mogli</de>
+		 <en>Gearbox v1.5 beta 4 by mogli</en></text>
+		  <it>Cambio v1.5 beta 4 by mogli</it>
   </l10n>
 
 	<inputBindings>

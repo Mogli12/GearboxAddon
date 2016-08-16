@@ -7,7 +7,7 @@
 --
 --***************************************************************
 
-local tempomatMogliVersion=1.400
+local tempomatMogliVersion=1.404
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version < tempomatMogliVersion then
@@ -101,15 +101,14 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:getMinSpeed( inKmH )
 		local minSpeed = 2
 		
-		if      self.mrGbMS          ~= nil
-				and self.mrGbMD          ~= nil
+		if      type( self.mrGbMS )            == "table"
+				and type( self.mrGbMGetGearSpeed ) == "function"
+				and type( self.mrGbMGetAutomatic ) == "function"
 				and not ( self.mrGbMS.Hydrostatic ) 
 				and not ( self:mrGbMGetAutomatic( ) )
-				and self.mrGbMD.Speed    ~= nil
-				and self.mrGbMD.Speed     > 0
 				and self.mrGbMS.IdleRpm	 ~= nil
 				and self.mrGbMS.RatedRpm ~= nil then
-			minSpeed = math.max( minSpeed, self.mrGbMD.Speed ) * self.mrGbMS.IdleRpm	/ self.mrGbMS.RatedRpm
+			minSpeed = math.max( minSpeed, self:mrGbMGetGearSpeed() ) * self.mrGbMS.IdleRpm	/ self.mrGbMS.RatedRpm
 		end
 		
 		if not ( inKmH ) then
