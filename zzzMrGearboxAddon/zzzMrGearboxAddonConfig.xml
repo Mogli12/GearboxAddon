@@ -6586,6 +6586,51 @@
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
+	
+	<vehicle>
+		<mod name="JohnDeereT670i">
+			<xmlFile name="JDT670.xml" />
+		</mod>
+	
+		<gearboxMogli disableManual="true" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1">
+			<combine defaultFruit="chaff" defaultWidth="9.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" >
+        <gear speed="13.27" name="field"/> <!-- 0.25 2.5 6 20-->
+        <gear speed="43.78" name="street"/> <!-- 0.83 8.24 20 67-->
+      </gears>
+			
+			<realEngine idleRpm="850" ratedRpm="2200">
+        <!-- 2000: 431.12(431) | 2200: 412.08(412) | 1600..1600: 1551.55(1552) | 70 | 0 | 149 | 2 | 2300 | 1360: 210 -->
+        <torque rpm="350" motorTorque="599" fuelUsageRatio="240.4"/>
+        <torque rpm="700" motorTorque="976" fuelUsageRatio="223"/>
+        <torque rpm="900" motorTorque="1195" fuelUsageRatio="216.3"/>
+        <torque rpm="1000" motorTorque="1290" fuelUsageRatio="213.9"/>
+        <torque rpm="1100" motorTorque="1370" fuelUsageRatio="212"/>
+        <torque rpm="1200" motorTorque="1435" fuelUsageRatio="210.8"/>
+        <torque rpm="1300" motorTorque="1486" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="1522" fuelUsageRatio="210.1"/>
+        <torque rpm="1500" motorTorque="1544" fuelUsageRatio="210.6"/>
+        <torque rpm="1600" motorTorque="1552" fuelUsageRatio="211.9"/>
+        <torque rpm="1700" motorTorque="1549" fuelUsageRatio="213.8"/>
+        <torque rpm="1800" motorTorque="1542" fuelUsageRatio="216.4"/>
+        <torque rpm="1850" motorTorque="1537" fuelUsageRatio="217.9"/>
+        <torque rpm="1900" motorTorque="1530" fuelUsageRatio="219.6"/>
+        <torque rpm="1950" motorTorque="1523" fuelUsageRatio="221.5"/>
+        <torque rpm="2000" motorTorque="1514" fuelUsageRatio="223.5"/>
+        <torque rpm="2050" motorTorque="1473" fuelUsageRatio="225.7"/>
+        <torque rpm="2100" motorTorque="1426" fuelUsageRatio="228.1"/>
+        <torque rpm="2150" motorTorque="1373" fuelUsageRatio="230.6"/>
+        <torque rpm="2200" motorTorque="1315" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="1167" fuelUsageRatio="248.6"/>
+        <torque rpm="2300" motorTorque="723" fuelUsageRatio="319.4"/>
+        <torque rpm="2350" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	
+	</vehicle>
 		
 	<vehicle> 
 		<mod name="Fendtkatana85" isPrefix="true">
