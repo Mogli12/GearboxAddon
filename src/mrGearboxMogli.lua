@@ -58,7 +58,7 @@ mrGearboxMogli.smoothFast           = 0.12
 mrGearboxMogli.smoothMedium         = 0.04
 mrGearboxMogli.smoothSlow           = 0.015
 mrGearboxMogli.absWheelSpeedRpmMin  = 10
-mrGearboxMogli.hydroEffDiff         = 50
+mrGearboxMogli.hydroEffDiff         = mrGearboxMogli.huge --50
 mrGearboxMogli.hydroEffDiffInc      = 1000
 mrGearboxMogli.ptoRpmThrottleDiff   = 25 --75
 mrGearboxMogli.powerFactor0         = 0.1424083769633507853403141361257
@@ -1563,7 +1563,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.HydrostaticStart  = self.mrGbMS.HydrostaticMin
 		end
 		
-		local dft = 2000
+		local dft = 1000
 		local hit = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs")
 		if hit == nil then
 			-- 2000 ms
@@ -1578,7 +1578,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.HydrostaticSmIFactor = 100 / hit 
 			self.mrGbMS.HydrostaticIncFactor = 1 / (hit+hit+hit)
 		end
-		dft = 2000
+		dft = 1000
 		local hdt = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxMinTimeMs")
 		if hdt == nil and hit == nil then
 			-- 2000 ms
@@ -7331,6 +7331,7 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end		
 				
 				-- target RPM
+				local c = self.lastMotorRpm 
 				local t = self.targetRpm 
 			--if not self.ptoOn and 0.8 < self.motorLoadP and self.motorLoadP < 1 then
 			--	local d = 1 - 10 * math.abs( self.motorLoadP - 0.9 )
@@ -7361,8 +7362,10 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					d = mrGearboxMogli.ptoRpmThrottleDiff
 				end
 				
-				n = math.max( n, t - d )
-				m = math.min( m, t + d )
+				n  = math.max( n, t - d )
+				m  = math.min( m, t + d )
+				ns = math.max( self.idleRpm, t - d )
+				ms = math.min( m0, t + d )
 				
 				-- boundaries hStart, hMin & hMax
 				local hMax0 = self.vehicle.mrGbMS.HydrostaticMax			
@@ -7413,7 +7416,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				--end
 				
 					local w = ( self.absWheelSpeedRpm + math.max( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm ) ) * r
-					local c = self.lastMotorRpm 
 					
 					if self.vehicle:mrGbMGetAutomatic() and g ~= currentGear then						
 						if not isValidEntry then
@@ -7581,17 +7583,22 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						end
 						
 						if self.vehicle:mrGbMGetAutomatic() then
-							local t = self:getRpmScore( w / h, n, m )
-							
-							if t <= 0 then
-								t = 1+e
+							local t1 = self:getRpmScore( w / h, ns, ms )							
+							local t2
+							if t1 <= 0 then
+								t2 = 1+e
 							else
-								t = 1-t
+								t2 = 1-t1
 							end
-							if     bestE < t 
-									or ( math.abs( bestE - t ) < 1e-4
+							
+							if mrGearboxMogli.debugGearShift then
+								print(string.format("w/h: %4.0f n: %4.0f (%4.0f) m: %4.0f (%4.0f) => %5f / %5f", w/h, n, ns, m, ms, t1, t2 ))
+							end
+							
+							if     bestE < t2 
+									or ( math.abs( bestE - t2 ) < 1e-4
 									 and math.abs( self.vehicle.mrGbML.currentGearSpeed - spd ) < math.abs( self.vehicle.mrGbML.currentGearSpeed - bestS ) ) then
-								bestE = t
+								bestE = t2
 								bestG = g
 								bestH = h
 								bestS = spd
