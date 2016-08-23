@@ -6415,6 +6415,55 @@
 	</vehicle> 
 	
 	<vehicle> 
+		<mod name="ikasMercator">
+			<link href="http://www.modhoster.de/mods/claas-mercator-60--5" />
+			<xmlFile name="claas.xml" />
+		</mod>
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" onlyHandThrottle="true">
+			<combine defaultWidth="3.6" minRpm="1800"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000" clutchRatio="0.8">
+				<gear name="1" speed="5"    forwardOnly="true"/>
+				<gear name="R" speed="7.5"  reverseOnly="true"/>
+				<gear name="2" speed="9.5"  forwardOnly="true"/>
+				<gear name="3" speed="18.5" forwardOnly="true"/>
+			</gears>
+	
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <!-- 2200: 95(95) | 2200: 95(95) | 1400..1400: 380(380) | 85 | 0.5 | 249 | 2 | 2300 | 1360: 210 -->
+        <torque rpm="350" motorTorque="214" fuelUsageRatio="240.4"/>
+        <torque rpm="700" motorTorque="304" fuelUsageRatio="223"/>
+        <torque rpm="900" motorTorque="340" fuelUsageRatio="216.3"/>
+        <torque rpm="1000" motorTorque="355" fuelUsageRatio="213.9"/>
+        <torque rpm="1100" motorTorque="366" fuelUsageRatio="212"/>
+        <torque rpm="1200" motorTorque="374" fuelUsageRatio="210.8"/>
+        <torque rpm="1300" motorTorque="378" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="380" fuelUsageRatio="210.1"/>
+        <torque rpm="1500" motorTorque="375" fuelUsageRatio="210.6"/>
+        <torque rpm="1600" motorTorque="368" fuelUsageRatio="211.9"/>
+        <torque rpm="1700" motorTorque="360" fuelUsageRatio="213.8"/>
+        <torque rpm="1800" motorTorque="351" fuelUsageRatio="216.4"/>
+        <torque rpm="1850" motorTorque="346" fuelUsageRatio="217.9"/>
+        <torque rpm="1900" motorTorque="341" fuelUsageRatio="219.6"/>
+        <torque rpm="1950" motorTorque="335" fuelUsageRatio="221.5"/>
+        <torque rpm="2000" motorTorque="330" fuelUsageRatio="223.5"/>
+        <torque rpm="2050" motorTorque="323" fuelUsageRatio="225.7"/>
+        <torque rpm="2100" motorTorque="317" fuelUsageRatio="228.1"/>
+        <torque rpm="2150" motorTorque="310" fuelUsageRatio="230.6"/>
+        <torque rpm="2200" motorTorque="303" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="291" fuelUsageRatio="237.5"/>
+        <torque rpm="2300" motorTorque="254" fuelUsageRatio="257.2"/>
+        <torque rpm="2350" motorTorque="193" fuelUsageRatio="299.1"/>
+        <torque rpm="2400" motorTorque="108" fuelUsageRatio="368.2"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle> 
 		<mod name="JohnDeere_670">
 			<xmlFile name="JohnDeere_S670.xml" />
 		</mod>
