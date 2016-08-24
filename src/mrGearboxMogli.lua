@@ -8,7 +8,7 @@
 --
 --***************************************************************
 
-local mrGearboxMogliVersion=1.404
+local mrGearboxMogliVersion=1.409
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if mrGearboxMogli == nil or mrGearboxMogli.version == nil or mrGearboxMogli.version < mrGearboxMogliVersion then
@@ -155,13 +155,17 @@ mrGearboxMogliGlobals.DefaultRevUpMs0       = 1000  -- ms
 mrGearboxMogliGlobals.DefaultRevUpMs1       = 2000  -- ms
 mrGearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 mrGearboxMogliGlobals.HydroSpeedIdleRedux   = 0.02  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
-mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.0   -- make some noise with motor brake 
-mrGearboxMogliGlobals.motorLoadVolumeBrakeR = 0.2   -- make some noise with motor brake 
-mrGearboxMogliGlobals.motorLoadVolumeFrom   = 0     -- this is for scaling motorLoad to volume
-mrGearboxMogliGlobals.motorLoadVolumeTo     = 1     -- this is for scaling motorLoad to volume
+mrGearboxMogliGlobals.motorLoadVolumeBrake  = 1.0   -- make some noise with motor brake; -1 take normal motor load 
+mrGearboxMogliGlobals.motorLoadVolumeBrakeR = -1    -- make some noise with motor brake; -1 take normal motor load
 mrGearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 mrGearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 mrGearboxMogliGlobals.maxTorqueMsInv        = 0.002 -- 1 / ( time in ms to increase torque )
+mrGearboxMogliGlobals.idleVolumeFactor      = 0.8
+mrGearboxMogliGlobals.idleVolumeFactorInc   = 0.8
+mrGearboxMogliGlobals.idleVolumeExponent    = 2.0
+mrGearboxMogliGlobals.runVolumeFactor       = 0.8
+mrGearboxMogliGlobals.runVolumeFactorInc    = 0.8
+mrGearboxMogliGlobals.runVolumeExponent     = 2.0
 
 --**********************************************************************************************************	
 -- setSampleVolume
@@ -983,14 +987,14 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 --**************************************************************************************************		
 	self.mrGbMS.IdlePitchFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idlePitchFactor"), -1 )
 	self.mrGbMS.IdlePitchMax            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idlePitchMax"), -1 )
-	self.mrGbMS.IdleVolumeFactor        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactor"), 0.8 )
-	self.mrGbMS.IdleVolumeFactorInc     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactorInc"), 0.7 )
-	self.mrGbMS.IdleVolumeExponent      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeExponent"), 1.0 )
+	self.mrGbMS.IdleVolumeFactor        = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactor"),    self.mrGbMG.idleVolumeFactor )
+	self.mrGbMS.IdleVolumeFactorInc     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeFactorInc"), self.mrGbMG.idleVolumeFactorInc )
+	self.mrGbMS.IdleVolumeExponent      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleVolumeExponent"),  self.mrGbMG.idleVolumeExponent )
 	self.mrGbMS.RunPitchFactor          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runPitchFactor"), -1 )
 	self.mrGbMS.RunPitchMax             = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runPitchMax"), -1 )
-	self.mrGbMS.RunVolumeFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactor"), 0.8 )	
-	self.mrGbMS.RunVolumeFactorInc      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactorInc"), 0.7 )	
-	self.mrGbMS.RunVolumeExponent       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeExponent"), 1.0 )	
+	self.mrGbMS.RunVolumeFactor         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactor"),    self.mrGbMG.runVolumeFactor )	
+	self.mrGbMS.RunVolumeFactorInc      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeFactorInc"), self.mrGbMG.runVolumeFactorInc )	
+	self.mrGbMS.RunVolumeExponent       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#runVolumeExponent"),  self.mrGbMG.runVolumeExponent )	
 	self.mrGbMS.Run2PitchEffect         = getXMLFloat(xmlFile, xmlString .. "#run2PitchEffect" )
 		
 	if xmlSource == "vehicle" then
@@ -2835,28 +2839,25 @@ function mrGearboxMogli:update(dt)
 				else
 					motorLoad = Utils.getNoNil( self:mrGbMGetMotorLoad(), 0.5 )
 				end
-				if self.mrGbMG.motorLoadVolumeFrom ~= 0 or self.mrGbMG.motorLoadVolumeTo ~= 1 then
-					motorLoad = self.mrGbMG.motorLoadVolumeFrom + motorLoad( self.mrGbMG.motorLoadVolumeTo - self.mrGbMG.motorLoadVolumeFrom )
-				end
 
-				if self.mrGbMS.MotorBrake then
-					motorLoad = 0
+				if self.mrGbMS.MotorBrake and self.mrGbMG.motorLoadVolumeBrakeR >= 0 then
+					motorLoad = self.mrGbMG.motorLoadVolumeBrakeR
 				end
 				
 				if self.mrGbML.motorLoadVolRun == nil then
 					self.mrGbML.motorLoadVolRun = motorLoad
 				else
-					self.mrGbML.motorLoadVolRun = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolRun-0.001*dt, self.mrGbML.motorLoadVolRun+0.001*dt ) 
+					self.mrGbML.motorLoadVolRun = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolRun-0.002*dt, self.mrGbML.motorLoadVolRun+0.002*dt ) 
 				end
 				
-				if self.mrGbMS.MotorBrake then
+				if self.mrGbMS.MotorBrake and self.mrGbMG.motorLoadVolumeBrake >= 0 then
 					motorLoad = self.mrGbMG.motorLoadVolumeBrake
 				end
 				
 				if self.mrGbML.motorLoadVolIdle == nil then
 					self.mrGbML.motorLoadVolIdle = motorLoad
 				else
-					self.mrGbML.motorLoadVolIdle = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolIdle-0.001*dt, self.mrGbML.motorLoadVolIdle+0.001*dt ) 
+					self.mrGbML.motorLoadVolIdle = Utils.clamp( motorLoad, self.mrGbML.motorLoadVolIdle-0.002*dt, self.mrGbML.motorLoadVolIdle+0.002*dt ) 
 				end
 				
 				local indoorFactor0 = 1				
@@ -6887,7 +6888,6 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 	
 	self.lastThrottle = math.max( self.minThrottle, accelerationPedal )
-	requestedTorque   = math.min( requestedTorque, self.lastThrottle * self.currentTorqueCurve:get( self.lastMotorRpm ) )
 	
 	local prevWheelSpeedRpm = self.absWheelSpeedRpm
 	self.absWheelSpeedRpm = self.wheelSpeedRpm
@@ -6987,8 +6987,12 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 --	self.motorLoadP = self.motorLoadS
 	elseif self.lastMissingTorque > 0 then
 		self.motorLoadP = 1
+	elseif lastNoTorque then
+		self.motorLoadP = 0
+	elseif self.lastRawTorque < mrGearboxMogli.eps then
+		self.motorLoadP = 1
 	else
-		self.motorLoadP = Utils.clamp( requestedTorque / self.lastMotorTorque, 0, 1 )
+		self.motorLoadP = Utils.clamp( requestedTorque / self.lastRawTorque, 0, 1 )
 	end
 	
 --if lastNoTransmission or lastNoTorque then
