@@ -7,7 +7,7 @@
 --
 --***************************************************************
 
-local tempomatMogliVersion=1.404
+local tempomatMogliVersion=1.500
 
 -- allow modders to include this source file together with mogliBase.lua in their mods
 if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version < tempomatMogliVersion then

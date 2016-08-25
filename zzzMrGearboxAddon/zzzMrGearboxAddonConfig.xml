@@ -301,6 +301,64 @@
 	</vehicle>
 
 	<vehicle>
+		<mod name="JohnDeere5085M">
+			<link href="http://www.modhoster.de/mods/john-deere-5085m" />
+			<xmlFile name="JohnDeere5085M.xml" />
+		</mod>
+		
+		<!-- http://manuals.deere.com/omview/OMSU41536_19/?tM=HO -->
+		<!-- http://www.dlg-test.de/tests/0613_JohnDeere_5100M.pdf -->
+		<gearboxMogli soundMaxRpm="1200" speedLimiter="false" maxAIRange="3">
+
+			<gears shiftTimeMs="700" defaultGear="1">	
+				<gear speed="21.11" name="1" />
+				<gear speed="26.95" name="2" />
+				<gear speed="32.67" name="3" />
+				<gear speed="39.05" name="4" />
+			</gears>
+
+			<ranges shiftTimeMs="800" defaultRange="3">
+				<range speed="4.27"  gear="4" name="A" />
+				<range speed="10.31" gear="4" name="B" />
+				<range speed="25.27" gear="4" name="C" />
+				<range ratio="1"              name="D" />
+			</ranges>
+			
+			<ranges shiftTimeMs="1000" defaultRange="3" reverseReset="true">
+				<range speed="32.49" gear="4" name="L" forwardOnly="true"/>
+				<range speed="35.81" gear="4" name="R" reverseOnly="true"/>
+				<range ratio="1"              name="H" forwardOnly="true"/>
+			</ranges>
+			
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <!-- 1900: 85(85) | 2200: 82(82) | 1400..1600: 356(356) | 77 | 0.8 | 99 | 3 | 2200 | 1420: 204 -->
+        <torque rpm="350" motorTorque="105" fuelUsageRatio="242.4"/>
+        <torque rpm="700" motorTorque="210" fuelUsageRatio="221.4"/>
+        <torque rpm="900" motorTorque="274" fuelUsageRatio="213.1"/>
+        <torque rpm="1000" motorTorque="304" fuelUsageRatio="209.9"/>
+        <torque rpm="1100" motorTorque="327" fuelUsageRatio="207.4"/>
+        <torque rpm="1200" motorTorque="343" fuelUsageRatio="205.6"/>
+        <torque rpm="1300" motorTorque="353" fuelUsageRatio="204.5"/>
+        <torque rpm="1400" motorTorque="356" fuelUsageRatio="204"/>
+        <torque rpm="1500" motorTorque="356" fuelUsageRatio="204.2"/>
+        <torque rpm="1600" motorTorque="356" fuelUsageRatio="205.2"/>
+        <torque rpm="1700" motorTorque="344" fuelUsageRatio="206.9"/>
+        <torque rpm="1800" motorTorque="330" fuelUsageRatio="209.4"/>
+        <torque rpm="1850" motorTorque="322" fuelUsageRatio="210.9"/>
+        <torque rpm="1900" motorTorque="314" fuelUsageRatio="212.6"/>
+        <torque rpm="1950" motorTorque="306" fuelUsageRatio="214.5"/>
+        <torque rpm="2000" motorTorque="297" fuelUsageRatio="216.5"/>
+        <torque rpm="2050" motorTorque="289" fuelUsageRatio="218.8"/>
+        <torque rpm="2100" motorTorque="280" fuelUsageRatio="221.2"/>
+        <torque rpm="2150" motorTorque="271" fuelUsageRatio="223.9"/>
+        <torque rpm="2200" motorTorque="262" fuelUsageRatio="226.7"/>
+        <torque rpm="2250" motorTorque="228" fuelUsageRatio="267.8"/>
+        <torque rpm="2300" motorTorque="0" fuelUsageRatio="453.3"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>
 		<mod name="FS15_JD6115M_" isPrefix="true">
 			<link href="http://ls-portal.eu/john-deere-6115m-pack/" />
 			<xmlFile name="JD6115M_FH.xml" />
