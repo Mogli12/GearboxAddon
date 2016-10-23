@@ -2128,9 +2128,11 @@ function mrGearboxMogli:update(dt)
 	if      self.mrGbMG.realFuelUsage 
 			and self.isServer then
 		if not ( self.isMotorStarted ) then
+			self.fuelUsage = 0	
+		elseif  self:getIsHired() and self.lastMovedDistance < mrGearboxMogli.eps then
+			-- hired worker but not moving
 			self.fuelUsage = 0		
-		elseif  self.motor.fuelCurve ~= nil
-				and ( not self:getIsHired() or self.lastMovedDistance > 0 ) then
+		elseif  self.motor.fuelCurve ~= nil then
 			-- see Motorized.lua, line 468
 			-- with GearboxAddon the vehicle will consume fuel if it is not hired of the hired worker moved 
 			
@@ -2155,6 +2157,8 @@ function mrGearboxMogli:update(dt)
 					g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
 				end
 			end
+		else
+			self.fuelUsage = self.mrGbMB.fuelUsage
 		end
 	end
 	
@@ -6366,7 +6370,6 @@ end
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 
---self.lastMotorTorque         = 0
 	self.lastTransTorque         = 0
 	self.lastPtoTorque           = 0
 	self.lastLostTorque          = 0	
@@ -6383,6 +6386,11 @@ function mrGearboxMogliMotor:getTorque( acceleration, limitRpm )
 
 	local pt = 0
 	self.neededPtoTorque = PowerConsumer.getTotalConsumedPtoTorque(self.vehicle) 
+	
+--if self.vehicle.mrGbMS.EcoMode and self.neededPtoTorque > 0 then
+--	self.neededPtoTorque = self.neededPtoTorque * self.vehicle.mrGbMS.PtoRpm / self.vehicle.mrGbMS.PtoRpmEco
+--end
+
 	if self.neededPtoTorque > 0 then
 	  pt = self.neededPtoTorque / self.ptoMotorRpmRatio
 	end

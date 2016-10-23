@@ -2293,6 +2293,9 @@
 		<mod name="Fendt_Favorit_824" isPrefix="true">
 			<xmlFile name="Fendt_Favorit.xml"/>
 		</mod>
+		<mod name="FENDT_FAVORIT_PACK" isPrefix="true">
+			<xmlFile name="Fendt_Favorit824.xml"/>
+		</mod>
 	
 		<gearboxMogli autoStartStop="true" clutchOpenRpm="1300" clutchCloseRpm="1500" torqueConverter="true" minClutchRatio="0.3125" ptoRpm="2031" ptoRpmEco="1598" maxForwardSpeed="51" maxBackwardSpeed="41">
 			<gears defaultGear="1" shiftTimeMs="0" speedMatching="true" clutchRatio="1.0">	
@@ -6236,6 +6239,110 @@
         <torque rpm="2200" motorTorque="1153" fuelUsageRatio="272.2"/>
         <torque rpm="2300" motorTorque="271" fuelUsageRatio="427.1"/>
         <torque rpm="2400" motorTorque="0" fuelUsageRatio="477.8"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>	
+	
+	<vehicle>
+		<mod name="Claas_tucano_320">
+			<link href="http://www.modhoster.de/mods/claas-tucano-320--2" />
+			<xmlFile name="Claas_tucano320.xml"/>
+		</mod>
+		
+		<!-- http://www.claas.de/blueprint/servlet/blob/363840/dfd033407c44716953b7faaf6d91e2dc/224846-dataRaw.pdf -->
+		<!-- http://www.dmg-duisburg.de/html/d_c_om906la.html -->
+		<gearboxMogli soundMaxRpm="1700" disableManual="true" speedLimiter="true" maxForwardSpeed="26.5" maxBackwardSpeed="26.5" enableAI="true" maxAIGear="2">
+			<combine defaultWidth="5.4"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
+        <gear speed="5.8"   name="1"/> <!-- 0.05 1.47 4 8-->
+        <gear speed="11.59" name="2"/> <!-- 0.1 2.94 8 15-->
+        <gear speed="23.19" name="3"/> <!-- 0.2 5.89 15 31-->
+      </gears>
+		
+			<!-- OM 906 LA (in older versions?) -->
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <!-- 2200: 220(220) | 2200: 220(220) | 1200..1600: 900(900) | 85 | 0.8 | 299 | 1.7 | 2300 | 1360: 210 -->
+        <torque rpm="350" motorTorque="421" fuelUsageRatio="240.4"/>
+        <torque rpm="700" motorTorque="697" fuelUsageRatio="223"/>
+        <torque rpm="900" motorTorque="824" fuelUsageRatio="216.3"/>
+        <torque rpm="1000" motorTorque="866" fuelUsageRatio="213.9"/>
+        <torque rpm="1100" motorTorque="892" fuelUsageRatio="212"/>
+        <torque rpm="1200" motorTorque="900" fuelUsageRatio="210.8"/>
+        <torque rpm="1300" motorTorque="900" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="900" fuelUsageRatio="210.1"/>
+        <torque rpm="1500" motorTorque="900" fuelUsageRatio="210.6"/>
+        <torque rpm="1600" motorTorque="900" fuelUsageRatio="211.9"/>
+        <torque rpm="1700" motorTorque="873" fuelUsageRatio="213.8"/>
+        <torque rpm="1800" motorTorque="843" fuelUsageRatio="216.4"/>
+        <torque rpm="1850" motorTorque="827" fuelUsageRatio="217.9"/>
+        <torque rpm="1900" motorTorque="811" fuelUsageRatio="219.6"/>
+        <torque rpm="1950" motorTorque="790" fuelUsageRatio="221.5"/>
+        <torque rpm="2000" motorTorque="771" fuelUsageRatio="223.5"/>
+        <torque rpm="2050" motorTorque="753" fuelUsageRatio="225.7"/>
+        <torque rpm="2100" motorTorque="735" fuelUsageRatio="228.1"/>
+        <torque rpm="2150" motorTorque="718" fuelUsageRatio="230.6"/>
+        <torque rpm="2200" motorTorque="702" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="669" fuelUsageRatio="236"/>
+        <torque rpm="2300" motorTorque="593" fuelUsageRatio="248.4"/>
+        <torque rpm="2350" motorTorque="485" fuelUsageRatio="274.9"/>
+        <torque rpm="2400" motorTorque="348" fuelUsageRatio="318.7"/>
+        <torque rpm="2450" motorTorque="184" fuelUsageRatio="382.5"/>
+        <torque rpm="2500" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>	
+	
+	<vehicle>
+		<mod name="Claas_tucano_320">
+			<link href="http://www.modhoster.de/mods/claas-tucano-320--2" />
+			<xmlFile name="Claas_tucano320_tan.xml"/>
+		</mod>
+		
+		<!-- http://www.claas.de/blueprint/servlet/blob/363840/dfd033407c44716953b7faaf6d91e2dc/224846-dataRaw.pdf -->
+		<!-- http://www.dmg-duisburg.de/html/d_c_om906la.html -->
+		<gearboxMogli soundMaxRpm="1700" disableManual="true" speedLimiter="true" maxForwardSpeed="26.5" maxBackwardSpeed="26.5" enableAI="true" maxAIGear="2">
+			<combine defaultWidth="5.4"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3">
+        <gear speed="5.8"   name="1"/> <!-- 0.05 1.47 4 8-->
+        <gear speed="11.59" name="2"/> <!-- 0.1 2.94 8 15-->
+        <gear speed="23.19" name="3"/> <!-- 0.2 5.89 15 31-->
+      </gears>
+		
+			<!-- OM 906 LA (in older versions?) -->
+			<realEngine idleRpm="900" ratedRpm="2200">
+        <!-- 2200: 190(190) | 2200: 190(190) | 1200..1600: 750(750) | 85 | 0.7 | 299 | 1.7 | 2300 | 1360: 210 -->
+        <torque rpm="350" motorTorque="351" fuelUsageRatio="240.4"/>
+        <torque rpm="700" motorTorque="581" fuelUsageRatio="223"/>
+        <torque rpm="900" motorTorque="687" fuelUsageRatio="216.3"/>
+        <torque rpm="1000" motorTorque="722" fuelUsageRatio="213.9"/>
+        <torque rpm="1100" motorTorque="743" fuelUsageRatio="212"/>
+        <torque rpm="1200" motorTorque="750" fuelUsageRatio="210.8"/>
+        <torque rpm="1300" motorTorque="750" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="750" fuelUsageRatio="210.1"/>
+        <torque rpm="1500" motorTorque="750" fuelUsageRatio="210.6"/>
+        <torque rpm="1600" motorTorque="750" fuelUsageRatio="211.9"/>
+        <torque rpm="1700" motorTorque="732" fuelUsageRatio="213.8"/>
+        <torque rpm="1800" motorTorque="712" fuelUsageRatio="216.4"/>
+        <torque rpm="1850" motorTorque="701" fuelUsageRatio="217.9"/>
+        <torque rpm="1900" motorTorque="689" fuelUsageRatio="219.6"/>
+        <torque rpm="1950" motorTorque="677" fuelUsageRatio="221.5"/>
+        <torque rpm="2000" motorTorque="664" fuelUsageRatio="223.5"/>
+        <torque rpm="2050" motorTorque="650" fuelUsageRatio="225.7"/>
+        <torque rpm="2100" motorTorque="635" fuelUsageRatio="228.1"/>
+        <torque rpm="2150" motorTorque="620" fuelUsageRatio="230.6"/>
+        <torque rpm="2200" motorTorque="606" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="577" fuelUsageRatio="236"/>
+        <torque rpm="2300" motorTorque="512" fuelUsageRatio="248.4"/>
+        <torque rpm="2350" motorTorque="419" fuelUsageRatio="274.9"/>
+        <torque rpm="2400" motorTorque="300" fuelUsageRatio="318.7"/>
+        <torque rpm="2450" motorTorque="159" fuelUsageRatio="382.5"/>
+        <torque rpm="2500" motorTorque="0" fuelUsageRatio="466.7"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle>	
