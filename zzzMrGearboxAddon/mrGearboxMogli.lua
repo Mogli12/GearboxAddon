@@ -562,82 +562,109 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	local torqueI = 0;
 	local torqueF = nil
 	local torqueP = 0
-	while true do
-		local key = string.format(xmlString..".realEngine.torque(%d)", torqueI);
-		local rpm = getXMLFloat(xmlFile, key.."#rpm");
-		local torque = getXMLFloat(xmlFile, key.."#motorTorque");
-		if torque == nil then
-			torque = getXMLFloat(xmlFile, key.."#ptoTorque");
-			if torque ~= nil then
-				torque = torque / self.mrGbMS.TransmissionEfficiency
+	local realEngineBaseKey = nil
+	
+	for i=1,3 do
+		local key 
+		if     i == 1 then
+			if self.configurations["motor"] ~= nil then
+				key = string.format(xmlString..".engines.engine(%d)", self.configurations["motor"]-1)
 			end
-		end		
-
-		if torque == nil or rpm == nil then --or fuelUsageRatio==nil then
-			break;
-		end;
-		
-		if self.mrGbMS.Engine.torqueValues == nil then
-			--print("loading motor with new torque curve")
-			self.mrGbMS.Engine.torqueValues = {}
-			torqueF = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#torqueFactor"), self.mrGbMG.torqueFactor) / 1000
+		elseif i == 2 then
+			key = xmlString..".engines.engine(0)"
+		else
+			key = xmlString..".realEngine"
 		end
 		
-		torque = torque * torqueF 
-  
-		self.mrGbMS.Engine.torqueValues[torqueI+1] = {v=torque, time = rpm}
-				
-		if torque>self.mrGbMS.Engine.maxTorque then
-			self.mrGbMS.Engine.maxTorqueRpm = rpm;
-			self.mrGbMS.Engine.maxTorque = torque;
-		end;
-		
-		local ecoTorque = getXMLFloat(xmlFile, key.."#motorTorqueEco");
-		if ecoTorque == nil then
-			ecoTorque = getXMLFloat(xmlFile, key.."#ptoTorqueEco");
-			if ecoTorque ~= nil then
-				ecoTorque = ecoTorque / self.mrGbMS.TransmissionEfficiency
-			end
-		end		
-		if      ecoTorque ~= nil
-				and ( ecoTorque > 0 or self.mrGbMS.Engine.ecoTorqueValues ~= nil ) then
-			ecoTorque = ecoTorque * torqueF 
-			
-			if self.mrGbMS.Engine.ecoTorqueValues == nil then
-				self.mrGbMS.Engine.ecoTorqueValues = {}
-			end
-			table.insert( self.mrGbMS.Engine.ecoTorqueValues, {v=ecoTorque, time = rpm} )
+		if key ~= nil and getXMLFloat(xmlFile, key..".torque(0)#rpm") ~= nil then
+			realEngineBaseKey = key
+			break
 		end
-		
-		local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio");
-		if      fuelUsageRatio ~= nil
-				and ( fuelUsageRatio > 0 or self.mrGbMS.Engine.fuelUsageValues ~= nil ) then
-			if self.mrGbMS.Engine.fuelUsageValues == nil then
-				self.mrGbMS.Engine.fuelUsageValues = {}
-			end
-			table.insert( self.mrGbMS.Engine.fuelUsageValues, {v=fuelUsageRatio, time = rpm} )
-		end
-		
-		if      self.mrGbMS.Engine.maxRpm < rpm 
-				and ( torque > 0 or torqueP > 0 ) then
-			self.mrGbMS.Engine.maxRpm = rpm
-		end
-		if      self.mrGbMS.Engine.minRpm > rpm 
-				and torque > 0 then
-			self.mrGbMS.Engine.minRpm = rpm
-		end
-		torqueI = torqueI + 1;	
-		torqueP = torque
-	end;
-
-	if torqueI > 0 then
-		self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#idleRpm"), 800);
-		self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#ratedRpm"), 2100);
-		self.mrGbMS.StallRpm  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString..".realEngine#stallRpm"), math.max( self.mrGbMS.IdleRpm  - mrGearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 	end
-	
-	self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString..".realEngine#boostMinSpeed"), 30 ) / 3600
-	
+
+	if realEngineBaseKey ~= nil then
+		local s = getXMLString( xmlFile, realEngineBaseKey.."#name" )
+		if s ~= nil then
+			print("New engine with name "..s)
+		end
+		
+		while true do
+			local key = string.format(realEngineBaseKey..".torque(%d)", torqueI);
+			local rpm = getXMLFloat(xmlFile, key.."#rpm");
+			local torque = getXMLFloat(xmlFile, key.."#motorTorque");
+			if torque == nil then
+				torque = getXMLFloat(xmlFile, key.."#ptoTorque");
+				if torque ~= nil then
+					torque = torque / self.mrGbMS.TransmissionEfficiency
+				end
+			end		
+
+			if torque == nil or rpm == nil then --or fuelUsageRatio==nil then
+				break;
+			end;
+			
+			if self.mrGbMS.Engine.torqueValues == nil then
+				--print("loading motor with new torque curve")
+				self.mrGbMS.Engine.torqueValues = {}
+				torqueF = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#torqueFactor"), self.mrGbMG.torqueFactor) / 1000
+			end
+			
+			torque = torque * torqueF 
+		
+			self.mrGbMS.Engine.torqueValues[torqueI+1] = {v=torque, time = rpm}
+					
+			if torque>self.mrGbMS.Engine.maxTorque then
+				self.mrGbMS.Engine.maxTorqueRpm = rpm;
+				self.mrGbMS.Engine.maxTorque = torque;
+			end;
+			
+			local ecoTorque = getXMLFloat(xmlFile, key.."#motorTorqueEco");
+			if ecoTorque == nil then
+				ecoTorque = getXMLFloat(xmlFile, key.."#ptoTorqueEco");
+				if ecoTorque ~= nil then
+					ecoTorque = ecoTorque / self.mrGbMS.TransmissionEfficiency
+				end
+			end		
+			if      ecoTorque ~= nil
+					and ( ecoTorque > 0 or self.mrGbMS.Engine.ecoTorqueValues ~= nil ) then
+				ecoTorque = ecoTorque * torqueF 
+				
+				if self.mrGbMS.Engine.ecoTorqueValues == nil then
+					self.mrGbMS.Engine.ecoTorqueValues = {}
+				end
+				table.insert( self.mrGbMS.Engine.ecoTorqueValues, {v=ecoTorque, time = rpm} )
+			end
+			
+			local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio");
+			if      fuelUsageRatio ~= nil
+					and ( fuelUsageRatio > 0 or self.mrGbMS.Engine.fuelUsageValues ~= nil ) then
+				if self.mrGbMS.Engine.fuelUsageValues == nil then
+					self.mrGbMS.Engine.fuelUsageValues = {}
+				end
+				table.insert( self.mrGbMS.Engine.fuelUsageValues, {v=fuelUsageRatio, time = rpm} )
+			end
+			
+			if      self.mrGbMS.Engine.maxRpm < rpm 
+					and ( torque > 0 or torqueP > 0 ) then
+				self.mrGbMS.Engine.maxRpm = rpm
+			end
+			if      self.mrGbMS.Engine.minRpm > rpm 
+					and torque > 0 then
+				self.mrGbMS.Engine.minRpm = rpm
+			end
+			torqueI = torqueI + 1;	
+			torqueP = torque
+		end
+
+		if torqueI > 0 then
+			self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#idleRpm"), 800);
+			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100);
+			self.mrGbMS.StallRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#stallRpm"), math.max( self.mrGbMS.IdleRpm  - mrGearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
+		end
+		
+		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3600
+	end
+		
 	if self.mrGbMS.Engine.fuelUsageValues == nil then
 		local fuelUsageRatio = getXMLFloat(xmlFile, xmlString.."#minFuelUsageRatio")
 		if fuelUsageRatio == nil then

@@ -5058,6 +5058,72 @@
 <!-- ********** Fendt Vario ******************** -->	
 <!-- ********** Fendt Vario ******************** -->	
 <!-- ********** Fendt Vario ******************** -->	
+
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/fendt/fendt300.xml"/>
+
+		<gearboxMogli maxBackwardSpeed="26">
+      <hydrostatic profile="Fendt" correctGearSpeed="true"/>
+      <gears automatic="true">
+				<gear name="" speed="40" atRpm="1700"/>
+      </gears>
+			<reverse ratio="0.625"/>
+			
+			<engines>
+				<engine name="310 Vario" idleRpm="850" ratedRpm="2100">
+					<!-- 1750: 113(113) | 2100: 100(100) | 1550..1550: 485(485) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 200 -->
+					<torque rpm="350" motorTorque="289" fuelUsageRatio="230.9"/>
+					<torque rpm="700" motorTorque="393" fuelUsageRatio="212.6"/>
+					<torque rpm="900" motorTorque="430" fuelUsageRatio="205.8"/>
+					<torque rpm="1000" motorTorque="446" fuelUsageRatio="203.4"/>
+					<torque rpm="1100" motorTorque="459" fuelUsageRatio="201.6"/>
+					<torque rpm="1200" motorTorque="469" fuelUsageRatio="200.5"/>
+					<torque rpm="1300" motorTorque="477" fuelUsageRatio="200"/>
+					<torque rpm="1400" motorTorque="482" fuelUsageRatio="200.2"/>
+					<torque rpm="1500" motorTorque="485" fuelUsageRatio="201.2"/>
+					<torque rpm="1600" motorTorque="480" fuelUsageRatio="202.9"/>
+					<torque rpm="1700" motorTorque="464" fuelUsageRatio="205.3"/>
+					<torque rpm="1800" motorTorque="440" fuelUsageRatio="208.4"/>
+					<torque rpm="1850" motorTorque="425" fuelUsageRatio="210.3"/>
+					<torque rpm="1900" motorTorque="409" fuelUsageRatio="212.3"/>
+					<torque rpm="1950" motorTorque="392" fuelUsageRatio="214.5"/>
+					<torque rpm="2000" motorTorque="373" fuelUsageRatio="216.9"/>
+					<torque rpm="2050" motorTorque="354" fuelUsageRatio="219.5"/>
+					<torque rpm="2100" motorTorque="334" fuelUsageRatio="222.2"/>
+					<torque rpm="2150" motorTorque="297" fuelUsageRatio="236.7"/>
+					<torque rpm="2200" motorTorque="184" fuelUsageRatio="304.2"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="444.4"/>
+				</engine>
+
+				<engine name="313 Vario" idleRpm="850" ratedRpm="2100">
+					<!-- 1750: 142(142) | 2100: 133(133) | 1550..1550: 596(596) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 199 -->
+					<torque rpm="350" motorTorque="355" fuelUsageRatio="229.8"/>
+					<torque rpm="700" motorTorque="483" fuelUsageRatio="211.6"/>
+					<torque rpm="900" motorTorque="529" fuelUsageRatio="204.8"/>
+					<torque rpm="1000" motorTorque="548" fuelUsageRatio="202.3"/>
+					<torque rpm="1100" motorTorque="564" fuelUsageRatio="200.6"/>
+					<torque rpm="1200" motorTorque="577" fuelUsageRatio="199.5"/>
+					<torque rpm="1300" motorTorque="586" fuelUsageRatio="199"/>
+					<torque rpm="1400" motorTorque="592" fuelUsageRatio="199.2"/>
+					<torque rpm="1500" motorTorque="596" fuelUsageRatio="200.2"/>
+					<torque rpm="1600" motorTorque="592" fuelUsageRatio="201.8"/>
+					<torque rpm="1700" motorTorque="579" fuelUsageRatio="204.2"/>
+					<torque rpm="1800" motorTorque="553" fuelUsageRatio="207.4"/>
+					<torque rpm="1850" motorTorque="536" fuelUsageRatio="209.2"/>
+					<torque rpm="1900" motorTorque="519" fuelUsageRatio="211.2"/>
+					<torque rpm="1950" motorTorque="501" fuelUsageRatio="213.4"/>
+					<torque rpm="2000" motorTorque="482" fuelUsageRatio="215.8"/>
+					<torque rpm="2050" motorTorque="464" fuelUsageRatio="218.4"/>
+					<torque rpm="2100" motorTorque="445" fuelUsageRatio="221.1"/>
+					<torque rpm="2150" motorTorque="395" fuelUsageRatio="235.5"/>
+					<torque rpm="2200" motorTorque="244" fuelUsageRatio="302.7"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="442.2"/>
+				</engine>
+			</engines>
+		</gearboxMogli>	
+	</vehicle>
+	
+
 	<vehicle>
 		<mod name="fendtvario">
 			<link href="http://www.modhoster.de/mods/fendt-936-vario-pack--9" />
