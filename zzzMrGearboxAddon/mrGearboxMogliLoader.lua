@@ -51,7 +51,7 @@ for _,funcName in pairs({ "delete",
 	end	
 end
 
-function mrGearboxMogliLoader:load(xmlFile) 
+function mrGearboxMogliLoader:load(savegame) 
 	
 	self.mrGbMLGearbox1       = false
 	
@@ -65,7 +65,7 @@ function mrGearboxMogliLoader:load(xmlFile)
 			return
 		end
 			
-		local state, message = pcall( mrGearboxMogliLoader.loadGearboxMogli, self, xmlFile )
+		local state, message = pcall( mrGearboxMogliLoader.loadGearboxMogli, self, self.xmlFile )
 		if not state then
 			print("Error 3 loading mrGearboxMogliLoader: "..tostring(message)) 
 			self.mrGbMLGearbox1 = false
@@ -271,7 +271,7 @@ function mrGearboxMogliLoader.getConfigEntry( configTable, configFileName )
 	return 
 end
 
-function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propName1, propName2, propName3 )
+function mrGearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, propName2, propName3 )
 	mrGearboxMogliLoader.initXmlFiles()
 	
 	local xmlFile
@@ -291,19 +291,19 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 		elseif not state then
 			print("Error 4 loading mrGearboxMogliLoader: "..tostring(message)) 
 		end
-	end
+	end 
 	
----- configuration innside the vehicle.xml
---xmlFile = vehicleXmlFile
---if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
---	local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
---	if state and message then
---		print(string.format( "zzzMrGearboxAddon: %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
---		return true
---	elseif not state then
---		print("Error 6 loading mrGearboxMogliLoader: "..tostring(message)) 
---	end
---end
+	-- configuration innside the vehicle.xml
+	xmlFile = self.xmlFile
+	if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
+		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
+		if state and message then
+			print(string.format( "zzzMrGearboxAddon: %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
+			return true
+		elseif not state then
+			print("Error 6 loading mrGearboxMogliLoader: "..tostring(message)) 
+		end
+	end
 	
 	-- internal configuration
 	xmlFile = mrGearboxMogliLoader.xmlFileInt
@@ -360,8 +360,8 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 end
 
 
-function mrGearboxMogliLoader:loadGearboxMogli( xmlFile )
-	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, xmlFile, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio", ".gearboxMogli.hydrostatic.efficiency#ratio" )
+function mrGearboxMogliLoader:loadGearboxMogli( savegame )
+	self.mrGbMLGearbox1 = mrGearboxMogliLoader.loadGeneric( self, savegame, mrGearboxMogliLoader.loadGearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio", ".gearboxMogli.hydrostatic.efficiency#ratio" )
 end
 
 function mrGearboxMogliLoader:loadGearboxMogli2( xmlFile, baseName, xmlSource )	
