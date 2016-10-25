@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="23">
+<modDesc descVersion="32">
 	<author>Mogli aka Biedens; Italian translation by zed636</author>
 	<title>
 		<en>Gearbox AddOn</en>
@@ -21,13 +21,13 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.5.0.1</version>
+	<version>1.9.1.1</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="mrGearboxMogliVERSION">
-		<de>Getriebe v1.5 von Mogli</de>
-		 <en>Gearbox v1.5 by mogli</en></text>
-		  <it>Cambio v1.5 by mogli</it>
+		<de>Getriebe v2.0 beta 1 von Mogli</de>
+		 <en>Gearbox v2.0 beta 1 by mogli</en></text>
+		  <it>Cambio v2.0 beta 1 by mogli</it>
   </l10n>
 
 	<inputBindings>

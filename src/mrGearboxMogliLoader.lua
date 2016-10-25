@@ -218,11 +218,12 @@ function mrGearboxMogliLoader.testXMLProperty( xmlFile, name )
 	if name == nil then
 		return true
 	end
-	local s = getXMLString( xmlFile, name )
-	if s == nil or s == "" then
-		return false
-  end
-	return true
+--local s = getXMLString( xmlFile, name )
+--if s == nil or s == "" then
+--	return false
+--end
+--return true
+	return hasXMLProperty( xmlFile, name )
 end
 
 function mrGearboxMogliLoader.testXmlFile( xmlFile, xmlName, propName1, propName2, propName3 )
@@ -292,17 +293,17 @@ function mrGearboxMogliLoader:loadGeneric( vehicleXmlFile, func, tagName, propNa
 		end
 	end
 	
-	-- configuration innside the vehicle.xml
-	xmlFile = vehicleXmlFile
-	if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
-		if state and message then
-			print(string.format( "zzzMrGearboxAddon: %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
-			return true
-		elseif not state then
-			print("Error 6 loading mrGearboxMogliLoader: "..tostring(message)) 
-		end
-	end
+---- configuration innside the vehicle.xml
+--xmlFile = vehicleXmlFile
+--if mrGearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
+--	local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
+--	if state and message then
+--		print(string.format( "zzzMrGearboxAddon: %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
+--		return true
+--	elseif not state then
+--		print("Error 6 loading mrGearboxMogliLoader: "..tostring(message)) 
+--	end
+--end
 	
 	-- internal configuration
 	xmlFile = mrGearboxMogliLoader.xmlFileInt

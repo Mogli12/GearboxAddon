@@ -163,12 +163,12 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	--**********************************************************************************************************	
 	-- tempomatMogli:newUpdateVehiclePhysics
 	--**********************************************************************************************************	
-	function tempomatMogli:newUpdateVehiclePhysics( superFunc, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
+	function tempomatMogli:newUpdateVehiclePhysics( superFunc, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, doHandbrake, dt, ... )
 		if     self.tempomatMogliV14                == nil 
 				or self.tempomatMogliV14.keepSpeedLimit == nil
 				or self.tempomatMogliV14.modName        == nil
 				or self.tempomatMogliV14.modName        ~= l_currentModName then
-			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, dt, ... )
+			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, doHandbrake, dt, ... )
 		end
 		
 		if type( self.mrGbMSetNeutralActive ) == "function" then
@@ -191,7 +191,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 
 		local temp1 = self.motor.speedLimit 
 		self.motor.speedLimit    = math.min( temp1, self.tempomatMogliV14.keepSpeedLimit )
-		superFunc( self, -1, false, axisSide, axisSideIsAnalog, dt, ... )
+		superFunc( self, -1, false, axisSide, axisSideIsAnalog, doHandbrake, dt, ... )
 		self.motor.speedLimit    = temp1
 	end
 	

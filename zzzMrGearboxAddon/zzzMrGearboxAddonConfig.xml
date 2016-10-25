@@ -1214,6 +1214,7 @@
 	
 	<vehicle>
 		<configFile xmlName="data/vehicles/steerable/cars/piQup.xml"/>
+		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
 		<gearboxMogli clutchOpenRpm="1150" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
@@ -1945,6 +1946,7 @@
 			<link href="http://www.modhoster.de/mods/case-ih-1455--2" />
 			<xmlFile name="1455xl.xml" />
 		</mod>
+		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="1">
 			<gears shiftTimeMs="800">	

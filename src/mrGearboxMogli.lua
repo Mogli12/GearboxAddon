@@ -112,8 +112,8 @@ mrGearboxMogliGlobals.autoShiftTimeoutHydroL= 1000 -- ms
 mrGearboxMogliGlobals.autoShiftTimeoutHydroS= 0    -- ms
 mrGearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
 mrGearboxMogliGlobals.modifySound           = true
-mrGearboxMogliGlobals.modifyVolume          = true
-mrGearboxMogliGlobals.modifyTransVol        = true
+mrGearboxMogliGlobals.modifyVolume          = false -- true
+mrGearboxMogliGlobals.modifyTransVol        = false -- true
 mrGearboxMogliGlobals.indoorSoundFactor     = 0.6
 mrGearboxMogliGlobals.shiftTimeMsFactor     = 1
 mrGearboxMogliGlobals.playGrindingSound     = true
@@ -429,8 +429,10 @@ function mrGearboxMogli:initClient()
 	if mrGearboxMogli.ovArrowUpWhite == nil then
 		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth;
 		local h = w * g_screenAspectRatio;
-		local x = g_currentMission.speedHud.x - w * 0.25
-		local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
+	--local x = g_currentMission.speedHud.x - w * 0.25
+	--local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
+		local x = 0.83229166666667 - w * 0.25
+		local y = 0.053402779369305 + 0.066111113081376 - 0.75 * h
 		
 		mrGearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_white.dds",   mrGearboxMogli.baseDirectory), x, y, w, h)
 		mrGearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_gray.dds",    mrGearboxMogli.baseDirectory), x, y, w, h)
@@ -1966,9 +1968,10 @@ function mrGearboxMogli:update(dt)
 	if self.mrGbMB.soundModified and not ( self.mrGbMS.IsOn ) then
 		if self.isMotorStarted then
 			if self.mrGbML.turnedOffByIncreaseRPMWhileTipping then
-				Utils.stopSample( self.sampleMotor )
-				Utils.stopSample( self.sampleMotorRun )
-				Utils.stopSample( self.sampleMotorRun2 )
+				SoundUtil.stopSample( self.sampleMotor )
+				SoundUtil.stopSample( self.sampleMotorRun )
+				SoundUtil.stopSample( self.sampleMotorLoad )
+				SoundUtil.stopSample( self.sampleGearbox )
 				if self.mrGbML.motor ~= nil and self.mrGbMB.motor ~= nil then
 					mrGearboxMogliMotor.copyRuntimeValues( self.mrGbML.motor, self.mrGbMB.motor )
 					self.motor = self.mrGbMB.motor
@@ -1984,13 +1987,17 @@ function mrGearboxMogli:update(dt)
 		self.motorSoundPitchMax          = self.mrGbMB.soundPitchMax       
 		self.motorSoundRunPitchScale	   = self.mrGbMB.soundRunPitchScale  
 		self.motorSoundRunPitchMax       = self.mrGbMB.soundRunPitchMax    
-		self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchMax    
+		self.motorSoundLoadPitchScale	   = self.mrGbMB.soundLoadPitchScale  
+		self.motorSoundLoadPitchMax      = self.mrGbMB.soundLoadPitchMax    
+		self.gearboxSoundPitchMax        = self.mrGbMB.soundGearboxPitchMax    
 		self.sampleMotor.volume          = self.mrGbMB.soundVolume         
 		self.sampleMotorRun.volume       = self.mrGbMB.soundRunVolume      
-		self.sampleMotorRun2.volume      = self.mrGbMB.soundRun2Volume      
+		self.sampleMotorLoad.volume      = self.mrGbMB.soundLoadVolume      
+		self.sampleGearbox.volume        = self.mrGbMB.soundGearboxVolume      
 		self.sampleMotor.pitchOffset     = self.mrGbMB.soundPitchOffset    
 		self.sampleMotorRun.pitchOffset  = self.mrGbMB.soundRunPitchOffset 
-		self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset
+		self.sampleMotorLoad.pitchOffset = self.mrGbMB.soundLoadPitchOffset 
+		self.sampleGearbox.pitchOffset   = self.mrGbMB.soundGearboxPitchOffset
 		
 		mrGearboxMogli.resetSampleVolume( self.sampleMotor )
 		mrGearboxMogli.resetSampleVolume( self.sampleMotorRun )
@@ -1998,7 +2005,7 @@ function mrGearboxMogli:update(dt)
 		if self.mrGbMS.IsCombine and self.sampleThreshing.sample ~= nil then
 			self.sampleThreshing.volume      = self.mrGbMB.threshingVolume
 			self.sampleThreshing.pitchOffset = self.mrGbMB.threshingPitchOffset
-			Utils.setSamplePitch( self.sampleThreshing, self.sampleThreshing.pitchOffset )
+			SoundUtil.setSamplePitch( self.sampleThreshing, self.sampleThreshing.pitchOffset )
 		--Utils.setSampleVolume( self.sampleThreshing, self.sampleThreshing.volume )
 			mrGearboxMogli.resetSampleVolume( self.sampleThreshing )
 		end		
@@ -2060,20 +2067,25 @@ function mrGearboxMogli:update(dt)
 		
 		mrGearboxMogli.resetSampleVolume( self.sampleMotor )
 		mrGearboxMogli.resetSampleVolume( self.sampleMotorRun )
+		mrGearboxMogli.resetSampleVolume( self.sampleMotorLoad )
 		
-		self.mrGbMB.soundDefaultsLoaded  = true
-		
-		self.mrGbMB.soundPitchScale      = self.motorSoundPitchScale
-		self.mrGbMB.soundPitchMax        = self.motorSoundPitchMax
-		self.mrGbMB.soundRunPitchScale   = self.motorSoundRunPitchScale	
-		self.mrGbMB.soundRunPitchMax     = self.motorSoundRunPitchMax
-		self.mrGbMB.soundRun2PitchMax    = self.motorRun2PitchMax
-		self.mrGbMB.soundVolume          = self.sampleMotor.volume   
-		self.mrGbMB.soundRunVolume       = self.sampleMotorRun.volume
-		self.mrGbMB.soundRun2Volume      = self.sampleMotorRun2.volume
-		self.mrGbMB.soundPitchOffset     = self.sampleMotor.pitchOffset   
-		self.mrGbMB.soundRunPitchOffset  = self.sampleMotorRun.pitchOffset
-		self.mrGbMB.soundRun2PitchOffset = self.sampleMotorRun2.pitchOffset
+		self.mrGbMB.soundDefaultsLoaded     = true
+		                                    
+		self.mrGbMB.soundPitchScale         = Utils.getNoNil( self.motorSoundPitchScale        , 0 )
+		self.mrGbMB.soundPitchMax           = Utils.getNoNil( self.motorSoundPitchMax          , 0 )
+		self.mrGbMB.soundRunPitchScale      = Utils.getNoNil( self.motorSoundRunPitchScale	   , 0 )
+		self.mrGbMB.soundRunPitchMax        = Utils.getNoNil( self.motorSoundRunPitchMax       , 0 )
+		self.mrGbMB.soundLoadPitchScale     = Utils.getNoNil( self.motorSoundLoadPitchScale	   , 0 )
+		self.mrGbMB.soundLoadPitchMax       = Utils.getNoNil( self.motorSoundLoadPitchMax      , 0 )
+		self.mrGbMB.soundGearboxPitchMax    = Utils.getNoNil( self.gearboxSoundPitchMax        , 0 )
+		self.mrGbMB.soundVolume             = Utils.getNoNil( self.sampleMotor.volume          , 0 )
+		self.mrGbMB.soundRunVolume          = Utils.getNoNil( self.sampleMotorRun.volume       , 0 )
+		self.mrGbMB.soundLoadVolume         = Utils.getNoNil( self.sampleMotorLoad.volume      , 0 )
+		self.mrGbMB.soundGearboxVolume      = Utils.getNoNil( self.sampleGearbox.volume        , 0 )
+		self.mrGbMB.soundPitchOffset        = Utils.getNoNil( self.sampleMotor.pitchOffset     , 0 )
+		self.mrGbMB.soundRunPitchOffset     = Utils.getNoNil( self.sampleMotorRun.pitchOffset  , 0 )
+		self.mrGbMB.soundLoadPitchOffset    = Utils.getNoNil( self.sampleMotorLoad.pitchOffset , 0 )
+		self.mrGbMB.soundGearboxPitchOffset = Utils.getNoNil( self.sampleGearbox.pitchOffset   , 0 )
 		if self.mrGbMS.IsCombine then
 			self.mrGbMB.threshingVolume      = self.sampleThreshing.volume
 			self.mrGbMB.threshingPitchOffset = self.sampleThreshing.pitchOffset
@@ -2727,7 +2739,7 @@ function mrGearboxMogli:update(dt)
 					local pitch = self.mrGbMB.threshingPitchOffset * ( self.mrGbMS.ThreshingSoundOffset 
 																												 +   self.mrGbMS.ThreshingSoundScale 
 																													 * Utils.clamp( ( self.mrGbML.soundRpm - self.mrGbMS.ThreshingMinRpm ) / ( self.mrGbMS.ThreshingMaxRpm - self.mrGbMS.ThreshingMinRpm ), -2, 1 ) )
-					Utils.setSamplePitch( self.sampleThreshing, pitch )
+					SoundUtil.setSamplePitch( self.sampleThreshing, pitch )
 				end
 
 				-- modified RPM range with old pitch offset
@@ -2767,49 +2779,58 @@ function mrGearboxMogli:update(dt)
 				self.sampleMotor.pitchOffset  = self.mrGbMB.soundPitchOffset - lowRpsRange * self.motorSoundPitchScale
 				
 				if self.mrGbMS.RunPitchFactor < 0 and self.mrGbMS.RunPitchMax < 0 then 
-					self.motorSoundRunPitchMax     = self.mrGbMB.soundRunPitchOffset + math.min( self.mrGbMB.soundRunPitchMax - self.mrGbMB.soundRunPitchOffset, self.mrGbMB.soundRunPitchScale * oldRpsRange ) * rpmFactor
+					self.motorSoundRunPitchMax     = self.mrGbMB.soundRunPitchOffset  + math.min( self.mrGbMB.soundRunPitchMax  - self.mrGbMB.soundRunPitchOffset,  self.mrGbMB.soundRunPitchScale  * oldRpsRange ) * rpmFactor
+					self.motorSoundLoadPitchMax    = self.mrGbMB.soundLoadPitchOffset + math.min( self.mrGbMB.soundLoadPitchMax - self.mrGbMB.soundLoadPitchOffset, self.mrGbMB.soundLoadPitchScale * oldRpsRange ) * rpmFactor
 				else
 					if self.mrGbMS.RunPitchFactor > 0 then
-						self.motorSoundRunPitchScale = self.mrGbMB.soundRunPitchScale * self.mrGbMS.RunPitchFactor * newRpmRange / oldRpmRange
+						self.motorSoundRunPitchScale  = self.mrGbMB.soundRunPitchScale  * self.mrGbMS.RunPitchFactor * newRpmRange / oldRpmRange
+						self.motorSoundLoadPitchScale = self.mrGbMB.soundLoadPitchScale * self.mrGbMS.RunPitchFactor * newRpmRange / oldRpmRange
 					end
 					
 					if     self.mrGbMS.RunPitchMax < 0 then 
-						self.motorSoundRunPitchMax   = self.mrGbMB.soundRunPitchOffset + self.motorSoundRunPitchScale * newRpsRange
+						self.motorSoundRunPitchMax   = self.mrGbMB.soundRunPitchOffset  + self.motorSoundRunPitchScale  * newRpsRange
+						self.motorSoundLoadPitchMax  = self.mrGbMB.soundLoadPitchOffset + self.motorSoundLoadPitchScale * newRpsRange
 					else
 						if self.mrGbMS.RunPitchMax > 0 then 
-							self.motorSoundRunPitchMax = self.mrGbMB.soundRunPitchOffset + ( self.mrGbMS.RunPitchMax - self.mrGbMB.soundRunPitchOffset ) * rpmFactor
+							self.motorSoundRunPitchMax  = self.mrGbMB.soundRunPitchOffset  + ( self.mrGbMS.RunPitchMax - self.mrGbMB.soundRunPitchOffset  ) * rpmFactor
+							self.motorSoundLoadPitchMax = self.mrGbMB.soundLoadPitchOffset + ( self.mrGbMS.RunPitchMax - self.mrGbMB.soundLoadPitchOffset ) * rpmFactor
 						else
-							self.motorSoundRunPitchMax = self.mrGbMB.soundRunPitchMax
+							self.motorSoundRunPitchMax  = self.mrGbMB.soundRunPitchMax
+							self.motorSoundLoadPitchMax = self.mrGbMB.soundLoadPitchMax
 						end 
 
 					end 
 				end 
 				if self.mrGbMS.RunPitchFactor < 0 then
 					self.motorSoundRunPitchScale   = ( self.motorSoundRunPitchMax - self.mrGbMB.soundRunPitchOffset ) / newRpsRange
+					self.motorSoundLoadPitchScale   = ( self.motorSoundLoadPitchMax - self.mrGbMB.soundLoadPitchOffset ) / newRpsRange
 				end		
 				self.sampleMotorRun.pitchOffset  = self.mrGbMB.soundRunPitchOffset - lowRpsRange * self.motorSoundRunPitchScale
+				self.sampleMotorLoad.pitchOffset  = self.mrGbMB.soundLoadPitchOffset - lowRpsRange * self.motorSoundLoadPitchScale
 				
 				
 				local roundPerSecond = self.lastRoundPerMinute / 60;
 				local motorSoundPitch = math.min(self.sampleMotor.pitchOffset + self.motorSoundPitchScale*math.abs(roundPerSecond), self.motorSoundPitchMax)
-				Utils.setSamplePitch(self.sampleMotor, motorSoundPitch);
+				SoundUtil.setSamplePitch(self.sampleMotor, motorSoundPitch);
 				local motorSoundRunPitch = math.min(self.sampleMotorRun.pitchOffset + self.motorSoundRunPitchScale*math.abs(roundPerSecond), self.motorSoundRunPitchMax)
-				Utils.setSamplePitch(self.sampleMotorRun, motorSoundRunPitch);
+				SoundUtil.setSamplePitch(self.sampleMotorRun, motorSoundRunPitch);
+				local motorSoundLoadPitch = math.min(self.sampleMotorLoad.pitchOffset + self.motorSoundLoadPitchScale*math.abs(roundPerSecond), self.motorSoundLoadPitchMax);
+				SoundUtil.setSamplePitch(self.sampleMotorLoad, motorSoundLoadPitch);
 			end
 			
 			if self.mrGbMG.modifyTransVol then
 				if not ( self.mrGbMS.Hydrostatic ) then
-					local eff = ( self.mrGbMS.CurrentGear % 2 ) * self.mrGbMS.Run2PitchEffect * self.motorRun2PitchMax
-					self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchMax    - eff
-					self.sampleMotorRun2.pitchOffset = self.mrGbMB.soundRun2PitchOffset - eff
+					local eff = ( self.mrGbMS.CurrentGear % 2 ) * self.mrGbMS.Run2PitchEffect * self.gearboxSoundPitchMax
+					self.gearboxSoundPitchMax           = self.mrGbMB.soundGearboxPitchMax    - eff
+					self.sampleGearbox.pitchOffset = self.mrGbMB.soundGearboxPitchOffset - eff
 				elseif math.abs( self.mrGbMS.HydroTransVolRatio ) > mrGearboxMogli.eps then
 					local factor = self:mrGbMGetHydrostaticFactor( 1 )
 					factor = Utils.clamp( math.abs( factor - 1 ) / ( self.mrGbMS.HydrostaticMax - 1 ), 0, 1 )
 					local speedFactor = Utils.clamp(self:getLastSpeed() / math.ceil(self.motor:getMaximumForwardSpeed()*3.6), 0, 1);
 					factor = self.mrGbMS.HydroTransVolRatio * factor + ( 1 - self.mrGbMS.HydroTransVolRatio ) * speedFactor
-					self.motorRun2PitchMax           = self.mrGbMB.soundRun2PitchOffset + ( self.mrGbMB.soundRun2PitchMax - self.mrGbMB.soundRun2PitchOffset ) * factor
-					self.sampleMotorRun2.pitchOffset = self.motorRun2PitchMax
-					self.sampleMotorRun2.volume      = self.mrGbMB.soundRun2Volume + 0.5 * Utils.getNoNil( self:mrGbMGetMotorLoad(), 0 ) * ( self.motorRun2VolumeMax - self.mrGbMB.soundRun2Volume )
+					self.gearboxSoundPitchMax           = self.mrGbMB.soundGearboxPitchOffset + ( self.mrGbMB.soundGearboxPitchMax - self.mrGbMB.soundGearboxPitchOffset ) * factor
+					self.sampleGearbox.pitchOffset = self.gearboxSoundPitchMax
+					self.sampleGearbox.volume      = self.mrGbMB.soundGearboxVolume + 0.5 * Utils.getNoNil( self:mrGbMGetMotorLoad(), 0 ) * ( self.motorRun2VolumeMax - self.mrGbMB.soundGearboxVolume )
 				end
 			end
 				
@@ -3245,6 +3266,8 @@ function mrGearboxMogli:updateTick(dt)
 			self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
 		end
 	end	
+	
+	self.actualLoadPercentage = self:mrGbMGetMotorLoad()
 end 
 
 --**********************************************************************************************************	
@@ -5676,7 +5699,7 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 			c = math.min( self.motor.maxClutchTorque, c * self.motor.maxMotorTorque )
 		end
 		
-		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c )
+		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c, self.motor:getRotInertia(), self.motor:getDampingRate());
 		
 	--if self.mrGbML.debugTimer ~= nil and g_currentMission.time < self.mrGbML.debugTimer and not ( self.mrGbMS.Hydrostatic ) then
 		if      mrGearboxMogli.debugGearShift
@@ -5738,18 +5761,16 @@ function mrGearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc
 		end
 	end
 
-	doBrake = 0 < brakePedal
-
+	local doBrake = brakePedal > 0; --(brakePedal > 0 and self.lastSpeed > 0.0002) or doHandbrake;			  -- ToDo
 	for _, implement in pairs(self.attachedImplements) do
 		if implement.object ~= nil then
 			if doBrake then
-				implement.object:onBrake(brakePedal)
+				implement.object:onBrake(brakePedal);
 			else
-				implement.object:onReleaseBrake()
+				implement.object:onReleaseBrake();
 			end
 		end
 	end
-	
 	for _, wheel in pairs(self.wheels) do
 		WheelsUtil.updateWheelPhysics(self, wheel, doHandbrake, wheelDriveTorque, brakePedal, requiredDriveMode, dt)
 	end
@@ -6058,10 +6079,17 @@ function mrGearboxMogliMotor.copyRuntimeValues( motorFrom, motorTo )
 	motorTo.motorLoad               = motorFrom.motorLoad          
 	motorTo.requiredWheelTorque     = motorFrom.requiredWheelTorque
 	motorTo.lastMotorRpm            = motorFrom.lastMotorRpm       
+	motorTo.lastRealMotorRpm        = motorFrom.lastRealMotorRpm       
+	motorTo.equalizedMotorRpm       = motorFrom.equalizedMotorRpm
+	motorTo.lastPtoRpm              = motorFrom.lastPtoRpm
 	motorTo.gear                    = motorFrom.gear               
 	motorTo.gearRatio               = motorFrom.gearRatio          
 	motorTo.rpmLimit                = motorFrom.rpmLimit 
 	motorTo.speedLimit              = motorFrom.speedLimit
+	motorTo.minSpeed                = motorFrom.minSpeed
+
+	motorTo.rotInertia              = motorFrom.rotInertia 
+	motorTo.dampingRate             = motorFrom.dampingRate
 
 end
 
@@ -6750,6 +6778,10 @@ function mrGearboxMogliMotor:updateMotorRpm( dt )
 	----print("sound effect on")
 	--	self.lastMotorRpm = self.minRpm
 	--end
+	
+	self.lastRealMotorRpm  = self.lastMotorRpm
+	self.equalizedMotorRpm = self.lastMotorRpm
+	self.lastPtoRpm        = self.lastMotorRpm
 end
 
 --**********************************************************************************************************	
@@ -8632,7 +8664,7 @@ function mrGearboxMogliMotor:splitGear( i )
 end
 
 --**********************************************************************************************************	
--- mrGearboxMogliMotor:splitGear
+-- mrGearboxMogliMotor:combineGear
 --**********************************************************************************************************	
 function mrGearboxMogliMotor:combineGear( I2g, I2r ) 
 	local i2g = Utils.getNoNil( I2g, self.vehicle.mrGbMS.CurrentGear )
@@ -8651,6 +8683,34 @@ function mrGearboxMogliMotor:combineGear( I2g, I2r )
 		return i2g + m * ( i2r-1 )
 	end
 	return 1
+end
+
+function mrGearboxMogliMotor:getMinRpm()
+	return self.vehicle.mrGbMS.OrigMinRpm
+end
+
+function mrGearboxMogliMotor:getMaxRpm()
+	return self.vehicle.mrGbMS.OrigMaxRpm
+end
+
+function mrGearboxMogliMotor:getLastMotorRpm()
+	return self.lastMotorRpm
+end
+
+function mrGearboxMogliMotor:getLastRealMotorRpm()
+	return self.lastMotorRpm
+end
+
+function mrGearboxMogliMotor:getEqualizedMotorRpm()
+	return Utils.clamp( self.lastMotorRpm, self.vehicle.mrGbMS.OrigMinRpm, self.vehicle.mrGbMS.OrigMaxRpm )
+end
+
+function mrGearboxMogliMotor:getMaximumForwardSpeed()
+	return mrGearboxMogli.huge
+end
+
+function mrGearboxMogliMotor:getMaximumBackwardSpeed()
+	return mrGearboxMogli.huge
 end
 
 --**********************************************************************************************************	
@@ -8746,7 +8806,7 @@ end
 --**********************************************************************************************************	
 WheelsUtil.updateWheelsPhysics = Utils.overwrittenFunction( WheelsUtil.updateWheelsPhysics,mrGearboxMogli.newUpdateWheelsPhysics )
 Vehicle.getLastSpeed = Utils.overwrittenFunction( Vehicle.getLastSpeed, mrGearboxMogli.newGetLastSpeed )
-IndoorHud.setHudValue = Utils.overwrittenFunction( IndoorHud.setHudValue, mrGearboxMogli.newSetHudValue )
+--IndoorHud.setHudValue = Utils.overwrittenFunction( IndoorHud.setHudValue, mrGearboxMogli.newSetHudValue )
 Motorized.loadMotor = Utils.appendedFunction( Motorized.loadMotor, mrGearboxMogli.afterLoadMotor )
 --**********************************************************************************************************	
 
