@@ -3239,6 +3239,10 @@
 		<mod name="FBM_JohnDeere7530_premium" isPrefix="true">
 			<xmlFile name="xml/JD7530.xml"/>
 		</mod>
+		<mod name="MB3D_JohnDeere7530" isPrefix="true">
+			<xmlFile name="JohnDeere7530FH.xml"/>
+			<xmlFile name="JohnDeere7530FL.xml"/>
+		</mod>
 	
 		<!-- http://manuals.deere.com/omview/OMAL171363_19/?tM= -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/John_Deere_7530_0808.pdf -->
