@@ -8,45 +8,45 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
-		<text name="mrGearboxMogliSHIFTGEARUP"     text="Gearbox: Gear up"/>
-		<text name="mrGearboxMogliSHIFTGEARDOWN"   text="Gearbox: Gear down"/>
-		<text name="mrGearboxMogliSHIFTRANGEUP"    text="Gearbox: Range up"/>
-		<text name="mrGearboxMogliSHIFTRANGE2UP"   text="Gearbox: Range 2 up"/>
-		<text name="mrGearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Range down"/>
-		<text name="mrGearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Range 2 down"/>
-		<text name="mrGearboxMogliNEUTRAL"         text="Gearbox: Neutral"/>
-		<text name="mrGearboxMogliOFF"             text="manual gearbox [off]"/>
-		<text name="mrGearboxMogliON"              text="manual gearbox [on]"/>
-		<text name="mrGearboxMogliON_OFF"          text="Gearbox: On/Off"/>
-		<text name="mrGearboxMogliHUD"             text="Gearbox: HUD on/off"/>
-		<text name="mrGearboxMogliAllAuto"         text="Gearbox: reality switch"/>
-		<text name="mrGearboxMogliAllAutoON"       text="Gearbox [simplified]"/>
-		<text name="mrGearboxMogliAllAutoOFF"      text="Gearbox [realistic]"/>
-		<text name="mrGearboxMogliREVERSE"         text="Gearbox: Reverse"/>
-		<text name="mrGearboxMogliAUTOCLUTCH2"     text="Gearbox: auto clutch"/>
-		<text name="mrGearboxMogliCLUTCH"          text="Gearbox: clutch"/>
-		<text name="mrGearboxMogliCLUTCH_1"        text="Gearbox: clutch open"/>
-		<text name="mrGearboxMogliCLUTCH_2"        text="Gearbox: clutch close"/>
-		<text name="mrGearboxMogliCLUTCH_3"        text="Gearbox: clutch"/>
-		<text name="mrGearboxMogliMINRPM"          text="Gearbox: hand throttle"/>
-		<text name="mrGearboxMogliMINRPM_1"        text="Gearbox: hand throttle down"/>
-		<text name="mrGearboxMogliMINRPM_2"        text="Gearbox: hand throttle up"/>
-		<text name="mrGearboxMogliGEAR1"           text="Gearbox: G27 1"/>
-		<text name="mrGearboxMogliGEAR2"           text="Gearbox: G27 2"/>
-		<text name="mrGearboxMogliGEAR3"           text="Gearbox: G27 3"/>
-		<text name="mrGearboxMogliGEAR4"           text="Gearbox: G27 4"/>
-		<text name="mrGearboxMogliGEAR5"           text="Gearbox: G27 5"/>
-		<text name="mrGearboxMogliGEAR6"           text="Gearbox: G27 6"/>
-		<text name="mrGearboxMogliGEARR"           text="Gearbox: G27 R"/>
-		<text name="mrGearboxMogliGEARFWD"         text="Gearbox: fwd"/>
-		<text name="mrGearboxMogliGEARBACK"        text="Gearbox: back"/> 
-		<text name="mrGearboxMogliSPEEDLIMIT"      text="Gearbox: limiter"/>
-		<text name="mrGearboxMogliSWAPSPEED"       text="Gearbox: limiter 2"/>
-		<text name="mrGearboxMogliSETSPEED"        text="Gearbox: set limit"/>
-		<text name="mrGearboxMogliACCTOLIMIT"      text="Gearbox: acceleration"/>
-		<text name="mrGearboxMogliDECTOLIMIT"      text="Gearbox: deceleration"/>
-		<text name="mrGearboxMogliECO"             text="Gearbox: eco on/off"/>
-		<text name="mrGearboxMogliKEEPSPEED"       text="Gearbox: keep speed"/>
+		<text name="input_mrGearboxMogliSHIFTGEARUP"     text="Gearbox: Gear up"/>
+		<text name="input_mrGearboxMogliSHIFTGEARDOWN"   text="Gearbox: Gear down"/>
+		<text name="input_mrGearboxMogliSHIFTRANGEUP"    text="Gearbox: Range up"/>
+		<text name="input_mrGearboxMogliSHIFTRANGE2UP"   text="Gearbox: Range 2 up"/>
+		<text name="input_mrGearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Range down"/>
+		<text name="input_mrGearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Range 2 down"/>
+		<text name="input_mrGearboxMogliNEUTRAL"         text="Gearbox: Neutral"/>
+		<text name="input_mrGearboxMogliOFF"             text="manual gearbox [off]"/>
+		<text name="input_mrGearboxMogliON"              text="manual gearbox [on]"/>
+		<text name="input_mrGearboxMogliON_OFF"          text="Gearbox: On/Off"/>
+		<text name="input_mrGearboxMogliHUD"             text="Gearbox: HUD on/off"/>
+		<text name="input_mrGearboxMogliAllAuto"         text="Gearbox: reality switch"/>
+		<text name="input_mrGearboxMogliAllAutoON"       text="Gearbox [simplified]"/>
+		<text name="input_mrGearboxMogliAllAutoOFF"      text="Gearbox [realistic]"/>
+		<text name="input_mrGearboxMogliREVERSE"         text="Gearbox: Reverse"/>
+		<text name="input_mrGearboxMogliAUTOCLUTCH2"     text="Gearbox: auto clutch"/>
+		<text name="input_mrGearboxMogliCLUTCH"          text="Gearbox: clutch"/>
+		<text name="input_mrGearboxMogliCLUTCH_1"        text="Gearbox: clutch open"/>
+		<text name="input_mrGearboxMogliCLUTCH_2"        text="Gearbox: clutch close"/>
+		<text name="input_mrGearboxMogliCLUTCH_3"        text="Gearbox: clutch"/>
+		<text name="input_mrGearboxMogliMINRPM"          text="Gearbox: hand throttle"/>
+		<text name="input_mrGearboxMogliMINRPM_1"        text="Gearbox: hand throttle down"/>
+		<text name="input_mrGearboxMogliMINRPM_2"        text="Gearbox: hand throttle up"/>
+		<text name="input_mrGearboxMogliGEAR1"           text="Gearbox: G27 1"/>
+		<text name="input_mrGearboxMogliGEAR2"           text="Gearbox: G27 2"/>
+		<text name="input_mrGearboxMogliGEAR3"           text="Gearbox: G27 3"/>
+		<text name="input_mrGearboxMogliGEAR4"           text="Gearbox: G27 4"/>
+		<text name="input_mrGearboxMogliGEAR5"           text="Gearbox: G27 5"/>
+		<text name="input_mrGearboxMogliGEAR6"           text="Gearbox: G27 6"/>
+		<text name="input_mrGearboxMogliGEARR"           text="Gearbox: G27 R"/>
+		<text name="input_mrGearboxMogliGEARFWD"         text="Gearbox: fwd"/>
+		<text name="input_mrGearboxMogliGEARBACK"        text="Gearbox: back"/> 
+		<text name="input_mrGearboxMogliSPEEDLIMIT"      text="Gearbox: limiter"/>
+		<text name="input_mrGearboxMogliSWAPSPEED"       text="Gearbox: limiter 2"/>
+		<text name="input_mrGearboxMogliSETSPEED"        text="Gearbox: set limit"/>
+		<text name="input_mrGearboxMogliACCTOLIMIT"      text="Gearbox: acceleration"/>
+		<text name="input_mrGearboxMogliDECTOLIMIT"      text="Gearbox: deceleration"/>
+		<text name="input_mrGearboxMogliECO"             text="Gearbox: eco on/off"/>
+		<text name="input_mrGearboxMogliKEEPSPEED"       text="Gearbox: keep speed"/>
 		<text name="mrGearboxMogliTEXT_OFF"        text="motor off"/>
 		<text name="mrGearboxMogliTEXT_AI"         text="AI"/>
 		<text name="mrGearboxMogliTEXT_BRAKE"      text="handbrake"/>

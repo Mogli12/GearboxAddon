@@ -150,9 +150,9 @@ function mrGearboxMogliRegister:add()
 	
 	print(string.format("--- zzzMrGearboxAddon: inserted into %d vehicle types / %d vehicle types updated ---", insertedMods, updatedMods ))
 	
-	g_i18n.globalI18N.texts["mrGearboxMogliVERSION"]      = g_i18n:getText("mrGearboxMogliVERSION"     )
-	g_i18n.globalI18N.texts["mrGearboxMogliON"]           = g_i18n:getText("mrGearboxMogliON"          )
-	g_i18n.globalI18N.texts["mrGearboxMogliOFF"]          = g_i18n:getText("mrGearboxMogliOFF"         )
+	g_i18n.globalI18N.texts["mrGearboxMogliVERSION"]      = g_i18n:getText("input_mrGearboxMogliVERSION"     )
+	g_i18n.globalI18N.texts["mrGearboxMogliON"]           = g_i18n:getText("input_mrGearboxMogliON"          )
+	g_i18n.globalI18N.texts["mrGearboxMogliOFF"]          = g_i18n:getText("input_mrGearboxMogliOFF"         )
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_OFF"]	    = g_i18n:getText("mrGearboxMogliTEXT_OFF"	   )
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_AI"]      = g_i18n:getText("mrGearboxMogliTEXT_AI"     )
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_BRAKE"]   = g_i18n:getText("mrGearboxMogliTEXT_BRAKE"  )
@@ -164,8 +164,8 @@ function mrGearboxMogliRegister:add()
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_VARIO"]   = g_i18n:getText("mrGearboxMogliTEXT_VARIO"  )
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ALLAUTO"] = g_i18n:getText("mrGearboxMogliTEXT_ALLAUTO")
 	g_i18n.globalI18N.texts["mrGearboxMogliTEXT_ECO"]     = g_i18n:getText("mrGearboxMogliTEXT_ECO")
-	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoON"]    = g_i18n:getText("mrGearboxMogliAllAutoON"   )
-	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoOFF"]   = g_i18n:getText("mrGearboxMogliAllAutoOFF"  )
+	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoON"]    = g_i18n:getText("input_mrGearboxMogliAllAutoON"   )
+	g_i18n.globalI18N.texts["mrGearboxMogliAllAutoOFF"]   = g_i18n:getText("input_mrGearboxMogliAllAutoOFF"  )
 end;
 
 addModEventListener(mrGearboxMogliRegister);
