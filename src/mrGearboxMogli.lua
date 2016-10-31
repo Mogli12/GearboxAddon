@@ -7110,6 +7110,8 @@ function mrGearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 --elseif self.lastRealMotorRpm > self.ratedRpm and self.maxRatedTorque > self.lastRawTorque then
 --	local refTorque = self.lastRawTorque + ( self.lastRealMotorRpm - self.ratedRpm ) / ( self.maxAllowedRpm - self.ratedRpm ) * ( self.maxRatedTorque - self.lastRawTorque )
 --	self.motorLoadP = Utils.clamp( requestedTorque / refTorque, 0, 1 )
+	elseif self.prevMotorRpm > self.ratedRpm and self.lastRawTorque * self.prevMotorRpm  < self.maxRatedTorque * self.ratedRpm then
+		self.motorLoadP = Utils.clamp( requestedTorque * self.prevMotorRpm / ( self.maxRatedTorque * self.ratedRpm ), 0, 1 )
 	elseif self.lastMissingTorque > 0 then
 		self.motorLoadP = 1
 	elseif lastNoTorque then
