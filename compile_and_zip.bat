@@ -14,6 +14,11 @@ goto :EOF
 	copy /v /y ..\src\%~n1.lua %~n1.lua
 	goto :EOF
 
+:loopbody_luc_17
+	echo %~n1
+	call c:\work\luapower-all-master\luajit -bg ..\src\%~n1.lua %~n1.l32
+	goto :EOF
+
 :loopbody_luc
 	echo %~n1
 	call c:\work\luapower-all-master\luajit -bg ..\src\%~n1.lua %~n1.luc

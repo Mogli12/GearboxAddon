@@ -101,7 +101,7 @@
 	<vehicle>huerlimannH488
 		<configFile xmlName="data/vehicles/steerable/huerlimann/huerlimannH488.xml"/>
 		
-		<gearboxMogli autoStartStop="false">
+		<gearboxMogli autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears>
@@ -117,6 +117,39 @@
 				<range ratio="0.182" name="M"/>
 				<range ratio="1"     name="V"/>
 			</ranges>
+			
+			<realEngine idleRpm="800" ratedRpm="2500">
+        <!-- 2500: 88(88) | 2500: 88(88) | 1300..1300: 323(323) | 85 | 0.5 | 149 | 2 | 2600 | 1300: 220 -->
+        <torque rpm="350" motorTorque="170" fuelUsageRatio="255.3"/>
+        <torque rpm="700" motorTorque="255" fuelUsageRatio="234.1"/>
+        <torque rpm="900" motorTorque="292" fuelUsageRatio="226.3"/>
+        <torque rpm="1000" motorTorque="306" fuelUsageRatio="223.5"/>
+        <torque rpm="1100" motorTorque="315" fuelUsageRatio="221.6"/>
+        <torque rpm="1200" motorTorque="321" fuelUsageRatio="220.4"/>
+        <torque rpm="1300" motorTorque="323" fuelUsageRatio="220"/>
+        <torque rpm="1400" motorTorque="320" fuelUsageRatio="220.2"/>
+        <torque rpm="1500" motorTorque="316" fuelUsageRatio="220.7"/>
+        <torque rpm="1600" motorTorque="311" fuelUsageRatio="221.5"/>
+        <torque rpm="1700" motorTorque="306" fuelUsageRatio="222.7"/>
+        <torque rpm="1800" motorTorque="301" fuelUsageRatio="224.2"/>
+        <torque rpm="1850" motorTorque="298" fuelUsageRatio="225.1"/>
+        <torque rpm="1900" motorTorque="295" fuelUsageRatio="226.1"/>
+        <torque rpm="1950" motorTorque="291" fuelUsageRatio="227.2"/>
+        <torque rpm="2000" motorTorque="288" fuelUsageRatio="228.3"/>
+        <torque rpm="2050" motorTorque="284" fuelUsageRatio="229.5"/>
+        <torque rpm="2100" motorTorque="281" fuelUsageRatio="230.9"/>
+        <torque rpm="2150" motorTorque="277" fuelUsageRatio="232.3"/>
+        <torque rpm="2200" motorTorque="273" fuelUsageRatio="233.8"/>
+        <torque rpm="2250" motorTorque="269" fuelUsageRatio="235.3"/>
+        <torque rpm="2300" motorTorque="265" fuelUsageRatio="237"/>
+        <torque rpm="2350" motorTorque="261" fuelUsageRatio="238.7"/>
+        <torque rpm="2400" motorTorque="256" fuelUsageRatio="240.5"/>
+        <torque rpm="2450" motorTorque="252" fuelUsageRatio="242.4"/>
+        <torque rpm="2500" motorTorque="247" fuelUsageRatio="244.4"/>
+        <torque rpm="2550" motorTorque="219" fuelUsageRatio="260.4"/>
+        <torque rpm="2600" motorTorque="136" fuelUsageRatio="334.6"/>
+        <torque rpm="2650" motorTorque="0" fuelUsageRatio="488.9"/>
+			</realEngine>
 		</gearboxMogli>
 	</vehicle>
 
@@ -406,11 +439,10 @@
 		</gearboxMogli>
 	</vehicle>
 	
-	<vehicle>lizardPickupRodeo, lizardPickupTT
+	<vehicle>lizardPickupRodeo
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
-		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupTT.xml"/>
 		
-		<gearboxMogli clutchOpenRpm="1150" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
+		<gearboxMogli torqueConverter="true" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="500"  automatic="true" reverseReset="true">	
@@ -419,6 +451,25 @@
 				<gear speed="60"  forwardOnly="true" name="2"/>
 				<gear speed="88"  forwardOnly="true" name="3"/>
 				<gear speed="130" forwardOnly="true" name="4"/>
+			</gears>
+			
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>lizardPickupTT
+		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupTT.xml"/>
+		
+		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
+			<blowOffVentilSound volume="0"/>
+			
+			<gears shiftTimeMs="500"  automatic="true" reverseReset="true">	
+				<gear speed="30"  forwardOnly="true" name="1"/>
+				<gear speed="50"  reverseOnly="true" name="R"/>			
+				<gear speed="55"  forwardOnly="true" name="2"/>
+				<gear speed="80"  forwardOnly="true" name="3"/>
+				<gear speed="120" forwardOnly="true" name="4"/>
+				<gear speed="180" forwardOnly="true" name="5"/>
+				<gear speed="250" forwardOnly="true" name="6"/>
 			</gears>
 			
 		</gearboxMogli>
@@ -471,7 +522,7 @@
 	<vehicle>caseIH1455
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 
-		<gearboxMogli autoStartStop="false" maxAIRange="1">
+		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true">
 			<gears shiftTimeMs="800">	
 				<gear speed="3.9"  name="1" />
 				<gear speed="6.2"  name="2" />
@@ -1333,8 +1384,9 @@ TODO
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt300.xml"/>
 
 		<gearboxMogli maxBackwardSpeed="26">
-      <hydrostatic profile="Fendt" correctGearSpeed="true"/>
-      <gears automatic="true">
+      <!--hydrostatic coupling="output" minRatio="-0.707" maxRatio="1.0" gearRatio="2" correctGearSpeed="false"/-->
+			<hydrostatic profile="Fendt" correctGearSpeed="true"/>		
+      <gears>
 				<gear name="" speed="40" atRpm="1700"/>
       </gears>
 			<reverse ratio="0.625"/>
@@ -1396,9 +1448,9 @@ TODO
 	<vehicle>fendt900
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt900.xml"/>
 	
-		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="62" maxBackwardSpeed="33">
+		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="62" maxBackwardSpeed="33" maxAIGear="1">
 			<hydrostatic profile="Fendt" correctGearSpeed="true"/>		
-			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
+			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="35" />
 				<gear name="transport"  speed="60" atRpm="1750"/>
 			</gears>
@@ -1491,12 +1543,27 @@ TODO
 	<vehicle>
 		<configFile xmlName="default"/>
 
-		<gearboxMogli disableManual="true" speedLimiter="true" autoStartStop="true" enableAI="true">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="1">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Fendt" maxRatio="1.4" correctGearSpeed="true"/>		
-			<gears defaultGear="2" maxAIGear="1" clutchRatio="1">	
+			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="Lo" maxForwardSpeedRatio="0.42" />
 				<gear name="Hi" maxForwardSpeedRatio="1.02" />
+			</gears>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultCombine"/>
+
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="2" onlyHandThrottle="true" defaultOn="false">
+			<blowOffVentilSound volume="0"/>
+			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/-->		
+			<hydrostatic profile="Combine" correctGearSpeed="true"/>		
+			<gears defaultGear="3">	
+				<gear name="I"   maxForwardSpeedRatio="0.37" />
+				<gear name="II"  maxForwardSpeedRatio="0.62" />
+				<gear name="III" maxForwardSpeedRatio="1.02" />
 			</gears>
 		</gearboxMogli>	
 	</vehicle>
@@ -1508,16 +1575,16 @@ TODO
 	<vehicle>sampoRosenlewC6
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true" defaultOn="false">
 			<combine defaultWidth="4.2"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine"/>
+			<hydrostatic profile="Fendt" correctGearSpeed="true"/>		
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
-				<gear name="I"   speed="5"  forwardOnly="true"/>
-				<gear name="II"  speed="9"  forwardOnly="true"/>
-				<gear name="R"   speed="12" reverseOnly="true"/>
-				<gear name="III" speed="20" forwardOnly="true"/>
+				<gear name="I"   speed="7"    forwardOnly="true"/>
+				<gear name="II"  speed="12.6" forwardOnly="true"/>
+				<gear name="R"   speed="16.8" reverseOnly="true"/>
+				<gear name="III" speed="28"   forwardOnly="true"/>
 			</gears>
 		</gearboxMogli>
 	</vehicle> 
@@ -1525,16 +1592,16 @@ TODO
 	<vehicle>newHollandTC590
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true" defaultOn="false">
 			<combine defaultWidth="5.5"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine"/>
+			<hydrostatic profile="Combine" correctGearSpeed="true"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
-				<gear name="I"   speed="5"  forwardOnly="true"/>
-				<gear name="II"  speed="9"  forwardOnly="true"/>
-				<gear name="R"   speed="12" reverseOnly="true"/>
-				<gear name="III" speed="16" forwardOnly="true"/>
+				<gear name="I"   speed="7"    forwardOnly="true"/>
+				<gear name="II"  speed="12.6" forwardOnly="true"/>
+				<gear name="R"   speed="16.8" reverseOnly="true"/>
+				<gear name="III" speed="22.4" forwardOnly="true"/>
 			</gears>
 			<reverse ratio="1"/>
 		</gearboxMogli>
@@ -1546,7 +1613,7 @@ TODO
 			<xmlFile name="caseIH7130.xml"/>
 		</mod>
 		
-		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2">
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2" defaultOn="false">
 			<combine defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -1562,7 +1629,7 @@ TODO
 	<vehicle>newHollandCR1090
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandCR1090.xml" />
 		
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3" defaultOn="false">
 			<combine defaultWidth="13.7"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -1582,7 +1649,7 @@ TODO
 			<xmlFile name="kroneBigX1100.xml"/>	
 		</mod>
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1" defaultOn="false">
 			<combine defaultFruit="chaff" defaultWidth="10.5"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -1621,7 +1688,7 @@ TODO
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandFR850.xml" />
 		
 		<!-- http://www.agriculture.newholland.com/Germany/de/Products/Forage/Documents/FR_123001_DOO.pdf -->
-		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3">
+		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="3" defaultOn="false">
 			<combine defaultFruit="chaff" defaultWidth="9.0"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -1664,7 +1731,7 @@ TODO
 	<vehicle>kroneBiGX580
 		<configFile xmlName="data/vehicles/steerable/krone/kroneBiGX580.xml" />
 		
-		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1">
+		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1" defaultOn="false">
 			<combine defaultFruit="chaff" defaultWidth="7.5"/>
 			<blowOffVentilSound volume="0"/>
 			

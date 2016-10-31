@@ -1,4 +1,4 @@
-# GearboxAddOn for Farming Simulator 2015
+# GearboxAddOn for Farming Simulator 2017
 
 ## Description
 This is the continuation of the mod MoreRealistic GearboxAddon for FS13. In FS15 it works even without MoreRealistic. 

@@ -64,6 +64,11 @@ function mrGearboxMogliLoader:load(savegame)
 			print("Error -1: "..tostring(self.customEnvironment).." "..tostring(self.mrGbMLConfigFileName))
 			return
 		end
+		
+		if string.find( string.upper( self.mrGbMLConfigFileName), "MB3D" ) ~= nil then
+			print("No support of MB3D mods: "..tostring(self.mrGbMLConfigFileName))
+			return
+		end
 			
 		local state, message = pcall( mrGearboxMogliLoader.loadGearboxMogli, self, self.xmlFile )
 		if not state then
@@ -183,7 +188,6 @@ function mrGearboxMogliLoader.initXmlFiles()
 					nothingFound = false
 					
 					if      string.len( entry.configFileName ) >= 7 
-							and string.len( entry.configFileName ) <= 9
 							and string.sub( entry.configFileName, 1, 7 ) == "default" then
 							
 						if f == 1 then
@@ -321,12 +325,14 @@ function mrGearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, p
 	end
 	
 	-- default config 
-	if     SpecializationUtil.hasSpecialization(AITractor, self.specializations)
-			or ( SpecializationUtil.hasSpecialization(Steerable, self.specializations)
-			 and not SpecializationUtil.hasSpecialization(Combine, self.specializations) ) then
+	if SpecializationUtil.hasSpecialization(Steerable, self.specializations) then
 	--local speed = 5 * math.floor( self.motor.maxForwardSpeed * 0.72 )
 	--local defaultConfigName = string.format( "default%2d", speed )
+	
 		local defaultConfigName = "default"
+		if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
+			defaultConfigName = "defaultCombine"
+		end
 		
 		print("zzzMrGearboxAddon: looking for default configuration ("..defaultConfigName..")")
 		
