@@ -332,6 +332,19 @@ function mrGearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, p
 		local defaultConfigName = "default"
 		if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
 			defaultConfigName = "defaultCombine"
+		else
+			local storeItem = StoreItemsUtil.storeItemsByXMLFilename[self.configFileName:lower()];
+			
+			if storeItem == nil then
+			elseif storeItem.category == "wheelLoaders" then
+				defaultConfigName = "defaultTorqueConverter"
+			elseif storeItem.category == "teleLoaders"  then
+				defaultConfigName = "defaultHydrostatic2"
+			elseif storeItem.category == "skidSteers"   then
+				defaultConfigName = "defaultHydrostatic1"
+			elseif storeItem.category == "wood"         then
+				defaultConfigName = "defaultHydrostatic1"
+			end
 		end
 		
 		print("zzzMrGearboxAddon: looking for default configuration ("..defaultConfigName..")")

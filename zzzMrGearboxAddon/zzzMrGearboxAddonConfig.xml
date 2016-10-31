@@ -1554,12 +1554,57 @@ TODO
 	</vehicle>
 
 	<vehicle>
+		<configFile xmlName="defaultTorqueConverter"/>
+
+		<gearboxMogli torqueConverter="true" speedLimiter="true" autoStartStop="true" enableAI="true">
+			<blowOffVentilSound volume="0"/>
+	
+			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="-1" speedMatching="false" defaultGear="3">
+				<gear name="1" maxForwardSpeedRatio="0.40" />
+				<gear name="2" maxForwardSpeedRatio="0.75" />
+				<gear name="3" maxForwardSpeedRatio="1.33" />
+			</gears>
+			
+			<ranges shiftTimeMs="300" shiftEffect="false" clutchRatio="-1" defaultRange="1" gearOffset="1">
+				<range ratio="0.33" name="A"/>
+				<range ratio="1.00" name="S"/>
+			</ranges>
+			<reverse shiftTimeMs="300" clutchRatio="0"/>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultHydrostatic1"/>
+
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true">
+			<blowOffVentilSound volume="0"/>
+			<hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/>	
+			<gears>	
+				<gear name="" maxForwardSpeedRatio="1.1" />
+			</gears>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultHydrostatic2"/>
+
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true">
+			<blowOffVentilSound volume="0"/>
+			<hydrostatic profile="Linde" />		
+			<gears defaultGear="2" clutchRatio="1">	
+				<gear name="Lo" maxForwardSpeedRatio="0.42" />
+				<gear name="Hi" maxForwardSpeedRatio="1.02" />
+			</gears>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
 		<configFile xmlName="defaultCombine"/>
 
-		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="2" onlyHandThrottle="true" defaultOn="false">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/-->		
-			<hydrostatic profile="Combine" correctGearSpeed="true"/>		
+			<hydrostatic profile="Combine" correctGearSpeed="true" minMaxTimeMs="0" maxMinTimeMs="0"/>		
 			<gears defaultGear="3">	
 				<gear name="I"   maxForwardSpeedRatio="0.37" />
 				<gear name="II"  maxForwardSpeedRatio="0.62" />
