@@ -8772,7 +8772,7 @@ function mrGearboxMogliMotor:combineGear( I2g, I2r )
 end
 
 function mrGearboxMogliMotor:getMotorLoad()
-	return self.maxMotorTorque * self.motorLoadP
+	return self.maxMotorTorque * ( 1 - ( 1 - self.motorLoadP )^2 )
 end
 
 function mrGearboxMogliMotor:getMinRpm()
