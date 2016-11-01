@@ -336,6 +336,10 @@ function mrGearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, p
 			local storeItem = StoreItemsUtil.storeItemsByXMLFilename[self.configFileName:lower()];
 			
 			if storeItem == nil then
+			elseif storeItem.category == "tractors"     then
+				defaultConfigName = "defaultTractors"
+			elseif storeItem.category == "trucks"       then
+				defaultConfigName = "defaultTrucks"
 			elseif storeItem.category == "wheelLoaders" then
 				defaultConfigName = "defaultTorqueConverter"
 			elseif storeItem.category == "teleLoaders"  then

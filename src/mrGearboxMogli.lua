@@ -92,6 +92,7 @@ mrGearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
 mrGearboxMogli.speedLimitMode       = "B" -- "T"orque limit only / "M"ax RPM only / "B"oth
 mrGearboxMogli.motorBrakeTime       = 250     
 mrGearboxMogli.hackSounds           = false
+mrGearboxMogli.motorLoadExp         = 1.5
 
 mrGearboxMogliGlobals                       = {}
 mrGearboxMogliGlobals.debugPrint            = false
@@ -899,7 +900,7 @@ function mrGearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.TorqueConverterLossExp = 3 
 	end		
 	
-	default = self.mrGbMS.IdleRpm+0.1*(self.mrGbMS.RatedRpm-self.mrGbMS.IdleRpm)
+	default = self.mrGbMS.IdleRpm+0.2*(self.mrGbMS.RatedRpm-self.mrGbMS.IdleRpm)
 	if self.mrGbMS.TorqueConverter then 
 		default = mrGearboxMogli.huge --self.mrGbMS.CurMaxRpm
 	end
@@ -8772,7 +8773,7 @@ function mrGearboxMogliMotor:combineGear( I2g, I2r )
 end
 
 function mrGearboxMogliMotor:getMotorLoad()
-	return self.maxMotorTorque * ( 1 - ( 1 - self.motorLoadP )^2 )
+	return self.maxMotorTorque * ( 1 - ( 1 - self.motorLoadP )^mrGearboxMogli.motorLoadExp )
 end
 
 function mrGearboxMogliMotor:getMinRpm()

@@ -156,7 +156,7 @@
 	<vehicle>sameFortis
 		<configFile xmlName="data/vehicles/steerable/same/sameFortis.xml" />
 						
-		<gearboxMogli   swapGearRangeKeys="true" maxAIRange="4">	
+		<gearboxMogli maxAIRange="4">	
 			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
@@ -233,7 +233,7 @@
 		<configFile xmlName="data/vehicles/steerable/steyr/steyrMulti.xml"/>
 		
 		<!-- http://media.steyr-traktoren.com/Media/Flip_viewer/de_at/Multi/flipviewerxpress.html -->
-		<gearboxMogli   swapGearRangeKeys="true" maxAIRange2="1">
+		<gearboxMogli maxAIRange2="1">
 			<engines>
 				<engine name="Multi 4095" idleRpm="900" ratedRpm="2200" >
 					<!-- 1900: 99(99) | 2200: 99(99) | 1300..1500: 407(407) | 95 | 0.5 | 149 | 2.5 | 2300 | 1400: 220 -->
@@ -501,29 +501,34 @@
         <torque rpm="2050" motorTorque="0" fuelUsageRatio="444.4"/>
 			</realEngine>
 		
-			<gears clutchRatio="0.7" automatic="true" shiftTimeMs="700" reverseReset="true"  speedMatching="true"> <!-- autoShiftTimeout="4000" autoShiftTimeout2="2500"-->	
+			<gears automatic="true" shiftTimeMs="700" reverseReset="false" speedMatching="true" autoShiftTimeout="6000" autoShiftTimeout2="2000">	
 				<gear speed="37.53"  forwardOnly="true" name="1"/>
-				<gear speed="40.46"  reverseOnly="true" name="R1"/>
+				<gear speed="40.46"  reverseOnly="true" name="R 1"/>
 				<gear speed="48.2"   forwardOnly="true" name="2"/>
-				<gear speed="53.31"  reverseOnly="true" name="R2"/>			
+				<gear speed="53.31"  reverseOnly="true" name="R 2"/>			
 				<gear speed="62.3"   forwardOnly="true" name="3"/>
 				<gear speed="79.9"   forwardOnly="true" name="4"/>
 				<gear speed="101.75" forwardOnly="true" name="5"/>
 				<gear speed="130.2"  forwardOnly="true" name="6"/>
 			</gears>
 			
-			<ranges clutchRatio="0.7" automatic="true" shiftTimeMs="800" reverseReset="true" defaultRange="2">
-				<range ratio="0.219" name="L" />
+			<ranges automatic="true" shiftTimeMs="800" reverseReset="true" defaultRange="3">
+				<range ratio="0.219" name="L" forwardOnly="true" />
+				<range ratio="0.219" name=""  reverseOnly="true" />
 				<range ratio="1"     name="H" forwardOnly="true" />
 			</ranges>
 		</gearboxMogli>
 	</vehicle>
 		
 	<vehicle>caseIH1455
+		<mod name="International1455xl_FS17">
+			<link href="http://www.modhoster.de/mods/international-1455xl" />
+			<xmlFile name="caseIH1455.xml"/>
+		</mod>
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true">
-			<gears shiftTimeMs="800">	
+			<gears defaultGear="4" shiftTimeMs="800">	
 				<gear speed="3.9"  name="1" />
 				<gear speed="6.2"  name="2" />
 				<gear speed="9.7"  name="3" />
@@ -716,6 +721,111 @@
 		</gearboxMogli>
 	</vehicle>
 		
+	<vehicle>valtraNSeries
+		<configFile xmlName="data/vehicles/steerable/valtra/valtraNSeries.xml"/>
+		
+		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="53">
+			<gears automatic="true" defaultGear="1" shiftTimeMs="0" clutchRatio="1">
+				<gear speed="25.01"/>
+				<gear speed="31.32"/>
+				<gear speed="37.63"/>
+				<gear speed="47.11"/>
+				<gear speed="56.60"/>
+			</gears>
+			
+			<ranges defaultRange="4" shiftTimeMs="800">
+				<range ratio="0.15" name="A"/>
+				<range ratio="0.33" name="B"/>
+				<range ratio="0.50" name="C" minRange2="2"/>
+				<range ratio="1"    name="D" minRange2="2"/>
+			</ranges>
+			
+			<ranges defaultRange="2">
+				<range ratio="0.2" name="LL" maxRange="2" />
+				<range ratio="1"   name="" />
+			</ranges>
+			
+			<reverse ratio="1.05413"/>
+
+			<engines>
+				<engine name="N134" idleRpm="800" ratedRpm="2100">
+					<!-- 2100: 145(135) | 2100: 145(135) | 1500..1500: 620(570) | 90 | 0.8 | 149 | 2.5 | 2200 | 1320: 210 -->
+					<torque rpm="350" motorTorque="413" motorTorqueEco="379" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="540" motorTorqueEco="497" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="574" motorTorqueEco="528" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="588" motorTorqueEco="541" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="600" motorTorqueEco="551" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="609" motorTorqueEco="560" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="615" motorTorqueEco="565" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="619" motorTorqueEco="569" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="620" motorTorqueEco="570" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="601" motorTorqueEco="554" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="581" motorTorqueEco="536" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="559" motorTorqueEco="517" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="548" motorTorqueEco="507" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="535" motorTorqueEco="496" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="521" motorTorqueEco="485" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="509" motorTorqueEco="474" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="496" motorTorqueEco="462" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="485" motorTorqueEco="451" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="453" motorTorqueEco="422" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="306" motorTorqueEco="285" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+				</engine>
+				
+				<engine name="N154e" idleRpm="800" ratedRpm="2100">
+					<!-- 1900: 165(155) | 2100: 165(155) | 1250..1250: 700(660) | 90 | 0.4 | 149 | 2.5 | 2200 | 1250: 200 -->
+					<torque rpm="350" motorTorque="426" motorTorqueEco="402" fuelUsageRatio="235.6"/>
+					<torque rpm="700" motorTorque="599" motorTorqueEco="564" fuelUsageRatio="213.3"/>
+					<torque rpm="900" motorTorque="658" motorTorqueEco="620" fuelUsageRatio="205.4"/>
+					<torque rpm="1000" motorTorque="678" motorTorqueEco="640" fuelUsageRatio="202.7"/>
+					<torque rpm="1100" motorTorque="692" motorTorqueEco="653" fuelUsageRatio="201"/>
+					<torque rpm="1200" motorTorque="699" motorTorqueEco="659" fuelUsageRatio="200.1"/>
+					<torque rpm="1300" motorTorque="697" motorTorqueEco="657" fuelUsageRatio="200.1"/>
+					<torque rpm="1400" motorTorque="689" motorTorqueEco="649" fuelUsageRatio="200.7"/>
+					<torque rpm="1500" motorTorque="678" motorTorqueEco="639" fuelUsageRatio="201.9"/>
+					<torque rpm="1600" motorTorque="665" motorTorqueEco="626" fuelUsageRatio="203.8"/>
+					<torque rpm="1700" motorTorque="649" motorTorqueEco="611" fuelUsageRatio="206.2"/>
+					<torque rpm="1800" motorTorque="631" motorTorqueEco="593" fuelUsageRatio="209.3"/>
+					<torque rpm="1850" motorTorque="621" motorTorqueEco="584" fuelUsageRatio="211.1"/>
+					<torque rpm="1900" motorTorque="610" motorTorqueEco="573" fuelUsageRatio="213"/>
+					<torque rpm="1950" motorTorque="594" motorTorqueEco="559" fuelUsageRatio="215.1"/>
+					<torque rpm="2000" motorTorque="579" motorTorqueEco="545" fuelUsageRatio="217.3"/>
+					<torque rpm="2050" motorTorque="565" motorTorqueEco="531" fuelUsageRatio="219.7"/>
+					<torque rpm="2100" motorTorque="552" motorTorqueEco="518" fuelUsageRatio="222.2"/>
+					<torque rpm="2150" motorTorque="516" motorTorqueEco="484" fuelUsageRatio="236.7"/>
+					<torque rpm="2200" motorTorque="348" motorTorqueEco="327" fuelUsageRatio="304.2"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+				</engine>
+				
+				<engine name="N174" idleRpm="800" ratedRpm="2100">
+					<!-- 2100: 185(165) | 2100: 185(165) | 1500..1500: 730(680) | 90 | 0.4 | 149 | 2.5 | 2200 | 1320: 210 -->
+					<torque rpm="350" motorTorque="486" motorTorqueEco="453" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="636" motorTorqueEco="593" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="676" motorTorqueEco="630" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="693" motorTorqueEco="645" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="706" motorTorqueEco="658" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="717" motorTorqueEco="668" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="724" motorTorqueEco="674" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="729" motorTorqueEco="679" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="730" motorTorqueEco="680" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="721" motorTorqueEco="669" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="708" motorTorqueEco="654" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="691" motorTorqueEco="635" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="681" motorTorqueEco="624" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="671" motorTorqueEco="609" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="659" motorTorqueEco="593" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="646" motorTorqueEco="579" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="633" motorTorqueEco="565" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="619" motorTorqueEco="552" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="578" motorTorqueEco="516" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="390" motorTorqueEco="348" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+				</engine>
+			</engines>
+		</gearboxMogli>
+	</vehicle>
+	
 	<vehicle>newHollandT6
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandT6.xml"/>
 	
@@ -1445,6 +1555,98 @@ TODO
 		</gearboxMogli>	
 	</vehicle>
 	
+	<vehicle>fendt700
+		<configFile xmlName="data/vehicles/steerable/fendt/fendt700.xml"/>
+	
+		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
+			<hydrostatic profile="Fendt" correctGearSpeed="true"/>		
+			<gears defaultGear="2" clutchRatio="1">	
+				<gear name="heavy duty" speed="28" />
+				<gear name="transport"  speed="50" atRpm="1800"/>
+			</gears>
+			<reverse ratio="0.56"/>
+
+			<engines>
+				<engine name="716 Vario" idleRpm="800" ratedRpm="2100">		
+					<!-- 1800: 165(165) | 2100: 148(148) | 1400..1500: 725(725) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 192 -->
+					<torque rpm="350" motorTorque="408" fuelUsageRatio="221.7"/>
+					<torque rpm="700" motorTorque="581" fuelUsageRatio="204.1"/>
+					<torque rpm="900" motorTorque="649" fuelUsageRatio="197.6"/>
+					<torque rpm="1000" motorTorque="677" fuelUsageRatio="195.2"/>
+					<torque rpm="1100" motorTorque="698" fuelUsageRatio="193.5"/>
+					<torque rpm="1200" motorTorque="713" fuelUsageRatio="192.5"/>
+					<torque rpm="1300" motorTorque="722" fuelUsageRatio="192"/>
+					<torque rpm="1400" motorTorque="725" fuelUsageRatio="192.2"/>
+					<torque rpm="1500" motorTorque="725" fuelUsageRatio="193.1"/>
+					<torque rpm="1600" motorTorque="707" fuelUsageRatio="194.7"/>
+					<torque rpm="1700" motorTorque="680" fuelUsageRatio="197.1"/>
+					<torque rpm="1800" motorTorque="644" fuelUsageRatio="200.1"/>
+					<torque rpm="1850" motorTorque="624" fuelUsageRatio="201.8"/>
+					<torque rpm="1900" motorTorque="603" fuelUsageRatio="203.8"/>
+					<torque rpm="1950" motorTorque="579" fuelUsageRatio="205.9"/>
+					<torque rpm="2000" motorTorque="553" fuelUsageRatio="208.2"/>
+					<torque rpm="2050" motorTorque="525" fuelUsageRatio="210.7"/>
+					<torque rpm="2100" motorTorque="495" fuelUsageRatio="213.3"/>
+					<torque rpm="2150" motorTorque="439" fuelUsageRatio="227.2"/>
+					<torque rpm="2200" motorTorque="272" fuelUsageRatio="292.1"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="426.7"/>
+				</engine>		
+
+				<engine name="720 Vario" idleRpm="800" ratedRpm="2100">		
+					<!-- 1800: 200(200) | 2100: 185(185) | 1400..1500: 897(897) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 192 -->
+					<torque rpm="350" motorTorque="505" fuelUsageRatio="221.7"/>
+					<torque rpm="700" motorTorque="718" fuelUsageRatio="204.1"/>
+					<torque rpm="900" motorTorque="804" fuelUsageRatio="197.6"/>
+					<torque rpm="1000" motorTorque="837" fuelUsageRatio="195.2"/>
+					<torque rpm="1100" motorTorque="863" fuelUsageRatio="193.5"/>
+					<torque rpm="1200" motorTorque="882" fuelUsageRatio="192.5"/>
+					<torque rpm="1300" motorTorque="893" fuelUsageRatio="192"/>
+					<torque rpm="1400" motorTorque="897" fuelUsageRatio="192.2"/>
+					<torque rpm="1500" motorTorque="897" fuelUsageRatio="193.1"/>
+					<torque rpm="1600" motorTorque="871" fuelUsageRatio="194.7"/>
+					<torque rpm="1700" motorTorque="825" fuelUsageRatio="197.1"/>
+					<torque rpm="1800" motorTorque="780" fuelUsageRatio="200.1"/>
+					<torque rpm="1850" motorTorque="758" fuelUsageRatio="201.8"/>
+					<torque rpm="1900" motorTorque="733" fuelUsageRatio="203.8"/>
+					<torque rpm="1950" motorTorque="707" fuelUsageRatio="205.9"/>
+					<torque rpm="2000" motorTorque="679" fuelUsageRatio="208.2"/>
+					<torque rpm="2050" motorTorque="649" fuelUsageRatio="210.7"/>
+					<torque rpm="2100" motorTorque="619" fuelUsageRatio="213.3"/>
+					<torque rpm="2150" motorTorque="549" fuelUsageRatio="227.2"/>
+					<torque rpm="2200" motorTorque="340" fuelUsageRatio="292.1"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="426.7"/>
+				</engine>		
+				
+				<engine name="724 Vario" idleRpm="800" ratedRpm="2100">		
+					<!-- 1800: 240(240) | 2100: 220(220) | 1400..1500: 1058(1058) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 192 -->
+					<torque rpm="350" motorTorque="596" fuelUsageRatio="221.7"/>
+					<torque rpm="700" motorTorque="847" fuelUsageRatio="204.1"/>
+					<torque rpm="900" motorTorque="948" fuelUsageRatio="197.6"/>
+					<torque rpm="1000" motorTorque="987" fuelUsageRatio="195.2"/>
+					<torque rpm="1100" motorTorque="1018" fuelUsageRatio="193.5"/>
+					<torque rpm="1200" motorTorque="1040" fuelUsageRatio="192.5"/>
+					<torque rpm="1300" motorTorque="1054" fuelUsageRatio="192"/>
+					<torque rpm="1400" motorTorque="1058" fuelUsageRatio="192.2"/>
+					<torque rpm="1500" motorTorque="1058" fuelUsageRatio="193.1"/>
+					<torque rpm="1600" motorTorque="1031" fuelUsageRatio="194.7"/>
+					<torque rpm="1700" motorTorque="990" fuelUsageRatio="197.1"/>
+					<torque rpm="1800" motorTorque="936" fuelUsageRatio="200.1"/>
+					<torque rpm="1850" motorTorque="909" fuelUsageRatio="201.8"/>
+					<torque rpm="1900" motorTorque="879" fuelUsageRatio="203.8"/>
+					<torque rpm="1950" motorTorque="846" fuelUsageRatio="205.9"/>
+					<torque rpm="2000" motorTorque="811" fuelUsageRatio="208.2"/>
+					<torque rpm="2050" motorTorque="775" fuelUsageRatio="210.7"/>
+					<torque rpm="2100" motorTorque="736" fuelUsageRatio="213.3"/>
+					<torque rpm="2150" motorTorque="653" fuelUsageRatio="227.2"/>
+					<torque rpm="2200" motorTorque="404" fuelUsageRatio="292.1"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="426.7"/>
+				</engine>		
+			
+			</engines>
+		</gearboxMogli>	
+	</vehicle>
+
+	
 	<vehicle>fendt900
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt900.xml"/>
 	
@@ -1543,7 +1745,7 @@ TODO
 	<vehicle>
 		<configFile xmlName="default"/>
 
-		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="1">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="1" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Fendt" maxRatio="1.4" correctGearSpeed="true"/>		
 			<gears defaultGear="2" clutchRatio="1">	
@@ -1554,9 +1756,56 @@ TODO
 	</vehicle>
 
 	<vehicle>
+		<configFile xmlName="defaultTrucks"/>
+
+		<gearboxMogli speedLimiter="true" maxForwardSpeed="92" maxBackwardSpeed="92" autoStartStop="true" enableAI="true" maxAIGear="1">
+			<blowOffVentilSound volume="0"/>
+			<gears automatic="true" shiftTimeMs="700" reverseReset="false" speedMatching="true" autoShiftTimeout="6000" autoShiftTimeout2="2000">	
+				<gear speed="37.53"  forwardOnly="true" name="1"/>
+				<gear speed="40.46"  reverseOnly="true" name="R 1"/>
+				<gear speed="48.2"   forwardOnly="true" name="2"/>
+				<gear speed="53.31"  reverseOnly="true" name="R 2"/>			
+				<gear speed="62.3"   forwardOnly="true" name="3"/>
+				<gear speed="79.9"   forwardOnly="true" name="4"/>
+				<gear speed="101.75" forwardOnly="true" name="5"/>
+				<gear speed="130.2"  forwardOnly="true" name="6"/>
+			</gears>
+			
+			<ranges automatic="true" shiftTimeMs="800" reverseReset="true" defaultRange="3">
+				<range ratio="0.219" name="L" forwardOnly="true" />
+				<range ratio="0.219" name=""  reverseOnly="true" />
+				<range ratio="1"     name="H" forwardOnly="true" />
+			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultTractors"/>
+
+		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIRange="1" defaultOn="false">
+			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
+				<gear maxForwardSpeedRatio="0.54" />
+				<gear maxForwardSpeedRatio="0.66" />
+				<gear maxForwardSpeedRatio="0.83" />
+				<gear maxForwardSpeedRatio="1.02"/>
+			</gears>
+			
+			<ranges defaultRange="2">
+				<range name="L" ratio="0.43"/>
+				<range name="H" ratio="1"/>
+			</ranges>
+			
+			<ranges defaultRange="2" doubleClutch="true">
+				<range name="L" ratio="0.245"/>
+				<range name="H" ratio="1"/>
+			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
 		<configFile xmlName="defaultTorqueConverter"/>
 
-		<gearboxMogli torqueConverter="true" speedLimiter="true" autoStartStop="true" enableAI="true">
+		<gearboxMogli torqueConverter="true" speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 	
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="-1" speedMatching="false" defaultGear="3">
@@ -1576,7 +1825,7 @@ TODO
 	<vehicle>
 		<configFile xmlName="defaultHydrostatic1"/>
 
-		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/>	
 			<gears>	
@@ -1588,7 +1837,7 @@ TODO
 	<vehicle>
 		<configFile xmlName="defaultHydrostatic2"/>
 
-		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Linde" />		
 			<gears defaultGear="2" clutchRatio="1">	

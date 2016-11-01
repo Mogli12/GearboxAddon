@@ -21,14 +21,14 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung mrGearboxMogli hinzu]]
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.1.6</version>
+	<version>1.9.1.7</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="mrGearboxMogliVERSION">
-			<de>Getriebe v2.0 beta 6 von Mogli</de>
-	  	 <en>Gearbox v2.0 beta 6 by mogli</en>
-				<it>Cambio v2.0 beta 6 by mogli</it>
-		</text>
+			<de>Getriebe v2.0 beta 7 von Mogli</de>
+	  	 <en>Gearbox v2.0 beta 7 by mogli</en>
+				<it>Cambio v2.0 beta 7 by mogli</it>
+		</text>                  
   </l10n>
 
 	<inputBindings>
