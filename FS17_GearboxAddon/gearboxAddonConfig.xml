@@ -4,7 +4,7 @@
 	<vehicle>newHolland8340
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHolland8340.xml"/>
 		
-		<gearboxMogli autoStartStop="false" speedLimiter="false" maxAIRange="1" swapGearRangeKeys="true">
+		<gearboxMogli autoStartStop="false" speedLimiter="false" maxAIRange="1">
 			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1">
 				<gear speed="21.9"/>
 				<gear speed="26.9"/>
@@ -2005,22 +2005,19 @@ TODO
 	<vehicle>
 		<configFile xmlName="defaultTractors"/>
 
-		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIRange="1" defaultOn="false">
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
-				<gear maxForwardSpeedRatio="0.54" />
-				<gear maxForwardSpeedRatio="0.66" />
-				<gear maxForwardSpeedRatio="0.83" />
-				<gear maxForwardSpeedRatio="1.02"/>
+		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="3" defaultOn="false">
+			<gears defaultGear="4">
+				<gear maxForwardSpeedRatio="0.099" name="G1"/>
+				<gear maxForwardSpeedRatio="0.231" name="G2"/>
+				<gear maxForwardSpeedRatio="0.406" name="G3"/>
+				<gear maxForwardSpeedRatio="0.943" name="G4"/>
 			</gears>
 			
-			<ranges defaultRange="2">
-				<range name="L" ratio="0.43"/>
-				<range name="H" ratio="1"/>
-			</ranges>
-			
-			<ranges defaultRange="2" doubleClutch="true">
-				<range name="L" ratio="0.245"/>
-				<range name="H" ratio="1"/>
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
+				<range name="P1" ratio="0.5475"/>
+				<range name="P2" ratio="0.6725"/>
+				<range name="P3" ratio="0.8375"/>
+				<range name="P4" ratio="1"/>
 			</ranges>
 		</gearboxMogli>	
 	</vehicle>
