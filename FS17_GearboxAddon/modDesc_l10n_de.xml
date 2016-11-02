@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Getriebe:
+Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
+</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="Getriebe: Gang hoch"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Getriebe: Gang runter"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Getriebe: Gruppe hoch"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Getriebe: Gruppe 2 hoch"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Getriebe: Gruppe runter"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Getriebe: Gruppe 2 runter"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="Getriebe: Neutral"/>
+		<text name="input_gearboxMogliOFF"             text="Manuelles Getriebe [aus]"/>
+		<text name="input_gearboxMogliON"              text="Manuelles Getriebe [an]"/>
+		<text name="input_gearboxMogliON_OFF"          text="Getriebe: An/Aus"/>
+		<text name="input_gearboxMogliHUD"             text="Getriebe: HUD an/aus"/>
+		<text name="input_gearboxMogliAllAuto"         text="Getriebe: Realismus-Schalter"/>
+		<text name="input_gearboxMogliAllAutoON"       text="Getriebe [einfach]"/>
+		<text name="input_gearboxMogliAllAutoOFF"      text="Getriebe [realistisch]"/>
+		<text name="input_gearboxMogliREVERSE"         text="Getriebe: Rückwärts"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Getriebe: Autom.Kupplung"/>
+		<text name="input_gearboxMogliCLUTCH"          text="Getriebe: Kupplung"/>
+		<text name="input_gearboxMogliCLUTCH_1"        text="Getriebe: Kupplung öffnen"/>
+		<text name="input_gearboxMogliCLUTCH_2"        text="Getriebe: Kupplung schliessen"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="Getriebe: Kupplung"/>
+		<text name="input_gearboxMogliMINRPM"          text="Getriebe: Handgas"/>
+		<text name="input_gearboxMogliMINRPM_1"        text="Getriebe: Handgas runter"/>
+		<text name="input_gearboxMogliMINRPM_2"        text="Getriebe: Handgas rauf"/>
+		<text name="input_gearboxMogliGEAR1"           text="Getriebe: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"           text="Getriebe: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"           text="Getriebe: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"           text="Getriebe: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"           text="Getriebe: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"           text="Getriebe: G27 6"/>
+		<text name="input_gearboxMogliGEARR"           text="Getriebe: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"         text="Getriebe: forwärts"/> 
+		<text name="input_gearboxMogliGEARBACK"        text="Getriebe: rückwärts"/>
+		<text name="input_gearboxMogliSPEEDLIMIT"      text="Getriebe: Begrenzer"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Getriebe: Tempomat 2"/>
+		<text name="input_gearboxMogliSETSPEED"        text="Getriebe: Setze Begrenzer"/>
+		<text name="input_gearboxMogliACCTOLIMIT"      text="Getriebe: Beschleunigung"/>
+		<text name="input_gearboxMogliDECTOLIMIT"      text="Getriebe: Bremsen"/>
+		<text name="input_gearboxMogliECO"             text="Getriebe: Eco an/aus"/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="Getriebe: Geschwindigkeit halten"/>
+		<text name="gearboxMogliTEXT_OFF"        text="Motor aus"/>
+		<text name="gearboxMogliTEXT_AI"         text="Helfer"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="Handbremse"/>
+		<text name="gearboxMogliTEXT_DC"         text="Zwischengas"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"    text="Neutral"/>
+		<text name="gearboxMogliTEXT_AUTO"       text="Automatik"/>
+		<text name="gearboxMogliTEXT_MANUAL"     text="Manuell"/>
+		<text name="gearboxMogliTEXT_NOGEAR"     text="Kein Gang"/>
+		<text name="gearboxMogliTEXT_VARIO"      text="Stufenlos"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"    text="Vereinfacht"/>
+		<text name="gearboxMogliTEXT_ECO"        text="Eco"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Auto Hold"/>
+	</texts>
+</l10n>
