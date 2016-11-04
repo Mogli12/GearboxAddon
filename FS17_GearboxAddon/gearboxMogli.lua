@@ -1523,14 +1523,37 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		self.mrGbMS.HydrostaticProfile = getXMLString(xmlFile, xmlString .. ".hydrostatic#profile")
 	  
 		if self.mrGbMS.HydrostaticProfile == nil then
+		elseif self.mrGbMS.HydrostaticProfile == "ZF"   then
+			print('Warning in gearboxMogli: hydrostatic profile "ZF" is out dated. Please use "Input" instead')
+			self.mrGbMS.HydrostaticProfile = "Input"
+		elseif self.mrGbMS.HydrostaticProfile == "Fendt"   then
+			print('Warning in gearboxMogli: hydrostatic profile "Fendt" is out dated. Please use "Output" instead and adjust the gear ratios.')
+			self.mrGbMS.HydrostaticProfile = "Output"
+			if not ( getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed") ) then
+				for i,g in pairs(self.mrGbMS.Gears) do
+					g.speed = g.speed * 1.333333333
+				end
+			end
+		elseif self.mrGbMS.HydrostaticProfile == "Combine" then
+			print('Warning in gearboxMogli: hydrostatic profile "Combine" is out dated. Please use "Direct" instead and adjust the gear ratios.')
+			self.mrGbMS.HydrostaticProfile = "Direct"
+			if not ( getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed") ) then
+				for i,g in pairs(self.mrGbMS.Gears) do
+					g.speed = g.speed * 1.4
+				end
+			end
+		end
+		
+		if self.mrGbMS.HydrostaticProfile == nil then
 			-- nothing 
-		elseif self.mrGbMS.HydrostaticProfile == "ZF" then
+		elseif self.mrGbMS.HydrostaticProfile == "Input" then
 			self.mrGbMS.HydrostaticMin = 0
 			self.mrGbMS.HydrostaticMax = 1.333333333
 			self.mrGbMS.TransmissionEfficiency = 0.98
 			self.mrGbMS.HydrostaticEfficiency  = {}
 			
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.00,v=0.600})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.00,v=gearboxMogli.eps})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.05,v=0.500})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.22,v=0.680})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.67,v=0.870})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.80,v=0.930})
@@ -1544,51 +1567,41 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.50,v=0.860})
 			
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
-		elseif self.mrGbMS.HydrostaticProfile == "Fendt" then
-			self.mrGbMS.HydrostaticMin = -1
-			self.mrGbMS.HydrostaticMax = 1.333333333
+		elseif self.mrGbMS.HydrostaticProfile == "Output" then
+			self.mrGbMS.HydrostaticMin = -0.7
+			self.mrGbMS.HydrostaticMax = 1
 			self.mrGbMS.TransmissionEfficiency = 0.98
 			self.mrGbMS.HydrostaticEfficiency  = {}
 
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-1	 ,v=0.65 })
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.01,v=0.82 })
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0	   ,v=0.6  })
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0	   ,v=gearboxMogli.eps })
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.01 ,v=0.825})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1	   ,v=0.98 })
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.5  ,v=0.89 })
 
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
-		elseif self.mrGbMS.HydrostaticProfile == "Combine" then
-			self.mrGbMS.HydrostaticMin = 0
-			self.mrGbMS.HydrostaticMax = 1.4
-		--self.mrGbMS.HydrostaticCoupling    = "direct"
-			self.mrGbMS.TransmissionEfficiency = 0.98
-			self.mrGbMS.HydrostaticEfficiency  = {}
-
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0	 ,v=0.6 })
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.2,v=0.75})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.4,v=0.84})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.7,v=0.93})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.9,v=0.97})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1	 ,v=0.98})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.1,v=0.97})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.2,v=0.95})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.4,v=0.9 })
-
-			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
-		elseif self.mrGbMS.HydrostaticProfile == "Linde" then
+		elseif self.mrGbMS.HydrostaticProfile == "Direct" then
 			self.mrGbMS.HydrostaticMin = -1
 			self.mrGbMS.HydrostaticMax = 1
-		--self.mrGbMS.HydrostaticCoupling    = "direct"
 			self.mrGbMS.TransmissionEfficiency = 0.98
 			self.mrGbMS.HydrostaticEfficiency  = {}
 
+			for i,g in pairs(self.mrGbMS.Gears) do
+				if g.forwardOnly or g.reverseOnly then
+					self.mrGbMS.HydrostaticMin = 0
+					break
+				end
+			end
+			
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-1.00,v=0.870})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.85,v=0.920})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.70,v=0.930})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.50,v=0.870})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.15,v=0.700})
-			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.000,v=0.600})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-0.02,v=0.400})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.000,v=gearboxMogli.eps})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.020,v=0.400})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.150,v=0.750})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.300,v=0.850})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.500,v=0.930})
@@ -1599,6 +1612,46 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1.000,v=0.900})
 
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
+		elseif self.mrGbMS.HydrostaticProfile == "Compound" then
+			self.mrGbMS.HydrostaticMin = 0
+			self.mrGbMS.HydrostaticMax = 1
+			self.mrGbMS.TransmissionEfficiency = 0.98
+			self.mrGbMS.HydrostaticEfficiency  = {}
+
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0 , v=gearboxMogli.eps})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.01 , v=0.4})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.07 , v=0.7})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.1 , v=0.81})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.17 , v=0.96})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.18 , v=0.97})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.19 , v=0.977})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.2 , v=0.98})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.21 , v=0.975})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.22 , v=0.94})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.23 , v=0.925})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.25 , v=0.92})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.3 , v=0.918})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.35 , v=0.92})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.4 , v=0.935})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.48 , v=0.965})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.49 , v=0.969})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.5 , v=0.97})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.51 , v=0.968})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.52 , v=0.96})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.53 , v=0.94})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.54 , v=0.9})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.55 , v=0.88})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.56 , v=0.88})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.6 , v=0.89})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.65 , v=0.895})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.7 , v=0.9})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.8 , v=0.908})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1 , v=0.91})
+
+			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
+		else
+			print('ERROR in gearboxMogli: invalid hydrostatic profile "'..tostring(self.mrGbMS.HydrostaticProfile)..'"')
+			self.mrGbMS.HydrostaticProfile = "Direct"
 		end
 	end
 	
@@ -1615,6 +1668,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 				or self.mrGbMS.HydrostaticVolumePump  ~= nil
 				or self.mrGbMS.HydrostaticVolumeMotor ~= nil 
 				or self.mrGbMS.HydrostaticCoupling    ~= nil then
+				
+			print("Warning in gearboxMogli: hydrostatic coupling is only experimental")
 				
 			self.mrGbMS.HydrostaticMin       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minRatio"), -1 )
 			self.mrGbMS.HydrostaticMax       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRatio"), 1.41421356 )
@@ -2073,13 +2128,20 @@ function gearboxMogli:update(dt)
 	elseif self.mrGbMS.NoDisable then
 		self:mrGbMSetIsOnOff( true ) 
 	elseif gearboxMogli.mbIsActiveForInput(self, false) and gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
-		if      self.isMotorStarted
-				and ( ( self.dCcheckModule ~= nil
-						and self:dCcheckModule("manMotorStart") )
-					 or ( self.setManualIgnitionMode ~= nil ) ) then
-			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
-		else	
+		if     self:getIsHired() then
+			if self.mrGbMS.IsOnOff then
+				self:mrGbMSetIsOnOff( false ) 
+			else
+				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while vehicle is hired" )
+			end
+		elseif not ( self.isMotorStarted ) then
 			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+		elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+			self:stopMotor()
+		elseif self.isMotorStarted then
+			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
 		end
 		processInput = false
 	end
@@ -6272,18 +6334,8 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor:motorStall( warningText1, warningText2 )
 	self.vehicle:mrGbMSetNeutralActive(true, false, true)
-	if      self.vehicle.dCcheckModule ~= nil
-			and self.vehicle:dCcheckModule("manMotorStart") 
-			and self.vehicle.driveControl ~= nil
-			and self.vehicle.driveControl.manMotorStart ~= nil then
-		self.vehicle.driveControl.manMotorStart.isMotorStarted = false;
-		driveControlInputEvent.sendEvent(self.vehicle)
-		self.vehicle:mrGbMSetState( "WarningText", warningText1 )
-	elseif self.vehicle.setManualIgnitionMode ~= nil then
-		self.vehicle:setManualIgnitionMode(ManualIgnition.STAGE_OFF)
-		self.vehicle:mrGbMSetState( "WarningText", warningText1 )
-	else
-		self.vehicle:mrGbMSetState( "WarningText", warningText2 )
+	if not ( g_currentMission.missionInfo.automaticMotorStartEnabled ) then
+		self.vehicle:stopMotor(true)
 	end
 end
 
