@@ -2673,7 +2673,7 @@
 		
 		<gearboxMogli>
 			<!-- john deere 9r transmission 18x6 = funk df 500 !?! -->
-			<gears shiftTimeMs="0" shiftEffect="true" clutchRatio="1" defaultGear="13" automatic="true">	
+			<gears shiftTimeMs="0" shiftEffect="true" clutchRatio="1" defaultGear="14" automatic="true">	
 				<gear forwardOnly="true" speed="4.1"  name="R1"/>
 				<gear forwardOnly="true" speed="4.2"  name="1"/>
 				<gear forwardOnly="true" speed="5.0"  name="2"/>
