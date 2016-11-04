@@ -553,7 +553,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.drawTargetRpm           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#drawTargetRpm" ),self.mrGbMG.drawTargetRpm)
 	self.mrGbMS.SwapGearRangeKeys       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#swapGearRangeKeys" ),false)
 	self.mrGbMS.TransmissionEfficiency  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#transmissionEfficiency"), 0.94) 
-	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), self.mrGbMG.momentOfInertia) 
 	
 	self.mrGbMS.IdleRpm	                = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleRpm"),  self.motor.minRpm ), self.motor.minRpm )
 	self.mrGbMS.RatedRpm                = math.min( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#ratedRpm"), math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ) ), self.motor.maxRpm )
@@ -711,6 +710,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	--self.mrGbMS.Sound.MaxRpm = self.mrGbMS.RatedRpm * self.mrGbMS.OrigMaxRpm / oldRatedRpm
 		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.RatedRpm
 	end
+
+	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), self.mrGbMG.momentOfInertia * maxTorque ) 
 	
 --**************************************************************************************************	
 -- PTO RPM
@@ -5594,21 +5595,23 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		local maxRotSpeed = maxRpm * gearboxMogli.factorpi30
 		local c           = 0
 		
-		if     self.mrGbMS.TorqueConverter then
-			if gearboxMogli.minClutchPercent + gearboxMogli.minClutchPercent <= self.motor.clutchPercent and self.motor.clutchPercent < 1 then
-				c = self.mrGbMS.TorqueConverterFactor * self.motor.lastTransTorque
-			end
-		elseif self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
+		if     self.motor.clutchPercent < gearboxMogli.minClutchPercent + gearboxMogli.minClutchPercent then
+			c = 0
+		elseif self.motor.clutchPercent >= 1 then
+			c = gearboxMogli.huge
+		elseif     self.mrGbMS.TorqueConverter then
 			if self.motor.clutchPercent >= gearboxMogli.minClutchPercent + gearboxMogli.minClutchPercent then
-				c = self.motor.maxClutchTorque
+				c = self.mrGbMS.TorqueConverterFactor * self.motor.lastTransTorque
+			else
+			c = self.motor.maxClutchTorque
 			end
 		else
 			if     self.motor.clutchPercent <= self.mrGbMG.clutchFrom   then
 				c = 0
-		--elseif self.motor.clutchPercent > self.mrGbMG.clutchTo      then
-		--	c = self.mrGbMG.clutchFactor
 			elseif self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom < 0.01 then
 				c = gearboxMogli.huge
+			elseif self.motor.clutchPercent >= self.mrGbMG.clutchTo      then
+				c = self.mrGbMG.clutchFactor
 			else
 				c = self.mrGbMG.clutchFactor * ( ( self.motor.clutchPercent - self.mrGbMG.clutchFrom ) / ( self.mrGbMG.clutchTo - self.mrGbMG.clutchFrom ) ) ^ self.mrGbMG.clutchExp
 			end
@@ -5627,7 +5630,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 				gearboxMogli.debugGearShiftHeader = true
 				print("AccPed: slAcc,  limit, torque,  brake,   nc.mot.RPM, motor RPM,  wheel RPM,  max RPM,     rot speed,  speed, ratio 1, ratio 2, factor, clutch, shift")
 			end
-			print(string.format("%6.2f%%: %4.0f Nm, %4.0f Nm, %4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.2f %4.2f km/h, %3.1f, %3.1f, %3.0f%%, %d ",
+			print(string.format("%6.2f%%: %4.0f Nm, %4.0f Nm, %4.0f Nm, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.0f U/min, %4.2f %4.2f km/h, %3.1f, %3.1f, %4.0f, %3.0f%%, %d ",
 													accelerationPedal*100,
 													brakePedal*1000,
 													torque*1000, 
@@ -5641,6 +5644,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 													self.lastSpeedReal * self.movingDirection * 3600,
 													ratio,
 													gearboxMogliMotor.getMogliGearRatio( self.motor ),
+													c*1000,
 													self.motor.clutchPercent * 100,
 													self.mrGbML.gearShiftingNeeded)..tostring(self.motor.noTorque))
 		elseif self.mrGbML.debugTimer ~= nil then
@@ -6398,7 +6402,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 --else
 --	local pR = self.prevMotorRpm
 --	local cR = self.lastRealMotorRpm
---	self.lastMOI = self.vehicle.mrGbMS.MomentOfInertia * ( cR - pR ) / ( 60 * self.tickDt )	
+--	self.lastMOI = self.vehicle.mrGbMS.3 * ( cR - pR ) / ( 60 * self.tickDt )	
 --	if cR > self.maxPossibleRpm and self.lastMOI < 0 then
 --		self.lastMOI = 0
 --	end
@@ -6905,7 +6909,11 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 			end
 		end
 	
-		self.lastRealMotorRpm = self:getMotorRpm()
+	--if self.clutchPercent < 1 then
+	--	self.lastRealMotorRpm = self:getMotorRpm()
+	--else
+			self.lastRealMotorRpm = self.nonClampedMotorRpm
+	--end
 		
 		if gearboxMogliMotor.increaseHyroLaunchRpm( self ) then
 			self.lastRealMotorRpm = math.max( self.lastRealMotorRpm, self.minRequiredRpm * gearboxMogli.rpmReduction )	
@@ -9158,6 +9166,15 @@ end
 
 function gearboxMogli:mrGbMDebug()
 	gearboxMogli.debugGearShift = not gearboxMogli.debugGearShift
+	
+	if g_currentMission.controlledVehicle ~= nil then
+		self = g_currentMission.controlledVehicle
+		
+		if self.mrGbML ~= nil then
+			self.mrGbML.debugTimer = g_currentMission.time + 1000
+		end
+	end
+	
 	print("debugGearShift: "..tostring(gearboxMogli.debugGearShift))
 end
 end
