@@ -2381,13 +2381,13 @@
 	
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" speedMatching="false" defaultGear="3">
 				<gear name="1" maxForwardSpeedRatio="0.40" />
-				<gear name="2" maxForwardSpeedRatio="0.75" />
-				<gear name="3" maxForwardSpeedRatio="1.33" />
+				<gear name="2" maxForwardSpeedRatio="0.69" />
+				<gear name="3" maxForwardSpeedRatio="1.15" />
 			</gears>
 			
 			<ranges shiftTimeMs="300" shiftEffect="false" clutchRatio="-1" defaultRange="1" gearOffset="1">
-				<range ratio="0.33" name="A"/>
-				<range ratio="1.00" name="S"/>
+				<range ratio="0.435" name="A"/>
+				<range ratio="1.000" name="S"/>
 			</ranges>
 			<reverse shiftTimeMs="300" clutchRatio="0"/>
 		</gearboxMogli>	
