@@ -1763,7 +1763,7 @@
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24" disableManual="false">
       <!--hydrostatic coupling="input" minRatio="0" maxRatio="1.4" startFactor="0" pressure="400" maxTorque="400" correctGearSpeed="false"/-->
       <hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
-			<gears defaultGear="1"  shiftTimeMs="2000" automatic="false">		
+			<gears defaultGear="1"  shiftTimeMs="2000" automatic="false" reverseReset="true">		
 				<gear name="heavy duty" speed="22"/>
 				<gear name="transport"  speed="50" forwardOnly="true"/>
 			</gears>
@@ -2448,10 +2448,10 @@
 			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true" minMaxTimeMs="0" maxMinTimeMs="0"/-->		
 			<hydrostatic profile="Direct" minRatio="0"/>		
 			<gears defaultGear="4" reverseReset="true">	
-				<gear name="I"   speed="8" />
-				<gear name="II"  speed="14" />
-				<gear name="R"   speed="14" />
-				<gear name="III" speed="23" />
+				<gear name="I"   speed="8"  forwardOnly="true"/>
+				<gear name="II"  speed="14" forwardOnly="true"/>
+				<gear name="R"   speed="14" reverseOnly="true"/>
+				<gear name="III" speed="23" forwardOnly="true"/>
 			</gears>
 
 			<realEngine idleRpm="800" ratedRpm="2300">
