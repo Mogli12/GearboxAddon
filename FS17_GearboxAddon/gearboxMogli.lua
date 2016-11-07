@@ -2925,9 +2925,9 @@ function gearboxMogli:addCutterArea( cutter, area, realArea, inputFruitType, fru
 end
 
 --**********************************************************************************************************	
--- gearboxMogli:setIsReverseDriving
+-- gearboxMogli:onReverseDirectionChanged 
 --**********************************************************************************************************	
-function gearboxMogli:setIsReverseDriving( isReverseDriving, noEventSend )
+function gearboxMogli:onReverseDirectionChanged ( direction )
 	if      self.isServer 
 			and self.mrGbMS ~= nil
 			and self.mrGbMS.IsOn
@@ -5115,8 +5115,8 @@ function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		end
 		
 		if new then
-			if self:mrGbMGetAutoStartStop() then
-				self:mrGbMSetState( "AutoHold", false )
+			if self:mrGbMGetAutoHold() then
+				self:mrGbMSetState( "AutoHold", true )
 			end
 			if self.mrGbMS.Hydrostatic then
 				self.motor.hydrostaticFactor = 0
@@ -6155,10 +6155,10 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 	if self.ratioFactorR ~= nil then 		
 		if     self.vehicle.mrGbMS.Hydrostatic then
 			curMaxRpm = Utils.getNoNil( self.vehicle.mrGbMS.HydrostaticMaxRpm, self.maxAllowedRpm )
-		elseif forGetTorque  then
-			curMaxRpm = self.maxPossibleRpm
 		elseif self.clutchPercent < 1 then
 			curMaxRpm = math.max( self.maxPossibleRpm, self.vehicle.mrGbMS.CloseRpm )
+		elseif forGetTorque  then
+			curMaxRpm = self.maxPossibleRpm
 		else
 			curMaxRpm = self.maxPossibleRpm
 		end
@@ -6383,7 +6383,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.lastLimitDeltaRatio  = 0
 			self.lastLimitDeltaTorque = 0
 		elseif self.ratioFactorR ~= nil then
-			local limit = self:getCurMaxRpm( true ) * self.ratioFactorR
+			local limit = self:getCurMaxRpm( true )
 			if      not self.noTransmission 
 					and not self.noTorque
 					and not ( self.vehicle.mrGbMS.Hydrostatic )
@@ -6630,7 +6630,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	self.ratioFactorR = 1
 	
 	if     self.noTransmission then
-		self.ratioFactorR = nil
+		self.ratioFactorR  = nil
+		self.lastGearRatio = nil
 	elseif self.vehicle.mrGbMS.Hydrostatic then
 
 		local r = self:getMogliGearRatio()

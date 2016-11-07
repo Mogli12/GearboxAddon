@@ -2232,7 +2232,7 @@
 			</gears>
 
 			<engines>
-				<engine idleRpm="800" ratedRpm="2100">		
+				<engine name="930 Vario" idleRpm="800" ratedRpm="2100">		
 					<!-- 1900: 305(305) | 2100: 300(300) | 1450..1450: 1248(1248) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 192 -->
 					<torque rpm="350" motorTorque="719" fuelUsageRatio="221.7"/>
 					<torque rpm="700" motorTorque="1004" fuelUsageRatio="204.1"/>
