@@ -340,6 +340,8 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 				defaultConfigName = "defaultTractors"
 			elseif storeItem.category == "trucks"       then
 				defaultConfigName = "defaultTrucks"
+			elseif storeItem.category == "cars"         then
+				defaultConfigName = "defaultCars"
 			elseif storeItem.category == "wheelLoaders" then
 				defaultConfigName = "defaultTorqueConverter"
 			elseif storeItem.category == "teleLoaders"  then
@@ -348,6 +350,10 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 				defaultConfigName = "defaultHydrostatic1"
 			elseif storeItem.category == "wood"         then
 				defaultConfigName = "defaultHydrostatic1"
+			elseif storeItem.category == "animals"      then
+				defaultConfigName = "defaultHydrostatic1"
+			elseif storeItem.category == "sprayers"     then
+				defaultConfigName = "defaultHydrostatic2"
 			end
 		end
 		

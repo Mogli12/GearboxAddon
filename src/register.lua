@@ -37,7 +37,7 @@ end;
 function gearboxMogliRegister:add()
 	print("--- loading "..g_i18n:getText("gearboxMogliVERSION").." ---")
 
-	local searchTable  = { "gearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox", "gearboxMogli" };	
+	local searchTable  = { "gearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox" };	
 	local searchTable2 = { "tempomat", "tempomatMogli" };	
 	local replObj1     = SpecializationUtil.getSpecialization("gearboxMogli")
 	local replObj2     = SpecializationUtil.getSpecialization("tempomatMogli")

@@ -2354,6 +2354,25 @@
 	</vehicle>
 
 	<vehicle>
+		<configFile xmlName="defaultCars"/>
+		
+		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
+			<blowOffVentilSound volume="0"/>
+			
+			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
+				<gear speed="30"  forwardOnly="true" name="1"/>
+				<gear speed="50"  reverseOnly="true" name="R"/>			
+				<gear speed="55"  forwardOnly="true" name="2"/>
+				<gear speed="80"  forwardOnly="true" name="3"/>
+				<gear speed="120" forwardOnly="true" name="4"/>
+				<gear speed="180" forwardOnly="true" name="5"/>
+				<gear speed="250" forwardOnly="true" name="6"/>
+			</gears>
+			
+		</gearboxMogli>
+	</vehicle>
+		
+	<vehicle>
 		<configFile xmlName="defaultTractors"/>
 
 		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="3" defaultOn="false">

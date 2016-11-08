@@ -274,7 +274,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	--**********************************************************************************************************	
 	-- tempomatMogli:loadFromAttributesAndNodes
 	--**********************************************************************************************************	
-	function tempomatMogli:loadFromAttributesAndNodes(savegame, key, resetVehicles)
+	function tempomatMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		local i
 		
 		if self.tempomatMogliV14 ~= nil then
