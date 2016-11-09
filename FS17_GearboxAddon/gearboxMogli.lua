@@ -2896,6 +2896,11 @@ function gearboxMogli:update(dt)
 			Drivable.updateVehiclePhysics(self, 1, false, 0, false, dt)
 		end
 	end	
+	
+	
+	if g_gui:getIsGuiVisible() or g_currentMission.isPlayerFrozen or g_currentMission.inGameMessage:getIsVisible() then	
+		gearboxMogli.onLeave( self )
+	end
 end 
 
 --**********************************************************************************************************	
@@ -4151,10 +4156,6 @@ function gearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 
 	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
 	
-	if self.mrGbMS.AutoHold then
-		self:mrGbMSetState( "AutoHold", value, noEventSend ) 
-	end
-	
 	return true
 end 
 
@@ -5115,11 +5116,8 @@ function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		end
 		
 		if new then
-			if self:mrGbMGetAutoHold() then
-				self:mrGbMSetState( "AutoHold", true )
-			end
 			if self.mrGbMS.Hydrostatic then
-				self.motor.hydrostaticFactor = 0
+				self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
 			end
 		else
 			self:mrGbMSetState( "AutoHold", false )
@@ -6699,7 +6697,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.clutchRpm           = self.clutchRpm          * gearboxMogli.factor30pi
 	self.requiredWheelTorque = self.maxMotorTorque*math.abs(self.gearRatio)	
 	self.wheelSpeedRpm       = self.vehicle.lastSpeedReal * 1000 * gearboxMogli.factor30pi * self.vehicle.movingDirection
-	if math.abs( self.gearRatio ) > gearboxMogli.eps then
+	if not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps then
 		local w = self.clutchRpm / self.gearRatio
 		if self.gearRatio > 0 then
 			self.wheelSpeedRpm   = math.max( w, self.wheelSpeedRpm )
@@ -6868,7 +6866,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	if self.vehicle.mrGbMS.ReverseActive then
 		currentAbsSpeed        = -currentSpeed
 	end
-					
+	
 --**********************************************************************************************************	
 	-- current RPM and power
 
@@ -7183,8 +7181,17 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		autoOpenClutch = false
 	end
 	
-	if accelerationPedal >= -0.001 then
-		self.brakeNeutralTimer = g_currentMission.time + self.vehicle.mrGbMG.brakeNeutralTimeout
+	if     self.vehicle.mrGbMS.G27Mode > 0 
+			or not self.vehicle.mrGbMS.NeutralActive 
+			or self.vehicle:getIsHired() then
+		if     accelerationPedal >= -0.001 
+				or currentAbsSpeed   >= self.vehicle.mrGbMG.minAbsSpeed then
+			self.brakeNeutralTimer = g_currentMission.time + self.vehicle.mrGbMG.brakeNeutralTimeout
+		end
+	else
+		if accelerationPedal > 0.001 then
+			self.brakeNeutralTimer = g_currentMission.time + self.vehicle.mrGbMG.brakeNeutralTimeout
+		end
 	end
 	
 	if     self.vehicle.mrGbMS.NeutralActive
@@ -7217,7 +7224,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		else
 			brakeNeutral = false
 		end
-	elseif currentAbsSpeed        < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
+	elseif currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
 			or self.lastMotorRpm     < minRpmReduced 
 			or ( self.lastMotorRpm   < self.minRequiredRpm and self.minThrottle > 0.2 ) then
 	-- no transmission 
@@ -7244,8 +7251,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- handbrake 
 		if      self.vehicle.mrGbMS.NeutralActive 
 				and self.vehicle:mrGbMGetAutoHold( )
-				and self.brakeNeutralTimer  < g_currentMission.time 
-			  and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed then
+				and self.brakeNeutralTimer  < g_currentMission.time then
 			self.vehicle:mrGbMSetState( "AutoHold", true )
 		end
 					
@@ -8265,7 +8271,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 	--**********************************************************************************************************		
 	-- overheating of clutch				
-	if self.vehicle.mrGbMS.ClutchCanOverheat and self.vehicle.steeringEnabled then
+	if self.vehicle.mrGbMS.ClutchCanOverheat and not ( self.vehicle:getIsHired() ) then
 		if 0.1 < self.clutchPercent and self.clutchPercent < 0.9 then
 			if self.clutchOverheatTimer == nil then
 				self.clutchOverheatTimer = 0
