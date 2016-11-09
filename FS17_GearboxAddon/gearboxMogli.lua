@@ -2156,11 +2156,11 @@ function gearboxMogli:update(dt)
 	
 	if      self.mrGbMS.WarningText ~= nil
 			and self.mrGbMS.WarningText ~= "" then
-		if self.mrGbMG.blinkingWarning and self.isEntered then
+		if self.isEntered then
 			g_currentMission:showBlinkingWarning(self.mrGbMS.WarningText, self.mrGbML.warningTimer - g_currentMission.time )
 			self.mrGbMS.WarningText = ""
 		elseif g_currentMission.time < self.mrGbML.warningTimer then
-			g_currentMission:addWarning(self.mrGbMS.WarningText, 0.018, 0.033)
+	--	g_currentMission:addWarning(self.mrGbMS.WarningText, 0.018, 0.033)
 		else
 			self.mrGbMS.WarningText = ""
 		end
