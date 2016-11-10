@@ -125,6 +125,7 @@ gearboxMogliGlobals.hudWidth              = 0.15
 gearboxMogliGlobals.stallWarningTime      = 250
 gearboxMogliGlobals.stallMotorOffTime     = 3000
 gearboxMogliGlobals.realFuelUsage         = true
+gearboxMogliGlobals.idleFuelTorqueRatio   = 0.3
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 8 -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
@@ -258,7 +259,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:load(savegame) 
 	local key = "vehicle.gearboxMogli"
-	if hasXMLProperty(xmlFile, key) then
+	if hasXMLProperty(self.xmlFile, key) then
 		gearboxMogli.initFromXml(self,self.xmlFile,key,"vehicle",true)
 	end
 end
@@ -6502,9 +6503,10 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 
 	if     torque < 0 then
-		self.lastMissingTorque = self.lastMissingTorque - torque
+		self.lastMissingTorque      = self.lastMissingTorque - torque
 		self.transmissionEfficiency = 0
 	elseif self.noTransmission then
+		self.lastPtoTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
 		self.transmissionEfficiency = 0
 	elseif self.vehicle.mrGbMS.HydrostaticCoupling ~= nil then
 		local Mm = torque 		
@@ -6650,7 +6652,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				self.lastGearRatio = -self.lastGearRatio
 			end
 			if self.lastGearRatio > 0 then
-				g = self.lastGearRatio + self.vehicle.mrGbML.smoothLittle * ( g - self.lastGearRatio )
+				if g > self.lastGearRatio + 1 or g < self.lastGearRatio - 1 then
+					g = self.lastGearRatio + self.vehicle.mrGbML.smoothLittle * ( g - self.lastGearRatio )
+				end
 				self.ratioFactorG = g / r
 			end
 		end
@@ -6680,6 +6684,10 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.ratioFactorR = 1 / self.ratioFactorG
 	end
 	
+	if self.ratioFactorR ~= nil then
+		self.ratioFactorR = Utils.clamp( self.ratioFactorR, 0, 1000 )
+	end
+	
 	return torque, brakePedal
 end
 
@@ -6705,6 +6713,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 			self.wheelSpeedRpm   = math.min( w, self.wheelSpeedRpm )
 		end
 	end
+	
 
 	if self.ratioFactorR == nil then
 		self.clutchRpm         = self.clutchRpm + Utils.clamp( self:getThrottleRpm() - self.clutchRpm,
@@ -6719,7 +6728,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 --											self.vehicle.lastSpeedReal*3600,
 --											self.wheelSpeedRpm,
 --											self.wheelSpeedRpm * self.gearRatio * self.ratioFactorR,
---											self.clutchRpm,
+--											self.nonClampedMotorRpm,
 --											self.gearRatio,
 --											self.ratioFactorR,
 --											self.ratioFactorG,
@@ -6750,28 +6759,28 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		self.motorLoadOverflow = 0
 	end
 		
-	if self.transmissionEfficiency ~= nil and 0 < self.transmissionEfficiency and self.transmissionEfficiency < 1 then
-		self.usedTransTorque = self.usedTransTorque / self.transmissionEfficiency
-	end
 	
-	if     not ( self.vehicle.isMotorStarted ) then
+	if not ( self.vehicle.isMotorStarted ) then
+		self.usedTransTorque   = 0
 		self.lastRealMotorRpm  = 0
+		self.lastMotorRpm      = 0
+	elseif self.noTransmission then
+		self.usedTransTorque   = 0
+		self.lastRealMotorRpm  = self.currentRpmS
+		self.lastMotorRpm      = self.currentRpmS
 	else
-		self.lastRealMotorRpm = math.max( self.minRpm, math.min( self.nonClampedMotorRpm, self.maxRpm ) )
+		if self.transmissionEfficiency ~= nil and 0.1 <= self.transmissionEfficiency and self.transmissionEfficiency < 1 then
+			self.usedTransTorque = self.usedTransTorque / self.transmissionEfficiency
+		end
+		self.lastRealMotorRpm  = math.max( self.minRpm, math.min( self.nonClampedMotorRpm, self.maxRpm ) )
+		local rpm = self.lastMotorRpm + Utils.clamp( self.lastRealMotorRpm - self.lastMotorRpm,	
+																								-dt * self.vehicle.mrGbMS.RpmDecFactor,
+																								 dt * self.vehicle.mrGbMS.RpmIncFactor )
+		self.lastMotorRpm      = Utils.clamp( rpm, self.stallRpm, self.maxPossibleRpm )
 	end
 	
 	self.lastAbsDeltaRpm = self.lastAbsDeltaRpm + self.vehicle.mrGbML.smoothMedium * ( math.abs( self.prevNonClampedMotorRpm - self.nonClampedMotorRpm ) - self.lastAbsDeltaRpm )	
 	self.deltaMotorRpm   = math.floor( self.lastRealMotorRpm - self.nonClampedMotorRpm + 0.5 )
-	
-	if not ( self.vehicle.isMotorStarted ) then
-		self.lastMotorRpm = 0
-	elseif self.noTransmission then
-		self.lastMotorRpm = self.currentRpmS
-	else
-		self.lastMotorRpm = self.lastMotorRpm + Utils.clamp( self.lastRealMotorRpm - self.lastMotorRpm,	
-																												-dt * self.vehicle.mrGbMS.RpmDecFactor,
-																												 dt * self.vehicle.mrGbMS.RpmIncFactor )
-	end
 	
 	local c = self.clutchPercent
 	if not ( self.vehicle.mrGbMS.Hydrostatic or self.vehicle:mrGbMGetAutoClutch() ) then
@@ -8777,12 +8786,13 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 	end
 	
 	if self.isMotorStarted then		
-		local rpm   = math.max( self.motor.prevNonClampedMotorRpm, self.motor.stallRpm )
-		local power = ( self.motor.usedTransTorque + self.motor.lastPtoTorque ) * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
-		local ratio = self.motor.fuelCurve:get( rpm )			
+		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.motor.stallRpm, self.motor.maxPossibleRpm )
+		local torque = Utils.clamp( self.motor.usedTransTorque + self.motor.lastPtoTorque, 0, self.motor.lastMotorTorque )
+		local power  = torque * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
+		local ratio  = self.motor.fuelCurve:get( rpm )			
 		
 		if self.motor.lastMotorTorque > 0 then
-			ratio = ratio / math.max( 0.001, gearboxMogli.powerFuelCurve:get( ( self.motor.usedTransTorque + self.motor.lastPtoTorque ) / self.motor.lastMotorTorque ) )
+			ratio = ratio / math.max( 0.001, gearboxMogli.powerFuelCurve:get( torque / self.motor.lastMotorTorque ) )
 		else
 			ratio = 0
 		end
@@ -8797,13 +8807,13 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		--	print("Fuel used: "..tostring(fuelUsed).." ("..tostring(self.mrGbML.checkFuelFillLevel - self.fuelFillLevel)..")")
 		--end
 			
-			if not self:getIsHired() or not g_currentMission.missionInfo.helperBuyFuel then
-				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
-				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
-			elseif self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel then
+			if self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel then
 				local delta = fuelUsed * g_currentMission.economyManager:getPricePerLiter(FillUtil.FILLTYPE_FUEL)
 				g_currentMission.missionStats:updateStats("expenses", delta);
 				g_currentMission:addSharedMoney(-delta, "purchaseFuel");
+			else
+				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
+				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
 			end
 			
 			self.mrGbML.checkFuelFillLevel = self.fuelFillLevel
