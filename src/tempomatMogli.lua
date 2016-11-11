@@ -178,19 +178,25 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		local currentSpeed  = self.lastSpeedReal*3600
 		local inAxisForward = axisForward
 		if     axisForward <= -0.2 then
-		-- accelerate by 1 m/s^2
+		-- accelerate by 0.5..2 m/s^2
+			local acc = 2 - math.min( 1.5, currentSpeed * 0.05 )
+		
 			if self.tempomatMogliV14.keepSpeedLimit < currentSpeed + 2 then
-				self.tempomatMogliV14.keepSpeedLimit = math.min( math.max( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0036, tempomatMogli.getMaxSpeed( self, true ) )
+			--self.tempomatMogliV14.keepSpeedLimit = math.min( math.max( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0036, tempomatMogli.getMaxSpeed( self, true ) )
+				self.tempomatMogliV14.keepSpeedLimit = math.max( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0036 * acc 
 			end
 		elseif axisForward >= 0.2 then	
-		-- decelerate by 2 m/s^2 
+		-- decelerate by 2..4 m/s^2 
+			local acc = Utils.clamp( currentSpeed * 0.05, 2, 4 )
+			
 			if self.tempomatMogliV14.keepSpeedLimit > currentSpeed - 2 then
-				self.tempomatMogliV14.keepSpeedLimit = math.max( math.min( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0072, 1 )
+				self.tempomatMogliV14.keepSpeedLimit = math.max( math.min( currentSpeed, self.tempomatMogliV14.keepSpeedLimit ) - axisForward * dt * 0.0072 * acc, 1 )
 			end
 		end
 
 		local temp1 = self.motor.speedLimit 
-		self.motor.speedLimit    = math.min( temp1, self.tempomatMogliV14.keepSpeedLimit )
+		
+		self.motor.speedLimit = math.min( temp1, self.tempomatMogliV14.keepSpeedLimit )
 		superFunc( self, -1, false, axisSide, axisSideIsAnalog, doHandbrake, dt, ... )
 		self.motor.speedLimit    = temp1
 	end

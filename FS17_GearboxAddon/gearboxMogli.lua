@@ -438,12 +438,10 @@ function gearboxMogli:initClient()
 
 	
 	if gearboxMogli.ovArrowUpWhite == nil then
-		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * g_uiScale
+		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
 		local h = w * g_screenAspectRatio;
-	--local x = g_currentMission.speedHud.x - w * 0.25
-	--local y = g_currentMission.speedHud.y + g_currentMission.speedHud.height - 0.75 * h
-		local x = g_currentMission.speedMeterIconOverlay.x-- + w * 0.25
-		local y = g_currentMission.speedMeterIconOverlay.y-- + g_currentMission.speedMeterIconOverlay.height - 0.75 * h
+		local x = g_currentMission.speedMeterIconOverlay.x
+		local y = g_currentMission.speedMeterIconOverlay.y
 		
 		gearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_white.dds",   gearboxMogli.baseDirectory), x, y, w, h)
 		gearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_gray.dds",    gearboxMogli.baseDirectory), x, y, w, h)
@@ -3157,7 +3155,8 @@ function gearboxMogli:updateTick(dt)
 						fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
 					end
 					local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
-					self.mrGbMD.Fuel              = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
+				--self.mrGbMD.Fuel              = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
+					self.mrGbMD.Fuel              = fuelUsageRatio
 				end 
 				
 				self.mrGbML.lastSumDt = 0
@@ -3303,10 +3302,32 @@ function gearboxMogli:draw()
 			local deltaY   = self.mrGbMG.hudTextSize 
 			local titleY   = self.mrGbMG.hudTitleSize
 			local ovBorder = self.mrGbMG.hudBorder   
-			local drawY0   = ovTop - 1.25*deltaY - titleY - self.mrGbMG.hudBorder
 			local ovLeft   = self.mrGbMG.hudPositionX + self.mrGbMG.hudBorder
-			local ovRight  = self.mrGbMG.hudPositionX + self.mrGbMG.hudWidth - self.mrGbMG.hudBorder            
-			                                          
+			local ovRight  = self.mrGbMG.hudPositionX + self.mrGbMG.hudWidth - self.mrGbMG.hudBorder   
+			local ovW      = self.mrGbMG.hudWidth
+			local ovX      = self.mrGbMG.hudPositionX
+			          
+			local uiScale  = gearboxMogli.getUiScale()
+			
+			if math.abs( uiScale - 1 ) > gearboxMogli.eps then
+				if ovX > 0.5 then
+					ovX     = 1 - ( 1 - ovX     ) * uiScale
+					ovLeft  = 1 - ( 1 - ovLeft  ) * uiScale
+					ovRight = 1 - ( 1 - ovRight ) * uiScale
+				else
+					ovX     = ovX      * uiScale
+					ovLeft  = ovLeft   * uiScale
+					ovRight = ovRight  * uiScale
+				end
+				
+				deltaY    = deltaY   * uiScale 
+				titleY    = titleY   * uiScale 
+				ovBorder  = ovBorder * uiScale 
+				ovW       = ovW      * uiScale 
+			end
+
+			local drawY0   = ovTop - 1.25*deltaY - titleY - self.mrGbMG.hudBorder
+			
 			--==============================================
 			-- enable/disable infos
 			--==============================================
@@ -3331,9 +3352,9 @@ function gearboxMogli:draw()
 				ovRows = ovRows + 1 infos[ovRows] = "power"
 			end
 			ovRows = ovRows + 1 infos[ovRows] = "load"
-			if self.mrGbMD.Fuel > 0 then
+		--if self.mrGbMD.Fuel > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "fuel"
-			end
+		--end
 			if not self:mrGbMGetAutoClutch() then
 				ovRows = ovRows + 1 infos[ovRows] = "clutch"
 			elseif self.mrGbMD.Clutch < 200  then
@@ -3346,10 +3367,10 @@ function gearboxMogli:draw()
 			end
 			--==============================================
 			
-			local ovH      = titleY + ( ovRows + 1 ) * deltaY + self.mrGbMG.hudBorder + self.mrGbMG.hudBorder-- title is 0.03 points above drawY0; add border of 0.01 x 2
+			local ovH      = titleY + ( ovRows + 1 ) * deltaY + ovBorder + ovBorder -- title is 0.03 points above drawY0; add border of 0.01 x 2
 			local ovY      = ovTop - ovH
 			
-			renderOverlay( gearboxMogli.backgroundOverlayId, self.mrGbMG.hudPositionX, ovY, self.mrGbMG.hudWidth, ovH )
+			renderOverlay( gearboxMogli.backgroundOverlayId, ovX, ovY, ovW, ovH )
 		
 			setTextAlignment(RenderText.ALIGN_LEFT) 
 			setTextColor(1, 1, 1, 1) 
@@ -3518,19 +3539,16 @@ function gearboxMogli:draw()
 			end
 			
 		elseif self.mrGbMS.HudMode == 2 then
-			setTextBold(true)
+			setTextAlignment(RenderText.ALIGN_LEFT) 
+			setTextBold(false)
 			
-			local w = math.floor(0.0095 * g_screenWidth) / g_screenWidth
-		--local t = w * g_screenAspectRatio
-			local t = 0.5*self.mrGbMG.hudTextSize
-			local d = 0.25*t
-			
+			local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
+			local h = w * g_screenAspectRatio;
+			local x = g_currentMission.speedMeterIconOverlay.x
+			local y = g_currentMission.speedMeterIconOverlay.y
+	
 			local text = self.mrGbMS.DrawText2 .." "..gearText
-			
-      local x = self.mrGbMG.hudPositionX + self.mrGbMG.hudWidth - self.mrGbMG.hudBorder 
-      local y = self.mrGbMG.hudPositionY
-			setTextAlignment(RenderText.ALIGN_RIGHT) 
-			renderText( x, y, t, text )
+			renderText( x, y+h, h, text )
 
 			if InputBinding.gearboxMogliHUD ~= nil then
 				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliHUD", "Gearbox HUD"),  InputBinding.gearboxMogliHUD);		
@@ -5527,6 +5545,12 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	self.motor:updateSpeedLimit( dt )
 	
+	if      self.tempomatMogliV14 ~= nil 
+			and self.tempomatMogliV14.keepSpeedLimit ~= nil 
+			and math.abs( currentSpeed ) * 3600 > self.tempomatMogliV14.keepSpeedLimit + 1 then
+		brakeLights = true
+	end
+	
 	local motorBrakeOn = false
 	if     self.mrGbML.gearShiftingNeeded ~= 0
 	    or self.motor.noTransmission 
@@ -5922,6 +5946,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.rpmFadeOutRange         = motor.rpmFadeOutRange
 	self.clutchRpm               = 0
 	self.usedTransTorque         = 0
+	self.noTransTorque           = 0
 	self.motorLoadP              = 0
 	self.targetRpm               = self.idleRpm
 	self.requiredWheelTorque     = 0
@@ -6238,6 +6263,7 @@ end
 function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 
 	self.lastTransTorque         = 0
+	self.noTransTorque           = 0
 	self.lastPtoTorque           = 0
 	self.neededPtoTorque         = 0	
 	self.lastMissingTorque       = 0
@@ -6506,7 +6532,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.lastMissingTorque      = self.lastMissingTorque - torque
 		self.transmissionEfficiency = 0
 	elseif self.noTransmission then
-		self.lastPtoTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
+		self.noTransTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
 		self.transmissionEfficiency = 0
 	elseif self.vehicle.mrGbMS.HydrostaticCoupling ~= nil then
 		local Mm = torque 		
@@ -6765,7 +6791,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		self.lastRealMotorRpm  = 0
 		self.lastMotorRpm      = 0
 	elseif self.noTransmission then
-		self.usedTransTorque   = 0
+		self.usedTransTorque   = self.noTransTorque
 		self.lastRealMotorRpm  = self.currentRpmS
 		self.lastMotorRpm      = self.currentRpmS
 	else
@@ -6773,10 +6799,14 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 			self.usedTransTorque = self.usedTransTorque / self.transmissionEfficiency
 		end
 		self.lastRealMotorRpm  = math.max( self.minRpm, math.min( self.nonClampedMotorRpm, self.maxRpm ) )
-		local rpm = self.lastMotorRpm + Utils.clamp( self.lastRealMotorRpm - self.lastMotorRpm,	
-																								-dt * self.vehicle.mrGbMS.RpmDecFactor,
-																								 dt * self.vehicle.mrGbMS.RpmIncFactor )
-		self.lastMotorRpm      = Utils.clamp( rpm, self.stallRpm, self.maxPossibleRpm )
+		
+		local diff = self.lastRealMotorRpm - self.lastMotorRpm
+		if self.vehicle.mrGbMS.Hydrostatic or self.clutchPercent < 1 then
+			diff = diff * self.vehicle.mrGbML.smoothFast
+		end
+		local rpm = self.lastMotorRpm + Utils.clamp( diff, -dt * self.vehicle.mrGbMS.RpmDecFactor, dt * self.vehicle.mrGbMS.RpmIncFactor )
+		
+		self.lastMotorRpm = Utils.clamp( rpm, self.stallRpm, self.maxPossibleRpm )
 	end
 	
 	self.lastAbsDeltaRpm = self.lastAbsDeltaRpm + self.vehicle.mrGbML.smoothMedium * ( math.abs( self.prevNonClampedMotorRpm - self.nonClampedMotorRpm ) - self.lastAbsDeltaRpm )	

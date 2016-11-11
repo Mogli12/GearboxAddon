@@ -28,7 +28,17 @@ Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwär
 Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. 
 In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.]]></de>
 		<it>
-<![CDATA[Cambio]]>
+		<it><![CDATA[
+Non tutti i trattore hanno una trasmissione a variazione continua.
+E anche le trasmissioni a variazione continua non sono di costruzione semplice come quella standard di Farming Simulator.
+Questo script aggiunge sulla base del file gearboxAddonConfig.xml un riduttore a tutti i trattori configurati.
+Molti diversi tipi di trasmissione possono essere simulati. Ci sono riduttori classici con ingranaggi, uno o due gruppi e ingranaggi o gruppi di retromarcia.
+Riducendo il tempo di risposta a zero si tradurrà in una trasmissione power shift.
+In trattori moderni cambi power-shift sono spesso combinati con cambio automatico della trasmissione. Un altro tipo di trasmissione è la trasmissione a variazione continua.
+Ci sono modelli con una o due marce, come il Fendt Vario.
+Altri modelli combinano quattro commutata automaticamente ingranaggi meccanici con una trasmissione idrostatica a variazione continua.
+Tutti questi trasmissione a variazione continua hanno una cosa in comune. L'efficienza varia piuttosto fortemente a seconda del rapporto di trasmissione.
+]]></it>
 		</it>
 		<fr><![CDATA[
 Chaque tracteur n'a pas de transmission variable en continu.
@@ -44,14 +54,14 @@ Toutes ces transmissions continuellement variables ont une chose en commun. Le r
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.2.7</version>
+	<version>1.9.2.8</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			<de>Getriebe v2.0 beta 17 von Mogli</de>
-	  	 <en>Gearbox v2.0 beta 17 by mogli</en>
-				<it>Cambio v2.0 beta 17 by mogli</it>
-	<fr>Transmission v2.0 beta 17 by mogli</fr>
+			<de>Getriebe v2.0 beta 18 von Mogli</de>
+	  	 <en>Gearbox v2.0 beta 18 by mogli</en>
+				<it>Cambio v2.0 beta 18 by mogli</it>
+	<fr>Transmission v2.0 beta 18 by mogli</fr>
 		</text>                  
   </l10n>
 
