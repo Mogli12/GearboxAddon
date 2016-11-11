@@ -6932,25 +6932,20 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local ptoTq = self.neededPtoTorque --PowerConsumer.getTotalConsumedPtoTorque(self.vehicle)
 	if ptoTq > 0 then
 		self.ptoOn = true
-		local ptoRpm = PowerConsumer.getMaxPtoRpm( self.vehicle )
-		
-		local p2 = Utils.clamp( ptoRpm * self.original.ptoMotorRpmRatio, self.minRequiredRpm, self.ratedRpm )
+	end	
+	
+	local ptoRpm = PowerConsumer.getMaxPtoRpm( self.vehicle )
+	
+	if ptoRpm ~= nil and ptoRpm > 0 then
 		local p0 = self.vehicle.mrGbMS.PtoRpm
 		if self.vehicle.mrGbMS.EcoMode then
 			p0 = self.vehicle.mrGbMS.PtoRpmEco
 		end
-		local p1 = p0
 		
-	--for i=0,4 do
-	--	p1 = p0 + 0.25 * i * ( p2 - p0 )
-	--	self.ptoMotorRpmRatio = p1 / ptoRpm
-	--		
-	--	if self.ptoMotorRpmRatio * self.currentTorqueCurve:get( p1 ) >= ptoTq or p2 <= p0 then
-	--		break
-	--	end                      
-	--end
-		if self.minRequiredRpm < p1 then
-			self.minRequiredRpm = p1
+		self.ptoMotorRpmRatio = p0 / ptoRpm
+
+		if self.minRequiredRpm < p0 then
+			self.minRequiredRpm = p0
 		end
 	end
 	
