@@ -4852,7 +4852,6 @@ function gearboxMogli:mrGbMDoGearShift()
 				self.mrGbML.afterShiftRpm = Utils.clamp( self.mrGbML.beforeShiftRpm * self.mrGbML.lastGearSpeed / self.mrGbML.currentGearSpeed, self.mrGbML.motor.idleRpm, self.mrGbML.motor.maxAllowedRpm )
 
 				if self.mrGbML.gearShiftingEffect then
-					self.motor.currentRpmS  = self.mrGbML.afterShiftRpm
 					self.motor.lastMotorRpm = self.mrGbML.afterShiftRpm
 				end
 			else
@@ -5967,7 +5966,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 		
 	self.maxPossibleRpm          = self.ratedRpm
 	self.wheelSpeedRpm           = 0
-	self.currentRpmS             = 0
 	self.noTransmission          = true
 	self.noTorque                = true
 	self.ptoOn                   = false
@@ -6792,8 +6790,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		self.lastMotorRpm      = 0
 	elseif self.noTransmission then
 		self.usedTransTorque   = self.noTransTorque
-		self.lastRealMotorRpm  = self.currentRpmS
-		self.lastMotorRpm      = self.currentRpmS
+		self.lastRealMotorRpm  = self.lastMotorRpm
 	else
 		if self.transmissionEfficiency ~= nil and 0.1 <= self.transmissionEfficiency and self.transmissionEfficiency < 1 then
 			self.usedTransTorque = self.usedTransTorque / self.transmissionEfficiency
@@ -8276,15 +8273,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.lastThrottle = math.max( self.vehicle.mrGbMS.HandThrottle, accelerationPedal )
 		end
 		if self.lastThrottle > 0 then			
-			self.currentRpmS  = Utils.clamp( self.currentRpmS + 5 * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
+			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + 5 * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
 																			 self.minRequiredRpm, 
 																			 self:getThrottleMaxRpm( ) )
 		else
-			self.currentRpmS  = Utils.clamp( self.currentRpmS - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, self.minRequiredRpm, self.maxAllowedRpm )
+			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, self.minRequiredRpm, self.maxAllowedRpm )
 		end	
 		self.lastThrottle   = math.max( self.minThrottle, self.lastThrottle )	
-	else
-		self.currentRpmS    = self.lastRealMotorRpm
 	end	
 	
 	--**********************************************************************************************************		
