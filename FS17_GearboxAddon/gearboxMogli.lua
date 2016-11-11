@@ -8272,7 +8272,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		else
 			self.lastThrottle = math.max( self.vehicle.mrGbMS.HandThrottle, accelerationPedal )
 		end
-		if self.lastThrottle > 0 then			
+		if self.lastThrottle > 0 and self.lastThrottle > ( self.lastMotorRpm / self.maxRpm )  then
 			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + 5 * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
 																			 self.minRequiredRpm, 
 																			 self:getThrottleMaxRpm( ) )
@@ -8938,3 +8938,4 @@ function gearboxMogli:mrGbMDebug()
 	print("debugGearShift: "..tostring(gearboxMogli.debugGearShift))
 end
 end
+
