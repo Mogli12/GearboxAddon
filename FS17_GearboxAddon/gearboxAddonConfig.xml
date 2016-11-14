@@ -440,6 +440,9 @@
 	</vehicle>
 	
 	<vehicle>lizardPickupRodeo
+		<mod name="FS17_slow_Fertilizer">
+			<xmlFile name="lizardPickupRodeo.xml"/>
+		</mod>
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
 		<gearboxMogli torqueConverter="true" speedLimiter="false">
@@ -1275,23 +1278,20 @@
 	<vehicle>MF5600
 		<configFile xmlName="data/vehicles/steerable/masseyFerguson/MF5600.xml"/>
 		
-		<!-- http://read.uberflip.com/i/596442-mf-5700-sl-de -->
-		<!-- http://www.dlg-test.de/tests/0514_MF_7615_Dyna6.pdf -->
+
 		<gearboxMogli maxBackwardSpeed="42" maxForwardSpeed="42" ptoRpm="2000" ptoRpmEco="1560" maxAIGear="3">
-			<gears shiftTimeMs="800" defaultGear="3">	
-				<gear speed="4.5"/>
-				<gear speed="11"/>
-				<gear speed="23"/>
-				<gear speed="48"/>
+			<gears shiftTimeMs="800" defaultGear="4">	
+				<gear speed="3.725"/>
+				<gear speed="9.3"/>
+				<gear speed="18.9"/>
+				<gear speed="40"/>
 			</gears>
 
 			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1"  automatic="true">
-				<range ratio="0.416" name="A" />
-				<range ratio="0.495" name="B" />
-				<range ratio="0.584" name="C" />
-				<range ratio="0.703" name="D" />
-				<range ratio="0.831" name="E" />
-				<range ratio="1"     name="F" />
+				<range ratio="0.547" name="A" />
+				<range ratio="0.666" name="B" />
+				<range ratio="0.808" name="C" />
+				<range ratio="1.000" name="D" />
 			</ranges>
 			
 			<reverse resetGear="false" resetRange="false" /> 
@@ -2471,8 +2471,8 @@
 	<vehicle>caseIH1660
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1660.xml" />
 
-		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true">
-			<combine defaultWidth="4.3"/>
+		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true" globalRatioFactor="0.913">
+			<combine defaultWidth="4.3" minRpm="1850" maxRpm="2050"/>
 			<blowOffVentilSound volume="0"/>
 			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true" minMaxTimeMs="0" maxMinTimeMs="0"/-->		
 			<hydrostatic profile="Direct" minRatio="0"/>		
@@ -2483,7 +2483,7 @@
 				<gear name="III" speed="23" forwardOnly="true"/>
 			</gears>
 
-			<realEngine idleRpm="800" ratedRpm="2300">
+			<realEngine idleRpm="800" ratedRpm="2100">
         <!-- 2000: 190(190) | 2000: 190(190) | 1500..1500: 790(790) | 85 | 0.6 | 400 | 1.5 | 2200 | 1280: 195 -->
         <torque rpm="350" motorTorque="464" fuelUsageRatio="227.5"/>
         <torque rpm="700" motorTorque="638" fuelUsageRatio="207.7"/>

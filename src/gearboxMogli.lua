@@ -108,9 +108,9 @@ gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
-gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort = 500  -- ms
-gearboxMogliGlobals.autoShiftTimeoutHydroL= 250 -- ms 
+gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutShort = 1000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutHydroL= 250  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 125  -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
 gearboxMogliGlobals.shiftTimeMsFactor     = 1
@@ -127,7 +127,7 @@ gearboxMogliGlobals.stallMotorOffTime     = 3000
 gearboxMogliGlobals.realFuelUsage         = true
 gearboxMogliGlobals.idleFuelTorqueRatio   = 0.3
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
-gearboxMogliGlobals.combineDefaultSpeed   = 8 -- km/h
+gearboxMogliGlobals.combineDefaultSpeed   = 14   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
 gearboxMogliGlobals.combineDynamicChopper = 0.8
 gearboxMogliGlobals.dtDeltaTargetFast     = 0.0005 --  2 second 
@@ -147,7 +147,7 @@ gearboxMogliGlobals.hydroTransVolRatio    = 0 --0.2
 gearboxMogliGlobals.defaultEnableAI       = gearboxMogli.AIPowerShift
 gearboxMogliGlobals.autoHold              = true
 gearboxMogliGlobals.minAutoGearSpeed      = 0.5
-gearboxMogliGlobals.minAbsSpeed           = 0.2   -- km/h
+gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
 gearboxMogliGlobals.DefaultRevUpMs0       = 1000  -- ms
@@ -6175,19 +6175,7 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 	curMaxRpm = gearboxMogli.huge
 						
 	if self.ratioFactorR ~= nil then 		
-		if     self.vehicle.mrGbMS.Hydrostatic then
-		-- hydrostatic unit will take care about min/max possible RPM (see hMin1 and hMax1)
-			curMaxRpm = gearboxMogli.huge 
-		elseif self.clutchPercent < 1 then
-		-- do not cut torque in case of open clutch or torque converter
-			curMaxRpm = math.max( self.maxPossibleRpm, self.vehicle.mrGbMS.CloseRpm )
-		else
-		-- static connnection between motor and wheels
-			curMaxRpm = self.maxPossibleRpm
-		end
-		curMaxRpm = curMaxRpm / self.ratioFactorR
-		
-	--curMaxRpm = self.maxPossibleRpm / self.ratioFactorR
+		curMaxRpm = self.maxPossibleRpm / self.ratioFactorR
 	
 		local speedLimit   = gearboxMogli.huge
 		
@@ -6803,7 +6791,8 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		end
 		local rpm = self.lastMotorRpm + Utils.clamp( diff, -dt * self.vehicle.mrGbMS.RpmDecFactor, dt * self.vehicle.mrGbMS.RpmIncFactor )
 		
-		self.lastMotorRpm = Utils.clamp( rpm, self.stallRpm, self.maxPossibleRpm )
+	--self.lastMotorRpm = Utils.clamp( rpm, self.stallRpm, self.maxPossibleRpm )
+		self.lastMotorRpm = Utils.clamp( rpm, self.stallRpm, self.maxAllowedRpm )
 	end
 	
 	self.lastAbsDeltaRpm = self.lastAbsDeltaRpm + self.vehicle.mrGbML.smoothMedium * ( math.abs( self.prevNonClampedMotorRpm - self.nonClampedMotorRpm ) - self.lastAbsDeltaRpm )	
@@ -7208,6 +7197,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 	if      self.vehicle.mrGbMS.Hydrostatic
 			and self.ptoOn 
+			and accelerationPedal < -0.5
 			and currentAbsSpeed >= self.vehicle.mrGbMG.minAbsSpeed then
 		autoOpenClutch = false
 	end
@@ -7631,6 +7621,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					-- calculated target hydrostatic factor w/o HydrostaticIncFactor																						
 					if     hMax1 - hMin1 < gearboxMogli.eps then
 						h = hMin1
+				--elseif self.ptoOn and ( self.vehicle.cruiseControl.state > 0 or self.vehicle.mrGbML.hydroTargetSpeed ~= nil ) then
+				--	h = Utils.clamp( self.ratedRpm * currentSpeedLimit / ( t * self.vehicle.mrGbML.currentGearSpeed ), hMin1, hMax1 )
 					elseif self.vehicle.mrGbMS.HydrostaticDirect then
 						h = Utils.clamp( w / t, hMin1, hMax1 )
 					else
@@ -8345,9 +8337,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.maxPossibleRpm = self.maxAllowedRpm
 		self.lastMaxRpmTab  = nil
 		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorFull
-	end
-	
-	if not self.noTransmission then
+	elseif self.vehicle.mrGbMS.Hydrostatic then
+		self.maxPossibleRpm = gearboxMogli.huge
+		self.lastMaxRpmTab  = nil
+	else
 		local tab = nil
 		if self.lastMaxRpmTab == nil then
 		--tab = nil
@@ -8412,6 +8405,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		end
 	end
 
+	--**********************************************************************************************************		
+	-- do not cut torque in case of open clutch or torque converter
+	if self.clutchPercent < 1 and self.maxPossibleRpm < self.vehicle.mrGbMS.CloseRpm then
+		self.maxPossibleRpm = self.vehicle.mrGbMS.CloseRpm
+	end	
+	
 	--**********************************************************************************************************		
 	-- reduce RPM if more power than available is requested 
 	local reductionMinRpm = self.stallRpm 
