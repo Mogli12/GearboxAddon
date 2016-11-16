@@ -108,8 +108,8 @@ gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
-gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort = 1000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutShort = 2000 -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 250  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 125  -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
@@ -977,9 +977,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	self.mrGbMS.Range2DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#doubleClutch"), alwaysDoubleClutch) 
 	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
 	
-	self.mrGbMS.GearTimeToShiftGear     = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#shiftTimeMs"), 750, -1, hasHydrostat and self.mrGbMS.DisableManual )
+	self.mrGbMS.GearTimeToShiftGear     = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#shiftTimeMs"), 650, -1, hasHydrostat and self.mrGbMS.DisableManual )
 	self.mrGbMS.GearShiftEffectGear     = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".gears#shiftEffect"),     self.mrGbMS.GearTimeToShiftGear < self.mrGbMG.shiftEffectTime )
-	self.mrGbMS.GearTimeToShiftHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftTimeMs"),  900 ) 
+	self.mrGbMS.GearTimeToShiftHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftTimeMs"),  750 ) 
 	self.mrGbMS.GearShiftEffectHl       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(0)#shiftEffect"), self.mrGbMS.GearTimeToShiftHl < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftRanges2  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#shiftTimeMs"), 1200 ) 
 	self.mrGbMS.GearShiftEffectRanges2  = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(1)#shiftEffect"), self.mrGbMS.GearTimeToShiftRanges2 < self.mrGbMG.shiftEffectTime )
@@ -7821,8 +7821,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local downTimer = refTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort
 				local upTimer   = refTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort
 				
-				if      self.vehicle.cruiseControl.state > 0 
-						and self.vehicle.mrGbML.currentGearSpeed * self.idleRpm / self.ratedRpm > currentSpeedLimit then
+				if      self.lastMotorRpm     > upRpm
+						and self.lastRealMotorRpm > upRpm
+						and self.clutchRpm        > upRpm then
+					-- allow immediate up shift
+					upTimer = 0
+				elseif  self.vehicle.cruiseControl.state > 0 
+						and self.vehicle.mrGbML.currentGearSpeed * downRpm / self.ratedRpm > currentSpeedLimit then
 					-- allow down shift after short timeout
 				elseif self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
 					if self.autoClutchPercent > self.vehicle.mrGbMS.AutoShiftMinClutch then

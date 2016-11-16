@@ -54,14 +54,14 @@ Toutes ces transmissions continuellement variables ont une chose en commun. Le r
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.3.1</version>
+	<version>1.9.3.2</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			<de>Getriebe v1.9.3.1 von Mogli</de>
-	  	 <en>Gearbox v1.9.3.1 by mogli</en>
-				<it>Cambio v1.9.3.1 by mogli</it>
-	<fr>Transmission v1.9.3.1 by mogli</fr>
+			<de>Getriebe v1.9.3.2 von Mogli</de>
+	  	 <en>Gearbox v1.9.3.2 by mogli</en>
+				<it>Cambio v1.9.3.2 by mogli</it>
+	<fr>Transmission v1.9.3.2 by mogli</fr>
 		</text>                  
   </l10n>
 
