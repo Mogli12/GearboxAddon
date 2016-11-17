@@ -5,7 +5,8 @@
 		<en>Gearbox AddOn</en>
 		<de>Getriebe AddOn</de>
 		<it>Cambio AddOn</it>
-		<it>Transmission AddOn</it>
+		<es>Cambio AddOn</es>
+		<fr>Transmission AddOn</fr>
 	</title>
 	<description>
 		<en><![CDATA[
@@ -51,6 +52,8 @@ Il existe des modèles avec une ou deux vitesses comme le Fendt Vario.
 D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable.
 Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
 ]]></fr>
+		<es><![CDATA[Descripción:
+Cambio Manual/automático para FS17 por Mogli]]></es>
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
