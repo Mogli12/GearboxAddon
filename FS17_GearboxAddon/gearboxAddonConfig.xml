@@ -607,7 +607,7 @@
 	<vehicle>caseIH1455
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 
-		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.6">
+		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.4">
 			<gears defaultGear="4" shiftTimeMs="800">	
 				<gear speed="3.9"  name="1" />
 				<gear speed="6.2"  name="2" />
