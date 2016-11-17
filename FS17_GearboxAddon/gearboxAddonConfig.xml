@@ -605,11 +605,52 @@
 	</vehicle>
 		
 	<vehicle>caseIH1455
+		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
+
+		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.6">
+			<gears defaultGear="4" shiftTimeMs="800">	
+				<gear speed="3.9"  name="1" />
+				<gear speed="6.2"  name="2" />
+				<gear speed="9.7"  name="3" />
+				<gear speed="14.7"  name="4" />
+				<gear speed="23.5"  name="5" />
+				<gear speed="40.0"  name="6" />
+			</gears>
+			<ranges defaultRange="2" shiftTimeMs="1200">
+				<range ratio="0.7825" name="A" forwardOnly="true"/>
+				<range ratio="1.0000" name="S" forwardOnly="true"/>
+				<range ratio="0.7475" name="R" reverseOnly="true"/>
+			</ranges>
+		
+			<realEngine idleRpm="900" ratedRpm="2200">
+				<torque rpm="0" motorTorque="0"/>
+				<torque rpm="700" motorTorque="410"/>
+				<torque rpm="800" motorTorque="435"/>
+				<torque rpm="900" motorTorque="457"/>
+				<torque rpm="1000" motorTorque="476"/>
+				<torque rpm="1100" motorTorque="492"/>
+				<torque rpm="1200" motorTorque="505"/>
+				<torque rpm="1300" motorTorque="516"/>
+				<torque rpm="1400" motorTorque="523"/>
+				<torque rpm="1500" motorTorque="528"/>
+				<torque rpm="1600" motorTorque="529"/>
+				<torque rpm="1700" motorTorque="519"/>
+				<torque rpm="1800" motorTorque="508"/>
+				<torque rpm="1900" motorTorque="498"/>
+				<torque rpm="2000" motorTorque="486"/>
+				<torque rpm="2100" motorTorque="475"/>
+				<torque rpm="2200" motorTorque="463"/>
+				<torque rpm="2300" motorTorque="347"/>
+				<torque rpm="2400" motorTorque="0"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>International1455xl_FS17
 		<mod name="International1455xl_FS17">
 			<link href="http://www.modhoster.de/mods/international-1455xl" />
 			<xmlFile name="caseIH1455.xml"/>
 		</mod>
-		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true">
 			<gears defaultGear="4" shiftTimeMs="800">	

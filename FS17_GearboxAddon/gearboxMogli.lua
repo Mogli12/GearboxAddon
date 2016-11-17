@@ -108,7 +108,7 @@ gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
-gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutLong  = 2100 -- ms
 gearboxMogliGlobals.autoShiftTimeoutShort = 2000 -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 250  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 125  -- ms
@@ -1824,7 +1824,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	
 	self.mrGbMS.AutoShiftTimeoutLong  = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftTimeout"),  self.mrGbMG.autoShiftTimeoutLong , self.mrGbMG.autoShiftTimeoutHydroL, self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual )
 	self.mrGbMS.AutoShiftTimeoutShort = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftTimeout2"), self.mrGbMG.autoShiftTimeoutShort, self.mrGbMG.autoShiftTimeoutHydroS, self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual )
-	self.mrGbMS.AutoShiftMinClutch    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftMinClutch"), self.mrGbMS.MaxClutchPercent - 0.1 ) 
+	self.mrGbMS.AutoShiftMinClutch    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".gears#autoShiftMinClutch"), 0 ) -- self.mrGbMS.MaxClutchPercent - 0.1 ) 
 
 	if self.mrGbMS.AutoShiftTimeoutShort > self.mrGbMS.AutoShiftTimeoutLong then
 		self.mrGbMS.AutoShiftTimeoutShort = self.mrGbMS.AutoShiftTimeoutLong
@@ -7826,6 +7826,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						and self.clutchRpm        > upRpm then
 					-- allow immediate up shift
 					upTimer = 0
+				elseif  self.clutchOverheatTimer ~= nil
+						and self.clutchPercent       < 0.9 
+						and self.clutchOverheatTimer > 0.8 * self.vehicle.mrGbMS.ClutchOverheatStartTime then
+					downTimer = 0
 				elseif  self.vehicle.cruiseControl.state > 0 
 						and self.vehicle.mrGbML.currentGearSpeed * downRpm / self.ratedRpm > currentSpeedLimit then
 					-- allow down shift after short timeout
@@ -7834,13 +7838,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						downTimer = refTime + self.vehicle.mrGbMS.AutoShiftTimeoutLong 
 					end
 				elseif self.vehicle.mrGbML.lastGearSpeed > self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
-					if      accelerationPedal       > 0.5
-							and self.nonClampedMotorRpm > self.ratedRpm then
-						-- allow up shift after short timeout
-						upTimer   = refTime -- + self.vehicle.mrGbMS.AutoShiftTimeoutShort
-					else
-						upTimer   = refTime + self.vehicle.mrGbMS.AutoShiftTimeoutLong 
-					end
+					upTimer   = refTime + self.vehicle.mrGbMS.AutoShiftTimeoutLong 
 				end		
 
 				local sMin = nil
@@ -8309,8 +8307,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.clutchOverheatTimer = math.min( self.clutchOverheatTimer, self.vehicle.mrGbMS.ClutchOverheatMaxTime )
 			end
 			
-			if      self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime
-					and self.vehicle.mrGbMS.ClutchOverheatIncTime > 0 then
+			if self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime then
 				local w = "Clutch is overheating"
 				if      self.vehicle.mrGbMS.WarningText ~= nil
 						and self.vehicle.mrGbMS.WarningText ~= "" 
@@ -8320,8 +8317,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 					
 				self.vehicle:mrGbMSetState( "WarningText", w )
-				local e = 1 + ( self.clutchOverheatTimer - self.vehicle.mrGbMS.ClutchOverheatStartTime ) / self.vehicle.mrGbMS.ClutchOverheatIncTime
-				self.clutchPercent = self.clutchPercent ^ e
+				
+				if self.vehicle.mrGbMS.ClutchOverheatIncTime > 0 then
+					local e = 1 + ( self.clutchOverheatTimer - self.vehicle.mrGbMS.ClutchOverheatStartTime ) / self.vehicle.mrGbMS.ClutchOverheatIncTime
+					self.clutchPercent = self.clutchPercent ^ e
+				end
 			end
 		elseif self.clutchOverheatTimer ~= nil then
 			self.clutchOverheatTimer = self.clutchOverheatTimer - self.tickDt
@@ -8330,6 +8330,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.clutchOverheatTimer = nil
 			end
 		end
+	elseif self.clutchOverheatTimer ~= nil then 
+		self.clutchOverheatTimer = nil
 	end
 
 	--**********************************************************************************************************		
