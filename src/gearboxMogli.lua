@@ -310,7 +310,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:initClient()		
 
-	print("gearboxMogli: Initialization of client...")
+	print("FS17_GearboxAddon: Initialization of client...")
 
 	-- state
 	self.mrGbMS = {}
@@ -581,8 +581,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	for i=1,3 do
 		local key 
 		if     i == 1 then
-			if self.configurations["motor"] ~= nil then
-				key = string.format(xmlString..".engines.engine(%d)", self.configurations["motor"]-1)
+			if self.configurations.motor ~= nil then
+				key = string.format(xmlString..".engines.engine(%d)", self.configurations.motor-1)
 			end
 		elseif i == 2 then
 			key = xmlString..".engines.engine(0)"
@@ -598,8 +598,25 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 
 	if realEngineBaseKey ~= nil then
 		local s = getXMLString( xmlFile, realEngineBaseKey.."#name" )
-		if s ~= nil then
-			print("New engine with name "..s)
+		if self.configurations.motor ~= nil then
+			local t = getXMLString( self.xmlFile, string.format("vehicle.motorConfigurations.motorConfiguration(%d)#name",self.configurations.motor-1))
+			self.mrGbMS.EngineName = t
+			
+			if     t == "$l10n_configuration_valueDefault" then
+				self.mrGbMS.EngineName = s
+				if s ~= nil then
+					print('FS17_GearboxAddon: Engine name: "'..s..'"')			
+				end
+			elseif s == nil then
+				print('FS17_GearboxAddon: Vehicle motorConfiguration name: "'..t..'"')
+			elseif s ~= t then
+				print('FS17_GearboxAddon: Warning! Engine names to not match: "'..s..'" <> "'..t..'"')
+			else
+				print('FS17_GearboxAddon: Engine and vehicle motorConfiguration name: "'..t..'"')
+			end
+		elseif s ~= nil then
+			self.mrGbMS.EngineName = s
+			print('FS17_GearboxAddon: Engine name: "'..s..'"')			
 		end
 		
 		while true do
@@ -759,7 +776,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			elseif defaultFruit == "chaff" then
 				defaultLiterPerSqm = 3.9
 			else
-				print('Unknown fruit type: "'..tostring(defaultFruit)..'"' )
+				print('FS17_GearboxAddon: Warning! Unknown fruit type: "'..tostring(defaultFruit)..'"' )
 			end
 			
 			defaultLiterPerSqm = defaultLiterPerSqm * self.mrGbMG.defaultLiterPerSqm / 1.2
@@ -1532,10 +1549,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 	  
 		if self.mrGbMS.HydrostaticProfile == nil then
 		elseif self.mrGbMS.HydrostaticProfile == "ZF"   then
-			print('Warning in gearboxMogli: hydrostatic profile "ZF" is out dated. Please use "Input" instead')
+			print('FS17_GearboxAddon: Warning! Hydrostatic profile "ZF" is out dated. Please use "Input" instead')
 			self.mrGbMS.HydrostaticProfile = "Input"
 		elseif self.mrGbMS.HydrostaticProfile == "Fendt"   then
-			print('Warning in gearboxMogli: hydrostatic profile "Fendt" is out dated. Please use "Output" instead and adjust the gear ratios.')
+			print('FS17_GearboxAddon: Warning! Hydrostatic profile "Fendt" is out dated. Please use "Output" instead and adjust the gear ratios.')
 			self.mrGbMS.HydrostaticProfile = "Output"
 			if not ( getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed") ) then
 				for i,g in pairs(self.mrGbMS.Gears) do
@@ -1543,7 +1560,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 				end
 			end
 		elseif self.mrGbMS.HydrostaticProfile == "Combine" then
-			print('Warning in gearboxMogli: hydrostatic profile "Combine" is out dated. Please use "Direct" instead and adjust the gear ratios.')
+			print('FS17_GearboxAddon: Warning! Hydrostatic profile "Combine" is out dated. Please use "Direct" instead and adjust the gear ratios.')
 			self.mrGbMS.HydrostaticProfile = "Direct"
 			if not ( getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed") ) then
 				for i,g in pairs(self.mrGbMS.Gears) do
@@ -1667,7 +1684,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
 		else
-			print('ERROR in gearboxMogli: invalid hydrostatic profile "'..tostring(self.mrGbMS.HydrostaticProfile)..'"')
+			print('FS17_GearboxAddon: Error! Invalid hydrostatic profile "'..tostring(self.mrGbMS.HydrostaticProfile)..'"')
 			self.mrGbMS.HydrostaticProfile = "Direct"
 		end
 	end
@@ -1686,7 +1703,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 				or self.mrGbMS.HydrostaticVolumeMotor ~= nil 
 				or self.mrGbMS.HydrostaticCoupling    ~= nil then
 				
-			print("Warning in gearboxMogli: hydrostatic coupling is only experimental")
+			print("FS17_GearboxAddon: Warning! Hydrostatic coupling is only experimental")
 				
 			self.mrGbMS.HydrostaticMin       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minRatio"), -1 )
 			self.mrGbMS.HydrostaticMax       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRatio"), 1.41421356 )
@@ -2058,7 +2075,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:checkIfReady( noEventSend )
 	if self.mrGbMS == nil then
-		print("ERROR: GearboxAddon not initialized")
+		print("FS17_GearboxAddon: Error! GearboxAddon not initialized")
 	elseif not ( self.mrGbMS.IsOn ) then
 	elseif self.mrGbML                                          == nil 
 			or self.mrGbMB                                          == nil
@@ -2073,7 +2090,7 @@ function gearboxMogli:checkIfReady( noEventSend )
 			or self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio == nil
 			or self.mrGbMS.ReverseRatio                             == nil
 			or self.mrGbMS.GlobalRatioFactor                        == nil then
-		print("ERROR: client initialization failed")
+		print("FS17_GearboxAddon: Error! Client initialization failed")
 		self:mrGbMSetState( "IsOn", false, noEventSend )
 		return 
 	end
@@ -2204,7 +2221,7 @@ function gearboxMogli:update(dt)
 			local code = 0
 			if self.mrGbML.motor == nil then code = code + 1 end
 			if self.mrGbMB.motor == nil then code = code + 2 end
-			print("Initialization of motor failed: "..tostring(self.configFileName).." ("..tostring(code)..")")
+			print("FS17_GearboxAddon: Error! Initialization of motor failed: "..tostring(self.configFileName).." ("..tostring(code)..")")
 			self.mrGbML.motor = nil
 			self:mrGbMSetIsOnOff( false ) 
 			self:mrGbMSetState( "IsOn", false ) 	
@@ -2217,7 +2234,7 @@ function gearboxMogli:update(dt)
 	end 	
 		
 	if self.mrGbMS.CurMinRpm == nil or self.mrGbMS.CurMaxRpm == nil then
-		print("Init failed")
+		print("FS17_GearboxAddon: Error! Initialization of motor failed")
 	end
 	
 	self.motor.minRpm = self.mrGbMS.CurMinRpm
@@ -3188,7 +3205,7 @@ function gearboxMogli:readUpdateStream(streamId, timestamp, connection)
 			if self.mrGbMS.sendReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
 			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end		
 		elseif checkId == nil or checkId ~= 142 then
-			print("gearboxMogli: there is another specialization with incorrect readUpdateStream implementation ("..tostring(checkId)..")")
+			print("FS17_GearboxAddon: Error! There is another specialization with incorrect readUpdateStream implementation ("..tostring(checkId)..")")
 			if self.mrGbMD ~= nil then
 				self.mrGbML.updateStreamErrors = self.mrGbML.updateStreamErrors + 1
 			end
@@ -3223,7 +3240,7 @@ end
 function gearboxMogli:mrGbMOnSetNoUpdateStream( old, new, noEventSend )
 	self.mrGbMS.NoUpdateStream = new
 	if new and not ( old ) then
-		print("gearboxMogli: there is another specialization with incorrect readUpdateStream implementation => turning off update stream")
+		print("FS17_GearboxAddon: Error! There is another specialization with incorrect readUpdateStream implementation => turning off update stream")
 		self.mrGbML.lastSumDt  = 1001
 		self.mrGbMD.lastClutch = -1
 	elseif old and not ( new ) then 
@@ -3333,6 +3350,10 @@ function gearboxMogli:draw()
 			--==============================================
 			local ovRows   = 0
 			local infos    = {}
+			if      self.mrGbMS.EngineName    ~= nil
+					and self.configurations.motor ~= nil then					
+				ovRows = ovRows + 1 infos[ovRows] = "engine"
+			end
 			if     self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual then
 				if gearText ~= "" then			
 					ovRows = ovRows + 1 infos[ovRows] = "gear"
@@ -3409,7 +3430,11 @@ function gearboxMogli:draw()
 				
 				for row,info in pairs( infos ) do
 				
-					if     info == "gear" then
+					if     info == "engine" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, self.mrGbMS.EngineName) 	
+						end
+					elseif info == "gear" then
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearText) 	
 						end
@@ -3810,7 +3835,7 @@ function gearboxMogli:mrGbMGetNewEntry( entries, current, index, name )
 	end
 		
 	if gearboxMogli.mrGbMIsNotValidEntry( self, entries[new], cg, cr, c2 ) then
-		print(string.format("no %s found: %d", name, index))
+		print(string.format("FS17_GearboxAddon: Warning! No %s found: %d", name, index))
 	end
 	
 	return new
@@ -4803,7 +4828,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			self.mrGbML.gearShiftingNeeded  = 0
 		end
 	else
-		print("ERROR: gearboxMogli:mrGbMPrepareGearShift called at client")
+		print("FS17_GearboxAddon: Error! gearboxMogli:mrGbMPrepareGearShift called at client")
 	end 
 	
 --print("B: "..tostring(self.mrGbML.beforeShiftRpm))
@@ -6066,7 +6091,7 @@ function gearboxMogliMotor:getHydroEff( h )
 	if self.vehicle.mrGbMS.HydrostaticMin <= h and h <= self.vehicle.mrGbMS.HydrostaticMax then
 		return self.hydroEff:get( h )
 	end
-	print("hydro out of range: "..tostring(h))
+	print("FS17_GearboxAddon: Error! hydrostaticFactor out of range: "..tostring(h))
 	return 0
 end
 

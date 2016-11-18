@@ -57,14 +57,14 @@ Cambio Manual/automático para FS17 por Mogli]]></es>
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.3.3</version>
+	<version>1.9.3.4</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			<de>Getriebe v1.9.3.3 von Mogli</de>
-	  	 <en>Gearbox v1.9.3.3 by mogli</en>
-				<it>Cambio v1.9.3.3 by mogli</it>
-	<fr>Transmission v1.9.3.3 by mogli</fr>
+			<de>Getriebe v1.9.3.4 von Mogli</de>
+	  	 <en>Gearbox v1.9.3.4 by mogli</en>
+				<it>Cambio v1.9.3.4 by mogli</it>
+	<fr>Transmission v1.9.3.4 by mogli</fr>
 		</text>                  
   </l10n>
 

@@ -179,7 +179,7 @@
 	</vehicle>
 
 	<vehicle>sameFortis
-		<configFile xmlName="data/vehicles/steerable/same/sameFortis.xml" />
+		<configFile xmlName="data/vehicles/steerable/same/sameFortis.xml"/>
 						
 		<gearboxMogli maxAIRange="4">	
 			<blowOffVentilSound volume="0.5"/>
