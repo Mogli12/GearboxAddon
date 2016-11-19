@@ -8,6 +8,7 @@
 		<es>Cambio AddOn</es>
 		<fr>Transmission AddOn</fr>
 		<ru>gearboxMogli</ru>
+		<cz>Řazení AddOn</cz>
 	</title>
 	<description>
 		<en><![CDATA[
@@ -57,6 +58,10 @@ Toutes ces transmissions continuellement variables ont une chose en commun. Le r
 Cambio Manual/automático para FS17 por Mogli]]></es>
 <ru><![CDATA[Коробка передач:
 gearboxMogli. Добавляет сконфигурированные специализации всем транспортным средствам]]></ru>
+<cz><![CDATA[
+Každý traktor nemá zjednodušené ovládání jako stroje ve Farming simulátoru. Tento mod přidává do každého stroje reálnější simulaci řazení převodových stupnů.
+Od manuálního řazení se spojkou a meziplynem, přes různe řady násobičů a redukcí, přes plně automatickou převodovku až po bezestupňové řazení (CVT).
+Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddonConfig.xml. Mód podporuje volanty se spojkou i řadící pákou, což stupňuje požitek ze hry.]]></cz>
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
