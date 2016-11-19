@@ -133,7 +133,7 @@ function gearboxMogliLoader.initXmlFiles()
 				local baseName       = string.format("vehicles.vehicle(%d)", i)
 				
 				if not hasXMLProperty( xmlFile, baseName..".gearboxMogli" ) then
-					print(string.format("Found %d configurations",i))								
+					print(string.format("FS17_GearboxAddon: Found %d configurations",i))								
 					break
 				end
 				
@@ -220,10 +220,10 @@ function gearboxMogliLoader.initXmlFiles()
 						entry.configFileName = string.lower( entry.configFileName )
 						if f == 1 then
 						--print(string.format( gearboxMogliRegister.modName..": found internal configuration for %s", entry.configFileName ))				
-							gearboxMogliLoader.configInt[i] = entry
+							table.insert( gearboxMogliLoader.configInt, entry )
 						else
 							print(string.format( gearboxMogliRegister.modName..": found external configuration for %s", entry.configFileName ))				
-							gearboxMogliLoader.configExt[i] = entry
+							table.insert( gearboxMogliLoader.configExt, entry )
 						end
 					end
 					if configFileName ~= nil then
