@@ -5,7 +5,7 @@
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHolland8340.xml"/>
 		
 		<gearboxMogli autoStartStop="false" speedLimiter="false" maxAIRange="1">
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1">
+			<gears shiftTimeMs="0" clutchRatio="1">
 				<gear speed="21.9"/>
 				<gear speed="26.9"/>
 				<gear speed="33.6"/>
@@ -55,7 +55,7 @@
 		</mod>
 		
 		<gearboxMogli autoStartStop="false" speedLimiter="false" maxAIRange="1">
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1">
+			<gears shiftTimeMs="0" clutchRatio="1">
 				<gear speed="21.9"/>
 				<gear speed="26.9"/>
 				<gear speed="33.6"/>
@@ -181,10 +181,10 @@
 	<vehicle>sameFortis
 		<configFile xmlName="data/vehicles/steerable/same/sameFortis.xml"/>
 						
-		<gearboxMogli maxAIRange="4">	
+		<gearboxMogli maxAIRange="4" swapGearRangeKeys="true">	
 			<blowOffVentilSound volume="0.5"/>
 			
-			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true" swapGearRangeKeys="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" automatic="true">	
 				<gear speed="29.15" name="S"/>
 				<gear speed="34.95" name="L"/>
 				<gear speed="41.83" name="M"/>
@@ -317,7 +317,7 @@
 				</engine>
 			</engines>
 
-			<gears shiftTimeMs="0" clutchRatio="1"  automatic="true" speedMatching="true">	
+			<gears shiftTimeMs="0" clutchRatio="1" automatic="true">	
 				<gear speed="29.6" name="P1"/>
 				<gear speed="35.5" name="P2"/>
 				<gear speed="42.5" name="P3"/>
@@ -646,51 +646,6 @@
 		</gearboxMogli>	
 	</vehicle>
 
-	<vehicle>International1455xl_FS17
-		<mod name="International1455xl_FS17">
-			<link href="http://www.modhoster.de/mods/international-1455xl" />
-			<xmlFile name="caseIH1455.xml"/>
-		</mod>
-
-		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true">
-			<gears defaultGear="4" shiftTimeMs="800">	
-				<gear speed="3.9"  name="1" />
-				<gear speed="6.2"  name="2" />
-				<gear speed="9.7"  name="3" />
-				<gear speed="14.7"  name="4" />
-				<gear speed="23.5"  name="5" />
-				<gear speed="40.0"  name="6" />
-			</gears>
-			<ranges defaultRange="2" shiftTimeMs="1200">
-				<range ratio="0.7825" name="A" forwardOnly="true"/>
-				<range ratio="1.0000" name="S" forwardOnly="true"/>
-				<range ratio="0.7475" name="R" reverseOnly="true"/>
-			</ranges>
-		
-			<realEngine idleRpm="900" ratedRpm="2200">
-				<torque rpm="0" motorTorque="0"/>
-				<torque rpm="700" motorTorque="410"/>
-				<torque rpm="800" motorTorque="435"/>
-				<torque rpm="900" motorTorque="457"/>
-				<torque rpm="1000" motorTorque="476"/>
-				<torque rpm="1100" motorTorque="492"/>
-				<torque rpm="1200" motorTorque="505"/>
-				<torque rpm="1300" motorTorque="516"/>
-				<torque rpm="1400" motorTorque="523"/>
-				<torque rpm="1500" motorTorque="528"/>
-				<torque rpm="1600" motorTorque="529"/>
-				<torque rpm="1700" motorTorque="519"/>
-				<torque rpm="1800" motorTorque="508"/>
-				<torque rpm="1900" motorTorque="498"/>
-				<torque rpm="2000" motorTorque="486"/>
-				<torque rpm="2100" motorTorque="475"/>
-				<torque rpm="2200" motorTorque="463"/>
-				<torque rpm="2300" motorTorque="347"/>
-				<torque rpm="2400" motorTorque="0"/>
-			</realEngine>
-		</gearboxMogli>	
-	</vehicle>
-
 	<vehicle>newHollandT5
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandT5.xml"/>
 		
@@ -699,7 +654,7 @@
 		<gearboxMogli >
 			<blowOffVentilSound volume="0.5"/>
 			
-			<gears automatic="true" defaultGear="3" shiftTimeMs="500">
+			<gears defaultGear="3" shiftTimeMs="500">
 				<gear speed="10.2"/>
 				<gear speed="18.4"/>
 				<gear speed="30.2"/>
@@ -796,7 +751,7 @@
 				<gear speed="56.60"/>
 			</gears>
 			
-			<ranges automatic="true" shiftTimeMs="500">
+			<ranges shiftTimeMs="500">
 				<range ratio="0.15" name="A"/>
 				<range ratio="0.33" name="B"/>
 				<range ratio="0.50" name="C" minRange2="2"/>
@@ -806,23 +761,6 @@
 			<ranges defaultRange="2">
 				<range ratio="0.2" name="LL" maxRange="2" />
 				<range ratio="1"   name="" />
-			</ranges>
-			
-			<gears automatic="true" shiftTimeMs="500">
-				<gear name="A LL" speed="1.698"/>
-				<gear name="B LL" speed="3.7356"/>
-				<gear name="A" speed="8.49"/>
-				<gear name="B" speed="18.678"/>
-				<gear name="C" speed="28.3"/>
-				<gear name="D" speed="56.6"/>
-			</gears>
-			
-			<ranges automatic="true" shiftTimeMs="0" clutchRatio="1">
-				<range ratio="0.441872792"/>
-				<range ratio="0.55335689"/>
-				<range ratio="0.664840989"/>
-				<range ratio="0.832332155"/>
-				<range ratio="1 "/>
 			</ranges>
 			
 			<reverse ratio="1.05413"/>
@@ -920,7 +858,7 @@
 				<gear speed="56.60"/>
 			</gears>
 			
-			<ranges automatic="true" shiftTimeMs="500">
+			<ranges shiftTimeMs="500">
 				<range ratio="0.15" name="A"/>
 				<range ratio="0.33" name="B"/>
 				<range ratio="0.50" name="C" minRange2="2"/>
@@ -2035,7 +1973,7 @@
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24" disableManual="false">
       <!--hydrostatic coupling="input" minRatio="0" maxRatio="1.4" startFactor="0" pressure="400" maxTorque="400" correctGearSpeed="false"/-->
       <hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
-			<gears defaultGear="1"  shiftTimeMs="2000" automatic="false" reverseReset="true">		
+			<gears  shiftTimeMs="2000" automatic="false" reverseReset="true">		
 				<gear name="heavy duty" speed="22"/>
 				<gear name="transport"  speed="50" forwardOnly="true"/>
 			</gears>
@@ -2960,7 +2898,7 @@
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorMajor.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
-			<gears defaultGear="1" shiftTimeMs="800">	
+			<gears shiftTimeMs="800">	
 				<gear speed="9.65"/>
 				<gear speed="14.29"/>
 				<gear speed="20.91"/>
@@ -3001,7 +2939,7 @@
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorProximaPower.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
-			<gears defaultGear="1" shiftTimeMs="800">	
+			<gears shiftTimeMs="800">	
 				<gear speed="10.8"/>
 				<gear speed="16.0"/>
 				<gear speed="25.6"/>
@@ -3051,7 +2989,7 @@
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorForterraHD.xml"/>
 
 		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
-			<gears defaultGear="1" shiftTimeMs="800">	
+			<gears shiftTimeMs="800">	
 				<gear speed="9.7"/>
 				<gear speed="13.2"/>
 				<gear speed="18.8"/>
