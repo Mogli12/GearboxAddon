@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Коробка передач:
+gearboxMogli. Добавляет сконфигурированные специализации всем транспортным средствам]]>
+</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="GB: Передача вверх"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="GB: Передача вниз"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="GB: Группа вверх"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="GB: Группа 2 вверх"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="GB: Группа вниз"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="GB: Группа 2 вниз"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="GB: Нейтраль"/>
+		<text name="input_gearboxMogliOFF"             text="МКПП [выкл]"/>
+		<text name="input_gearboxMogliON"              text="МКПП [вкл]"/>
+		<text name="input_gearboxMogliON_OFF"          text="GB: ВКЛ/ВЫКЛ"/>
+		<text name="input_gearboxMogliHUD"             text="GB: HUD вкл/выкл"/>
+		<text name="input_gearboxMogliAllAuto"         text="GB: реальное переключение"/>
+		<text name="input_gearboxMogliAllAutoON"       text="GB [упрощенная]"/>
+		<text name="input_gearboxMogliAllAutoOFF"      text="GB [реальная]"/>
+		<text name="input_gearboxMogliREVERSE"         text="GB: Задний ход"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="GB: авто.сцепление"/>
+		<text name="input_gearboxMogliCLUTCH"          text="GB: сцепление"/>
+		<text name="input_gearboxMogliCLUTCH_1"        text="GB: сцепление открытое"/>
+		<text name="input_gearboxMogliCLUTCH_2"        text="GB: сцепление закрытое"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="GB: сцепление"/>
+		<text name="input_gearboxMogliMINRPM"          text="GB: ручной газ"/>
+		<text name="input_gearboxMogliMINRPM_1"        text="GB: ручной газ вниз"/>
+		<text name="input_gearboxMogliMINRPM_2"        text="GB: ручной газ вверх"/>
+		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"           text="Gearbox: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"           text="Gearbox: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"           text="Gearbox: G27 6"/>
+		<text name="input_gearboxMogliGEARR"           text="Gearbox: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"         text="GB: вперед"/>
+		<text name="input_gearboxMogliGEARBACK"        text="GB: назад"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"      text="GB: ограничитель"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="GB: ограничитель 2"/>
+		<text name="input_gearboxMogliSETSPEED"        text="GB: установить ограничитель"/>
+		<text name="input_gearboxMogliACCTOLIMIT"      text="GB: ускорение"/>
+		<text name="input_gearboxMogliDECTOLIMIT"      text="GB: замедление"/>
+		<text name="input_gearboxMogliECO"             text="GB: ЭКО вкл/выкл"/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="GB: держать скорость"/>
+		<text name="gearboxMogliTEXT_OFF"        text="мотор Выкл."/>
+		<text name="gearboxMogliTEXT_AI"         text="Наймит"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="Ручник"/>
+		<text name="gearboxMogliTEXT_DC"         text="Двойное сцепление"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"    text="нейтраль"/>
+		<text name="gearboxMogliTEXT_AUTO"       text="Автомат"/>
+		<text name="gearboxMogliTEXT_MANUAL"     text="Ручная"/>
+		<text name="gearboxMogliTEXT_NOGEAR"     text="нет передач"/>
+		<text name="gearboxMogliTEXT_VARIO"      text="Плавно"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"    text="Упрощенная"/>
+		<text name="gearboxMogliTEXT_ECO"        text="ЭКО"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Автоудержание"/>
+	</texts>
+</l10n>
