@@ -47,6 +47,7 @@ gearboxMogli.clutchLoopTimes      = 10
 gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minGearRatio         = 0.1
 gearboxMogli.minHydrostaticFactor = 0.001
+gearboxMogli.accHydrostaticFactor = 0.1
 gearboxMogli.maxHydroGearRatio    = 377  -- 1.0 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.maxGearRatio         = 1885 -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
@@ -492,7 +493,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:initFromXml
 --**********************************************************************************************************	
-function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient) 
+function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,motorConfig) 
 
 --**************************************************************************************************	
 	if xmlSource == "vehicle" then
@@ -583,7 +584,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 		local key 
 		if     i == 1 then
 			if self.configurations.motor ~= nil then
-				key = string.format(xmlString..".engines.engine(%d)", self.configurations.motor-1)
+				if motorConfig == nil then				
+					key = string.format(xmlString..".engines.engine(%d)", self.configurations.motor-1)
+				elseif motorConfig[self.configurations.motor-1] ~= nil then
+					key = string.format(xmlString..".engines.engine(%d)", motorConfig[self.configurations.motor-1])
+				end
 			end
 		elseif i == 2 then
 			key = xmlString..".engines.engine(0)"
@@ -1062,7 +1067,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient)
 			self.mrGbMS.BlowOffVentilVolume = 0
 		else
 			if self.mrGbMS.AutoStartStop then
-				default = 1.4
+				default = 1
 			else
 				default = 2
 			end
@@ -2867,6 +2872,7 @@ function gearboxMogli:update(dt)
 
 	if      self.steeringEnabled 
 			and self.isServer 
+			and self.isMotorStarted
 			and not ( self.isEntered or self.isControlled ) then
 	
 --**********************************************************************************************************			
@@ -2927,14 +2933,21 @@ function gearboxMogli:update(dt)
 	
 --**********************************************************************************************************			
 -- keep on going if not entered 
---**********************************************************************************************************			
+--**********************************************************************************************************		
 		if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then	
-			Drivable.updateVehiclePhysics(self, 0, false, 0, false, dt)
+			doUpdate = true
+			Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
 		elseif  not self.mrGbMS.NeutralActive
 				and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
 			self:mrGbMSetNeutralActive( true, false, true )
 			self:mrGbMSetState( "AutoHold", true )
-			Drivable.updateVehiclePhysics(self, 1, false, 0, false, dt)
+			Drivable.updateVehiclePhysics(self, 1, false, 0, false, false, dt)
+		elseif  self.motor.lastMotorRpm > 1.1 * self.motor.idleRpm then
+			if self.mrGbMS.AutoHold then
+				Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
+			else
+				Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
+			end
 		end
 	end	
 	
@@ -7524,6 +7537,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					hMin = 0 --gearboxMogli.eps
 				end
 				
+				if accelerationPedal > 0.001 then
+					hMin = math.max( hMin, accelerationPedal * gearboxMogli.accHydrostaticFactor )
+				end
+				
 			--local h0 = math.max( hMin, self.hydrostaticFactor )
 			--if h0 < hMax then
 			--	if     accelerationPedal < 0.001 then
@@ -7533,7 +7550,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			--	end
 			--end
 				
-				local w0 = self.absWheelSpeedRpm -- + math.max( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm )
+				local w0 = self.absWheelSpeedRpm + math.max( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm )
 				
 				if self.vehicle:mrGbMGetAutomatic() then
 					local gearMaxSpeed = self.vehicle.mrGbMS.Ranges2[self.vehicle.mrGbMS.CurrentRange2].ratio

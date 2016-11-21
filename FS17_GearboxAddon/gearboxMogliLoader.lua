@@ -144,7 +144,7 @@ function gearboxMogliLoader.initXmlFiles()
 				local l = 0
 				while true do
 					local entry = { xmlName = baseName }
-					local tag   = nil
+					local eTag  = nil
 					
 					if configFileName ~= nil then
 						entry.configFileName = configFileName
@@ -197,7 +197,7 @@ function gearboxMogliLoader.initXmlFiles()
 										if entry.motorConfig == nil then
 											entry.motorConfig = {}
 										end
-										entry.motorConfig[j] = true
+										entry.motorConfig[j] = i
 									end
 								end
 							end
@@ -278,7 +278,7 @@ function gearboxMogliLoader.getConfigEntry( configTable, configFileName, motorCo
 	for i,e in pairs( configTable ) do
 		if     motorConfig   == nil
 				or e.motorConfig == nil
-				or e.motorConfig[motorConfig] then
+				or ( e.motorConfig[motorConfig] and e.motorConfig[motorConfig] > 0 ) then
 			if     e.configFileName == configFileName then
 				return e
 			elseif e.configIsPrefix and e.configModName ~= nil then
@@ -319,7 +319,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	
 	if      entry ~= nil
 			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
+		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
 		if state and message then
 			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", tagName, self.mrGbMLConfigFileName ))
 			return true
@@ -331,7 +331,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	-- configuration inside the vehicle.xml
 	xmlFile = self.xmlFile
 	if gearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
+		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle", entry.motorConfig )	
 		if state and message then
 			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
 			return true
@@ -346,7 +346,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 
 	if      entry ~= nil
 			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
+		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
 		if state and message then
 			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", tagName, self.mrGbMLConfigFileName ))
 			return true
@@ -393,7 +393,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 		xmlFile = gearboxMogliLoader.xmlFileExt
 		entry   = gearboxMogliLoader.defaultConfigE[defaultConfigName]		
 		if entry ~= nil then
-			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external" )	
+			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
 			if state and message then
 				print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
 				return true
@@ -405,7 +405,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 		xmlFile = gearboxMogliLoader.xmlFileInt
 		entry   = gearboxMogliLoader.defaultConfigI[defaultConfigName]
 		if entry ~= nil then
-			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal" )	
+			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
 			if state and message then
 				print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
 				return true
@@ -424,7 +424,7 @@ function gearboxMogliLoader:loadgearboxMogli( savegame )
 	self.mrGbMLGearbox1 = gearboxMogliLoader.loadGeneric( self, savegame, gearboxMogliLoader.loadgearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio", ".gearboxMogli.hydrostatic.efficiency#ratio" )
 end
 
-function gearboxMogliLoader:loadgearboxMogli2( xmlFile, baseName, xmlSource )	
+function gearboxMogliLoader:loadgearboxMogli2( xmlFile, baseName, xmlSource, motorConfig )	
 	gearboxMogli.initFromXml( self, xmlFile, baseName .. ".gearboxMogli", xmlSource, false )
 	return true
 end
