@@ -1603,7 +1603,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			self.mrGbMS.HydrostaticMin = -0.7
 			self.mrGbMS.HydrostaticMax = 1
 			self.mrGbMS.TransmissionEfficiency = 0.98
-			self.mrGbMS.HydrostaticMaxTorque   = 1.1 * maxTorque
+			self.mrGbMS.HydrostaticMaxTorque   = 2 * maxTorque
 			self.mrGbMS.HydrostaticEfficiency  = {}
 
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=-1	 ,v=0.65 })
