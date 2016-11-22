@@ -2442,19 +2442,6 @@
 	</vehicle>
 
 
-	<vehicle>jcbFastrac3000
-		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac3000.xml"/>
-	
-		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="47" maxAIGear="1">
-			<hydrostatic profile="Output" minRatio="-0.642" maxRatio="1"/>		
-			<gears defaultGear="2" clutchRatio="1">	
-				<gear name="heavy duty" speed="45" />
-				<gear name="transport"  speed="70"/>
-			</gears>
-		</gearboxMogli>	
-	</vehicle>
-
-
 	<vehicle>jcbFastrac8000
 		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac8000.xml"/>
 	
