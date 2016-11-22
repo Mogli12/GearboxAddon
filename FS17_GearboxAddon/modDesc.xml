@@ -65,14 +65,15 @@ Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddo
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.3.7</version>
+	<version>1.9.3.8</version>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			<de>Getriebe v1.9.3.7 von Mogli</de>
-	  	 <en>Gearbox v1.9.3.7 by mogli</en>
-				<it>Cambio v1.9.3.7 by mogli</it>
-	<fr>Transmission v1.9.3.7 by mogli</fr>
+			<de>Getriebe v1.9.3.8 von Mogli</de>
+	  	 <en>Gearbox v1.9.3.8 by mogli</en>
+				<it>Cambio v1.9.3.8 by mogli</it>
+	<fr>Transmission v1.9.3.8 by mogli</fr>
+				<cz>Řazení v1.9.3.8 by mogli</cz>
 		</text>                  
   </l10n>
 

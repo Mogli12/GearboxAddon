@@ -8,56 +8,56 @@ Přidává do všech vozidel rozšířené ovládání řízení vozidel pomocí
 
 	<texts>
 		<!--GBAddon helpPanel text-->
-		<text name="input_GBMogliSHIFTGEARUP"     text="GB: Řazení nahoru"/>
-		<text name="input_GBMogliSHIFTGEARDOWN"   text="GB: Řazení dolu"/>
-		<text name="input_GBMogliSHIFTRANGEUP"    text="GB: Řada 1 nahoru"/>
-		<text name="input_GBMogliSHIFTRANGE2UP"   text="GB: Řada 2 nahoru"/>
-		<text name="input_GBMogliSHIFTRANGEDOWN"  text="GB: Řada 1 dolu"/>
-		<text name="input_GBMogliSHIFTRANGE2DOWN" text="GB: Řada 2 dolu"/>
-		<text name="input_GBMogliNEUTRAL"         text="GB: Neutral"/>
-		<text name="input_GBMogliOFF"             text="Ruční řazení [vyp.]"/>
-		<text name="input_GBMogliON"              text="Ruční řazení [zap.]"/>
-		<text name="input_GBMogliON_OFF"          text="GB: Zap./Vyp."/>
-		<text name="input_GBMogliHUD"             text="GB: HUD Zap./Vyp."/>
-		<text name="input_GBMogliAllAuto"         text="GB: Přepínač ovládání"/>
-		<text name="input_GBMogliAllAutoON"       text="GB [jednoduché]"/>
-		<text name="input_GBMogliAllAutoOFF"      text="GB [reálné]"/>
-		<text name="input_GBMogliREVERSE"         text="GB: Zpátečka"/>
-		<text name="input_GBMogliAUTOCLUTCH2"     text="GB: Automat. spojka"/>
-		<text name="input_GBMogliCLUTCH"          text="GB: Spojka"/>
-		<text name="input_GBMogliCLUTCH_1"        text="GB: Spojka zap."/>
-		<text name="input_GBMogliCLUTCH_2"        text="GB: Spojka vyp."/>
-		<text name="input_GBMogliCLUTCH_3"        text="GB: Spojka"/>
-		<text name="input_GBMogliMINRPM"          text="GB: Ruční plyn"/>
-		<text name="input_GBMogliMINRPM_1"        text="GB: Přidat ruční plyn"/>
-		<text name="input_GBMogliMINRPM_2"        text="GB: Ubrat ruční plyn"/>
-		<text name="input_GBMogliGEAR1"           text="GB: G27 1"/>
-		<text name="input_GBMogliGEAR2"           text="GB: G27 2"/>
-		<text name="input_GBMogliGEAR3"           text="GB: G27 3"/>
-		<text name="input_GBMogliGEAR4"           text="GB: G27 4"/>
-		<text name="input_GBMogliGEAR5"           text="GB: G27 5"/>
-		<text name="input_GBMogliGEAR6"           text="GB: G27 6"/>
-		<text name="input_GBMogliGEARR"           text="GB: G27 R"/>
-		<text name="input_GBMogliGEARFWD"         text="GB: Dopředu"/>
-		<text name="input_GBMogliGEARBACK"        text="GB: Dozadu"/> 
-		<text name="input_GBMogliSPEEDLIMIT"      text="GB: Tempomat 1"/>
-		<text name="input_GBMogliSWAPSPEED"       text="GB: Tempomat 2"/>
-		<text name="input_GBMogliSETSPEED"        text="GB: Nastav Tempomat"/>
-		<text name="input_GBMogliACCTOLIMIT"      text="GB: Zrychlení"/>
-		<text name="input_GBMogliDECTOLIMIT"      text="GB: Zpomalení"/>
-		<text name="input_GBMogliECO"             text="GB: EKO mod zap./vyp."/>
-		<text name="input_GBMogliKEEPSPEED"       text="GB: keep speed"/>
-		<text name="GBMogliTEXT_OFF"        text="Vypnutý motor"/>
-		<text name="GBMogliTEXT_AI"         text="AI"/>
-		<text name="GBMogliTEXT_BRAKE"      text="Ruční spojka"/>
-		<text name="GBMogliTEXT_DC"         text="Meziplyn"/>
-		<text name="GBMogliTEXT_NEUTRAL"    text="Neutrál"/>
-		<text name="GBMogliTEXT_AUTO"       text="Automat"/>
-		<text name="GBMogliTEXT_MANUAL"     text="Manuál"/>
-		<text name="GBMogliTEXT_NOGEAR"     text="Nezařazeno"/>
-		<text name="GBMogliTEXT_VARIO"      text="CVT"/>
-		<text name="GBMogliTEXT_ALLAUTO"    text="Zjednodušené ovládání"/>
-		<text name="GBMogliTEXT_ECO"        text="Eko mod"/>
-		<text name="GBMogliTEXT_AUTO_HOLD"  text="Autobrzda"/>
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="GB: Řazení nahoru"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="GB: Řazení dolu"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="GB: Řada 1 nahoru"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="GB: Řada 2 nahoru"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="GB: Řada 1 dolu"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="GB: Řada 2 dolu"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="GB: Neutral"/>
+		<text name="input_gearboxMogliOFF"             text="Ruční řazení [vyp.]"/>
+		<text name="input_gearboxMogliON"              text="Ruční řazení [zap.]"/>
+		<text name="input_gearboxMogliON_OFF"          text="GB: Zap./Vyp."/>
+		<text name="input_gearboxMogliHUD"             text="GB: HUD Zap./Vyp."/>
+		<text name="input_gearboxMogliAllAuto"         text="GB: Přepínač ovládání"/>
+		<text name="input_gearboxMogliAllAutoON"       text="GB [jednoduché]"/>
+		<text name="input_gearboxMogliAllAutoOFF"      text="GB [reálné]"/>
+		<text name="input_gearboxMogliREVERSE"         text="GB: Zpátečka"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="GB: Automat. spojka"/>
+		<text name="input_gearboxMogliCLUTCH"          text="GB: Spojka"/>
+		<text name="input_gearboxMogliCLUTCH_1"        text="GB: Spojka zap."/>
+		<text name="input_gearboxMogliCLUTCH_2"        text="GB: Spojka vyp."/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="GB: Spojka"/>
+		<text name="input_gearboxMogliMINRPM"          text="GB: Ruční plyn"/>
+		<text name="input_gearboxMogliMINRPM_1"        text="GB: Přidat ruční plyn"/>
+		<text name="input_gearboxMogliMINRPM_2"        text="GB: Ubrat ruční plyn"/>
+		<text name="input_gearboxMogliGEAR1"           text="GB: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"           text="GB: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"           text="GB: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"           text="GB: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"           text="GB: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"           text="GB: G27 6"/>
+		<text name="input_gearboxMogliGEARR"           text="GB: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"         text="GB: Dopředu"/>
+		<text name="input_gearboxMogliGEARBACK"        text="GB: Dozadu"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"      text="GB: Tempomat 1"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="GB: Tempomat 2"/>
+		<text name="input_gearboxMogliSETSPEED"        text="GB: Nastav Tempomat"/>
+		<text name="input_gearboxMogliACCTOLIMIT"      text="GB: Zrychlení"/>
+		<text name="input_gearboxMogliDECTOLIMIT"      text="GB: Zpomalení"/>
+		<text name="input_gearboxMogliECO"             text="GB: EKO mod zap./vyp."/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="GB: keep speed"/>
+		<text name="gearboxMogliTEXT_OFF"        text="Vypnutý motor"/>
+		<text name="gearboxMogliTEXT_AI"         text="AI"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="Ruční spojka"/>
+		<text name="gearboxMogliTEXT_DC"         text="Meziplyn"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"    text="Neutrál"/>
+		<text name="gearboxMogliTEXT_AUTO"       text="Automat"/>
+		<text name="gearboxMogliTEXT_MANUAL"     text="Manuál"/>
+		<text name="gearboxMogliTEXT_NOGEAR"     text="Nezařazeno"/>
+		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"    text="Zjednodušené ovládání"/>
+		<text name="gearboxMogliTEXT_ECO"        text="Eko mod"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Autobrzda"/>
 	</texts>
 </l10n>
