@@ -9,6 +9,7 @@
 		<fr>Transmission AddOn</fr>
 		<ru>gearboxMogli</ru>
 		<cz>Řazení AddOn</cz>
+		<pl>Skrzynia biegów</pl>
 	</title>
 	<description>
 		<en><![CDATA[
@@ -62,6 +63,8 @@ gearboxMogli. Добавляет сконфигурированные специ
 Každý traktor nemá zjednodušené ovládání jako stroje ve Farming simulátoru. Tento mod přidává do každého stroje reálnější simulaci řazení převodových stupnů.
 Od manuálního řazení se spojkou a meziplynem, přes různe řady násobičů a redukcí, přes plně automatickou převodovku až po bezestupňové řazení (CVT).
 Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddonConfig.xml. Mód podporuje volanty se spojkou i řadící pákou, což stupňuje požitek ze hry.]]></cz>
+<pl><![CDATA[Skrzynia biegów:
+Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]></pl>
 	</description>
 	<multiplayer supported="true"/>
 	<iconFilename>dds/store.dds</iconFilename>
@@ -69,11 +72,12 @@ Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddo
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			<de>Getriebe v1.9.3.8 von Mogli</de>
-	  	 <en>Gearbox v1.9.3.8 by mogli</en>
-				<it>Cambio v1.9.3.8 by mogli</it>
-	<fr>Transmission v1.9.3.8 by mogli</fr>
-				<cz>Řazení v1.9.3.8 by mogli</cz>
+			 <de>Getriebe v1.9.3.8 von Mogli</de>
+				<en>Gearbox v1.9.3.8 by mogli</en>
+				 <it>Cambio v1.9.3.8 by mogli</it>
+	 <fr>Transmission v1.9.3.8 by mogli</fr>
+				 <cz>Řazení v1.9.3.8 by mogli</cz>
+<pl>Skrzynia biegów v1.9.3.8 by mogli</pl>
 		</text>                  
   </l10n>
 
