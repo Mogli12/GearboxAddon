@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Skrzynia biegów:
+Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]>
+	</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Bieg w górę"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Bieg w dół"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: Zakres 1 w górę"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: Zakres 2 w górę"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Zakres 1 w dół"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Zakres 2 w dół"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: Luz"/>
+		<text name="input_gearboxMogliOFF"             text="Skrzynia biegów [wyłączona]"/>
+		<text name="input_gearboxMogliON"              text="Skrzynia biegów [włączona]"/>
+		<text name="input_gearboxMogliON_OFF"          text="Gearbox: Wł/Wył"/>
+		<text name="input_gearboxMogliHUD"             text="Gearbox: Pokaż/Ukryj HUD"/>
+		<text name="input_gearboxMogliAllAuto"         text="Gearbox: Prełączanie skrzyni"/>
+		<text name="input_gearboxMogliAllAutoON"       text="Skrzynia biegów [uproszczona]"/>
+		<text name="input_gearboxMogliAllAutoOFF"      text="Skrzynia biegów [realistyczna]"/>
+		<text name="input_gearboxMogliREVERSE"         text="Gearbox: Rewers"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: Automatyczne sprzęgło"/>
+		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: Sprzęgło"/>
+		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: Sprzęgło otwarte"/>
+		<text name="input_gearboxMogliCLUTCH_2"        text="Gearbox: Sprzęgło zamknięte"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="Gearbox: Sprzęgło"/>
+		<text name="input_gearboxMogliMINRPM"          text="Gearbox: Gaz ręczny"/>
+		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: Zmniejsz gaz ręczny"/>
+		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: Zwiększ gaz ręczny"/>
+		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"           text="Gearbox: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"           text="Gearbox: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"           text="Gearbox: G27 6"/>
+		<text name="input_gearboxMogliGEARR"           text="Gearbox: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"         text="Gearbox: W przód"/>
+		<text name="input_gearboxMogliGEARBACK"        text="Gearbox: W tył"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"      text="Gearbox: Ogranicznik"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: Tempomat 2"/>
+		<text name="input_gearboxMogliSETSPEED"        text="Gearbox: Ustaw tempomat"/>
+		<text name="input_gearboxMogliACCTOLIMIT"      text="Gearbox: Zwiększanie pręd. temp."/>
+		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: Zmniejszanie pręd. temp."/>
+		<text name="input_gearboxMogliECO"             text="Gearbox: Tryb EKO wł/wył"/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: Tempomat"/>
+		<text name="input_gearboxMogliCONFLICT_1"	   text="Gearbox: Konflikt 1"/>
+		<text name="input_gearboxMogliCONFLICT_2"	   text="Gearbox: Konflikt 2"/>
+		<text name="input_gearboxMogliCONFLICT_3"	   text="Gearbox: Konflikt 3"/>
+		<text name="input_gearboxMogliCONFLICT_4"	   text="Gearbox: Konflikt 4"/>
+		<text name="gearboxMogliTEXT_OFF"        text="Silnik wyłączony"/>
+		<text name="gearboxMogliTEXT_AI"         text="Pomocnik"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="Hamulec ręczny"/>
+		<text name="gearboxMogliTEXT_DC"         text="Podwojne sprzęgło"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"    text="Neutralna"/>
+		<text name="gearboxMogliTEXT_AUTO"       text="Automatyczna"/>
+		<text name="gearboxMogliTEXT_MANUAL"     text="Ręczna"/>
+		<text name="gearboxMogliTEXT_NOGEAR"     text="Luz"/>
+		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"    text="Prosta"/>
+		<text name="gearboxMogliTEXT_ECO"        text="Tryb EKO"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Auto hamulec"/>
+	</texts>
+</l10n>
