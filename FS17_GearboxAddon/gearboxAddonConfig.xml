@@ -1508,6 +1508,35 @@
 	</vehicle>
 	
 	
+	<vehicle>jcbFastrac3000
+		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac3000.xml"/>
+	
+		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="28" maxAIRange2="3" autoStartStop="true">
+			<gears defaultGear="2">	
+				<gear speed="12" name="1"/>
+				<gear speed="22" name="2"/>
+				<gear speed="34" name="3"/>
+				<gear speed="51" name="4"/>
+				<gear speed="63" name="5"/>
+				<gear speed="78" name="6"/>
+			</gears>
+			
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1.0" automatic="true" speedMatching="true">
+				<range ratio="0.692708333" name="A"/>
+				<range ratio="0.822916667" name="B"/>
+				<range ratio="1"           name="C"/>
+			</ranges>
+			
+			<ranges defaultRange="4">
+				<range ratio="0.1927"  name="L" forwardOnly="true"/>
+				<range ratio="0.34375" name="R" reverseOnly="true"/>
+				<range ratio="0.5625"  name="M" forwardOnly="true"/>
+				<range ratio="1"       name="H" forwardOnly="true"/>
+			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+
+
 	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
@@ -2453,7 +2482,6 @@
 			</gears>
 		</gearboxMogli>	
 	</vehicle>
-
 
 
 <!-- ********** Default configuration ******************** -->	

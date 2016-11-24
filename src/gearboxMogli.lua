@@ -1100,7 +1100,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	local prevSpeed, gearTireRevPerKm, gearInvRadiusAxleSpeed
 	self.mrGbMS.Gears     = {} 
 	
-	local i = 0 
+	local b1, b2
+	
+--**************************************************************************************************		
+	local i  = 0 
+	local fo = false
+	local ro = false
 	while true do
 		local baseName = xmlString .. string.format(".gears.gear(%d)", i) 		
 		local speed    = getXMLFloat(xmlFile, baseName .. "#speed") 
@@ -1158,14 +1163,15 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		i = i + 1 
 		local name  = Utils.getNoNil(getXMLString(xmlFile, baseName .. "#name"), tostring(i)) 
 
-		local fwdOnly = getXMLBool(xmlFile, baseName .. "#forwardOnly" )
-		if fwdOnly == nil then
-			fwdOnly = not ( ( reverseMinGear == nil or i >= reverseMinGear )
-									and ( reverseMaxGear == nil or i <= reverseMaxGear ) )
-		end		
-
 		local newEntry = gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, {speed=speed/3.6,name=name} )
 		
+		if newEntry.forwardOnly == nil and ( reverseMinGear ~= nil or reverseMaxGear ~= nil ) then
+			newEntry.forwardOnly = not ( ( reverseMinGear == nil or i >= reverseMinGear ) and ( reverseMaxGear == nil or i <= reverseMaxGear ) )
+		end		
+		
+		if newEntry.forwardOnly then fo = true end
+		if newEntry.reverseOnly then ro = true end
+			
 		newEntry.upRangeOffset   = Utils.getNoNil( getXMLInt( xmlFile, baseName .. "#upRangeOffset" ),  -gearRangeOffset ) 
 		newEntry.downRangeOffset = Utils.getNoNil( getXMLInt( xmlFile, baseName .. "#downRangeOffset" ), gearRangeOffset ) 
 		
@@ -1186,9 +1192,21 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		local newEntry = {speed=self.motor.maxForwardSpeed/self.mrGbMS.GlobalRatioFactor,name=""} 
 		table.insert(self.mrGbMS.Gears, newEntry)  -- m/s
 	end 	
+	
+	b1 = getXMLBool(xmlFile, xmlString .. ".reverse#resetGear")
+	b2 = getXMLBool(xmlFile, xmlString .. ".gears#reverseReset")
+	if b1 == nil and b2 == nil then
+		self.mrGbMS.ReverseResetGear = fo and ro
+	else
+		self.mrGbMS.ReverseResetGear = b1 or b2 
+	end
+
 			
+--**************************************************************************************************		
 	self.mrGbMS.Ranges = {} 
-	i = 0 
+	i  = 0 
+	fo = false
+	ro = false
 	local generateNames = true 
 	while true do
 		local baseName = xmlString .. string.format(".ranges(0).range(%d)", i) 		
@@ -1220,6 +1238,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		
 		local newEntry = gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, {ratio=ratio,name=name} )
 		
+		if newEntry.forwardOnly then fo = true end
+		if newEntry.reverseOnly then ro = true end
+			
 		newEntry.upGearOffset   = Utils.getNoNil( getXMLInt( xmlFile, baseName .. "#upGearOffset" ),  -rangeGearOffset ) 
 		newEntry.downGearOffset = Utils.getNoNil( getXMLInt( xmlFile, baseName .. "#downGearOffset" ), rangeGearOffset ) 
 
@@ -1237,6 +1258,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		table.insert(self.mrGbMS.Ranges, newEntry)  -- m/s
 		generateNames = false
 	end
+	
+	b1 = getXMLBool(xmlFile, xmlString .. ".reverse#resetRange")
+	b2 = getXMLBool(xmlFile, xmlString .. ".ranges(0)#reverseReset")
+	if b1 == nil and b2 == nil then
+		self.mrGbMS.ReverseResetRange = fo and ro
+	else
+		self.mrGbMS.ReverseResetRange = b1 or b2 
+	end
+	
+--**************************************************************************************************		
 	
 	if generateNames then
 		local fwd,rev=0,0
@@ -1305,8 +1336,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end		
 	end
 	
+--**************************************************************************************************		
 	self.mrGbMS.Ranges2 = {} 
-	i = 0 
+	i  = 0 
+	fo = false
+	ro = false
 	while true do
 		local baseName = xmlString .. string.format(".ranges(1).range(%d)", i) 		
 		local ratio = getXMLFloat(xmlFile, baseName .. "#ratio") 
@@ -1328,6 +1362,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end
 		local newEntry = gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, {ratio=ratio,name=name} )
 		
+		if newEntry.forwardOnly then fo = true end
+		if newEntry.reverseOnly then ro = true end
+			
 		table.insert(self.mrGbMS.Ranges2, newEntry)  -- m/s
 	end 
 	
@@ -1336,20 +1373,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		table.insert(self.mrGbMS.Ranges2, newEntry)  -- m/s
 	end
 		
+	b1 = getXMLBool(xmlFile, xmlString .. ".ranges(1)#reverseReset")
+	if b1 == nil then
+		self.mrGbMS.ReverseResetRange2    = fo and ro
+	else
+		self.mrGbMS.ReverseResetRange2    = b1
+	end
+
+	--**************************************************************************************************		
 	self.mrGbMS.ReverseRatio            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#ratio"), 1) 
-	
-	self.mrGbMS.ReverseResetGear        = false 
-	if getXMLBool(xmlFile, xmlString .. ".reverse#resetGear") or getXMLBool(xmlFile, xmlString .. ".gears#reverseReset") then
-		self.mrGbMS.ReverseResetGear      = true 
-	end
-	self.mrGbMS.ReverseResetRange       = false 
-	if getXMLBool(xmlFile, xmlString .. ".reverse#resetRange") or getXMLBool(xmlFile, xmlString .. ".ranges(0)#reverseReset") then
-		self.mrGbMS.ReverseResetRange     = true
-	end
-	self.mrGbMS.ReverseResetRange2      = false
-	if getXMLBool(xmlFile, xmlString .. ".ranges(1)#reverseReset") then
-		self.mrGbMS.ReverseResetRange2    = true
-	end
+
 	
 	local hasDefaultGear = true
 	self.mrGbMS.DefaultGear        = getXMLInt(xmlFile, xmlString .. ".gears#defaultGear")
@@ -2952,9 +2985,9 @@ function gearboxMogli:update(dt)
 	end	
 	
 	
-	if g_gui:getIsGuiVisible() then --or g_currentMission.isPlayerFrozen or g_currentMission.inGameMessage:getIsVisible() then	
-		gearboxMogli.onLeave( self )
-	end
+	--if g_gui:getIsGuiVisible() or g_currentMission.isPlayerFrozen or g_currentMission.inGameMessage:getIsVisible() then	
+	--	gearboxMogli.onLeave( self )
+	--end
 end 
 
 --**********************************************************************************************************	
