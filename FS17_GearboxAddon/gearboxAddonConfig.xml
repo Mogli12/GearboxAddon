@@ -80,23 +80,93 @@
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
 		<gearboxMogli autoStartStop="false" maxAIRange2="3">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
-				<torque rpm="900"  motorTorque="510"/>
-				<torque rpm="1000" motorTorque="525"/>
-				<torque rpm="1100" motorTorque="535"/>
-				<torque rpm="1200" motorTorque="541"/>
-				<torque rpm="1300" motorTorque="546"/>
-				<torque rpm="1400" motorTorque="548"/>
-				<torque rpm="1500" motorTorque="549"/>
-				<torque rpm="1600" motorTorque="550"/>
-				<torque rpm="1700" motorTorque="547"/>
-				<torque rpm="1800" motorTorque="535"/>
-				<torque rpm="1900" motorTorque="517"/>
-				<torque rpm="2000" motorTorque="497"/>
-				<torque rpm="2100" motorTorque="476"/>
-				<torque rpm="2200" motorTorque="456"/>
-				<torque rpm="2300" motorTorque="437"/>
-				<torque rpm="2350" motorTorque="410"/>
-				<torque rpm="2400" motorTorque="0"/>
+        <!-- 2300: 143(143) | 2300: 143(143) | 1600..1600: 549(549) | 94 | 0.7 | 149 | 2 | 2400 | 1460: 211 -->
+        <torque rpm="350" motorTorque="370" fuelUsageRatio="247.8"/>
+        <torque rpm="700" motorTorque="494" fuelUsageRatio="228.3"/>
+        <torque rpm="900" motorTorque="516" fuelUsageRatio="220.4"/>
+        <torque rpm="1000" motorTorque="525" fuelUsageRatio="217.3"/>
+        <torque rpm="1100" motorTorque="532" fuelUsageRatio="214.9"/>
+        <torque rpm="1200" motorTorque="538" fuelUsageRatio="213"/>
+        <torque rpm="1300" motorTorque="543" fuelUsageRatio="211.8"/>
+        <torque rpm="1400" motorTorque="546" fuelUsageRatio="211.1"/>
+        <torque rpm="1500" motorTorque="548" fuelUsageRatio="211.1"/>
+        <torque rpm="1600" motorTorque="549" fuelUsageRatio="211.7"/>
+        <torque rpm="1700" motorTorque="537" fuelUsageRatio="212.9"/>
+        <torque rpm="1800" motorTorque="524" fuelUsageRatio="214.8"/>
+        <torque rpm="1850" motorTorque="517" fuelUsageRatio="216.1"/>
+        <torque rpm="1900" motorTorque="509" fuelUsageRatio="217.4"/>
+        <torque rpm="1950" motorTorque="501" fuelUsageRatio="219"/>
+        <torque rpm="2000" motorTorque="493" fuelUsageRatio="220.7"/>
+        <torque rpm="2050" motorTorque="484" fuelUsageRatio="222.6"/>
+        <torque rpm="2100" motorTorque="476" fuelUsageRatio="224.6"/>
+        <torque rpm="2150" motorTorque="466" fuelUsageRatio="226.8"/>
+        <torque rpm="2200" motorTorque="456" fuelUsageRatio="229.2"/>
+        <torque rpm="2250" motorTorque="446" fuelUsageRatio="231.7"/>
+        <torque rpm="2300" motorTorque="437" fuelUsageRatio="234.4"/>
+        <torque rpm="2350" motorTorque="387" fuelUsageRatio="249.7"/>
+        <torque rpm="2400" motorTorque="240" fuelUsageRatio="321"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="468.9"/>
+			</realEngine>
+		
+			<gears defaultGear="4" shiftTimeMs="800" speedMatching="false">
+				<gear speed="10.0"/>
+				<gear speed="13.5"/>
+				<gear speed="17.0"/>
+				<gear speed="25.0"/>
+				<gear speed="30.0"/>
+				<gear speed="40.0"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" speedMatching="false">
+				<range ratio="0.8" name="I" />
+				<range ratio="1.0" name="II" />
+			</ranges>
+
+			<ranges defaultRange="4" reverseReset="true" doubleClutch="true">
+				<range ratio="0.0425" name="LL" forwardOnly="true"/>
+				<range ratio="0.2275" name="L" forwardOnly="true"/>
+				<range ratio="0.47"   name="M" forwardOnly="true"/>
+				<range ratio="1"      name="H" forwardOnly="true"/>
+				<range ratio="0.44"   name="R" reverseOnly="true"/>
+			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+	
+	<vehicle>FS17_DeutzDX621
+		<mod name="FS17_DeutzDX621">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=57393" />
+			<xmlFile name="deutzAgroStar621.xml" />
+		</mod>
+
+		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
+		<gearboxMogli autoStartStop="false" maxAIRange2="3">
+			<realEngine idleRpm="900" ratedRpm="2300" >
+        <!-- 2300: 113(113) | 2300: 113(113) | 1600..1600: 424.5(425) | 94 | 0.5 | 149 | 2 | 2400 | 1460: 211 -->
+        <torque rpm="350" motorTorque="286" fuelUsageRatio="247.8"/>
+        <torque rpm="700" motorTorque="382" fuelUsageRatio="228.3"/>
+        <torque rpm="900" motorTorque="399" fuelUsageRatio="220.4"/>
+        <torque rpm="1000" motorTorque="406" fuelUsageRatio="217.3"/>
+        <torque rpm="1100" motorTorque="412" fuelUsageRatio="214.9"/>
+        <torque rpm="1200" motorTorque="416" fuelUsageRatio="213"/>
+        <torque rpm="1300" motorTorque="420" fuelUsageRatio="211.8"/>
+        <torque rpm="1400" motorTorque="422" fuelUsageRatio="211.1"/>
+        <torque rpm="1500" motorTorque="424" fuelUsageRatio="211.1"/>
+        <torque rpm="1600" motorTorque="425" fuelUsageRatio="211.7"/>
+        <torque rpm="1700" motorTorque="418" fuelUsageRatio="212.9"/>
+        <torque rpm="1800" motorTorque="410" fuelUsageRatio="214.8"/>
+        <torque rpm="1850" motorTorque="405" fuelUsageRatio="216.1"/>
+        <torque rpm="1900" motorTorque="400" fuelUsageRatio="217.4"/>
+        <torque rpm="1950" motorTorque="395" fuelUsageRatio="219"/>
+        <torque rpm="2000" motorTorque="389" fuelUsageRatio="220.7"/>
+        <torque rpm="2050" motorTorque="383" fuelUsageRatio="222.6"/>
+        <torque rpm="2100" motorTorque="376" fuelUsageRatio="224.6"/>
+        <torque rpm="2150" motorTorque="369" fuelUsageRatio="226.8"/>
+        <torque rpm="2200" motorTorque="360" fuelUsageRatio="229.2"/>
+        <torque rpm="2250" motorTorque="353" fuelUsageRatio="231.7"/>
+        <torque rpm="2300" motorTorque="345" fuelUsageRatio="234.4"/>
+        <torque rpm="2350" motorTorque="306" fuelUsageRatio="249.7"/>
+        <torque rpm="2400" motorTorque="190" fuelUsageRatio="321"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="468.9"/>
 			</realEngine>
 		
 			<gears defaultGear="4" shiftTimeMs="800" speedMatching="false">
@@ -1585,7 +1655,61 @@
 		</gearboxMogli>	
 	</vehicle>
 
+	<vehicle>
+		<mod name="FS17_kirovetsK700A">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=58337" />
+			<xmlFile name="kirovets/KirovetsK700A.xml" />
+		</mod>
 
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Kirovets_K-700A -->
+		<!-- http://www.dlg-test.de/pbdocs/traktoren/kirovets701m.pdf -->
+		<!-- https://data.motor-talk.de/data/galleries/0/73/1160/47059283/kirovets-k-700-a-page-2-1630353563984878437.jpg -->
+		<gearboxMogli autoStartStop="false" speedLimiter="false">
+			<gears  shiftTimeMs="0">
+				<gear speed="17.1"/>
+				<gear speed="20.6"/>
+				<gear speed="24.7"/>
+				<gear speed="29.6"/>
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
+				<range ratio="0.45"  name="L" forwardOnly="true"/>
+				<range ratio="1"     name="H" forwardOnly="true"/>
+				<range ratio="0.777" name="R" reverseOnly="true"/>
+			</ranges>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" doubleClutch="true">
+				<range ratio="0.5" name="A" />
+				<range ratio="1"   name="S" />
+			</ranges>
+			
+			<reverse ratio="1" shiftTimeMs="1200" resetRange="true" resetGear="false"/>
+			
+			<realEngine idleRpm="800" ratedRpm="1900">
+        <!-- 1700: 225(225) | 1900: 220(220) | 1300..1300: 1108(1108) | 90 | 0.5 | 249 | 1.7 | 2000 | 1300: 175 -->
+        <torque rpm="350" motorTorque="570" fuelUsageRatio="218.9"/>
+        <torque rpm="700" motorTorque="879" fuelUsageRatio="192.5"/>
+        <torque rpm="900" motorTorque="997" fuelUsageRatio="182.8"/>
+        <torque rpm="1000" motorTorque="1046" fuelUsageRatio="179.4"/>
+        <torque rpm="1100" motorTorque="1080" fuelUsageRatio="176.9"/>
+        <torque rpm="1200" motorTorque="1101" fuelUsageRatio="175.5"/>
+        <torque rpm="1300" motorTorque="1108" fuelUsageRatio="175"/>
+        <torque rpm="1400" motorTorque="1080" fuelUsageRatio="175.5"/>
+        <torque rpm="1500" motorTorque="1041" fuelUsageRatio="177.2"/>
+        <torque rpm="1600" motorTorque="987" fuelUsageRatio="179.9"/>
+        <torque rpm="1700" motorTorque="929" fuelUsageRatio="183.6"/>
+        <torque rpm="1800" motorTorque="873" fuelUsageRatio="188.5"/>
+        <torque rpm="1850" motorTorque="843" fuelUsageRatio="191.3"/>
+        <torque rpm="1900" motorTorque="813" fuelUsageRatio="194.4"/>
+        <torque rpm="1950" motorTorque="760" fuelUsageRatio="198"/>
+        <torque rpm="2000" motorTorque="641" fuelUsageRatio="214.3"/>
+        <torque rpm="2050" motorTorque="470" fuelUsageRatio="249.2"/>
+        <torque rpm="2100" motorTorque="253" fuelUsageRatio="306.9"/>
+        <torque rpm="2150" motorTorque="0" fuelUsageRatio="388.9"/>
+			</realEngine>
+		</gearboxMogli>	
+	</vehicle>
+	
 	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
 <!-- ********** ZF variable transmission with 4 gears ******************** -->	
