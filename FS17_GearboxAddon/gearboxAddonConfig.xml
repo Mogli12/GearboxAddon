@@ -1511,8 +1511,8 @@
 	<vehicle>jcbFastrac3000
 		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac3000.xml"/>
 	
-		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="28" maxAIRange="3" autoStartStop="true">
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1.0" speedMatching="true">
+		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="28" maxAIRange="3" autoStartStop="true" swapGearRangeKeys="true">
+			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1.0" automatic="true">
 				<gear speed="28.7" name="1"/>
 				<gear speed="34.7" name="2" forwardOnly="true"/>
 				<gear speed="41.8" name="3"/>
@@ -1529,6 +1529,59 @@
 			</ranges>
 			
 			<reverse ratio="0.957" shiftTimeMs="200" clutchRatio="0"/>
+			
+			<engines>
+				<engine name="3200 Xtra" idleRpm="800" ratedRpm="2100">
+					<!-- 1900: 225(195) | 2100: 220(190) | 1500..1500: 960(835) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 210 -->
+					<torque rpm="350" motorTorque="564" motorTorqueEco="490" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="776" motorTorqueEco="675" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="854" motorTorqueEco="743" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="887" motorTorqueEco="771" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="913" motorTorqueEco="794" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="934" motorTorqueEco="812" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="948" motorTorqueEco="825" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="957" motorTorqueEco="833" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="960" motorTorqueEco="835" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="940" motorTorqueEco="817" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="912" motorTorqueEco="792" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="876" motorTorqueEco="759" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="854" motorTorqueEco="739" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="832" motorTorqueEco="720" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="809" motorTorqueEco="700" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="786" motorTorqueEco="680" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="761" motorTorqueEco="658" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="736" motorTorqueEco="635" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="653" motorTorqueEco="564" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="404" motorTorqueEco="349" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+				</engine>
+				
+				<engine name="3230 Xtra" idleRpm="800" ratedRpm="2100">
+					<!-- 1900: 270(230) | 2100: 260(220) | 1500..1800: 1015(964) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 210 -->
+					<!-- max torque rpm for eco is 1500..1500-->
+					<torque rpm="350" motorTorque="596" motorTorqueEco="596" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="820" motorTorqueEco="820" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="903" motorTorqueEco="903" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="937" motorTorqueEco="937" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="965" motorTorqueEco="965" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="987" motorTorqueEco="987" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="1003" motorTorqueEco="1003" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="1012" motorTorqueEco="1012" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="1015" motorTorqueEco="1015" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="1015" motorTorqueEco="989" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="1015" motorTorqueEco="948" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="1015" motorTorqueEco="896" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="1009" motorTorqueEco="873" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="998" motorTorqueEco="850" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="970" motorTorqueEco="826" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="939" motorTorqueEco="799" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="906" motorTorqueEco="769" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="869" motorTorqueEco="736" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="771" motorTorqueEco="653" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="478" motorTorqueEco="404" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>				
+				</engine>
+			</engines>
 		</gearboxMogli>	
 	</vehicle>
 
@@ -2470,12 +2523,65 @@
 	<vehicle>jcbFastrac8000
 		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac8000.xml"/>
 	
-		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="47" maxAIGear="1">
+		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="42" maxAIGear="1">
 			<hydrostatic profile="Output" minRatio="-0.642" maxRatio="1"/>		
 			<gears defaultGear="2" clutchRatio="1">	
-				<gear name="heavy duty" speed="45" />
+				<gear name="heavy duty" speed="40" />
 				<gear name="transport"  speed="70"/>
 			</gears>
+			
+			<engines><!-- these are the new engines of 8290 and 8330 -->
+				<engine name="8280" idleRpm="800" ratedRpm="2100">		
+					<!-- 1900: 306(306) | 2100: 280(280) | 1500..1500: 1310(1310) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 210 -->
+					<torque rpm="350" motorTorque="769" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="1059" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="1166" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="1210" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="1246" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="1274" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="1294" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="1306" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="1310" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="1282" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="1243" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="1192" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="1161" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="1131" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="1096" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="1052" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="998" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="936" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="831" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="515" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+				</engine>		
+
+				<engine name="8310" idleRpm="800" ratedRpm="2100">		
+					<!-- 1900: 348(348) | 2100: 335(335) | 1500..1500: 1440(1440) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 210 -->
+					<torque rpm="350" motorTorque="846" fuelUsageRatio="242.5"/>
+					<torque rpm="700" motorTorque="1164" fuelUsageRatio="223.3"/>
+					<torque rpm="900" motorTorque="1281" fuelUsageRatio="216.1"/>
+					<torque rpm="1000" motorTorque="1330" fuelUsageRatio="213.5"/>
+					<torque rpm="1100" motorTorque="1369" fuelUsageRatio="211.7"/>
+					<torque rpm="1200" motorTorque="1400" fuelUsageRatio="210.5"/>
+					<torque rpm="1300" motorTorque="1422" fuelUsageRatio="210"/>
+					<torque rpm="1400" motorTorque="1436" fuelUsageRatio="210.2"/>
+					<torque rpm="1500" motorTorque="1440" fuelUsageRatio="211.2"/>
+					<torque rpm="1600" motorTorque="1416" fuelUsageRatio="213"/>
+					<torque rpm="1700" motorTorque="1382" fuelUsageRatio="215.5"/>
+					<torque rpm="1800" motorTorque="1339" fuelUsageRatio="218.8"/>
+					<torque rpm="1850" motorTorque="1314" fuelUsageRatio="220.8"/>
+					<torque rpm="1900" motorTorque="1286" fuelUsageRatio="222.9"/>
+					<torque rpm="1950" motorTorque="1250" fuelUsageRatio="225.2"/>
+					<torque rpm="2000" motorTorque="1210" fuelUsageRatio="227.7"/>
+					<torque rpm="2050" motorTorque="1167" fuelUsageRatio="230.4"/>
+					<torque rpm="2100" motorTorque="1120" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="994" fuelUsageRatio="248.6"/>
+					<torque rpm="2200" motorTorque="616" fuelUsageRatio="319.4"/>
+					<torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+					<torque rpm="2300" motorTorque="0" fuelUsageRatio="466.7"/>
+				</engine>					
+			</engines>				
 		</gearboxMogli>	
 	</vehicle>
 

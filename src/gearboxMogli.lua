@@ -408,6 +408,7 @@ function gearboxMogli:initClient()
 	self.mrGbMGetAutoHold          = gearboxMogli.mrGbMGetAutoHold
 	self.mrGbMGetOnlyHandThrottle  = gearboxMogli.mrGbMGetOnlyHandThrottle
 	self.mrGbMGetHydrostaticFactor = gearboxMogli.mrGbMGetHydrostaticFactor
+	self.mrGbMSetLanuchGear        = gearboxMogli.mrGbMSetLanuchGear
 	
 --**********************************************************************************************************	
 
@@ -1794,37 +1795,29 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			self.mrGbMS.HydrostaticStart = math.max( 0, self.mrGbMS.HydrostaticMin )
 		end
 		
-		local dft = 0 -- 1000
-		if hit == nil then
-			-- 2000 ms
-			self.mrGbMS.HydrostaticSmIFactor = 100/dft
-			self.mrGbMS.HydrostaticIncFactor = 1/(dft+dft+dft)
-		elseif hit < 100 then
+		local dft = Utils.getNoNil( hit, 0 ) -- 1000 )
+		if dft < 100 then
 			-- do not smooth 
 			self.mrGbMS.HydrostaticSmIFactor = 1
 			self.mrGbMS.HydrostaticIncFactor = 1
 		else
 			-- see Documents/smooth.xlsx
-			self.mrGbMS.HydrostaticSmIFactor = 100 / hit 
-			self.mrGbMS.HydrostaticIncFactor = 1 / (hit+hit+hit)
+			self.mrGbMS.HydrostaticSmIFactor = 100 / dft 
+			self.mrGbMS.HydrostaticIncFactor = 1 / (dft+dft+dft)
 		end
-		dft = 0 -- 1000
-		if hdt == nil and hit == nil then
-			-- 2000 ms
-			self.mrGbMS.HydrostaticSmDFactor = 100/dft
-			self.mrGbMS.HydrostaticDecFactor = 1/(dft+dft+dft)
-		elseif hdt == nil then
+		dft = Utils.getNoNil( hdt, 0 ) -- 1000
+		if hdt == nil and hit ~= nil then
 			-- compatibility
 			self.mrGbMS.HydrostaticSmDFactor = self.mrGbMS.HydrostaticSmIFactor
 			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor
-		elseif hdt < 100 then
+		elseif dft < 100 then
 			-- do not smooth 
 			self.mrGbMS.HydrostaticSmDFactor = 1
 			self.mrGbMS.HydrostaticDecFactor = 1
 		else
 			-- see Documents/smooth.xlsx
 			self.mrGbMS.HydrostaticSmDFactor = 100 / hdt 
-			self.mrGbMS.HydrostaticDecFactor = 1 / (hdt+hdt+hdt)
+			self.mrGbMS.HydrostaticDecFactor = 1 / (dft+dft+dft)
 		end
 		
 		local sc = getXMLBool(xmlFile, xmlString .. ".hydrostatic#startWithClutch")
@@ -5155,6 +5148,24 @@ function gearboxMogli:setLaunchGear( noEventSend, init )
 end
 
 --**********************************************************************************************************	
+-- gearboxMogli:mrGbMSetLanuchGear
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMSetLanuchGear( noEventSend )
+	if self.steeringEnabled then
+		if self:mrGbMGetAutomatic() then
+			gearboxMogli.setLaunchGear( self, noEventSend )
+		else
+			if self.mrGbMS.MatchGears  == "true" then
+				self:mrGbMSetCurrentGear( self.mrGbMS.LaunchGear, noEventSend ) 					
+			end
+			if self.mrGbMS.MatchRanges == "true" then
+				self:mrGbMSetCurrentRange( self.mrGbMS.LaunchRange, noEventSend ) 	
+			end
+		end
+	end		
+end
+
+--**********************************************************************************************************	
 -- gearboxMogli:mrGbMOnSetReverse
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
@@ -5195,9 +5206,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 	self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2, noEventSend ) 
 	self:mrGbMSetState( "CurrentRange2", gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2, default, "range2" ), noEventSend ) 
 	
-	if self.steeringEnabled and self:mrGbMGetAutomatic() then
-		gearboxMogli.setLaunchGear( self, noEventSend )
-	end	
+	self:mrGbMSetLanuchGear( noEventSend )
 	
 	if self.isServer and self.mrGbML.motor ~= nil then
 		self.mrGbML.motor.speedLimitS = 0
@@ -5236,8 +5245,8 @@ end
 function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )		
 	self.mrGbMS.NeutralActive   = new 
 
-	if new and self:mrGbMGetAutomatic() then 
-		gearboxMogli.setLaunchGear( self, noEventSend )
+	if new then
+		self:mrGbMSetLanuchGear( noEventSend )
 	end
 	
 	if self.isServer then
