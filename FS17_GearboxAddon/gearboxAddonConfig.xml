@@ -1511,28 +1511,24 @@
 	<vehicle>jcbFastrac3000
 		<configFile xmlName="data/vehicles/steerable/jcb/jcbFastrac3000.xml"/>
 	
-		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="28" maxAIRange2="3" autoStartStop="true">
-			<gears defaultGear="2">	
-				<gear speed="12" name="1"/>
-				<gear speed="22" name="2"/>
-				<gear speed="34" name="3"/>
-				<gear speed="51" name="4"/>
-				<gear speed="63" name="5"/>
-				<gear speed="78" name="6"/>
+		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="28" maxAIRange="3" autoStartStop="true">
+			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1.0" speedMatching="true">
+				<gear speed="28.7" name="1"/>
+				<gear speed="34.7" name="2" forwardOnly="true"/>
+				<gear speed="41.8" name="3"/>
+				<gear speed="50.3" name="4" forwardOnly="true"/>
+				<gear speed="60.0" name="5"/>
+				<gear speed="72.5" name="6" forwardOnly="true"/>
 			</gears>
 			
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1.0" automatic="true" speedMatching="true">
-				<range ratio="0.692708333" name="A"/>
-				<range ratio="0.822916667" name="B"/>
-				<range ratio="1"           name="C"/>
+			<ranges defaultRange="3">
+				<range ratio="0.063109049" name="A"/>
+				<range ratio="0.175406032" name="B"/>
+				<range ratio="0.32900232" name="C"/>
+				<range ratio="1"           name="D" forwardOnly="true"/>
 			</ranges>
 			
-			<ranges defaultRange="4">
-				<range ratio="0.1927"  name="L" forwardOnly="true"/>
-				<range ratio="0.34375" name="R" reverseOnly="true"/>
-				<range ratio="0.5625"  name="M" forwardOnly="true"/>
-				<range ratio="1"       name="H" forwardOnly="true"/>
-			</ranges>
+			<reverse ratio="0.957" shiftTimeMs="200" clutchRatio="0"/>
 		</gearboxMogli>	
 	</vehicle>
 
