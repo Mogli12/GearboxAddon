@@ -2425,7 +2425,9 @@ function gearboxMogli:update(dt)
 			end
 		end
 		
-		if self.mrGbMS.ReverseActive and not ( driveControlShuttle ) then
+		if      not ( driveControlShuttle )
+				and ( ( self.mrGbMS.ReverseActive and not ( self.isReverseDriving ) )
+					 or ( not self.mrGbMS.ReverseActive and self.isReverseDriving ) ) then
 			if text  ~= "" then text  = text  .. " " end
 			text = text .. "(R)" 	
 		end
@@ -5734,7 +5736,10 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end
 		
 	self.setBrakeLightsVisibility(self, brakeLights)
-	self.setReverseLightsVisibility(self, self.mrGbMS.ReverseActive)
+	if not ( self.isReverseDriving ) then
+		self.setReverseLightsVisibility(self, self.mrGbMS.ReverseActive)
+	end
+	
 	gearboxMogliMotor.mrGbMUpdateGear( self.motor, acceleration )	
 	
 	local absAccelerationPedal = math.abs(accelerationPedal)
