@@ -48,8 +48,10 @@ gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minGearRatio         = 0.1
 gearboxMogli.minHydrostaticFactor = 0.001
 gearboxMogli.accHydrostaticFactor = 0.1
-gearboxMogli.maxHydroGearRatio    = 377  -- 1.0 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
-gearboxMogli.maxGearRatio         = 1885 -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxGearRatio         = 1885                          -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.minGearRatio         = 1.508                         -- 250 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 5 -- 1.0 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxManualGearRatio   = gearboxMogli.maxGearRatio     -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 gearboxMogli.rpmReduction         = 0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
@@ -6206,6 +6208,39 @@ function gearboxMogliMotor:getHydroEff( h )
 	return 0
 end
 
+
+--**********************************************************************************************************	
+-- gearboxMogliMotor:getGearRatio
+--**********************************************************************************************************	
+function gearboxMogliMotor:getGearRatio()
+	if type( self.gearRatio ) ~= "number" then
+		print("FS17_GearboxAddon: Error! self.gearRatio is not a number: "..tostring(self.gearRatio))
+		return gearboxMogli.maxGearRatio
+	end
+	
+	local a = math.abs( self.gearRatio )
+	
+	if a < gearboxMogli.minGearRatio then
+		print("FS17_GearboxAddon: Error! self.gearRatio is too small: "..tostring(self.gearRatio))
+		if self.gearRatio < 0 then
+			return -gearboxMogli.minGearRatio
+		else
+			return  gearboxMogli.minGearRatio
+		end
+	end
+
+	if a > gearboxMogli.maxGearRatio then
+		print("FS17_GearboxAddon: Error! self.gearRatio is too big: "..tostring(self.gearRatio))
+		if self.gearRatio < 0 then
+			return -gearboxMogli.maxGearRatio
+		else
+			return  gearboxMogli.maxGearRatio
+		end
+	end
+
+	return self.gearRatio
+end
+
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getMogliGearRatio
 --**********************************************************************************************************	
@@ -7206,29 +7241,22 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 	self.motorLoadP = 0
 	
-	if     not ( self.vehicle.isMotorStarted )          then
-		self.motorLoadP = 0
+	if     not ( self.vehicle.isMotorStarted ) then
 		self.motorLoadS1 = nil
---elseif self.vehicle.mrGbML.gearShiftingNeeded > 0   then
---	self.motorLoadP = self.motorLoadS
-	elseif self.lastRealMotorRpm >= self.maxAllowedRpm or self.lastMotorTorque < gearboxMogli.eps then
 		self.motorLoadP = 0
---elseif self.lastRealMotorRpm > self.ratedRpm and self.maxRatedTorque > self.lastMotorTorque then
---	local refTorque = self.lastMotorTorque + ( self.lastRealMotorRpm - self.ratedRpm ) / ( self.maxAllowedRpm - self.ratedRpm ) * ( self.maxRatedTorque - self.lastMotorTorque )
---	self.motorLoadP = Utils.clamp( self.motorLoad / refTorque, 0, 1 )
-	elseif self.prevMotorRpm > self.ratedRpm and self.lastMotorTorque * self.prevMotorRpm  < self.maxRatedTorque * self.ratedRpm then
-		self.motorLoadP = Utils.clamp( self.motorLoad * self.prevMotorRpm / ( self.maxRatedTorque * self.ratedRpm ), 0, 1 )
-	elseif self.lastMissingTorque > 0 then
-		self.motorLoadP = 1
-	elseif lastNoTorque then
+	elseif self.lastRealMotorRpm >= self.maxAllowedRpm or self.lastMotorTorque < gearboxMogli.eps then
 		self.motorLoadP = 0
 	else
 		self.motorLoadP = self.motorLoad / self.lastMotorTorque
 	end
-	
---if lastNoTransmission or lastNoTorque then
---	self.motorLoadP = math.max( self.motorLoadP, self.lastThrottle )
---end
+
+	if     self.prevMotorRpm > self.ratedRpm and self.lastMotorTorque * self.prevMotorRpm  < self.maxRatedTorque * self.ratedRpm then
+		self.motorLoadP = 0.2 * self.motorLoadP + 0.8 * self.motorLoad * self.prevMotorRpm / ( self.maxRatedTorque * self.ratedRpm )
+	elseif self.lastMissingTorque > 0 and self.motorLoadP < 1 then
+		self.motorLoadP = 1
+	elseif lastNoTorque then
+		self.motorLoadP = 0
+	end
 
 	if self.requestedPower1 == nil then
 		self.requestedPower1 = requestedPower
@@ -7892,11 +7920,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					self.hydrostaticFactor = hMin0 
 				elseif self.autoClutchPercent + gearboxMogli.eps < 1 then
 					clutchMode             = 1
-					self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / gearboxMogli.maxGearRatio )
-				elseif self.hydrostaticFactor < r / gearboxMogli.maxGearRatio then
+					self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / gearboxMogli.maxManualGearRatio )
+				elseif self.hydrostaticFactor < r / gearboxMogli.maxManualGearRatio then
 					-- open clutch to stop
 					clutchMode             = 1
-					self.hydrostaticFactor = r / gearboxMogli.maxGearRatio
+					self.hydrostaticFactor = r / gearboxMogli.maxManualGearRatio
 				else				
 					local smallestGearSpeed  = self.vehicle.mrGbMS.Gears[bestG].speed 
 																	 * self.vehicle.mrGbMS.Ranges[1].ratio 
@@ -7913,7 +7941,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					else
 						clutchMode             = 0
 						self.autoClutchPercent = self.vehicle.mrGbMS.MaxClutchPercent
-						self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / gearboxMogli.maxGearRatio )
+						self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / gearboxMogli.maxManualGearRatio )
 					end			
 				end			
 				
@@ -8849,7 +8877,7 @@ function gearboxMogliMotor:combineGear( I2g, I2r )
 end
 
 function gearboxMogliMotor:getMotorLoad()
-	return self.maxMotorTorque * ( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp )
+	return self.maxMotorTorque * Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 )
 end
 
 function gearboxMogliMotor:getMinRpm()
