@@ -48,10 +48,10 @@ gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minGearRatio         = 0.1
 gearboxMogli.minHydrostaticFactor = 0.001
 gearboxMogli.accHydrostaticFactor = 0.1
-gearboxMogli.maxGearRatio         = 1885                          -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
-gearboxMogli.minGearRatio         = 1.508                         -- 250 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
-gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 5 -- 1.0 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
-gearboxMogli.maxManualGearRatio   = gearboxMogli.maxGearRatio     -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxGearRatio         = 37699.11184                     -- 0.01 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.minGearRatio         = 1.508                           -- 250 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 100 -- 1.0 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxManualGearRatio   = gearboxMogli.maxGearRatio / 20  -- 0.2 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 gearboxMogli.rpmReduction         = 0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
@@ -95,7 +95,6 @@ gearboxMogli.deltaLimitTimeMs     = 500
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
 gearboxMogli.speedLimitMode       = "B" -- "T"orque limit only / "M"ax RPM only / "B"oth
 gearboxMogli.motorBrakeTime       = 250     
-gearboxMogli.hackSounds           = false
 gearboxMogli.motorLoadExp         = 1.5
 
 gearboxMogliGlobals                       = {}
@@ -163,93 +162,6 @@ gearboxMogliGlobals.motorLoadVolumeBrakeR = -1    -- make some noise with motor 
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 gearboxMogliGlobals.momentOfInertia       = 2     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 
---**********************************************************************************************************	
--- setSampleVolume
---**********************************************************************************************************	
-gearboxMogli.builtInSetSampleVolume   = setSampleVolume
-gearboxMogli.SoundUtilSetSampleVolume = SoundUtil.setSampleVolume
-gearboxMogli.disabledVolumes          = {}
-setSampleVolume = function( sample, volume )
-	if gearboxMogli.disabledVolumes[sample] then
-		return 
-	end
-	gearboxMogli.builtInSetSampleVolume( sample, volume )
-end
-
-SoundUtil.setSampleVolume = function( sound, volume, ... )
-	if sound ~= nil and sound.sample ~= nil then
-		sound.mrGbMVolumeO = volume 
-	end
-	gearboxMogli.SoundUtilSetSampleVolume( sound, volume, ... )
-end
-
---**********************************************************************************************************	
--- gearboxMogli.setSampleVolume 
---**********************************************************************************************************	
-function gearboxMogli.setSampleVolume( sound, volume )
-	if sound ~= nil and sound.sample ~= nil then
-		gearboxMogli.disabledVolumes[sound.sample] = true
-		sound.mrGbMVolume = volume 
-		if sound.mrGbMVolumeO ~= nil then
-			sound.mrGbMVolumeD = volume - sound.mrGbMVolumeO
-		end
-		gearboxMogli.builtInSetSampleVolume( sound.sample, volume )
-	end
-end
-
---**********************************************************************************************************	
--- gearboxMogli.resetSampleVolume 
---**********************************************************************************************************	
-function gearboxMogli.resetSampleVolume( sound )
-	if sound ~= nil and sound.sample ~= nil then
-		gearboxMogli.disabledVolumes[sound.sample] = false
-		gearboxMogli.builtInSetSampleVolume( sound.sample, Utils.getNoNil( sound.mrGbMVolumeO, 0 ) )
-	end
-end
-
---**********************************************************************************************************	
--- setSamplePitch
---**********************************************************************************************************	
-gearboxMogli.builtInSetSamplePitch   = setSamplePitch
-gearboxMogli.SoundUtilSetSamplePitch = SoundUtil.setSamplePitch
-gearboxMogli.disabledPitches         = {}
-setSamplePitch = function( sample, pitch )
-	if gearboxMogli.disabledPitches[sample] then
-		return 
-	end
-	gearboxMogli.builtInSetSamplePitch( sample, pitch )
-end
-
-SoundUtil.setSamplePitch = function( sound, pitch, ... )
-	if sound ~= nil and sound.sample ~= nil then
-		sound.mrGbMPitchO = pitch 
-	end
-	gearboxMogli.SoundUtilSetSamplePitch( sound, pitch, ... )
-end
-
---**********************************************************************************************************	
--- gearboxMogli.setSamplePitch 
---**********************************************************************************************************	
-function gearboxMogli.setSamplePitch( sound, pitch )
-	if sound ~= nil and sound.sample ~= nil then
-		gearboxMogli.disabledPitches[sound.sample] = true
-		sound.mrGbMPitch = pitch 
-		if sound.mrGbMPitchO ~= nil then
-			sound.mrGbMPitchD = pitch - sound.mrGbMPitchO
-		end
-		gearboxMogli.builtInSetSamplePitch( sound.sample, pitch )
-	end
-end
-
---**********************************************************************************************************	
--- gearboxMogli.resetSamplePitch 
---**********************************************************************************************************	
-function gearboxMogli.resetSamplePitch( sound )
-	if sound ~= nil and sound.sample ~= nil then
-		gearboxMogli.disabledPitches[sound.sample] = false
-		gearboxMogli.builtInSetSamplePitch( sound.sample, Utils.getNoNil( sound.mrGbMPitchO, sound.pitchOffset ) )
-	end
-end
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 
@@ -2247,16 +2159,6 @@ function gearboxMogli:update(dt)
 		end
 	end
 	
-	if self.mrGbML.soundModified and not ( self.mrGbMS.IsOn and gearboxMogli.hackSounds ) then
-		self.mrGbML.soundModified = false
-		gearboxMogli.resetSampleVolume( self.sampleMotor )
-		gearboxMogli.resetSampleVolume( self.sampleMotorRun )
-		gearboxMogli.resetSampleVolume( self.sampleMotorLoad )
-		gearboxMogli.resetSamplePitch( self.sampleMotor )
-		gearboxMogli.resetSamplePitch( self.sampleMotorRun )
-		gearboxMogli.resetSamplePitch( self.sampleMotorLoad )
-	end
-	
 	if      self.mrGbMS.IsOnOff 
 			and self.mrGbML.turnedOffByIncreaseRPMWhileTipping
 			and not ( self.hasChangedGearBoxAddon ) then
@@ -2862,42 +2764,11 @@ function gearboxMogli:update(dt)
 -- sound pitch and volume
 --**********************************************************************************************************			
 	
-	if      self:getIsMotorStarted()
-			and self.isClient
-			and gearboxMogli.hackSounds
-			and ( (self.wheels ~= nil and table.getn(self.wheels) > 0) 
-				 or (self.dummyWheels ~= nil and table.getn(self.dummyWheels) > 0) )
-			then
-		
-		self.mrGbML.soundModified	= true
-		
-		local minRpm = self.mrGbMS.CurMinRpm
-		local maxRpm = self.mrGbMS.CurMaxRpm
-		local roundPerMinute = self:mrGbMGetCurrentRPM() - minRpm
-		local roundPerSecondSmoothed = roundPerMinute / 60;
-		if self.sampleMotor.sample ~= nil then
-			local motorSoundPitch = math.min(self.mrGbMS.Sound.IdlePitchOffset + self.mrGbMS.Sound.IdlePitchScale*math.abs(roundPerSecondSmoothed), self.mrGbMS.Sound.IdlePitchMax);
-			gearboxMogli.setSamplePitch(self.sampleMotor, motorSoundPitch);
-			local deltaVolume = (self.sampleMotor.volume - self.motorSoundVolumeMin) * math.max(0.0, math.min(1.0, self:getLastSpeed()/self.motorSoundVolumeMinSpeed))
-			gearboxMogli.setSampleVolume(self.sampleMotor, math.max(self.motorSoundVolumeMin, self.sampleMotor.volume - deltaVolume));
-		end;
-		if self.sampleMotorRun.sample ~= nil then
-			local motorSoundRunPitch = math.min(self.mrGbMS.Sound.RunPitchOffset + self.mrGbMS.Sound.RunPitchScale*math.abs(roundPerSecondSmoothed), self.mrGbMS.Sound.RunPitchMax);
-			gearboxMogli.setSamplePitch(self.sampleMotorRun, motorSoundRunPitch);
-			local runVolume = roundPerMinute/(maxRpm - minRpm);
-			runVolume = 0.65 * Utils.clamp(runVolume, 0.0, 1.0) + 0.5 * Utils.clamp( self.motorSoundLoadFactor - 0.3, 0.0, 0.7 )
-			if self.sampleMotorLoad.sample == nil then
-				gearboxMogli.setSampleVolume(self.sampleMotorRun, runVolume * self.sampleMotorRun.volume);
-			else
-				local motorSoundLoadPitch = math.min(self.mrGbMS.Sound.LoadPitchOffset + self.mrGbMS.Sound.LoadPitchScale*math.abs(roundPerSecondSmoothed), self.mrGbMS.Sound.LoadPitchMax);
-				gearboxMogli.setSamplePitch(self.sampleMotorLoad, motorSoundLoadPitch);
-				gearboxMogli.setSampleVolume(self.sampleMotorRun,  math.max(self.motorSoundRunMinimalVolumeFactor, (1.0 - self.motorSoundLoadFactor) * runVolume * self.sampleMotorRun.volume) );
-				gearboxMogli.setSampleVolume(self.sampleMotorLoad, math.max(self.motorSoundLoadMinimalVolumeFactor, self.motorSoundLoadFactor * runVolume * self.sampleMotorLoad.volume) );
-			end
-		end
-	elseif self.sampleMotorLoad.sample ~= nil and self.motorSoundLoadFactor > 0.5 then
+	if self.motorSoundLoadFactor ~= nil and self.motorSoundLoadFactor > 0.5 then
 	-- at least half of the motor sound load volume even at low RPM
 		self.motorSoundLoadMinimalVolumeFactor = math.max( self.mrGbMS.Sound.LoadMinimalVolumeFactor, ( self.motorSoundLoadFactor - 0.5 ) * self.sampleMotorLoad.volume )
+	else
+		self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
 	end			
 
 	if      self.steeringEnabled 
@@ -4384,7 +4255,7 @@ end
 function gearboxMogli:mrGbMGetCurrentRPM()
 	if self.mrGbML.motor == nil then
 		if self.motor ~= nil then
-			return self.motor.equalizedMotorRpm 
+			return self.motor:getEqualizedMotorRpm()
 		else
 			return nil
 		end
@@ -6208,37 +6079,53 @@ function gearboxMogliMotor:getHydroEff( h )
 	return 0
 end
 
-
 --**********************************************************************************************************	
--- gearboxMogliMotor:getGearRatio
+-- gearboxMogliMotor:getLimitedGearRatio
 --**********************************************************************************************************	
-function gearboxMogliMotor:getGearRatio()
-	if type( self.gearRatio ) ~= "number" then
-		print("FS17_GearboxAddon: Error! self.gearRatio is not a number: "..tostring(self.gearRatio))
-		return gearboxMogli.maxGearRatio
+function gearboxMogliMotor:getLimitedGearRatio( r, withSign )
+	if type( r ) ~= "number" then
+		print("FS17_GearboxAddon: Error! gearRatio is not a number: "..tostring(r))
+		gearboxMogli.printCallStack( self.vehicle )
+		if self.vehicle.mrGbMS.ReverseActive then
+			return -gearboxMogli.maxGearRatio
+		else
+			return  gearboxMogli.maxGearRatio
+		end
 	end
 	
-	local a = math.abs( self.gearRatio )
+	local a = r
+	if withSign and r < 0 then
+		a = -r
+	end		
 	
 	if a < gearboxMogli.minGearRatio then
-		print("FS17_GearboxAddon: Error! self.gearRatio is too small: "..tostring(self.gearRatio))
-		if self.gearRatio < 0 then
+		print("FS17_GearboxAddon: Error! gearRatio is too small: "..tostring(r))
+		gearboxMogli.printCallStack( self.vehicle )
+		if withSign and r < 0 then
 			return -gearboxMogli.minGearRatio
 		else
 			return  gearboxMogli.minGearRatio
 		end
 	end
-
+	
 	if a > gearboxMogli.maxGearRatio then
-		print("FS17_GearboxAddon: Error! self.gearRatio is too big: "..tostring(self.gearRatio))
-		if self.gearRatio < 0 then
+		print("FS17_GearboxAddon: Error! gearRatio is too big: "..tostring(r))
+		gearboxMogli.printCallStack( self.vehicle )
+		if withSign and r < 0 then
 			return -gearboxMogli.maxGearRatio
 		else
 			return  gearboxMogli.maxGearRatio
 		end
 	end
 
-	return self.gearRatio
+	return r
+end
+
+--**********************************************************************************************************	
+-- gearboxMogliMotor:getGearRatio
+--**********************************************************************************************************	
+function gearboxMogliMotor:getGearRatio()
+	return self:getLimitedGearRatio( self.gearRatio, true )
 end
 
 --**********************************************************************************************************	
@@ -6833,29 +6720,34 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		local r = self:getMogliGearRatio()
 	
 		if      self.hydrostaticFactor < gearboxMogli.minHydrostaticFactor then
-			self.lastGearRatio = gearboxMogli.maxHydroGearRatio
+			if self.vehicle.mrGbMS.ReverseActive then 
+				self.lastGearRatio = -gearboxMogli.maxHydroGearRatio
+			else
+				self.lastGearRatio =  gearboxMogli.maxHydroGearRatio
+			end
 		end
 		
+		local gMax = gearboxMogli.huge
 		if      self.vehicle.mrGbMS.HydrostaticMaxTorque ~= nil
 				and torque > self.hydrostaticFactor * ( torque + self.vehicle.mrGbMS.HydrostaticMaxTorque ) then
-			self.ratioFactorG = 1 + self.vehicle.mrGbMS.HydrostaticMaxTorque / torque
-		elseif gearboxMogli.maxHydroGearRatio * self.hydrostaticFactor < self:getMogliGearRatio()  then
-			self.ratioFactorG = gearboxMogli.maxHydroGearRatio / r
-		else
-			self.ratioFactorG = 1 / self.hydrostaticFactor
+			gMax = 1 + self.vehicle.mrGbMS.HydrostaticMaxTorque / torque
 		end
 		
-		local g = r * self.ratioFactorG
+		if gearboxMogli.maxHydroGearRatio * self.hydrostaticFactor < r then
+			self.ratioFactorG = math.min( gMax, gearboxMogli.maxHydroGearRatio / r )
+		else
+			self.ratioFactorG = math.min( gMax, 1 / self.hydrostaticFactor )
+		end
+		
+		local g = self:getLimitedGearRatio( r * self.ratioFactorG, false )
 		if self.lastGearRatio ~= nil then
-			if self.vehicle.mrGbMS.ReverseActive then 
-				self.lastGearRatio = -self.lastGearRatio
-			end
-			if self.lastGearRatio > 0 then
-				if g > self.lastGearRatio + 1 or g < self.lastGearRatio - 1 then
+			local l = self:getLimitedGearRatio( math.abs( self.lastGearRatio ), false )
+			if self.lastGearRatio >= gearboxMogli.minGearRatio then
+				if g > l + 1 or g < l - 1 then
 				--g = self.lastGearRatio + self.vehicle.mrGbML.smoothLittle * ( g - self.lastGearRatio )
 					local i1 = 1 / g
-					local i2 = 1 / self.lastGearRatio
-					g = 1 / ( i2 + self.vehicle.mrGbML.smoothLittle * ( i1 - i2 ) )
+					local i2 = 1 / l
+					g = self:getLimitedGearRatio( 1 / ( i2 + self.vehicle.mrGbML.smoothLittle * ( i1 - i2 ) ), false )
 				end
 				self.ratioFactorG = g / r
 			end

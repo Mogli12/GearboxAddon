@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="32">
 	<author>Mogli aka Biedens; Italian translation by zed636</author>
+	<iconFilename>dds/store.dds</iconFilename>
+	<version>1.9.4.2</version>
+	<multiplayer supported="true"/>
+	
+	<l10n filenamePrefix="modDesc_l10n">
+		<text name="gearboxMogliVERSION">
+			 <de>Getriebe v1.9.4.2 von Mogli</de>
+				<en>Gearbox v1.9.4.2 by mogli</en>
+				 <it>Cambio v1.9.4.2 by mogli</it>
+	 <fr>Transmission v1.9.4.2 by mogli</fr>
+				 <cz>Řazení v1.9.4.2 by mogli</cz>
+<pl>Skrzynia biegów v1.9.4.2 by mogli</pl>
+		</text>                  
+  </l10n>
+
 	<title>
 		<en>Gearbox AddOn</en>
 		<de>Getriebe AddOn</de>
@@ -66,20 +81,6 @@ Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddo
 <pl><![CDATA[Skrzynia biegów:
 Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]></pl>
 	</description>
-	<multiplayer supported="true"/>
-	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.4.1</version>
-	
-	<l10n filenamePrefix="modDesc_l10n">
-		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v1.9.4.1 von Mogli</de>
-				<en>Gearbox v1.9.4.1 by mogli</en>
-				 <it>Cambio v1.9.4.1 by mogli</it>
-	 <fr>Transmission v1.9.4.1 by mogli</fr>
-				 <cz>Řazení v1.9.4.1 by mogli</cz>
-<pl>Skrzynia biegów v1.9.4.1 by mogli</pl>
-		</text>                  
-  </l10n>
 
 	<inputBindings>
 		<input name="gearboxMogliSHIFTGEARUP" 	  key1="KEY_leftbracket"             button="BUTTON_3"  category="VEHICLE" />
