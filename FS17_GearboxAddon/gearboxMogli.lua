@@ -133,8 +133,8 @@ gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 14   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
 gearboxMogliGlobals.combineDynamicChopper = 0.8
-gearboxMogliGlobals.dtDeltaTargetFast     = 0.0004 -- 2.5 second 
-gearboxMogliGlobals.dtDeltaTargetSlow     = 0.0001 --  10 seconds
+gearboxMogliGlobals.dtDeltaTargetFast     = 0.0005 --  2 second 
+gearboxMogliGlobals.dtDeltaTargetSlow     = 0.0001 -- 10 seconds
 gearboxMogliGlobals.ddsDirectory          = "dds/"
 gearboxMogliGlobals.initMotorOnLoad       = true
 gearboxMogliGlobals.ptoSpeedLimit         = true
@@ -5866,44 +5866,43 @@ function gearboxMogliMotor:new( vehicle, motor )
 		end
 	end
 	
+	local minTargetRpm = math.max( vehicle.mrGbMS.MinTargetRpm, self.vehicle.mrGbMS.IdleRpm+1 )
 	
 	self.rpmPowerCurve  = AnimCurve:new( interpolFunction, interpolDegree )	
-	self.maxPower       = self.vehicle.mrGbMS.IdleRpm * self.torqueCurve:get( self.vehicle.mrGbMS.IdleRpm ) 		
+	self.maxPower       = minTargetRpm * self.torqueCurve:get( minTargetRpm ) 		
 	self.maxPowerRpm    = self.vehicle.mrGbMS.RatedRpm 
 	self.maxMaxPowerRpm = self.vehicle.mrGbMS.RatedRpm
-	self.rpmPowerCurve:addKeyframe( {v=self.vehicle.mrGbMS.IdleRpm,  time=0} )				
-	self.rpmPowerCurve:addKeyframe( {v=self.vehicle.mrGbMS.IdleRpm+1,time=self.maxPower} )		
+	self.rpmPowerCurve:addKeyframe( {v=minTargetRpm-1, time=0} )				
+	self.rpmPowerCurve:addKeyframe( {v=minTargetRpm,   time=0.8*self.maxPower} )		
 
 	local lastP = self.maxPower 
 	local lastR = self.maxPowerRpm
 
 	for _,k in pairs(self.torqueCurve.keyframes) do			
 		local p = k.v*k.time
-		if self.maxPower < p then
+		if     p      >  self.maxPower then
 			self.maxPower       = p
 			self.maxPowerRpm    = k.time
 			self.maxMaxPowerRpm = k.time
 			self.rpmPowerCurve:addKeyframe( {v=k.time, time=0.8*self.maxPower} )		
-		elseif k.time <= self.vehicle.mrGbMS.RatedRpm then
-			if      p     >= gearboxMogli.maxPowerLimit * self.maxPower then
-				self.maxMaxPowerRpm = k.time
-			elseif  lastP >= gearboxMogli.maxPowerLimit * self.maxPower 
-			    and lastP >  p + gearboxMogli.eps then
-				self.maxMaxPowerRpm = lastR + ( k.time - lastR ) * ( lastP - gearboxMogli.maxPowerLimit * self.maxPower ) / ( lastP - p )
-			end
+		elseif  p     >= gearboxMogli.maxPowerLimit * self.maxPower then
+			self.maxMaxPowerRpm = k.time
+		elseif  lastP >= gearboxMogli.maxPowerLimit * self.maxPower 
+		    and lastP >  p + gearboxMogli.eps then
+			self.maxMaxPowerRpm = lastR + ( k.time - lastR ) * ( lastP - gearboxMogli.maxPowerLimit * self.maxPower ) / ( lastP - p )
 		end
 		lastP = p
 		lastR = k.time
 	end
 	self.rpmPowerCurve:addKeyframe( {v=self.maxMaxPowerRpm, time=self.maxPower} )			
 	
-	self.maxMaxPowerRpm = math.min( self.maxMaxPowerRpm + gearboxMogli.maxPowerPlusRpm, self.vehicle.mrGbMS.RatedRpm )
+--self.maxMaxPowerRpm = math.min( self.maxMaxPowerRpm + gearboxMogli.maxPowerPlusRpm, self.vehicle.mrGbMS.RatedRpm )
 	
 	if self.ecoTorqueCurve ~= nil then
-		self.maxEcoPower   = self.vehicle.mrGbMS.IdleRpm * self.ecoTorqueCurve:get( self.vehicle.mrGbMS.IdleRpm ) 		
+		self.maxEcoPower   = minTargetRpm * self.ecoTorqueCurve:get( minTargetRpm ) 		
 		self.ecoPowerCurve = AnimCurve:new( interpolFunction, interpolDegree )
-		self.ecoPowerCurve:addKeyframe( {v=self.vehicle.mrGbMS.IdleRpm,  time=0} )				
-		self.ecoPowerCurve:addKeyframe( {v=self.vehicle.mrGbMS.IdleRpm+1,time=self.maxEcoPower} )		
+		self.ecoPowerCurve:addKeyframe( {v=minTargetRpm-1, time=0} )				
+		self.ecoPowerCurve:addKeyframe( {v=minTargetRpm,   time=0.8*self.maxEcoPower} )		
 		for _,k in pairs(self.ecoTorqueCurve.keyframes) do			
 			local p = k.v*k.time
 			if self.maxEcoPower < p then
