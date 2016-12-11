@@ -2,17 +2,17 @@
 <modDesc descVersion="32">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>1.9.4.8</version>
+	<version>1.9.4.9</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v1.9.4.8 von Mogli</de>
-				<en>Gearbox v1.9.4.8 by mogli</en>
-				 <it>Cambio v1.9.4.8 by mogli</it>
-	 <fr>Transmission v1.9.4.8 by mogli</fr>
-				 <cz>Řazení v1.9.4.8 by mogli</cz>
-<pl>Skrzynia biegów v1.9.4.8 by mogli</pl>
+			 <de>Getriebe v1.9.4.9 von Mogli</de>
+				<en>Gearbox v1.9.4.9 by mogli</en>
+				 <it>Cambio v1.9.4.9 by mogli</it>
+	 <fr>Transmission v1.9.4.9 by mogli</fr>
+				 <cz>Řazení v1.9.4.9 by mogli</cz>
+<pl>Skrzynia biegów v1.9.4.9 by mogli</pl>
 		</text>                  
   </l10n>
 
