@@ -3815,19 +3815,20 @@ function gearboxMogli:mrGbMGetRangeForNewGear( newGear )
 		newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset
 	end
 
-	if     self:mrGbMGetAutoShiftRange()
-			or ( self.mrGbMS.MatchRanges ~= nil
-			 and self.mrGbMS.MatchRanges ~= "false"
-			 and ( self.mrGbMS.G27Mode    <= 0
-					or not self.mrGbMS.SwapGearRangeKeys )
-			 and ( ( newGear ~= self.mrGbMS.CurrentGear
-				 	 and self.mrGbMS.MatchRanges == "true" )
-					or ( newGear > self.mrGbMS.CurrentGear
-					 and self.mrGbMS.MatchRanges == "end"
-					 and self.mrGbMS.CurrentRange == table.getn( self.mrGbMS.Ranges ) )
-					or ( newGear < self.mrGbMS.CurrentGear
-					 and self.mrGbMS.MatchRanges == "end"
-					 and self.mrGbMS.CurrentRange == 1 ) ) ) then
+	if      not self.mrGbMS.NeutralActive
+			and ( self:mrGbMGetAutoShiftRange()
+				 or ( self.mrGbMS.MatchRanges ~= nil
+					and self.mrGbMS.MatchRanges ~= "false"
+					and ( self.mrGbMS.G27Mode    <= 0
+						 or not self.mrGbMS.SwapGearRangeKeys )
+					and ( ( newGear ~= self.mrGbMS.CurrentGear
+							and self.mrGbMS.MatchRanges == "true" )
+						 or ( newGear > self.mrGbMS.CurrentGear
+							and self.mrGbMS.MatchRanges == "end"
+							and self.mrGbMS.CurrentRange == table.getn( self.mrGbMS.Ranges ) )
+						 or ( newGear < self.mrGbMS.CurrentGear
+							and self.mrGbMS.MatchRanges == "end"
+							and self.mrGbMS.CurrentRange == 1 ) ) ) ) then
 		
 		local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
 		local delta = nil
@@ -3917,19 +3918,20 @@ function gearboxMogli:mrGbMGetGearForNewRange( newRange )
 		newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset
 	end
 	
-	if     self:mrGbMGetAutoShiftGears()
-			or ( self.mrGbMS.MatchGears ~= nil
-			 and self.mrGbMS.MatchGears ~= "false"
-			 and ( self.mrGbMS.G27Mode    <= 0
-					or self.mrGbMS.SwapGearRangeKeys )
-			 and ( ( newRange ~= self.mrGbMS.CurrentRange
-					 and self.mrGbMS.MatchGears == "true" )
-					or ( newRange > self.mrGbMS.CurrentRange
-					 and self.mrGbMS.MatchGears == "end"
-					 and self.mrGbMS.CurrentGear == table.getn( self.mrGbMS.Gears ) )
-					or ( newRange < self.mrGbMS.CurrentRange
-					 and self.mrGbMS.MatchGears == "end"
-					 and self.mrGbMS.CurrentGear == 1 ) ) ) then
+	if      not self.mrGbMS.NeutralActive
+			and ( self:mrGbMGetAutoShiftGears()
+				 or ( self.mrGbMS.MatchGears ~= nil
+					and self.mrGbMS.MatchGears ~= "false"
+					and ( self.mrGbMS.G27Mode    <= 0
+						 or self.mrGbMS.SwapGearRangeKeys )
+					and ( ( newRange ~= self.mrGbMS.CurrentRange
+							and self.mrGbMS.MatchGears == "true" )
+						 or ( newRange > self.mrGbMS.CurrentRange
+							and self.mrGbMS.MatchGears == "end"
+							and self.mrGbMS.CurrentGear == table.getn( self.mrGbMS.Gears ) )
+						 or ( newRange < self.mrGbMS.CurrentRange
+							and self.mrGbMS.MatchGears == "end"
+							and self.mrGbMS.CurrentGear == 1 ) ) ) ) then
 		
 		local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
 		local delta = nil
@@ -4033,7 +4035,7 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 		local newRange = self.mrGbMS.CurrentRange
 		local newGear  = self.mrGbMS.CurrentGear
 		
-		if true then -- self:mrGbMGetAutomatic() then
+		if not self.mrGbMS.NeutralActive then
 			local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
 			local delta = nil
 			local fr    = self.motor:combineGear( self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange )
@@ -5975,7 +5977,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.nonClampedMotorRpmS     = motor.nonClampedMotorRpm
 	self.deltaRpm                = 0
 	self.transmissionInputRpm    = 0
-	self.lastMotorTorque           = 0
+	self.motorLoad               = 0
+	self.usedMotorTorque         = 0
 	self.lastMotorTorque         = 0
 	self.lastTransTorque         = 0
 	self.neededPtoTorque         = 0
@@ -6923,7 +6926,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.lastPtoRpm          = self.lastRealMotorRpm
 	self.equalizedMotorRpm   = self.vehicle:mrGbMGetEqualizedRpm( self.lastMotorRpm )
 		
-	self.motorLoad = self.usedTransTorque + self.lastPtoTorque + self.lastMissingTorque
+	self.usedMotorTorque     = self.usedTransTorque + self.lastPtoTorque + self.lastMissingTorque
 end
 
 --**********************************************************************************************************	
@@ -7086,7 +7089,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local currentPower      = ( self.usedTransTorque + self.lastPtoTorque ) * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm )
 	local getMaxPower       = ( self.lastMissingTorque > 0 )
 	
---if currentAbsSpeed > 3 and self.motorLoad > self.lastMotorTorque - gearboxMogli.eps then
+--if currentAbsSpeed > 3 and self.usedMotorTorque > self.lastMotorTorque - gearboxMogli.eps then
 --	getMaxPower = true
 --end
 	
@@ -7103,7 +7106,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			elseif getMaxPower then
 				targetRpmC        = Utils.clamp( self.maxMaxPowerRpm, self.vehicle.mrGbMS.ThreshingMinRpm, self.vehicle.mrGbMS.ThreshingMaxRpm )
 			else
-				targetRpmC        = self.currentPowerCurve:get( math.max( self.motorLoad, 1.25 * self.lastPtoTorque ) * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm ) )
+				targetRpmC        = self.currentPowerCurve:get( math.max( self.usedMotorTorque, 1.25 * self.lastPtoTorque ) * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm ) )
 				targetRpmC        = Utils.clamp( targetRpmC, self.vehicle.mrGbMS.ThreshingMinRpm, self.vehicle.mrGbMS.ThreshingMaxRpm )
 				if handThrottle >= 0 then 
 					targetRpmC      = math.max( targetRpmC, self.vehicle.mrGbMS.IdleRpm + handThrottle * math.max( 0, self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm ) )
@@ -7161,11 +7164,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	elseif self.lastRealMotorRpm >= self.vehicle.mrGbMS.CurMaxRpm or self.lastMotorTorque < gearboxMogli.eps then
 		self.motorLoadP = 0
 	else
-		self.motorLoadP = self.motorLoad / self.lastMotorTorque
+		self.motorLoadP = self.usedMotorTorque / self.lastMotorTorque
 	end
 
 	if     self.prevMotorRpm > self.vehicle.mrGbMS.RatedRpm and self.lastMotorTorque * self.prevMotorRpm  < self.maxRatedTorque * self.vehicle.mrGbMS.RatedRpm then
-		self.motorLoadP = 0.2 * self.motorLoadP + 0.8 * self.motorLoad * self.prevMotorRpm / ( self.maxRatedTorque * self.vehicle.mrGbMS.RatedRpm )
+		self.motorLoadP = 0.2 * self.motorLoadP + 0.8 * self.usedMotorTorque * self.prevMotorRpm / ( self.maxRatedTorque * self.vehicle.mrGbMS.RatedRpm )
 	elseif self.lastMissingTorque > 0 and self.motorLoadP < 1 then
 		self.motorLoadP = 1
 	elseif lastNoTorque then
@@ -7197,6 +7200,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 		self.motorLoadS	 = Utils.clamp( math.max( self.motorLoadS1, self.motorLoadS2 ), 0, 1 )	
 		self.motorLoadP  = Utils.clamp( self.motorLoadP, 0, 1 )
   end		
+
+	self.motorLoad = math.max( 0, self.maxMotorTorque * Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 ) - self.neededPtoTorque / self.ptoMotorRpmRatio )
 	
 	local wheelLoad        = math.abs( self.usedTransTorque * self:getGearRatio()	)
 	if self.wheelLoadS == nil then
@@ -8794,16 +8799,6 @@ function gearboxMogliMotor:combineGear( I2g, I2r )
 		return i2g + m * ( i2r-1 )
 	end
 	return 1
-end
-
---**********************************************************************************************************	
--- gearboxMogliMotor:combineGear
---**********************************************************************************************************	
-function gearboxMogliMotor:getMotorLoad()
-	if self.lastMissingTorque > gearboxMogli.eps then
-		return self.maxMotorTorque
-	end
-	return self.maxMotorTorque * Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 )
 end
 
 --**********************************************************************************************************	
