@@ -69,12 +69,12 @@ gearboxMogli.blowOffVentilTime1   = 1000
 gearboxMogli.blowOffVentilTime2   = 100
 gearboxMogli.debugGearShift       = false
 gearboxMogli.globalsLoaded        = false
-gearboxMogli.ptoSpeedLimitMin     = 3 / 3.6  -- minimal speed limit
-gearboxMogli.ptoSpeedLimitIni     = 0 / 3.6  -- initial offset for ptoSpeedLimit 
-gearboxMogli.ptoSpeedLimitOff     = 1 / 3.6  -- turn off ptoSpeedLimit 
-gearboxMogli.ptoSpeedLimitDec     = 0 / 3600 -- brake 
-gearboxMogli.ptoSpeedLimitInc     = 1 / 3600 -- accelerate by 2 km/h per second 
-gearboxMogli.ptoSpeedLimitRatio   = 0.15
+gearboxMogli.ptoSpeedLimitMin     = 2   / 3.6  -- minimal speed limit
+gearboxMogli.ptoSpeedLimitIni     = 0.2 / 3.6  -- initial offset for ptoSpeedLimit 
+gearboxMogli.ptoSpeedLimitOff     = 2.0 / 3.6  -- turn off ptoSpeedLimit 
+gearboxMogli.ptoSpeedLimitDec     = 0.2 / 3600 -- brake 
+gearboxMogli.ptoSpeedLimitInc     = 1.0 / 3600 -- accelerate by 2 km/h per second 
+gearboxMogli.ptoSpeedLimitRatio   = 0.01
 gearboxMogli.combineUseRealArea   = true
 gearboxMogli.AIPowerShift         = "P"
 gearboxMogli.AIGearboxOff         = "N"
@@ -139,7 +139,6 @@ gearboxMogliGlobals.blinkingWarning       = true
 gearboxMogliGlobals.grindingMinRpmDelta   = 200
 gearboxMogliGlobals.grindingMaxRpmSound   = 600
 gearboxMogliGlobals.grindingMaxRpmDelta   = gearboxMogli.huge
-gearboxMogliGlobals.hydroTransVolRatio    = 0 --0.2
 gearboxMogliGlobals.defaultEnableAI       = gearboxMogli.AIPowerShift
 gearboxMogliGlobals.autoHold              = true
 gearboxMogliGlobals.minAutoGearSpeed      = 0.2777
@@ -154,7 +153,7 @@ gearboxMogliGlobals.smoothGearRatio       = false -- smooth gear ratio with hydr
 gearboxMogliGlobals.motorLoadVolumeBrake  = 1.0   -- make some noise with motor brake; -1 take normal motor load 
 gearboxMogliGlobals.motorLoadVolumeBrakeR = -1    -- make some noise with motor brake; -1 take normal motor load
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
-gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertia       = 3     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 
 
 --**********************************************************************************************************	
@@ -657,7 +656,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	end
 	
 	local maxPtoTorqueRatio = 0.5
-	local maxPtoTorqueSpeed = 7
+	local maxPtoTorqueSpeed = 10
 
 --**************************************************************************************************	
 -- combine
@@ -667,7 +666,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		
 		local width  = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
 		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), self.mrGbMG.combineDefaultSpeed )
-		maxPtoTorqueSpeed = math.min( maxPtoTorqueSpeed, 0.5 * speed )
+		maxPtoTorqueSpeed = math.min( maxPtoTorqueSpeed, speed )
 		local f = 1.36 * self.mrGbMG.torqueFactor / gearboxMogli.powerFactor0 * 7 / speed
 		local du0, dc0, dci, dp0, dpi = 0, 0, 0, 0, 10.6
 		
@@ -701,16 +700,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			defaultLiterPerSqm = defaultLiterPerSqm * self.mrGbMG.defaultLiterPerSqm / 1.2
 			
 			local factor = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultLiterPerSqm"), defaultLiterPerSqm )
-			
-			if width == nil then
-				if     self.combineSize <= 1 then
-					width = 3
-				elseif self.combineSize <= 2 then
-					width = 6
-				else
-					width = 12
-				end
-			end		
 			
 			local dynamicRatio = getXMLFloat(xmlFile, xmlString .. ".combine#dynamicRatio")
 			
@@ -1747,7 +1736,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		else
 			self.mrGbMS.HydrostaticLaunch = not ( sc )
 		end
-		self.mrGbMS.HydroTransVolRatio  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#transVolRatio"), self.mrGbMG.hydroTransVolRatio )
 		
 		if      self.mrGbMS.HydrostaticMax > gearboxMogli.eps 
 				and math.abs( self.mrGbMS.HydrostaticMax - 1 ) > gearboxMogli.eps 
@@ -1887,9 +1875,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.sendReqPower    = self.mrGbMG.drawReqPower
 	self.mrGbMS.sendHydro       = false
 	
-	if self.mrGbMS.Hydrostatic and math.abs( self.mrGbMS.HydroTransVolRatio ) > gearboxMogli.eps then
-		self.mrGbMS.sendHydro     = true
-	end
 	if self.mrGbMS.OnlyHandThrottle then
 		self.mrGbMS.sendHydro     = true
 		self.mrGbMS.sendTargetRpm = true
@@ -7074,10 +7059,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 	-- acceleration pedal and speed limit
 	local currentSpeedLimit = self.currentSpeedLimit
-	if self.ptoSpeedLimit ~= nil and currentSpeedLimit < self.ptoSpeedLimit then
+	currentSpeedLimit       = currentSpeedLimit + gearboxMogli.extraSpeedLimitMs
+	if self.ptoSpeedLimit ~= nil and currentSpeedLimit > self.ptoSpeedLimit then
 		currentSpeedLimit = self.ptoSpeedLimit
 	end
-	currentSpeedLimit       = currentSpeedLimit + gearboxMogli.extraSpeedLimitMs
 		
 	local prevWheelSpeedRpm = self.absWheelSpeedRpm
 	self.absWheelSpeedRpm = self.wheelSpeedRpm
@@ -7743,8 +7728,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local m0 = self.vehicle.mrGbMS.HydrostaticMaxRpm
 					
 					if self.torqueRpmReduction ~= nil then
-						n0 = math.min( n0, math.max( t, self.lastRealMotorRpm ) - self.torqueRpmReduction )
-						m0 = math.min( m0, math.max( t, self.lastRealMotorRpm ) - self.torqueRpmReduction )
+						n0 = math.min( n0, self.torqueRpmReference - self.torqueRpmReduction )
+						m0 = math.min( m0, self.torqueRpmReference - self.torqueRpmReduction )
+						t  = math.min( t,  self.torqueRpmReference - self.torqueRpmReduction )
 					end
 										
 					local d = gearboxMogli.hydroEffDiff
@@ -7765,7 +7751,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					if     hMin1 > hMax1 - gearboxMogli.eps then
 						hTgt = hMin1
 					elseif self.ptoOn and ( self.vehicle.cruiseControl.state > 0 or self.vehicle.mrGbML.hydroTargetSpeed ~= nil ) then
-						hTgt = Utils.clamp( self.vehicle.mrGbMS.RatedRpm * currentSpeedLimit / ( t * self.vehicle.mrGbML.currentGearSpeed ), hMin1, hMax1 )
+						hTgt = Utils.clamp( self.vehicle.mrGbMS.RatedRpm * currentSpeedLimit / ( t * self.vehicle.mrGbML.currentGearSpeed ), hMin1, hMax1 )						
 					elseif not ( self.vehicle.mrGbMS.HydrostaticDirect ) then
 						local sp = nil
 						local sf = nil						
@@ -7802,7 +7788,21 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						end
 					end
 					
+					if gearboxMogli.debugGearShift and self.torqueRpmReduction ~= nil then
+						print(string.format("torqueRpmReduction r: %4d n: %4d m: %4d t: %4d / h: %6f t: %6f / %6f / %6f",
+																self.torqueRpmReference - self.torqueRpmReduction,
+																n1,
+																m1,
+																t,
+																self.hydrostaticFactor,
+																hTgt,
+																currentSpeedLimit*3.6,
+																self.vehicle.lastSpeedReal*3600))
+					end
+						
+					
 					if     self.hydrostaticFactorT == nil 
+							or self.torqueRpmReduction ~= nil
 							or ( self.vehicle.mrGbMS.HydrostaticIncFactor >= 1 and self.vehicle.mrGbMS.HydrostaticDecFactor >= 1 ) then
 						self.hydrostaticFactorT = hTgt
 					elseif math.abs( hTgt - self.hydrostaticFactorT ) > gearboxMogli.eps then
@@ -8800,6 +8800,9 @@ end
 -- gearboxMogliMotor:combineGear
 --**********************************************************************************************************	
 function gearboxMogliMotor:getMotorLoad()
+	if self.lastMissingTorque > gearboxMogli.eps then
+		return self.maxMotorTorque
+	end
 	return self.maxMotorTorque * Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 )
 end
 
