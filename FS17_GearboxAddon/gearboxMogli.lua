@@ -466,13 +466,13 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.SwapGearRangeKeys       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#swapGearRangeKeys" ),false)
 	self.mrGbMS.TransmissionEfficiency  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#transmissionEfficiency"), gearboxMogliGlobals.transmissionEfficiency) 
 	
-	self.mrGbMS.IdleRpm	                = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#vehicle.mrGbMS.IdleRpm"),  self.motor.minRpm ), self.motor.minRpm )
-	self.mrGbMS.RatedRpm                = math.min( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#vehicle.mrGbMS.RatedRpm"), math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ) ), self.motor.maxRpm )
+	self.mrGbMS.IdleRpm	                = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleRpm"),  self.motor.minRpm ), self.motor.minRpm )
 	self.mrGbMS.OrigMinRpm              = self.motor.minRpm
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
 	self.mrGbMS.CurMinRpm               = math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, 0 )
 	self.mrGbMS.CurMaxRpm               = self.mrGbMS.OrigMaxRpm + gearboxMogli.rpmPlus
-	self.mrGbMS.OrigRatedRpm            = math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm )
+	self.mrGbMS.OrigRatedRpm            = math.min( math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ), self.motor.maxRpm )
+	self.mrGbMS.RatedRpm                = math.min( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#ratedRpm"), self.mrGbMS.OrigRatedRpm ), self.motor.maxRpm )
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
 	self.mrGbMS.MinTargetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm )
@@ -609,9 +609,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end
 
 		if torqueI > 0 then
-			self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#vehicle.mrGbMS.IdleRpm"), 800);
-			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#vehicle.mrGbMS.RatedRpm"), 2100);
-			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#vehicle.mrGbMS.CurMinRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
+			self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#idleRpm"), 800);
+			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100);
+			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#minRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 			self.mrGbMS.CurMaxRpm = self.mrGbMS.Engine.maxRpm + gearboxMogli.rpmPlus
 		end
 		
@@ -5802,16 +5802,15 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.maxTorqueRpm   = vehicle.mrGbMS.Engine.maxTorqueRpm
 		self.maxMotorTorque = vehicle.mrGbMS.Engine.maxTorque
 	else
-		local zeroTorqueRpm = 0.5*motor.minRpm
-		local idleTorque    = motor.torqueCurve:get(motor.minRpm) --/ self.vehicle.mrGbMS.TransmissionEfficiency
+		local idleTorque    = motor.torqueCurve:get(vehicle.mrGbMS.OrigMinRpm) --/ self.vehicle.mrGbMS.TransmissionEfficiency
 		self.torqueCurve:addKeyframe( {v=0.1*idleTorque, time=0} )
-		self.torqueCurve:addKeyframe( {v=0.9*idleTorque, time=zeroTorqueRpm} )
+		self.torqueCurve:addKeyframe( {v=0.9*idleTorque, time=vehicle.mrGbMS.CurMinRpm} )
 		local vMax  = 0
-		local tMax  = motor.maxRpm
+		local tMax  = vehicle.mrGbMS.OrigMaxRpm
 		local tvMax = 0
 		local vvMax = 0
 		for _,k in pairs(motor.torqueCurve.keyframes) do
-			if k.time > zeroTorqueRpm then 
+			if k.time > vehicle.mrGbMS.CurMinRpm then 
 				local kv = k.v --/ self.vehicle.mrGbMS.TransmissionEfficiency
 				local kt = k.time
 				
@@ -5828,11 +5827,12 @@ function gearboxMogliMotor:new( vehicle, motor )
 		end		
 		
 		if vMax > 0 then
-			self.torqueCurve:addKeyframe( {v=0.9*vMax, time=tMax + 25} )
-			self.torqueCurve:addKeyframe( {v=0.5*vMax, time=tMax + 50} )
-			self.torqueCurve:addKeyframe( {v=0.1*vMax, time=tMax + 75} )
-			self.torqueCurve:addKeyframe( {v=0, time=tMax + 100} )
-			tMax = tMax + 100
+			local r = Utils.clamp( self.mrGbMS.CurMaxRpm - tMax, 1, gearboxMogli.rpmRatedMinus )
+			self.torqueCurve:addKeyframe( {v=0.9*vMax, time=tMax + 0.25*r} )
+			self.torqueCurve:addKeyframe( {v=0.5*vMax, time=tMax + 0.50*r} )
+			self.torqueCurve:addKeyframe( {v=0.1*vMax, time=tMax + 0.75*r} )
+			self.torqueCurve:addKeyframe( {v=0, time=tMax + r} )
+			tMax = tMax + r
 		end
 		
 		self.maxTorqueRpm   = tvMax	
@@ -5927,8 +5927,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	
 	gearboxMogliMotor.copyRuntimeValues( motor, self )
 	
-	self.minRpm                  = motor.minRpm
-	self.maxRpm                  = motor.maxRpm	
+	self.minRpm                  = vehicle.mrGbMS.OrigMinRpm
+	self.maxRpm                  = vehicle.mrGbMS.OrigMaxRpm	
 	self.minRequiredRpm          = self.vehicle.mrGbMS.IdleRpm
 	self.maxClutchTorque         = motor.maxClutchTorque
 	self.brakeForce              = motor.brakeForce
