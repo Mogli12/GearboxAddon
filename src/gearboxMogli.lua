@@ -5812,7 +5812,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		for _,k in pairs(motor.torqueCurve.keyframes) do
 			if k.time > vehicle.mrGbMS.CurMinRpm then 
 				local kv = k.v --/ self.vehicle.mrGbMS.TransmissionEfficiency
-				local kt = k.time
+				local kt = math.min( k.time, vehicle.mrGbMS.CurMaxRpm - 1 )
 				
 				if vvMax < k.v then
 					vvMax = k.v
@@ -5827,7 +5827,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		end		
 		
 		if vMax > 0 then
-			local r = Utils.clamp( self.mrGbMS.CurMaxRpm - tMax, 1, gearboxMogli.rpmRatedMinus )
+			local r = Utils.clamp( vehicle.mrGbMS.CurMaxRpm - tMax, 1, gearboxMogli.rpmRatedMinus )
 			self.torqueCurve:addKeyframe( {v=0.9*vMax, time=tMax + 0.25*r} )
 			self.torqueCurve:addKeyframe( {v=0.5*vMax, time=tMax + 0.50*r} )
 			self.torqueCurve:addKeyframe( {v=0.1*vMax, time=tMax + 0.75*r} )
