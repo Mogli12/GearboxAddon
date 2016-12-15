@@ -331,7 +331,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	-- configuration inside the vehicle.xml
 	xmlFile = self.xmlFile
 	if gearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle", entry.motorConfig )	
+		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
 		if state and message then
 			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
 			return true
