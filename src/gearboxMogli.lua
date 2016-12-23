@@ -2912,6 +2912,7 @@ function gearboxMogli:onLeave()
 
 	if      self.steeringEnabled 
 			and self.mrGbMS.IsOn 
+			and self.isMotorStarted
 			and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_OFF
 			and ( self:mrGbMGetAutoClutch() or self:mrGbMGetAutomatic() or self:mrGbMGetAutoStartStop() ) then 
 		self:mrGbMSetNeutralActive( true, false, true )

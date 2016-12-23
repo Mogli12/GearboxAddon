@@ -1,6 +1,7 @@
 del %modname%.zip
 cd %modname%
 del /q *.lua
+del /q *.lub
 del /q *.luc
 for %%I in (..\src\*.lua) do call :loopbody "%%~fI"
 "C:\Program Files\WinRAR\winrar" A -r ..\%modname%.zip *.*
@@ -16,7 +17,7 @@ goto :EOF
 
 :loopbody_luc_17
 	echo %~n1
-	call c:\work\luapower-all-master\luajit -bg ..\src\%~n1.lua %~n1.l32
+	call c:\work\luapower-all-master\luajit -bg ..\src\%~n1.lua %~n1.lub
 	goto :EOF
 
 :loopbody_luc
