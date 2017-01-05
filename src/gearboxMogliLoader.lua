@@ -65,10 +65,10 @@ function gearboxMogliLoader:load(savegame)
 			return
 		end
 		
-		if string.find( string.upper( self.mrGbMLConfigFileName), "MB3D" ) ~= nil then
-			print("No support of MB3D mods: "..tostring(self.mrGbMLConfigFileName))
-			return
-		end
+	--if string.find( string.upper( self.mrGbMLConfigFileName), "MB3D" ) ~= nil then
+	--	print("No support of MB3D mods: "..tostring(self.mrGbMLConfigFileName))
+	--	return
+	--end
 			
 		local state, message = pcall( gearboxMogliLoader.loadgearboxMogli, self, self.xmlFile )
 		if not state then
@@ -425,7 +425,7 @@ function gearboxMogliLoader:loadgearboxMogli( savegame )
 end
 
 function gearboxMogliLoader:loadgearboxMogli2( xmlFile, baseName, xmlSource, motorConfig )	
-	gearboxMogli.initFromXml( self, xmlFile, baseName .. ".gearboxMogli", xmlSource, false )
+	gearboxMogli.initFromXml( self, xmlFile, baseName .. ".gearboxMogli", xmlSource, false, motorConfig )
 	return true
 end
 
