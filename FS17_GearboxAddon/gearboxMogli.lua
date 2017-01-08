@@ -105,8 +105,8 @@ gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
-gearboxMogliGlobals.autoShiftTimeoutLong  = 2500 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort = 1000 -- ms -- let it go up to ratedRPM !!!
+gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
+gearboxMogliGlobals.autoShiftTimeoutShort = 1500 -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 250  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 125  -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
@@ -4698,6 +4698,19 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoShiftGears()
 
+	local i = 0
+	for _,r in pairs( self.mrGbMS.Gears ) do
+		if not self.mrGbMS.ReverseActive and r.reverseOnly then
+		elseif self.mrGbMS.ReverseActive and r.forwardOnly then
+		else
+			i = i + 1
+		end
+	end
+	
+	if i <= 1 then
+		return false
+	end
+	
 	if      self.mrGbMS.AllAuto then
 		return true
 	elseif  self.mrGbMS.Automatic 
@@ -4724,6 +4737,19 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoShiftRange()
 
+	local i = 0
+	for _,r in pairs( self.mrGbMS.Ranges ) do
+		if not self.mrGbMS.ReverseActive and r.reverseOnly then
+		elseif self.mrGbMS.ReverseActive and r.forwardOnly then
+		else
+			i = i + 1
+		end
+	end
+	
+	if i <= 1 then
+		return false
+	end
+	
 	if      self.mrGbMS.AllAuto then
 		return true
 	elseif  self.mrGbMS.Automatic 
@@ -4750,6 +4776,19 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoShiftRange2()
 
+	local i = 0
+	for _,r in pairs( self.mrGbMS.Ranges2 ) do
+		if not self.mrGbMS.ReverseActive and r.reverseOnly then
+		elseif self.mrGbMS.ReverseActive and r.forwardOnly then
+		else
+			i = i + 1
+		end
+	end
+	
+	if i <= 1 then
+		return false
+	end
+	
 	if      self.mrGbMS.AllAuto then
 		return true
 	elseif  self.mrGbMS.Automatic 
@@ -8201,10 +8240,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				
 	--**********************************************************************************************************		
 	-- automatic shifting			
-			elseif  self.vehicle:mrGbMGetAutomatic() 
-					and self.vehicle.aiIsStarted
-					and self.turnStage ~= nil and self.turnStage > 0 then			
-				gearboxMogli.setLaunchGear( self.vehicle )
 			elseif self.vehicle:mrGbMGetAutomatic() then		
 				local maxAutoRpm   = self.vehicle.mrGbMS.CurMaxRpm - math.min( 50, 0.5 * ( self.vehicle.mrGbMS.CurMaxRpm - self.vehicle.mrGbMS.RatedRpm ) )
 				local halfOverheat = 0.5 * self.vehicle.mrGbMS.ClutchOverheatStartTime										
@@ -8216,19 +8251,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local possibleCombinations = {}
 				local shiftRange1st        = false
 
-				table.insert( possibleCombinations, { self.vehicle.mrGbMS.CurrentGear, self.vehicle.mrGbMS.CurrentRange, self.vehicle.mrGbMS.CurrentRange2 } )
+				table.insert( possibleCombinations, { gear     = self.vehicle.mrGbMS.CurrentGear,
+																							range1   = self.vehicle.mrGbMS.CurrentRange,
+																							range2   = self.vehicle.mrGbMS.CurrentRange2,
+																							priority = 0} )
 
-				local showGears = false
-				if     self.debugCurrentGear   == nil
-						or self.debugCurrentGear   ~= self.vehicle.mrGbMS.CurrentGear
-						or self.debugCurrentRange  ~= self.vehicle.mrGbMS.CurrentRange 
-						or self.debugCurrentRange2 ~= self.vehicle.mrGbMS.CurrentRange2 then
-					showGears = self.vehicle.mrGbMG.debugPrint
-					self.debugCurrentGear   = self.vehicle.mrGbMS.CurrentGear
-					self.debugCurrentRange  = self.vehicle.mrGbMS.CurrentRange 
-					self.debugCurrentRange2 = self.vehicle.mrGbMS.CurrentRange2
-				end
-				
 				local alwaysShiftGears  =  self.vehicle.mrGbMS.GearTimeToShiftGear    < self.vehicle.mrGbMG.maxTimeToSkipGear 
 																or self.vehicle.mrGbMS.ShiftNoThrottleGear
 																or ( self.vehicle.mrGbMS.MatchGears ~= nil and self.vehicle.mrGbMS.MatchGears == "true" )
@@ -8238,367 +8265,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local alwaysShiftRange2 =  self.vehicle.mrGbMS.GearTimeToShiftRanges2 < self.vehicle.mrGbMG.maxTimeToSkipGear
 																or self.vehicle.mrGbMS.ShiftNoThrottleRanges2
 				
-				if showGears then
-					print(tostring(alwaysShiftGears).." "..
-								tostring(self.vehicle.mrGbMS.MatchGears).." "..
-								tostring(alwaysShiftRange).." "..
-								tostring(self.vehicle.mrGbMS.MatchRanges).." "..
-								tostring(alwaysShiftRange2))
-					for i,p in pairs(possibleCombinations) do print(string.format("%2d, %2d, %2d",p[1],p[2],p[3])) end
-				end
-				
-				local m2g = table.getn( self.vehicle.mrGbMS.Gears )
-				local m2r = table.getn( self.vehicle.mrGbMS.Ranges )
-				local m22 = table.getn( self.vehicle.mrGbMS.Ranges2 )
-				
-				-- loop over gears 
-				if self.vehicle:mrGbMGetAutoShiftGears() then
-					local tmp = {}
-					for i,p in pairs( possibleCombinations ) do
-						table.insert( tmp, p )
-					end
-					
-					for i,p in pairs( possibleCombinations ) do
-						local check   = {}
-						local gears   = self.vehicle.mrGbMS.Gears
-						local current = self.vehicle.mrGbMS.CurrentGear
-						for i,g in pairs(gears) do
-							local i2g  = i
-							local i2r  = p[2]
-						  local i22  = p[3]
-							local skip = false
-							local f2g, t2g = 1, m2g
-							local f2r, t2r = 1, m2r
-							local f22, t22 = 1, m22
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange, m2r ) )
-							f22 = math.max( f22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange2, 1 ) )
-							t22 = math.min( t22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxGear, m2g ) )
-							f22 = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minRange2, 1 ) )
-							t22 = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxGear, m2g ) )
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxRange, m2r ) )
-							
-							if self.vehicle.mrGbMS.ReverseActive  then
-								if g.forwardOnly then
-									skip = true
-								end
-							else
-								if g.reverseOnly then
-									skip = true
-								end
-							end
-							
-							if i == current then
-								if     alwaysShiftGears
-										or (  ( i2r == self.vehicle.mrGbMS.CurrentRange  or alwaysShiftRange  )
-											and ( i22 == self.vehicle.mrGbMS.CurrentRange2 or alwaysShiftRange2 ) ) then
-								else
-									skip = true
-								end
-							else
-								if     alwaysShiftGears
-										or (  ( i2r == self.vehicle.mrGbMS.CurrentRange  or alwaysShiftRange  )
-											and ( i22 == self.vehicle.mrGbMS.CurrentRange2 or alwaysShiftRange2 ) ) then
-							--elseif ( self.vehicle.mrGbMS.MatchRanges ~= nil and self.vehicle.mrGbMS.MatchRanges == "false" ) then
-							--	skip = true
-								elseif  i > current 
-										and self.vehicle.mrGbMS.CurrentRange  == t2r
-										and self.vehicle.mrGbMS.CurrentRange2 == t22 then
-									-- all allowed 
-								elseif  i < current 
-										and self.vehicle.mrGbMS.CurrentRange  == f2r
-										and self.vehicle.mrGbMS.CurrentRange2 == f22 then
-									-- all allowed 
-								else									
-									skip = true
-								end
-								
-								-- keep the complete range!!!
-								if i > current then
-									i2r = Utils.clamp( i2r + gears[current].upRangeOffset, 1, m2r )
-								end
-								if i < current then
-									i2r = Utils.clamp( i2r + gears[current].downRangeOffset, 1, m2r )
-								end
-							end
-							
-							if not skip then								
-								for _,q in pairs( tmp ) do
-									if q[1] == i2g and q[2] == i2r and q[3] == i22 then
-										skip = true
-										break 
-									end
-								end
-								
-								if not skip then
-									table.insert( tmp, { i2g, i2r, i22 } )
-								end
-							end
-						end
-					end
-					
-					if showGears then
-						print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-						for i,p in pairs(tmp) do print(string.format("%2d, %2d, %2d",p[1],p[2],p[3])) end
-					end
-					
-					possibleCombinations = tmp
-				end
-								
-				-- loop over range1
-				if self.vehicle:mrGbMGetAutoShiftRange() then
-					local tmp = {}
-					for i,p in pairs( possibleCombinations ) do
-						table.insert( tmp, p )
-					end
-					
-					for i,p in pairs( possibleCombinations ) do					
-						local gears   = self.vehicle.mrGbMS.Ranges
-						local current = self.vehicle.mrGbMS.CurrentRange
-						for i,g in pairs(gears) do
-							local i2g  = p[1]
-							local i2r  = i
-						  local i22  = p[3]
-							local skip = false							
-							local f2g, t2g = 1, m2g
-							local f2r, t2r = 1, m2r
-							local f22, t22 = 1, m22
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange, m2r ) )
-							f22 = math.max( f22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange2, 1 ) )
-							t22 = math.min( t22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxGear, m2g ) )
-							f22 = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minRange2, 1 ) )
-							t22 = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxGear, m2g ) )
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxRange, m2r ) )
-							
-							if self.vehicle.mrGbMS.ReverseActive  then
-								if g.forwardOnly then
-									skip = true
-								end
-							else
-								if g.reverseOnly then
-									skip = true
-								end
-							end
-							
-							if i == current then
-								if      alwaysShiftRange 
-										or (  ( i2g == self.vehicle.mrGbMS.CurrentGear   or alwaysShiftGears  )
-											and ( i22 == self.vehicle.mrGbMS.CurrentRange2 or alwaysShiftRange2 ) ) then
-								else
-									skip = true
-								end
-							else
-								if      alwaysShiftRange 
-										or (  ( i2g == self.vehicle.mrGbMS.CurrentGear   or alwaysShiftGears  )
-											and ( i22 == self.vehicle.mrGbMS.CurrentRange2 or alwaysShiftRange2 ) ) then
-							--elseif ( self.vehicle.mrGbMS.MatchGears  ~= nil and self.vehicle.mrGbMS.MatchGears  == "false" ) then
-							--	skip = true
-								elseif  i > current 
-										and self.vehicle.mrGbMS.CurrentGear   == t2g
-										and self.vehicle.mrGbMS.CurrentRange2 == t22 then
-									-- all allowed 
-								elseif  i < current 
-										and self.vehicle.mrGbMS.CurrentGear   == f2g
-										and self.vehicle.mrGbMS.CurrentRange2 == f22 then
-									-- all allowed 
-								else									
-									skip = true
-								end
-
-								-- keep the complete range!!!
-								if i > current then
-									i2g = Utils.clamp( i2g + gears[current].upGearOffset, 1, m2g )
-								end
-								if i < current then
-									i2g = Utils.clamp( i2g + gears[current].downGearOffset, 1, m2g )
-								end
-							end
-							
-							if not skip then
-								for _,q in pairs( tmp ) do
-									if q[1] == i2g and q[2] == i2r and q[3] == i22 then
-										skip = true
-										break 
-									end
-								end
-								
-								if not skip then
-									table.insert( tmp, { i2g, i2r, i22 } )
-								end
-							end
-						end
-					end
-					
-					if showGears then
-						print("RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR")
-						for i,p in pairs(tmp) do print(string.format("%2d, %2d, %2d",p[1],p[2],p[3])) end
-					end
-					possibleCombinations = tmp
-				end
-								
-				-- loop over range2
-				if self.vehicle:mrGbMGetAutoShiftRange2() then
-					local tmp = {}
-					for i,p in pairs( possibleCombinations ) do
-						table.insert( tmp, p )
-					end
-					
-					for i,p in pairs( possibleCombinations ) do
-						local gears   = self.vehicle.mrGbMS.Ranges2
-						local current = self.vehicle.mrGbMS.CurrentRange2
-						for i,g in pairs(gears) do
-							local i2g  = p[1]
-							local i2r  = p[2]
-							local i22  = i								
-							local skip = false
-							local f2g, t2g = 1, m2g
-							local f2r, t2r = 1, m2r
-							local f22, t22 = 1, m22
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange, m2r ) )
-							f22 = math.max( f22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].minRange2, 1 ) )
-							t22 = math.min( t22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[i2g].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxGear, m2g ) )
-							f22 = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].minRange2, 1 ) )
-							t22 = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[i2r].maxRange2, m22 ) )
-							f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minGear, 1 ) )
-							t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxGear, m2g ) )
-							f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].minRange, 1 ) )
-							t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[i22].maxRange, m2r ) )
-							
-							if self.vehicle.mrGbMS.ReverseActive  then
-								if g.forwardOnly then
-									skip = true
-								end
-							else
-								if g.reverseOnly then
-									skip = true
-								end
-							end
-							
-							if i == current then
-								if     alwaysShiftRange2 
-										or (  ( i2g == self.vehicle.mrGbMS.CurrentGear   or alwaysShiftGears  )
-											and ( i2r == self.vehicle.mrGbMS.CurrentRange  or alwaysShiftRange  ) ) then
-								else
-									skip = true
-								end
-							else
-								if      alwaysShiftRange2 
-										or (  ( i2g == self.vehicle.mrGbMS.CurrentGear   or alwaysShiftGears  )
-											and ( i2r == self.vehicle.mrGbMS.CurrentRange  or alwaysShiftRange  ) ) then
-							--elseif ( self.vehicle.mrGbMS.MatchGears  ~= nil and self.vehicle.mrGbMS.MatchGears  == "false" )
-							--		or ( self.vehicle.mrGbMS.MatchRanges ~= nil and self.vehicle.mrGbMS.MatchRanges == "false" ) then
-							--	skip = true
-								elseif  i > current 
-										and self.vehicle.mrGbMS.CurrentGear  == t2g
-										and self.vehicle.mrGbMS.CurrentRange == t2r then
-									-- all allowed 
-								elseif  i < current 
-										and self.vehicle.mrGbMS.CurrentGear  == f2g
-										and self.vehicle.mrGbMS.CurrentRange == f2r then
-									-- all allowed 
-								else									
-									skip = true
-								end
-							end
-							
-							if not skip then
-								for _,q in pairs( tmp ) do
-									if q[1] == i2g and q[2] == i2r and q[3] == i22 then
-										skip = true
-										break 
-									end
-								end
-								
-								if not skip then
-									table.insert( tmp, { i2g, i2r, i22 } )
-								end
-							end
-						end
-					end
-					
-					if showGears then
-						print("222222222222222222222222222222")
-						for i,p in pairs(tmp) do print(string.format("%2d, %2d, %2d",p[1],p[2],p[3])) end
-					end
-					
-					possibleCombinations = tmp
-				end
-				
-				if showGears then
-					print("==============================")
-				end
-												
-				local maxTimeToShift = 0
-				do
-					local tmp = {}
-					for i,p in pairs( possibleCombinations ) do
-						local i2g  = p[1]
-						local i2r  = p[2]
-						local i22  = p[3]
-						if not ( gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Gears[i2g],   i2g, i2r, i22 )
-									or gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Ranges[i2r],  i2g, i2r, i22 )
-									or gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Ranges2[i22], i2g, i2r, i22 ) ) then
-							p[4] = gearMaxSpeed * self.vehicle.mrGbMS.Gears[p[1]].speed 
-																	* self.vehicle.mrGbMS.Ranges[p[2]].ratio
-																	* self.vehicle.mrGbMS.Ranges2[p[3]].ratio
-							p[5] = 0
-							p[6] = true
-							if p[1] ~= self.vehicle.mrGbMS.CurrentGear then
-								p[6] = false
-								p[5] = math.max( p[5], self.vehicle.mrGbMS.GearTimeToShiftGear )
-							end
-							if p[2] ~= self.vehicle.mrGbMS.CurrentRange then
-								p[6] = false
-								p[5] = math.max( p[5], self.vehicle.mrGbMS.GearTimeToShiftHl )
-							end
-							if p[3] ~= self.vehicle.mrGbMS.CurrentRange2 then
-								p[6] = false
-								p[5] = math.max( p[5], self.vehicle.mrGbMS.GearTimeToShiftRanges2 )
-							end
-							if maxTimeToShift < p[5] then
-								maxTimeToShift = p[5]
-							end
-							table.insert( tmp, p )
-						end
-					end
-					possibleCombinations = tmp
-				end
-				
-				local function sortGears( a, b )
-					local i = 4
-					for j=1,5 do
-						if     a[i] < b[i] - gearboxMogli.eps then
-							return true
-						elseif a[i] > b[i] + gearboxMogli.eps then
-							return false
-						end
-						if i < 5 then
-							i = i + 1
-						else
-							i = 1
-						end
-					end
-					return false
-				end
-				table.sort( possibleCombinations, sortGears )
-										
-				local maxGear   = table.getn( possibleCombinations )
-				local downRpm   = math.max( self.vehicle.mrGbMS.IdleRpm, self.vehicle.mrGbMS.MinTargetRpm )
-				local upRpm     = 0.5 * ( self.vehicle.mrGbMS.RatedRpm + self.vehicle.mrGbMS.CurMaxRpm )
+				local downRpm   = self.vehicle.mrGbMS.IdleRpm -- math.max( self.vehicle.mrGbMS.IdleRpm,  self.vehicle.mrGbMS.MinTargetRpm )
+				local upRpm     = math.max( self.vehicle.mrGbMS.RatedRpm, self.maxMaxPowerRpm )
 							
 				if self.vehicle.mrGbMS.AutoShiftDownRpm ~= nil and self.vehicle.mrGbMS.AutoShiftDownRpm > downRpm then
 					downRpm = self.vehicle.mrGbMS.AutoShiftDownRpm
@@ -8611,8 +8279,223 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					upRpm   = Utils.clamp( self.minRequiredRpm + gearboxMogli.autoShiftRpmDiff, downRpm, upRpm )
 					downRpm = Utils.clamp( math.max( self.minRequiredRpm - gearboxMogli.autoShiftRpmDiff, minRpmReduced ), downRpm, upRpm )
 				end
+				local rpmC = self.absWheelSpeedRpmS * gearboxMogli.gearSpeedToRatio( self.vehicle, self.vehicle.mrGbML.currentGearSpeed )
 				
+				if self.vehicle.mrGbMS.TorqueConverter and self.vehicle.mrGbMS.TorqueConverterFactor > 1 then
+					downRpm = downRpm / self.vehicle.mrGbMS.TorqueConverterFactor
+				end
+				
+				local m2g = table.getn( self.vehicle.mrGbMS.Gears )
+				local m2r = table.getn( self.vehicle.mrGbMS.Ranges )
+				local m22 = table.getn( self.vehicle.mrGbMS.Ranges2 )
+									
+				local function loop( possibleCombinations, n0, n1, n2 )
+					local tmp = {}
+					for i,p in pairs( possibleCombinations ) do
+						table.insert( tmp, p )
+					end
+					
+					local function push( i0, i1, i2 ) 
+						local p={} 
+						p[n0]=i0
+						p[n1]=i1 
+						p[n2]=i2
+						return p
+					end
+					
+					local function pop( p ) 
+						return p[n0], p[n1], p[n2]
+					end
+					
+					local c0, c1, c2 = pop( { gear   = self.vehicle.mrGbMS.CurrentGear,
+																		range1 = self.vehicle.mrGbMS.CurrentRange,
+																		range2 = self.vehicle.mrGbMS.CurrentRange2 } )
+					local a0, a1, a2 = pop( { gear   = alwaysShiftGears,
+																		range1 = alwaysShiftRange,
+																		range2 = alwaysShiftRange2 } )
+					local r0, r1, r2 = pop( { gear   = self.vehicle.mrGbMS.Gears,
+																		range1 = self.vehicle.mrGbMS.Ranges,
+																		range2 = self.vehicle.mrGbMS.Ranges2 } )
+					
+					for _,p in pairs( possibleCombinations ) do					
+						for i0,g in pairs(r0) do
+							local _, i1, i2     = pop( p )
+							local priority      = 0
+							local fg, f1, f2
+							local tg, t1, t2
+							local skip = false
+							
+							do
+								local f2g, t2g = 1, m2g
+								local f2r, t2r = 1, m2r
+								local f22, t22 = 1, m22
+								local q = push( i0, i1, i2 )
+								
+								if q.range1 == nil or q.range1 < 1 or q.range1 > m2r then
+									print(tostring(q))
+									gearboxMogli.printCallStack()
+								end
+																
+								f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[q.gear].minRange, 1 ) )
+								t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Gears[q.gear].maxRange, m2r ) )
+								f22 = math.max( f22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[q.gear].minRange2, 1 ) )
+								t22 = math.min( t22, Utils.getNoNil( self.vehicle.mrGbMS.Gears[q.gear].maxRange2, m22 ) )
+								f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[q.range1].minGear, 1 ) )
+								t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[q.range1].maxGear, m2g ) )
+								f22 = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[q.range1].minRange2, 1 ) )
+								t22 = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges[q.range1].maxRange2, m22 ) )
+								f2g = math.max( f2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[q.range2].minGear, 1 ) )
+								t2g = math.min( t2g, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[q.range2].maxGear, m2g ) )
+								f2r = math.max( f2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[q.range2].minRange, 1 ) )
+								t2r = math.min( t2r, Utils.getNoNil( self.vehicle.mrGbMS.Ranges2[q.range2].maxRange, m2r ) )
+
+								fg, f1, f2 = pop( { gear=f2g, range1=f2r, range2=f22 } )
+								tg, t1, t2 = pop( { gear=f2g, range1=f2r, range2=f22 } )
+							end
+							
+							if self.vehicle.mrGbMS.ReverseActive  then
+								if g.forwardOnly then
+									skip = true
+								end
+							else
+								if g.reverseOnly then
+									skip = true
+								end
+							end
+							
+							if a0 or ( ( i1 == c1 or a1 ) and ( i2 == c2 or a2 ) ) then
+								priority = 0
+							else				
+							--skip     = true
+								priority = 4
+							end
+							
+								-- keep the complete range!!!
+							if     i0 > c0 then
+								if     n0 == "gear" and n1 == "range1" then
+									i1 = Utils.clamp( i1 + r0[c0].upRangeOffset,1, m2r )
+								elseif n0 == "range1" and n1 == "gear" then
+									i1 = Utils.clamp( i1 + r0[c0].upGearOffset, 1, m2g )
+								end
+							elseif i0 < c0 then
+								if     n0 == "gear" and n1 == "range1" then
+									i1 = Utils.clamp( i1 + r0[c0].downRangeOffset,1, m2r )
+								elseif n0 == "range1" and n1 == "gear" then
+									i1 = Utils.clamp( i1 + r0[c0].downGearOffset, 1, m2g )
+								end
+							end
+							
+							if not skip then
+								if p.priority > priority then
+									priority = p.priority
+								end
+								
+								for _,q in pairs( tmp ) do
+									local j0, j1, j2 = pop( q )
+									if j0 == i0 and j1 == i1 and j2 == i2 then
+										if q.priority > priority then
+											q.priority = priority 
+										end
+										skip = true
+										break 
+									end
+								end
+								
+								if not skip then
+									local q = push( i0, i1, i2 )
+									q.priority = priority
+									table.insert( tmp, q )
+								end
+							end
+						end
+					end
+					
+					return tmp
+				end
+						
+				-- loop over gears 
+				if self.vehicle:mrGbMGetAutoShiftGears() then
+					possibleCombinations = loop( possibleCombinations, "gear", "range1", "range2" )
+				end
+						
+				-- loop over range1
+				if self.vehicle:mrGbMGetAutoShiftRange() then
+					possibleCombinations = loop( possibleCombinations, "range1", "gear", "range2" )
+				end
+								
+				-- loop over range2
+				if self.vehicle:mrGbMGetAutoShiftRange2() then
+					possibleCombinations = loop( possibleCombinations, "range2", "gear", "range1" )
+				end
+				
+				local minTimeToShift = math.huge
+				
+				do
+					local tmp = {}
+					for i,p in pairs( possibleCombinations ) do
+						local i2g = p.gear
+						local i2r = p.range1
+						local i22 = p.range2
+						if not ( gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Gears[i2g],   i2g, i2r, i22 )
+									or gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Ranges[i2r],  i2g, i2r, i22 )
+									or gearboxMogli.mrGbMIsNotValidEntry( self.vehicle, self.vehicle.mrGbMS.Ranges2[i22], i2g, i2r, i22 ) ) then
+							p.gearSpeed = gearMaxSpeed * self.vehicle.mrGbMS.Gears[p.gear].speed 
+																	* self.vehicle.mrGbMS.Ranges[p.range1].ratio
+																	* self.vehicle.mrGbMS.Ranges2[p.range2].ratio
+							p.isCurrent   = true
+							p.timeToShift = 0
+							
+							pts = 0
+
+							if p.gear ~= self.vehicle.mrGbMS.CurrentGear then
+								p.isCurrent   = false
+								p.timeToShift = math.max( p.timeToShift, self.vehicle.mrGbMS.GearTimeToShiftGear )
+								
+								if self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftHl      + gearboxMogli.eps then pts = pts + 1 end
+								if self.vehicle.mrGbMS.GearTimeToShiftGear > self.vehicle.mrGbMS.GearTimeToShiftRanges2 + gearboxMogli.eps then pts = pts + 1 end
+							end
+							if p.range1 ~= self.vehicle.mrGbMS.CurrentRange then
+								p.isCurrent   = false
+								p.timeToShift = math.max( p.timeToShift, self.vehicle.mrGbMS.GearTimeToShiftHl )
+								
+								if self.vehicle.mrGbMS.GearTimeToShiftHl > self.vehicle.mrGbMS.GearTimeToShiftGear    + gearboxMogli.eps then pts = pts + 1 end
+								if self.vehicle.mrGbMS.GearTimeToShiftHl > self.vehicle.mrGbMS.GearTimeToShiftRanges2 + gearboxMogli.eps then pts = pts + 1 end
+							end
+							if p.range2 ~= self.vehicle.mrGbMS.CurrentRange2 then
+								p.isCurrent   = false
+								p.timeToShift = math.max( p.timeToShift, self.vehicle.mrGbMS.GearTimeToShiftRanges2 )
+								
+								if self.vehicle.mrGbMS.GearTimeToShiftRanges2 > self.vehicle.mrGbMS.GearTimeToShiftGear + gearboxMogli.eps then pts = pts + 1 end
+								if self.vehicle.mrGbMS.GearTimeToShiftRanges2 > self.vehicle.mrGbMS.GearTimeToShiftHl   + gearboxMogli.eps then pts = pts + 1 end
+							end
+							
+							p.priority = math.max( p.priority, pts )
+							
+							if minTimeToShift > p.timeToShift then
+								minTimeToShift = p.timeToShift
+							end
+							
+							table.insert( tmp, p )
+						end
+					end
+					possibleCombinations = tmp
+				end
+				
+				local function sortGears( a, b )
+					for _,comp in pairs( {"gearSpeed","timeToShift","gear","range1","range2"} ) do
+						if     a[comp] < b[comp] - gearboxMogli.eps then
+							return true
+						elseif a[comp] > b[comp] + gearboxMogli.eps then
+							return false
+						end
+					end
+					return false
+				end
+				table.sort( possibleCombinations, sortGears )
+										
+				local maxGear   = table.getn( possibleCombinations )
 				local currentGearPower = self.absWheelSpeedRpmS * gearRatio
+				
 				if self.vehicle.mrGbMS.CurMinRpm < currentGearPower and currentGearPower < self.vehicle.mrGbMS.CurMaxRpm then
 					currentGearPower = currentGearPower * self.currentTorqueCurve:get( currentGearPower )
 				else
@@ -8653,61 +8536,70 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				
 				local sMin = nil
 				local sMax = nil
-				local rpmC = self.absWheelSpeedRpmS * gearboxMogli.gearSpeedToRatio( self.vehicle, self.vehicle.mrGbML.currentGearSpeed )
 				
-				local scoreRpm  = nil
-				local bestGear  = nil
-				local bestSpeed = self.vehicle.mrGbML.currentGearSpeed
+				local bestScore = math.huge
+				local bestGear  = 1
+				local bestSpeed = possibleCombinations[1].gearSpeed
+				
+				local nextScore = math.huge
+				local nextGear  = 1
+				local nextSpeed = possibleCombinations[1].gearSpeed
 				
 				for i,p in pairs( possibleCombinations ) do
-					local i2g = p[1]					
-					local i2r = p[2]
-					local i22 = p[3]
-					local spd = p[4]
-					local timeToShift = p[5]
-					local rpmHi, rpmLo
-					local isCurrentGear = p[6]
-					
-					rpmHi = self.absWheelSpeedRpmS * gearboxMogli.gearSpeedToRatio( self.vehicle, spd )
-					rpmLo = rpmHi					
+					p.score = math.huge
+					p.rpmHi = self.absWheelSpeedRpmS * gearboxMogli.gearSpeedToRatio( self.vehicle, p.gearSpeed )
+					p.rpmLo = p.rpmHi					
 					--**********************************************************************************--
-					-- estimate speed lost: 3.6 km/h lost at wheelLoad above 50 kNm for every 800 ms					
-					if timeToShift > 0 and spd > 0 and self.maxMotorTorque > 0 then
+					-- estimate speed lost: 5.4 km/h lost at wheelLoad above 50 kNm for every 800 ms					
+					if p.timeToShift > 0 and p.gearSpeed > 0 and self.maxMotorTorque > 0 then
 						-- rpmLo can become negative !!!
-						rpmLo = rpmHi - timeToShift * 0.00125 * Utils.clamp( self.wheelLoadS * 0.02, 0.1, 2 ) * self.vehicle.mrGbMS.RatedRpm / spd
+						p.rpmLo = p.rpmHi - p.timeToShift * 0.00125 * Utils.clamp( self.wheelLoadS * 0.02, 0, 1 ) * self.vehicle.mrGbMS.RatedRpm / p.gearSpeed
 					end
 									
 					local isValidEntry = true
 					
-					if     spd > maxDcSpeed 
-							or spd < self.vehicle.mrGbMG.minAutoGearSpeed then
+					if      downRpm                 <= rpmC and rpmC <= upRpm
+							and p.rpmLo + gearboxMogli.eps < rpmC and rpmC < p.rpmHi - gearboxMogli.eps
+							and p.timeToShift              > self.vehicle.mrGbMG.maxTimeToSkipGear then
+						-- the current gear is still valud => keep it
+						isValidEntry = false
+					elseif p.rpmHi < rpmC and rpmC < downRpm then
+						-- the current gear is better than the new onw
+						isValidEntry = false
+					elseif p.rpmHi > rpmC and rpmC > upRpm   then
+						-- the current gear is better than the new onw
+						isValidEntry = false
+					end
+					
+					if     p.gearSpeed > maxDcSpeed 
+							or p.gearSpeed < self.vehicle.mrGbMG.minAutoGearSpeed then
 						isValidEntry = false
 					end
 					
 					if      self.vehicle.cruiseControl.state > 0 
-							and spd * self.vehicle.mrGbMS.IdleRpm > currentSpeedLimit * self.vehicle.mrGbMS.RatedRpm then
+							and p.gearSpeed * self.vehicle.mrGbMS.IdleRpm > currentSpeedLimit * self.vehicle.mrGbMS.RatedRpm then
 						isValidEntry = false
 					end			
 					
 					if      isValidEntry 
-							and not isCurrentGear then
+							and not p.isCurrent then
 						if      self.deltaRpm < -gearboxMogli.autoShiftMaxDeltaRpm
-								and spd           > self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
+								and p.gearSpeed           > self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
 							isValidEntry = false
 						elseif  self.deltaRpm > gearboxMogli.autoShiftMaxDeltaRpm
-								and spd           < self.vehicle.mrGbML.currentGearSpeed - gearboxMogli.eps then
+								and p.gearSpeed           < self.vehicle.mrGbML.currentGearSpeed - gearboxMogli.eps then
 							isValidEntry = false
 						end
 					end
 					
 					if      isValidEntry 
-							and not isCurrentGear 
+							and not p.isCurrent 
 							and self.vehicle.mrGbMS.AutoShiftTimeoutLong > 0 then
 							
 						local autoShiftTimeout = 0
-						if     spd < self.vehicle.mrGbML.currentGearSpeed - gearboxMogli.eps then
+						if     p.gearSpeed < self.vehicle.mrGbML.currentGearSpeed - gearboxMogli.eps then
 							autoShiftTimeout = downTimerMode							
-						elseif spd > self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
+						elseif p.gearSpeed > self.vehicle.mrGbML.currentGearSpeed + gearboxMogli.eps then
 							autoShiftTimeout = upTimerMode
 						else
 							autoShiftTimeout = math.min( downTimerMode, upTimerMode )
@@ -8719,123 +8611,128 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							else
 								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort 
 							end
-						--autoShiftTimeout = autoShiftTimeout + timeToShift			
-							if autoShiftTimeout > g_currentMission.time then
+							if     autoShiftTimeout + minTimeToShift > g_currentMission.time then
 								isValidEntry = false
+							elseif autoShiftTimeout + p.timeToShift  > g_currentMission.time then
+								p.priority = 3
 							end
 						end
 					end
 					
-					if isCurrentGear or isValidEntry then
-						-- gear is possible 													
-						local test = math.huge
-						
+					if isValidEntry then
+						-- gear is possible 																			
             local testRpm
 						
-						testRpm = self:getRpmScore( rpmHi, downRpm, upRpm )
-						if     testRpm < 1 and rpmLo < rpmHi then
-							testRpm = testRpm + self:getRpmScore( rpmLo, downRpm, upRpm )
-						elseif testRpm < 1 then
-							testRpm = testRpm + testRpm
-						else
-							testRpm = 2
+						testRpm = self:getRpmScore( p.rpmHi, downRpm, upRpm )
+						if     testRpm < 1 and p.rpmLo < p.rpmHi then
+							testRpm = math.max( testRpm, self:getRpmScore( p.rpmLo, downRpm, upRpm ) )
 						end
 
 						local t1, t2 = 0, 0
-						if self.vehicle.mrGbMS.CurMinRpm < rpmHi and rpmHi < self.vehicle.mrGbMS.CurMaxRpm then
-							t1 = self.currentTorqueCurve:get( rpmHi ) * gearboxMogli.autoShiftPowerRatio
+						if self.vehicle.mrGbMS.CurMinRpm <= p.rpmHi and p.rpmHi <= self.vehicle.mrGbMS.CurMaxRpm then
+							t1 = self.currentTorqueCurve:get( p.rpmHi ) * gearboxMogli.autoShiftPowerRatio
 						end
-						if     rpmLo >= rpmHi then
+						if     p.rpmLo >= p.rpmHi then
 							t2 = t1
-						elseif self.vehicle.mrGbMS.CurMinRpm < rpmLo and rpmLo < self.vehicle.mrGbMS.CurMaxRpm then
-							t2 = self.currentTorqueCurve:get( rpmLo ) * gearboxMogli.autoShiftPowerRatio
+						elseif self.vehicle.mrGbMS.CurMinRpm <= p.rpmLo and p.rpmLo <= self.vehicle.mrGbMS.CurMaxRpm then
+							t2 = self.currentTorqueCurve:get( p.rpmLo ) * gearboxMogli.autoShiftPowerRatio
 						end		
 					
-						local testPwr = Utils.clamp( ( self.requestedPower - 0.8 * rpmHi * t1 ) / self.currentMaxPower, 0, 1 )
+						local testPwr = Utils.clamp( ( self.requestedPower - 0.8 * p.rpmHi * t1 ) / self.currentMaxPower, 0, 1 )
 					
-						if     t2 * rpmLo < self.requestedPower then
-							testPwr = testPwr + 1
-						elseif testPwr < 1 and rpmLo < rpmHi then
-							testPwr = testPwr + Utils.clamp( ( self.requestedPower - 0.8 * rpmLo * t2 ) / self.currentMaxPower, 0, 1 )
-						elseif testPwr < 1 then
-							testPwr = testPwr + testPwr
-						else
-							testPwr = 2
+						if p.rpmLo < p.rpmHi then
+							testPwr = math.max( testPwr, Utils.clamp( ( self.requestedPower - 0.8 * p.rpmLo * t2 ) / self.currentMaxPower, 0, 1 ) )
 						end
 						
-						if isCurrentGear then
-							testRpm = math.min( testRpm, 1.999 )
-							testPwr = math.min( testPwr, 1.999 )
-						end
-					
-						if      testPwr <= 0 
-								and testRpm <= 0 then
-							test = Utils.clamp( 0.001 * self.fuelCurve:get( rpmHi ), 0, 0.4 )
-							if rpmLo < rpmHi then
-								test = math.max( test, Utils.clamp( 0.001 * self.fuelCurve:get( rpmLo ), 0, 0.4 ) )
-							elseif not isCurrentGear and self.motorLoadS > 0.3 then
-								test = test * ( 1 + 0.14 * ( self.motorLoadS - 0.3 ) )
-							end
-						elseif self.ptoOn then
-							if testRpm > 0 then
-							-- reach RPM window
-								test = 4 + testRpm 
-							else
-							-- and optimize power afterwards
-								test = 2 + testPwr 
-							end
-					--elseif testRpm >= 2 and testPwr >= 2 then
-					--	test = 6 + 0.001 * math.min( math.max( 0, downRpm - rpmHi ), math.max( 0, rpmHi - upRpm ) )
-					--	print(string.format("%d %d => %f", i2g, i2r, test - 6 ))
+						if     testRpm > 0 then
+						-- reach RPM window
+							p.score = 3 + testRpm 
+						elseif testPwr > 0 then
+						-- and optimize power afterwards
+							p.score = 2 + testPwr 
+						elseif p.priority > 0 then
+						-- gear to be skipped => only relevant if it is the only gear that fits
+							p.score = 1 + 0.1 * math.min( p.priority, 10 )
 						else
-							test = math.max( testRpm, testPwr )
-							test = 2 + test + test
+						-- optimize fuel usage ratio
+							p.score = Utils.clamp( 0.001 * self.fuelCurve:get( p.rpmHi ), 0, 0.4 )
+							if p.rpmLo < p.rpmHi then
+								p.score = math.max( p.score, Utils.clamp( 0.001 * self.fuelCurve:get( p.rpmLo ), 0, 0.4 ) )
+						--elseif not p.isCurrent and self.motorLoadS > 0.3 then
+						--	p.score = p.score * ( 1 + 0.14 * ( self.motorLoadS - 0.3 ) )
+							end
 						end
 						
-						if     scoreRpm == nil
-								or scoreRpm > test
-								or ( test < 6
-								 and math.abs( scoreRpm - test ) < 1e-4
-								 and math.abs( self.vehicle.mrGbML.currentGearSpeed - spd ) < math.abs( self.vehicle.mrGbML.currentGearSpeed - bestSpeed ) )
-								or ( scoreRpm >= 6
-								 and test     >= 6
-								 and ( ( spd > bestSpeed and rpmHi > self.vehicle.mrGbMS.CurMaxRpm )
-										or ( spd < bestSpeed and rpmHi < self.vehicle.mrGbMS.CurMinRpm      ) ) )
+						if     bestScore == nil
+								or bestScore > p.score
+								or ( math.abs( bestScore - p.score ) < 1e-4
+								 and math.abs( self.vehicle.mrGbML.currentGearSpeed - p.gearSpeed ) < math.abs( self.vehicle.mrGbML.currentGearSpeed - bestSpeed ) )
 								then
-							scoreRpm  = test
+							bestScore = p.score
 							bestGear  = i
-							bestSpeed = spd
+							bestSpeed = p.gearSpeed
 						end		
+						
+						if not p.isCurrent then
+							if     nextScore == nil
+									or nextScore > p.score
+									or ( math.abs( nextScore - p.score ) < 1e-4
+									 and math.abs( self.vehicle.mrGbML.currentGearSpeed - p.gearSpeed ) < math.abs( self.vehicle.mrGbML.currentGearSpeed - nextSpeed ) )
+									then
+								nextScore = p.score
+								nextGear  = i
+								nextSpeed = p.gearSpeed
+							end		
+						end	
+						
 					end
 				end
-					
+								
+				self.vehicle.mrGbML.autoShiftInfo = string.format("%4d / %4d / %4d..%4d\nB: %6.3f %2d %5.2f\nN: %6.3f %2d %5.2f",
+																													rpmC,
+																													self.lastRealMotorRpm,
+																													downRpm,
+																													upRpm,
+																													Utils.getNoNil( bestScore, -1 ),
+																													Utils.getNoNil( bestGear,  -1 ),
+																													Utils.getNoNil( bestSpeed, -1 ),
+																													Utils.getNoNil( nextScore, -1 ),
+																													Utils.getNoNil( nextGear,  -1 ),
+																													Utils.getNoNil( nextSpeed, -1 ) )
+				
+				local doit = self.vehicle.mrGbML.autoShiftInfoPrint
+				
 				if bestGear ~= nil and possibleCombinations[bestGear] ~= nil then
 					local p = possibleCombinations[bestGear]
-					if     p[1] ~= self.vehicle.mrGbMS.CurrentGear 
-							or p[3] ~= self.vehicle.mrGbMS.CurrentRange2 
-							or p[2] ~= self.vehicle.mrGbMS.CurrentRange then
-						
-						if showGears then
-							print(string.format("old %2d %2d %2d; %2.2f",
-																	self.vehicle.mrGbMS.CurrentGear,
-																	self.vehicle.mrGbMS.CurrentRange,
-																	self.vehicle.mrGbMS.CurrentRange2,
-																	self.vehicle.mrGbML.currentGearSpeed*3.6))
-							for i,p in pairs( possibleCombinations ) do
-								print(string.format("%2d: %2d %2d %2d; %2.2f; %4d",i,p[1],p[2],p[3],p[4]*3.6, p[5]))
-							end
+					if     p.gear   ~= self.vehicle.mrGbMS.CurrentGear 
+							or p.range2 ~= self.vehicle.mrGbMS.CurrentRange2 
+							or p.range1 ~= self.vehicle.mrGbMS.CurrentRange then
 							
-							print(string.format("new %2d %2d %2d; %2.2f",p[1],p[2],p[3],p[4]*3.6))
-						end
+						if self.vehicle.mrGbMG.debugPrint or gearboxMogli.debugGearShift then doit = true end
 						
-						self.vehicle:mrGbMSetState( "CurrentGear",   p[1] ) 		
-						self.vehicle:mrGbMSetState( "CurrentRange",  p[2] ) 
-						self.vehicle:mrGbMSetState( "CurrentRange2", p[3] )
+						self.vehicle:mrGbMSetState( "CurrentGear",   p.gear ) 		
+						self.vehicle:mrGbMSetState( "CurrentRange",  p.range1 ) 
+						self.vehicle:mrGbMSetState( "CurrentRange2", p.range2 )
 	
 						clutchMode                           = 2
 						self.vehicle.mrGbML.manualClutchTime = 0
 					end
 				end										
+				
+				if doit then
+					self.vehicle.mrGbML.autoShiftInfoPrint = false
+					for i,p in pairs(possibleCombinations) do
+						print(string.format("%2d, %2d, %2d (%1d): %5.2f",p.gear,p.range1,p.range2,p.priority,p.gearSpeed*3.6)
+																..", "..tostring(self.vehicle.mrGbMS.Ranges2[p.range2].name)
+																..", "..tostring(self.vehicle.mrGbMS.Gears[p.gear].name)
+																..", "..tostring(self.vehicle.mrGbMS.Ranges[p.range1].name)
+																..", "..string.format("%4d (%4d)",p.rpmHi,p.rpmLo)
+																..", "..tostring(p.isCurrent)
+																.." => "..tostring(p.score))
+					end
+					print(self.vehicle.mrGbML.autoShiftInfo)
+				end
+				
 			end
 		end
 	end
@@ -9301,15 +9198,18 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor:getRpmScore( rpm, downRpm, upRpm ) 
 
+	local f = downRpm-1000
+	local t = upRpm  +1000
+
 	if downRpm <= rpm and rpm <= upRpm then
 		return 0
-	elseif rpm <= self.vehicle.mrGbMS.CurMinRpm
-	    or rpm >= self.vehicle.mrGbMS.CurMaxRpm then
+	elseif rpm <= f
+	    or rpm >= t then
 		return 1
 	elseif rpm < downRpm then
-		return ( downRpm - rpm ) / ( downRpm - self.vehicle.mrGbMS.CurMinRpm )
+		return ( downRpm - rpm ) * 0.001
 	elseif rpm > upRpm then
-		return ( rpm - upRpm ) / ( self.vehicle.mrGbMS.CurMaxRpm - upRpm     ) 
+		return ( rpm - upRpm ) * 0.001
 	end
 	-- error
 	print("warning: invalid parameters in gearboxMogliMotor:getRpmScore( "..tostring(rpm)..", "..tostring(downRpm)..", "..tostring(upRpm).." )")
