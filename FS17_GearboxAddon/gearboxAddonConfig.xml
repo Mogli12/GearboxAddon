@@ -1232,41 +1232,45 @@
 			<!-- http://www.roadranger.com/ecm/groups/public/@pub/@eaton/@roadranger/documents/content/ct_062746.swf -->
 			<gears axleSpeed="3.70" tireWidth="315" tireRatio="80" rimDiameter="22.5" defaultGear="3" automatic="true" doubleClutch="true" shiftTimeMs="1000" autoShiftPriority="1">
 				<gear name="Lo" forwardOnly="true" inverseRatio="14.40" maxRange="1">
-					<extraName range1="1" name="Lo"/>
-					<extraName range1="2" name="!!do not use!! (L)"/>
-					<extraName range1="3" name="!!do not use!! (H)"/>
+					<extraName range1="1" range2="1" name="Lo"/>
+					<extraName range1="2" range2="1" name="!!do not use!! (L)"/>
+					<extraName range1="2" range2="2" name="!!do not use!! (H)"/>
 				</gear>
 				<gear name="R"  reverseOnly="true" inverseRatio="15.06">
-					<extraName range1="1" name="R1"/>
-					<extraName range1="2" name="R2"/>
-					<extraName range1="3" name="R3"/>
+					<extraName range1="1" range2="1" name="R1"/>
+					<extraName range1="2" range2="1" name="R2"/>
+					<extraName range1="2" range2="2" name="R3"/>
 				</gear>
 				<gear name="1"  forwardOnly="true" inverseRatio="8.51">
-					<extraName range1="1" name="1"/>
-					<extraName range1="2" name="5 L"/>
-					<extraName range1="3" name="5 H"/>
+					<extraName range1="1" range2="1" name="1"/>
+					<extraName range1="2" range2="1" name="5 L"/>
+					<extraName range1="2" range2="2" name="5 H"/>
 				</gear>
 				<gear name="2"  forwardOnly="true" inverseRatio="6.05">
-					<extraName range1="1" name="2"/>
-					<extraName range1="2" name="6 L"/>
-					<extraName range1="3" name="6 H"/>
+					<extraName range1="1" range2="1" name="2"/>
+					<extraName range1="2" range2="1" name="6 L"/>
+					<extraName range1="2" range2="2" name="6 H"/>
 				</gear>
 				<gear name="3"  forwardOnly="true" inverseRatio="4.38">
-					<extraName range1="1" name="3"/>
-					<extraName range1="2" name="7 L"/>
-					<extraName range1="3" name="7 H"/>
+					<extraName range1="1" range2="1" name="3"/>
+					<extraName range1="2" range2="1" name="7 L"/>
+					<extraName range1="2" range2="2" name="7 H"/>
 				</gear>
 				<gear name="4"  forwardOnly="true" inverseRatio="3.20">
-					<extraName range1="1" name="4"/>
-					<extraName range1="2" name="8 L"/>
-					<extraName range1="3" name="8 H"/>
+					<extraName range1="1" range2="1" name="4"/>
+					<extraName range1="2" range2="1" name="8 L"/>
+					<extraName range1="2" range2="2" name="8 H"/>
 				</gear>
 			</gears>
 			
-			<ranges shiftTimeMs="500" clutchRatio="1" shiftNoThrottle="true" defaultRange="1" automatic="true" autoShiftPriority="1">
-				<range name="Lo"   ratio="1" upGearOffset="-3"/>
-				<range name="Hi L" ratio="3.74" downGearOffset="3" minGear="2"/>
-				<range name="Hi H" ratio="4.3758" minGear="2"/>
+			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3">
+				<range name="Lo" ratio="1"    upGearOffset="-3" maxRange2="1"/>
+				<range name="Hi" ratio="3.74" downGearOffset="3" minGear="2"/>
+			</ranges>
+			
+			<ranges shiftTimeMs="300" clutchRatio="1" shiftNoThrottle="true" defaultRange="1" automatic="true" autoShiftPriority="1">
+				<range name="L" ratio="1"/>
+				<range name="H" ratio="1.172" minRange="2"/>
 			</ranges>
 		</gearboxMogli>		
 	</vehicle>
@@ -1343,12 +1347,12 @@
 				</gear>
 			</gears>
 			
-			<ranges shiftTimeMs="500" clutchRatio="1" shiftNoThrottle="true" defaultRange="1" automatic="true" autoShiftPriority="3">
+			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3">
 				<range name="Lo" ratio="1"    upGearOffset="-3"/>
 				<range name="Hi" ratio="3.74" downGearOffset="3" minGear="2"/>
 			</ranges>
 			
-			<ranges shiftTimeMs="500" clutchRatio="1" shiftNoThrottle="true" defaultRange="2" automatic="true" autoShiftPriority="1">
+			<ranges shiftTimeMs="300" clutchRatio="1" shiftNoThrottle="true" defaultRange="2" automatic="true" autoShiftPriority="1">
 				<range name="L" ratio="1"/>
 				<range name="H" ratio="1.172"/>
 			</ranges>
@@ -2358,7 +2362,7 @@
 				<gear name="" speed="40" atRpm="1700"/>
       </gears>
 			<reverse ratio="0.625"/>
-			
+
 			<engines>
 				<engine name="310 Vario" idleRpm="850" ratedRpm="2100">
 					<!-- 1750: 113(113) | 2100: 100(100) | 1550..1550: 485(485) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 200 -->
@@ -2941,6 +2945,7 @@
 				<gear name="Lo" maxForwardSpeedRatio="0.42" />
 				<gear name="Hi" maxForwardSpeedRatio="1.02" />
 			</gears>
+			<reverse shiftTimeMs="0"/>
 		</gearboxMogli>	
 	</vehicle>
 
