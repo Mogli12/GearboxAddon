@@ -103,6 +103,7 @@ gearboxMogliGlobals.noDisable             = false
 gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
+gearboxMogliGlobals.minTimeToShiftReverse = 252  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
 gearboxMogliGlobals.autoShiftTimeoutShort = 1500 -- ms -- let it go up to ratedRPM !!!
@@ -908,7 +909,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.GearShiftEffectHl       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(0)#shiftEffect"), self.mrGbMS.GearTimeToShiftHl < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftRanges2  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#shiftTimeMs"), 1200 ) 
 	self.mrGbMS.GearShiftEffectRanges2  = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(1)#shiftEffect"), self.mrGbMS.GearTimeToShiftRanges2 < self.mrGbMG.shiftEffectTime )
-	self.mrGbMS.GearTimeToShiftReverse  = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".reverse#shiftTimeMs"), 700, -1, hasHydrostat )
+	self.mrGbMS.GearTimeToShiftReverse  = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#shiftTimeMs"), 0 ), self.mrGbMG.minTimeToShiftReverse )
 
 	self.mrGbMS.GearTimeToShiftGear     = self.mrGbMS.GearTimeToShiftGear    * self.mrGbMG.shiftTimeMsFactor
 	self.mrGbMS.GearTimeToShiftHl       = self.mrGbMS.GearTimeToShiftHl      * self.mrGbMG.shiftTimeMsFactor
@@ -7670,8 +7671,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	elseif  currentAbsSpeed < -1.8 
 			and math.abs( self.vehicle.lastSpeedReal * 3600 ) > 1
 			and autoOpenClutch 
-		--and not (  self.vehicle.mrGbMS.HydrostaticCoupling ~= nil 
-		--	     and self.vehicle.mrGbMS.HydrostaticCoupling == "direct" ) then
 			and not self.vehicle.mrGbMS.TorqueConverterOrHydro then
 		brakeNeutral  = true 
 		self.noTorque = true

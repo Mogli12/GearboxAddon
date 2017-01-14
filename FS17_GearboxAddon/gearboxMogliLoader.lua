@@ -342,7 +342,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	
 	-- internal configuration
 	xmlFile = gearboxMogliLoader.xmlFileInt
-	entry   = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configInt, configFileName )
+	entry   = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configInt, configFileName, motorConfig )
 
 	if      entry ~= nil
 			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
