@@ -524,7 +524,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			local t = getXMLString( self.xmlFile, string.format("vehicle.motorConfigurations.motorConfiguration(%d)#name",self.configurations.motor-1))
 			self.mrGbMS.EngineName = t
 			
-			if     t == "$l10n_configuration_valueDefault" then
+			if     t == "$l10n_configuration_valueDefault" or t == "l10n_configuration_valueDefault" then
 				self.mrGbMS.EngineName = s
 				if s ~= nil then
 					print('FS17_GearboxAddon: Engine name: "'..s..'"')			
@@ -667,11 +667,27 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), self.mrGbMG.combineDefaultSpeed )
 		maxPtoTorqueSpeed = math.min( maxPtoTorqueSpeed, speed )
 		local f = 1.36 * self.mrGbMG.torqueFactor / gearboxMogli.powerFactor0 * 7 / speed
-		local du0, dc0, dci, dp0, dpi = 0, 0, 0, 0, 10.6
+		local du0, dc0, dci, dp0, dpi = 0, 0, 0, 0, 0
+		
+		local storeItem = StoreItemsUtil.storeItemsByXMLFilename[self.configFileName:lower()]
+		
+		if storeItem ~= nil and storeItem.category == "forageHarvesters" then
+			dp0 = 30 * maxTorque 
+			dpi = 9.200
+		else
+			dp0 = 50 * maxTorque 
+			dc0 = 3.2* maxTorque
+			dpi = 6
+			dci = 0.383
+		end
 		
 		if width ~= nil then
 			local defaultFruit = getXMLString(xmlFile, xmlString .. ".combine#defaultFruit")			
 			local defaultLiterPerSqm = self.mrGbMG.defaultLiterPerSqm
+			
+			if defaultFruit == nil and storeItem ~= nil and storeItem.category == "forageHarvesters" then
+				defaultFruit = "chaff"
+			end
 			
 			if     defaultFruit == nil
 					or defaultFruit == "wheat"  then
@@ -725,7 +741,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end	
 	
 		if self.mrGbMG.debugPrint then
-			print(string.format("combine settings: du0: %4.3f dp0: %4.3f dpi: %3.3f dc0: %4.3f dci: %3.3f", du0, dp0, dpi, dc0, dci ))
+			print(string.format("combine settings: du0: %8.3f dp0: %8.3f dpi: %8.3f dc0: %8.3f dci: %8.3f rp0: %8.3f rc0: %8.3f (%8.3f)", du0, dp0, dpi, dc0, dci, dp0/maxTorque, dc0/maxTorque, maxTorque ))
 		end			
 			
 		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , 0.2 * self.mrGbMS.IdleRpm + 0.8 * self.mrGbMS.RatedRpm )
@@ -9431,7 +9447,7 @@ function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 			local normValue = 0
 
 			if self.speedHud == hud then
-				maxValue = self.motor.maxForwardSpeed 
+				maxValue = g_i18n:getSpeed(Utils.getNoNil(self.mrGbMB.cruiseControlMaxSpeed,30))
 			end
 			
 			local minValueAnim = Utils.getNoNil( hudItem.minValueAnim, 0 )
