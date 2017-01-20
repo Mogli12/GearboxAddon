@@ -2,7 +2,7 @@
 <modDesc descVersion="32">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.0.0.8</version>
+	<version>2.0.0.9</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
@@ -40,12 +40,13 @@ All of these continuously variable transmission have one thing in common. The ef
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. 
-Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das LS15 Standardgetriebe. 
+Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
 Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. 
 Dabei können ganz unterschiedliche Getriebe simuliert werden. 
 Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. 
 Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. 
-In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.]]></de>
+In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
+]]></de>
 		<it>
 		<it><![CDATA[
 Non tutti i trattore hanno una trasmissione a variazione continua.

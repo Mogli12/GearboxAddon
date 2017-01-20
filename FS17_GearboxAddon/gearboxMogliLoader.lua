@@ -7,6 +7,13 @@
 --
 --***************************************************************
 
+local showLogLevel = 1 -- 1 for source external, 2 for source vehicle, 3 for default configs and 4 for all vehicles, 99 for all messages
+local function logWrite( level, ... )
+	if ( level == nil and showLogLevel >= 99 ) or level <= showLogLevel then
+		print(...)
+	end
+end
+
 --***************************************************************
 source(Utils.getFilename("mogliBase.lua", g_currentModDirectory))
 source(Utils.getFilename("gearboxMogli.lua", g_currentModDirectory))
@@ -39,7 +46,7 @@ for _,funcName in pairs({ "delete",
 					if state then
 						return result
 					else
-						print("Error 3: "..tostring(result))
+						logWrite( 0,"Error 3: "..tostring(result))
 					end
 				end
 			end
@@ -55,24 +62,19 @@ function gearboxMogliLoader:load(savegame)
 	
 	self.mrGbMLGearbox1       = false
 	
-	--print("gearboxMogliLoader: "..tostring(self.isServer))
+	logWrite( 99,"gearboxMogliLoader: "..tostring(self.isServer))
 	
 	if self.isServer then
 		self.mrGbMLConfigFileName = Utils.removeModDirectory(self.configFileName);
 		
 		if self.mrGbMLConfigFileName == "" then
-			print("Error -1: "..tostring(self.customEnvironment).." "..tostring(self.mrGbMLConfigFileName))
+			logWrite( 0,"Error -1: "..tostring(self.customEnvironment).." "..tostring(self.mrGbMLConfigFileName))
 			return
 		end
 		
-	--if string.find( string.upper( self.mrGbMLConfigFileName), "MB3D" ) ~= nil then
-	--	print("No support of MB3D mods: "..tostring(self.mrGbMLConfigFileName))
-	--	return
-	--end
-			
 		local state, message = pcall( gearboxMogliLoader.loadgearboxMogli, self, self.xmlFile )
 		if not state then
-			print("Error 3 loading gearboxMogliLoader: "..tostring(message)) 
+			logWrite( 0,"Error 3 loading gearboxMogliLoader: "..tostring(message)) 
 			self.mrGbMLGearbox1 = false
 		end
 	end
@@ -111,14 +113,17 @@ function gearboxMogliLoader.initXmlFiles()
 	
 	for f=1,2 do 	
 		local file1
+		local logLevel
 
 		if f == 1 then
 			file1 = gearboxMogliLoader.baseDirectory.."gearboxAddonConfig.xml"
+			logLevel = 4
 		else
 			file1 = gearboxMogliLoader.modsDirectory.."gearboxAddonConfig.xml"
+			logLevel = 2
 		end
 		
-		print(file1)
+		logWrite( logLevel, file1)
 		if fileExists(file1) then	
 			local xmlFile = loadXMLFile( "vehicles", file1, "vehicles" )
 			
@@ -133,7 +138,7 @@ function gearboxMogliLoader.initXmlFiles()
 				local baseName       = string.format("vehicles.vehicle(%d)", i)
 				
 				if not hasXMLProperty( xmlFile, baseName..".gearboxMogli" ) then
-					print(string.format("FS17_GearboxAddon: Found %d configurations",i))								
+					logWrite( logLevel, string.format("FS17_GearboxAddon: Found %d configurations",i))								
 					break
 				end
 				
@@ -210,19 +215,19 @@ function gearboxMogliLoader.initXmlFiles()
 							and string.sub( entry.configFileName, 1, 7 ) == "default" then
 							
 						if f == 1 then
-						--print(string.format( gearboxMogliRegister.modName..": found internal default configuration (%s)", entry.configFileName ))				
+							logWrite( logLevel, string.format( gearboxMogliRegister.modName..": found internal default configuration (%s)", entry.configFileName ))				
 							gearboxMogliLoader.defaultConfigI[entry.configFileName] = entry
 						else
-							print(string.format( gearboxMogliRegister.modName..": found external default configuration (%s)", entry.configFileName ))				
+							logWrite( logLevel, string.format( gearboxMogliRegister.modName..": found external default configuration (%s)", entry.configFileName ))				
 							gearboxMogliLoader.defaultConfigE[entry.configFileName] = entry
 						end
 					elseif entry.configFileName ~= nil then
 						entry.configFileName = string.lower( entry.configFileName )
 						if f == 1 then
-						--print(string.format( gearboxMogliRegister.modName..": found internal configuration for %s", entry.configFileName ))				
+							logWrite( logLevel, string.format( gearboxMogliRegister.modName..": found internal configuration for %s", entry.configFileName ))				
 							table.insert( gearboxMogliLoader.configInt, entry )
 						else
-							print(string.format( gearboxMogliRegister.modName..": found external configuration for %s", entry.configFileName ))				
+							logWrite( logLevel, string.format( gearboxMogliRegister.modName..": found external configuration for %s", entry.configFileName ))				
 							table.insert( gearboxMogliLoader.configExt, entry )
 						end
 					end
@@ -321,10 +326,10 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
 		if state and message then
-			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", tagName, self.mrGbMLConfigFileName ))
+			logWrite( 1, string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", tagName, self.mrGbMLConfigFileName ))
 			return true
 		elseif not state then
-			print("Error 4 loading gearboxMogliLoader: "..tostring(message)) 
+			logWrite( 0, "Error 4 loading gearboxMogliLoader: "..tostring(message)) 
 		end
 	end 
 	
@@ -333,10 +338,10 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	if gearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
 		if state and message then
-			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
+			logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
 			return true
 		elseif not state then
-			print("Error 6 loading gearboxMogliLoader: "..tostring(message)) 
+			logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
 		end
 	end
 	
@@ -348,10 +353,10 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
 		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
 		if state and message then
-			print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", tagName, self.mrGbMLConfigFileName ))
+			logWrite( 4, string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", tagName, self.mrGbMLConfigFileName ))
 			return true
 		elseif not state then
-			print("Error 5 loading gearboxMogliLoader: "..tostring(message)) 
+			logWrite( 0, "Error 5 loading gearboxMogliLoader: "..tostring(message)) 
 		end
 	end
 	
@@ -388,17 +393,17 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 			end
 		end
 		
-		print(gearboxMogliRegister.modName..": looking for default configuration ("..defaultConfigName..")")
+		logWrite( 0,gearboxMogliRegister.modName..": looking for default configuration ("..defaultConfigName..")")
 		
 		xmlFile = gearboxMogliLoader.xmlFileExt
 		entry   = gearboxMogliLoader.defaultConfigE[defaultConfigName]		
 		if entry ~= nil then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
 			if state and message then
-				print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
+				logWrite( 3, string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
 				return true
 			elseif not state then
-				print("Error 7 loading gearboxMogliLoader: "..tostring(message)) 
+				logWrite( 0, "Error 7 loading gearboxMogliLoader: "..tostring(message)) 
 			end
 		end
 
@@ -407,15 +412,15 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 		if entry ~= nil then
 			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
 			if state and message then
-				print(string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
+				logWrite( 3, string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
 				return true
 			elseif not state then
-				print("Error 7 loading gearboxMogliLoader: "..tostring(message)) 
+				logWrite( 0, "Error 7 loading gearboxMogliLoader: "..tostring(message)) 
 			end
 		end
 	end
 	
-	print(string.format( gearboxMogliRegister.modName..": no configuration found for inserting %s into %s", tagName, self.mrGbMLConfigFileName ))
+	logWrite( 99, string.format( gearboxMogliRegister.modName..": no configuration found for inserting %s into %s", tagName, self.mrGbMLConfigFileName ))
 	return false
 end
 

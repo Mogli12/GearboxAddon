@@ -219,8 +219,6 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:initClient()		
 
-	print("FS17_GearboxAddon: Initialization of client...")
-
 	-- state
 	self.mrGbMS = {}
 	-- locals used for calculations
@@ -527,18 +525,18 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			if     t == "$l10n_configuration_valueDefault" or t == "l10n_configuration_valueDefault" then
 				self.mrGbMS.EngineName = s
 				if s ~= nil then
-					print('FS17_GearboxAddon: Engine name: "'..s..'"')			
+				--print('FS17_GearboxAddon: Engine name: "'..s..'"')			
 				end
 			elseif s == nil then
-				print('FS17_GearboxAddon: Vehicle motorConfiguration name: "'..t..'"')
+			--print('FS17_GearboxAddon: Vehicle motorConfiguration name: "'..t..'"')
 			elseif s ~= t then
 				print('FS17_GearboxAddon: Warning! Engine names to not match: "'..s..'" <> "'..t..'"')
 			else
-				print('FS17_GearboxAddon: Engine and vehicle motorConfiguration name: "'..t..'"')
+			--print('FS17_GearboxAddon: Engine and vehicle motorConfiguration name: "'..t..'"')
 			end
 		elseif s ~= nil then
 			self.mrGbMS.EngineName = s
-			print('FS17_GearboxAddon: Engine name: "'..s..'"')			
+		--print('FS17_GearboxAddon: Engine name: "'..s..'"')			
 		end
 		
 		while true do
