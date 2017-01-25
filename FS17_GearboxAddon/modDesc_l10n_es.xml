@@ -47,7 +47,7 @@ Cambio Manual/automático para FS17 por Mogli]]>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="GB: Desaceleración"/>
 		<text name="input_gearboxMogliECO"             text="GB: ECO Activar/Desactivar"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="GB: Mantener velocidad"/>
-		<text name="gearboxMogliTEXT_OFF"        text="Apagar motor"/>
+		<text name="gearboxMogliTEXT_OFF"        text="Motor OFF"/>
 		<text name="gearboxMogliTEXT_AI"         text="IA"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="Freno de mano"/>
 		<text name="gearboxMogliTEXT_DC"         text="Doble embrague"/>
@@ -58,6 +58,6 @@ Cambio Manual/automático para FS17 por Mogli]]>
 		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="Simple"/>
 		<text name="gearboxMogliTEXT_ECO"        text="ECO"/>
-		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Mantener automaticamente"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Motor ON"/>
 	</texts>
 </l10n>
