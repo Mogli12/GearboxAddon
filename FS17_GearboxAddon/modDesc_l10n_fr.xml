@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Transmission:
+Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vitesses GearboxMogli]]>
+</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Vitesse sup"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Vitesse inf"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: Gamme sup"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: Gamme 2 sup"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Gamme inf"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Gamme 2 inf"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: Point mort"/>
+		<text name="input_gearboxMogliOFF"             text="boite manuelle [off]"/>
+		<text name="input_gearboxMogliON"              text="boite manuelle [on]"/>
+		<text name="input_gearboxMogliON_OFF"          text="Gearbox: On/Off"/>
+		<text name="input_gearboxMogliHUD"             text="Gearbox: HUD on/off"/>
+		<text name="input_gearboxMogliAllAuto"         text="Gearbox: Changer simple/réaliste"/>
+		<text name="input_gearboxMogliAllAutoON"       text="Gearbox [simplifiée]"/>
+		<text name="input_gearboxMogliAllAutoOFF"      text="Gearbox [réaliste]"/>
+		<text name="input_gearboxMogliREVERSE"         text="Gearbox: Sens inverse"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: Changer embrayage auto/manuel"/>
+		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: embrayage"/>
+		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: débrayer"/>
+		<text name="input_gearboxMogliCLUTCH_2"        text="Gearbox: embrayer"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="Gearbox: embrayage"/>
+		<text name="input_gearboxMogliMINRPM"          text="Gearbox: accélérateur à main"/>
+		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: réduire accélérateur à main"/>
+		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: augmenter accélérateur à main"/>
+		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"           text="Gearbox: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"           text="Gearbox: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"           text="Gearbox: G27 6"/>
+		<text name="input_gearboxMogliGEARR"           text="Gearbox: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"         text="Gearbox: marche avant"/>
+		<text name="input_gearboxMogliGEARBACK"        text="Gearbox: marche arrière"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"      text="Gearbox: régulateur"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: régulateur 2"/>
+		<text name="input_gearboxMogliSETSPEED"        text="Gearbox: réglage régulateur"/>
+		<text name="input_gearboxMogliACCTOLIMIT"      text="Gearbox: accéleration"/>
+		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: décélération"/>
+		<text name="input_gearboxMogliECO"             text="Gearbox: éco on/off"/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: régulateur de vitesse"/>
+		<text name="gearboxMogliTEXT_OFF"        text="moteur off"/>
+		<text name="gearboxMogliTEXT_AI"         text="IA"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="frein à main"/>
+		<text name="gearboxMogliTEXT_DC"         text="double embrayage"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"    text="point mort"/>
+		<text name="gearboxMogliTEXT_AUTO"       text="automatique"/>
+		<text name="gearboxMogliTEXT_MANUAL"     text="manuelle"/>
+		<text name="gearboxMogliTEXT_NOGEAR"     text="pas de vitesse"/>
+		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"    text="simple"/>
+		<text name="gearboxMogliTEXT_ECO"        text="éco"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="auto-blocage"/>
+	</texts>
+</l10n>
