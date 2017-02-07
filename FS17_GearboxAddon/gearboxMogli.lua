@@ -89,6 +89,7 @@ gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.powerCurveFactor     = 0.95
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 0
+gearboxMogli.brakeForceLimitRpm   = 25
 
 gearboxMogliGlobals                       = {}
 gearboxMogliGlobals.debugPrint            = false
@@ -155,10 +156,10 @@ gearboxMogliGlobals.momentOfInertiaBase   = 2     -- J in unit kg m^2; for a cyl
 gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
-gearboxMogliGlobals.brakeForceRatio       = 0.1
+gearboxMogliGlobals.brakeForceRatio       = 0.2
 
 --**********************************************************************************************************	
--- gearboxMogli.prerequisitesPresent 
+-- gearboxMogli.prerequisitesPresent 7
 --**********************************************************************************************************	
 function gearboxMogli.prerequisitesPresent(specializations) 
 	return true
@@ -6783,14 +6784,38 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		if self.nonClampedMotorRpm > r0 then
 			t0 = math.max( t0, self.torqueCurve:get( r0 ) )
 		end
-		if self.noTorque or self.nonClampedMotorRpm >= limit + 100 then
-			brakeForce = self.vehicle.mrGbMS.BrakeForceRatio * t0
+		if     self.nonClampedMotorRpm <= self.vehicle.mrGbMS.IdleRpm then
+			brakeForce = 0
 		else
-			local a0 = acc
-			if self.nonClampedMotorRpm > limit then
-				a0 = math.min( acc, 0.01 * ( 100 + limit - self.nonClampedMotorRpm ) )
+			if r0 > self.vehicle.mrGbMS.IdleRpm + gearboxMogli.eps then
+				brakeForce = self.vehicle.mrGbMS.BrakeForceRatio * ( self.nonClampedMotorRpm - self.vehicle.mrGbMS.IdleRpm ) / ( r0 - self.vehicle.mrGbMS.IdleRpm )
+			else
+				brakeForce = self.vehicle.mrGbMS.BrakeForceRatio
 			end
-			brakeForce = self.vehicle.mrGbMS.BrakeForceRatio * ( t0 - a0 * self.lastMotorTorque )
+			
+			local l0 = math.min( limit, self.vehicle.mrGbMS.CurMaxRpm )
+			if self.vehicle.mrGbMS.Hydrostatic then
+				l0 = math.huge
+			end
+			
+			if     self.noTorque 
+					or acc                     <= 0
+					or self.nonClampedMotorRpm >= l0 + gearboxMogli.brakeForceLimitRpm then
+				brakeForce = brakeForce * t0
+			else
+				local a0 = acc
+				if self.nonClampedMotorRpm > l0 + gearboxMogli.eps then
+					a0 = math.min( acc, ( l0 + gearboxMogli.brakeForceLimitRpm - self.nonClampedMotorRpm ) / gearboxMogli.brakeForceLimitRpm )
+				end
+
+				if a0 <= 0 then
+					brakeForce = brakeForce * t0
+				elseif a0 >= 1 then
+					brakeForce = 0
+				else
+					brakeForce = brakeForce * ( t0 - a0 * self.lastMotorTorque )
+				end
+			end
 		end
 		self.lastBrakeForce = self.lastBrakeForce + self.vehicle.mrGbML.smoothFast * ( brakeForce - self.lastBrakeForce )
 		brakeForce          = self.lastBrakeForce
