@@ -157,6 +157,7 @@ gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cyl
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
+gearboxMogliGlobals.maxRpmThrottle        = 0.8
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -770,6 +771,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**************************************************************************************************		
 	self.mrGbMS.AutoStartStop           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#autoStartStop"), true)
 	self.mrGbMS.MaxSpeedLimiter         = getXMLBool( xmlFile, xmlString .. "#speedLimiter")
+	self.mrGbMS.MaxRpmThrottle          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#maxRpmThrottle"), self.mrGbMG.maxRpmThrottle )
 	self.mrGbMS.CruiseControlBrake      = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#cruiseControlBrake" ), self.mrGbMS.AutoStartStop)
 	
 	self.mrGbMS.OnlyHandThrottle        = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#onlyHandThrottle" ), false)
@@ -6747,10 +6749,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	if      not self.noTransmission 
 			and not self.noTorque
 			and self.vehicle.cruiseControl.state == 0
-		--and not ( self.vehicle.mrGbMS.Hydrostatic )
 			and self.vehicle.steeringEnabled 
-			and acc   < 0.95 then
-		limitA = math.min( limitA, self:getThrottleMaxRpm( acc ) )
+			and gearboxMogli.eps < acc and acc < self.vehicle.mrGbMS.MaxRpmThrottle then
+		limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
 	end
 	if self.lastMaxPossibleRpm ~= nil then
 		limitA = math.min( limitA, self.lastMaxPossibleRpm )
@@ -6761,7 +6762,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 	if     self.vehicle:mrGbMGetOnlyHandThrottle()
 			or self.vehicle.mrGbMS.HandThrottle > 0.01 then
-		limitA = self.minRequiredRpm
+		limitA = self.minRequiredRpm + gearboxMogli.ptoRpmThrottleDiff
 	end
 	
 -- motor brake force
@@ -6791,7 +6792,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			else
 				local a0 = acc
 				if self.nonClampedMotorRpm > limitC + gearboxMogli.eps then
-					a0 = math.min( acc, ( limitC + gearboxMogli.brakeForceLimitRpm - self.nonClampedMotorRpm ) / gearboxMogli.brakeForceLimitRpm )
+					a0 = math.min( a0, ( limitC + gearboxMogli.brakeForceLimitRpm - self.nonClampedMotorRpm ) / gearboxMogli.brakeForceLimitRpm )
 				end
 
 				if a0 <= 0 then

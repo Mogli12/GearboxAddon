@@ -439,7 +439,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
-		<gearboxMogli torqueConverter="true" speedLimiter="false">
+		<gearboxMogli torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
@@ -456,7 +456,7 @@
 	<vehicle>lizardPickupTT
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupTT.xml"/>
 		
-		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
+		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
@@ -476,7 +476,7 @@
 		<configFile xmlName="data/vehicles/steerable/man/manTGS18480.xml"/>		
 		
 		<!-- http://www.eurotransport.de/test/1/9/5/1/3/8/6/Technische_Daten_und_Messwerte.pdf -->
-		<gearboxMogli  maxForwardSpeed="93" maxBackwardSpeed="93">
+		<gearboxMogli  maxForwardSpeed="93" maxBackwardSpeed="93" maxRpmThrottle="0.5">
 			<realEngine idleRpm="930" ratedRpm="1900">
         <!-- 1500: 440(440) | 1900: 440(440) | 1000..1350: 2100(2100) | 85 | 0.5 | 250 | 3 | 2000 | 1180: 195 -->
         <torque rpm="350" motorTorque="980" fuelUsageRatio="220.9"/>
@@ -524,7 +524,7 @@
 		
 		<!-- http://tatra-lkw.de/files/Phoenix-Product-Sheet-A4_DE.pdf -->
 		<!-- https://www.zf.com/global/media/product_media/trucks/trucks_driveline_astronic/pdf_69/16_as_2630_to.pdf -->
-		<gearboxMogli torqueConverter="true" clutchCloseRpm="1700" torqueConverterMaxFactor="2.42">
+		<gearboxMogli torqueConverter="true" clutchCloseRpm="1700" torqueConverterMaxFactor="2.42" maxRpmThrottle="0.5">
 			<realEngine idleRpm="700" ratedRpm="1900">
         <!-- 1500: 462(462) | 1900: 462(462) | 1000..1350: 2300(2300) | 85 | 0.5 | 250 | 3 | 2000 | 1180: 210 -->
         <torque rpm="350" motorTorque="1073" fuelUsageRatio="237.9"/>
@@ -1113,7 +1113,7 @@
 	<vehicle>americanTruckOneAxle
 		<configFile xmlName="data/vehicles/steerable/americanTruck/americanTruckOneAxle.xml"/>
 		
-		<gearboxMogli speedLimiter="false">
+		<gearboxMogli speedLimiter="false" maxRpmThrottle="0.5">
 			<!-- https://origin-www.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
 			<!-- https://www.youtube.com/watch?v=FTEXLzPjPXw -->
 			<realEngine idleRpm="600" ratedRpm="2100">
@@ -1195,7 +1195,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/americanTruck/americanTruckDualAxle.xml"/>
 		
-		<gearboxMogli speedLimiter="false">
+		<gearboxMogli speedLimiter="false" maxRpmThrottle="0.5">
 			<!-- https://origin-www.cat.com/cda/files/2208232/7/LEHT8893-00.pdf -->
 			<!-- https://www.youtube.com/watch?v=FTEXLzPjPXw -->
 			<realEngine idleRpm="600" ratedRpm="2100">
@@ -2643,7 +2643,7 @@
 	<vehicle>
 		<configFile xmlName="defaultTrucks"/>
 
-		<gearboxMogli speedLimiter="true" maxForwardSpeed="93" maxBackwardSpeed="93" autoStartStop="true" enableAI="true">
+		<gearboxMogli speedLimiter="true" maxForwardSpeed="93" maxBackwardSpeed="93" autoStartStop="true" enableAI="true" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			<gears axleSpeed="2.71" tireWidth="600" tireRatio="50" rimDiameter="22.5" defaultGear="7" automatic="true">
 				<gear name="1"  forwardOnly="true" inverseRatio="15.86"/>
@@ -2667,7 +2667,7 @@
 	<vehicle>
 		<configFile xmlName="defaultCars"/>
 		
-		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false">
+		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
