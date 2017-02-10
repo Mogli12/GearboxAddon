@@ -6748,6 +6748,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	local limitC = self.vehicle.mrGbMS.CurMaxRpm
 	if      not self.noTransmission 
 			and not self.noTorque
+		--and not ( self.vehicle.mrGbMS.Hydrostatic )
 			and self.vehicle.cruiseControl.state == 0
 			and self.vehicle.steeringEnabled 
 			and gearboxMogli.eps < acc and acc < self.vehicle.mrGbMS.MaxRpmThrottle then
@@ -6762,7 +6763,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 	if     self.vehicle:mrGbMGetOnlyHandThrottle()
 			or self.vehicle.mrGbMS.HandThrottle > 0.01 then
-		limitA = self.minRequiredRpm + gearboxMogli.ptoRpmThrottleDiff
+		limitA = self.minRequiredRpm
 	end
 	
 -- motor brake force
@@ -6814,7 +6815,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 		torque = 0
 	else
-		if self.nonClampedMotorRpm > limitA then
+	--if     self.vehicle.mrGbMS.Hydrostatic  then
+	--elseif self.nonClampedMotorRpm > limitA then
+		if     self.nonClampedMotorRpm > limitA + gearboxMogli.ptoRpmThrottleDiff then
 			self.lastMotorTorque = self.lastMotorTorque - torque 
 			torque               = 0
 		elseif not self.limitMaxRpm and self.nonClampedMotorRpm > limitC then
@@ -7562,8 +7565,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	-- nothing
 	elseif accelerationPedal <= 0 then
 		targetRpm = minTarget	
-	elseif accelerationPedal < 0.95 then
-		local tr = self:getThrottleMaxRpm( accelerationPedal )
+	elseif gearboxMogli.eps < accelerationPedal and accelerationPedal < self.vehicle.mrGbMS.MaxRpmThrottle then
+		local tr = self:getThrottleMaxRpm( accelerationPedal / self.vehicle.mrGbMS.MaxRpmThrottle )
 		if     tr < minTarget then
 			targetRpm = minTarget 
 		elseif tr > targetRpm then
