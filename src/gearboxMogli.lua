@@ -157,7 +157,7 @@ gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cyl
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
-gearboxMogliGlobals.maxRpmThrottle        = 0.8
+gearboxMogliGlobals.maxRpmThrottle        = 0.9
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -6752,8 +6752,54 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and self.vehicle.cruiseControl.state == 0
 			and self.vehicle.steeringEnabled 
 			and gearboxMogli.eps < acc and acc < self.vehicle.mrGbMS.MaxRpmThrottle then
-		limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
+			
+		local noLimit = false
+		local o = "reverseOnly"
+		if self.vehicle.mrGbMS.ReverseActive then
+			o = "forwardOnly"
+		end
+		
+		for j=1,3 do
+			local n, g, c, f
+			
+			if     j==1 then
+				n = "speed"
+        g = self.vehicle.mrGbMS.Gears
+        c = self.vehicle.mrGbMS.CurrentGear
+				f = self.vehicle.mrGbMGetAutoShiftGears
+			elseif j==2 then
+				n = "ratio"
+			  g = self.vehicle.mrGbMS.Ranges
+			  c = self.vehicle.mrGbMS.CurrentRange
+				f = self.vehicle.mrGbMGetAutoShiftRange
+			else
+				n = "ratio"
+			  g = self.vehicle.mrGbMS.Ranges2
+			  c = self.vehicle.mrGbMS.CurrentRange2
+				f = self.vehicle.mrGbMGetAutoShiftRange2
+			end
+
+			local r = g[c][n]
+
+			if f( self.vehicle ) then
+				for i=c+1,table.getn( g ) do
+					if g[i][n] > r and not ( g[i][o] ) then
+						noLimit = true
+						break
+					end
+				end
+			end
+			
+			if noLimit then
+				break
+			end
+		end
+		
+		if not noLimit then
+			limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
+		end
 	end
+	
 	if self.lastMaxPossibleRpm ~= nil then
 		limitA = math.min( limitA, self.lastMaxPossibleRpm )
 	end
