@@ -3794,6 +3794,66 @@
 		</gearboxMogli>	
 	</vehicle>
 
+	<vehicle>FS17_DeutzAgrostar471
+		<mod name="FS17_DeutzAgrostar471">
+			<link href="http://farming-simulator.com/mod.php?mod_id=69341" />
+			<xmlFile name="DeutzAgrostar471.xml" />
+		</mod>
+
+		<!-- https://de.wikipedia.org/wiki/Liste_der_Deutz-Motoren#Baureihe_FL913 FL913T -->
+		<gearboxMogli autoStartStop="false" maxAIRange2="3">
+			<realEngine idleRpm="900" ratedRpm="2300">
+        <!-- 2100: 97(97) | 2300: 95(95) | 1600..1600: 366(366) | 85 | 0.5 | 149 | 2.2 | 2400 | 1400: 211 -->
+        <torque rpm="350" motorTorque="221" fuelUsageRatio="239.7"/>
+        <torque rpm="700" motorTorque="298" fuelUsageRatio="223.8"/>
+        <torque rpm="900" motorTorque="324" fuelUsageRatio="217.5"/>
+        <torque rpm="1000" motorTorque="335" fuelUsageRatio="215.2"/>
+        <torque rpm="1100" motorTorque="345" fuelUsageRatio="213.3"/>
+        <torque rpm="1200" motorTorque="352" fuelUsageRatio="212"/>
+        <torque rpm="1300" motorTorque="358" fuelUsageRatio="211.3"/>
+        <torque rpm="1400" motorTorque="363" fuelUsageRatio="211"/>
+        <torque rpm="1500" motorTorque="365" fuelUsageRatio="211.3"/>
+        <torque rpm="1600" motorTorque="366" fuelUsageRatio="212.2"/>
+        <torque rpm="1700" motorTorque="361" fuelUsageRatio="213.6"/>
+        <torque rpm="1800" motorTorque="354" fuelUsageRatio="215.6"/>
+        <torque rpm="1850" motorTorque="350" fuelUsageRatio="216.9"/>
+        <torque rpm="1900" motorTorque="346" fuelUsageRatio="218.2"/>
+        <torque rpm="1950" motorTorque="341" fuelUsageRatio="219.8"/>
+        <torque rpm="2000" motorTorque="336" fuelUsageRatio="221.4"/>
+        <torque rpm="2050" motorTorque="330" fuelUsageRatio="223.2"/>
+        <torque rpm="2100" motorTorque="324" fuelUsageRatio="225.2"/>
+        <torque rpm="2150" motorTorque="316" fuelUsageRatio="227.3"/>
+        <torque rpm="2200" motorTorque="308" fuelUsageRatio="229.5"/>
+        <torque rpm="2250" motorTorque="299" fuelUsageRatio="231.9"/>
+        <torque rpm="2300" motorTorque="290" fuelUsageRatio="234.4"/>
+        <torque rpm="2350" motorTorque="264" fuelUsageRatio="249.7"/>
+        <torque rpm="2400" motorTorque="169" fuelUsageRatio="321"/>
+        <torque rpm="2450" motorTorque="0" fuelUsageRatio="468.9"/>
+			</realEngine>
+		
+			<gears defaultGear="4" shiftTimeMs="800" speedMatching="false">
+				<gear speed="10.0"/>
+				<gear speed="13.5"/>
+				<gear speed="17.0"/>
+				<gear speed="25.0"/>
+				<gear speed="30.0"/>
+				<gear speed="40.0"/>
+			</gears>
+
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" speedMatching="false">
+				<range ratio="0.8" name="I" />
+				<range ratio="1.0" name="II" />
+			</ranges>
+
+			<ranges defaultRange="4" reverseReset="true" doubleClutch="true">
+				<range ratio="0.2275" name="L" forwardOnly="true"/>
+				<range ratio="0.47"   name="M" forwardOnly="true"/>
+				<range ratio="1"      name="H" forwardOnly="true"/>
+				<range ratio="0.44"   name="R" reverseOnly="true"/>
+			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+
 	<vehicle>FS17_kirovetsK700A
 		<mod name="FS17_kirovetsK700A">
 			<link href="http://www.farming-simulator.com/mod.php?mod_id=58337" />
