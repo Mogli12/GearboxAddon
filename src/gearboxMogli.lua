@@ -158,6 +158,8 @@ gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
 gearboxMogliGlobals.maxRpmThrottle        = 0.9
+gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
+gearboxMogliGlobals.autoStartStop         = false -- option to enable auto start stop for all vechiles
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -1486,6 +1488,15 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.MatchRanges = "false"
 	elseif  self.mrGbMS.MatchGears  == nil then
 		self.mrGbMS.MatchGears  = "false"
+	end
+	
+--**************************************************************************************************	
+-- speed matching disabled via global settings
+	if self.mrGbMG.noSpeedMatching then
+		self.mrGbMS.MatchRanges          = "false"
+		self.mrGbMS.MatchGears           = "false"
+		self.mrGbMS.StartInSmallestGear  = false
+		self.mrGbMS.StartInSmallestRange = false
 	end
 	
 --**************************************************************************************************	
@@ -2936,10 +2947,14 @@ function gearboxMogli:update(dt)
 		end
 	end	
 	
-	
-	--if g_gui:getIsGuiVisible() or g_currentMission.isPlayerFrozen or g_currentMission.inGameMessage:getIsVisible() then	
-	--	gearboxMogli.onLeave( self )
-	--end
+	if      self.steeringEnabled 
+			and self.isMotorStarted
+			and self.isClient
+			and not self:getIsActiveForInput(false, true)
+			and g_gui:getIsGuiVisible() 
+			and g_gui.currentGuiName ~= "ChatDialog" then
+		gearboxMogli.onLeave( self )
+	end
 end 
 
 --**********************************************************************************************************	
@@ -4710,7 +4725,7 @@ end
 -- gearboxMogli:mrGbMGetAutoStartStop
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoStartStop()
-	return self.mrGbMS.AllAuto or self.mrGbMS.AutoStartStop or not ( self.steeringEnabled )
+	return self.mrGbMS.AllAuto or self.mrGbMS.AutoStartStop or self.mrGbMG.autoStartStop or not ( self.steeringEnabled )
 end
 
 --**********************************************************************************************************	
