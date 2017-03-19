@@ -4732,6 +4732,110 @@
 			</engines>
 		</gearboxMogli>
 	</vehicle>
+	
+	<vehicle>
+		<configFile modName="IHC_644"  xmlName="IHC_644.xml"/>
+		<configFile modName="IHC_644A" xmlName="IHC_644A.xml"/>
+
+		<gearboxMogli autoStartStop="false" speedLimiter="false">
+			<blowOffVentilSound volume="0"/>
+				
+			<gears defaultGear="2" shiftTimeMs="800">	
+				<gear speed="6.1" />
+				<gear speed="10.6" />
+				<gear speed="17.9" />
+				<gear speed="28.3" />
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" clutchRatio="1">
+				<range ratio="0.29" name="A" forwardOnly="true" />
+				<range ratio="1.00" name="S" forwardOnly="true" />
+				<range ratio="0.58" name="R" reverseOnly="true" />
+			</ranges>
+			
+			<realEngine idleRpm="700" ratedRpm="2150">
+        <!-- 2150: 60(60) | 2150: 60(60) | 1600..1600: 212(212) | 70 | 0 | 249 | 2 | 2300 | 1280: 210 -->
+        <torque rpm="350" motorTorque="100" fuelUsageRatio="234"/>
+        <torque rpm="700" motorTorque="148" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="174" fuelUsageRatio="214"/>
+        <torque rpm="1000" motorTorque="184" fuelUsageRatio="212.2"/>
+        <torque rpm="1100" motorTorque="192" fuelUsageRatio="210.9"/>
+        <torque rpm="1200" motorTorque="199" fuelUsageRatio="210.2"/>
+        <torque rpm="1300" motorTorque="205" fuelUsageRatio="210"/>
+        <torque rpm="1400" motorTorque="209" fuelUsageRatio="210.4"/>
+        <torque rpm="1500" motorTorque="211" fuelUsageRatio="211.5"/>
+        <torque rpm="1600" motorTorque="212" fuelUsageRatio="213.2"/>
+        <torque rpm="1700" motorTorque="211" fuelUsageRatio="215.4"/>
+        <torque rpm="1800" motorTorque="210" fuelUsageRatio="218.3"/>
+        <torque rpm="1850" motorTorque="209" fuelUsageRatio="220"/>
+        <torque rpm="1900" motorTorque="207" fuelUsageRatio="221.9"/>
+        <torque rpm="1950" motorTorque="206" fuelUsageRatio="223.8"/>
+        <torque rpm="2000" motorTorque="204" fuelUsageRatio="226"/>
+        <torque rpm="2050" motorTorque="201" fuelUsageRatio="228.3"/>
+        <torque rpm="2100" motorTorque="199" fuelUsageRatio="230.7"/>
+        <torque rpm="2150" motorTorque="196" fuelUsageRatio="233.3"/>
+        <torque rpm="2200" motorTorque="188" fuelUsageRatio="237.5"/>
+        <torque rpm="2250" motorTorque="164" fuelUsageRatio="257.2"/>
+        <torque rpm="2300" motorTorque="125" fuelUsageRatio="299.1"/>
+        <torque rpm="2350" motorTorque="70" fuelUsageRatio="368.2"/>
+        <torque rpm="2400" motorTorque="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<configFile modName="IHC_744"  xmlName="IHC_744.xml"/>
+		<configFile modName="IHC_744A" xmlName="IHC_744A.xml"/>
+
+		<gearboxMogli autoStartStop="false" speedLimiter="false">
+			<blowOffVentilSound volume="0"/>
+				
+			<gears defaultGear="2" shiftTimeMs="800">	
+				<gear speed="5.82" />
+				<gear speed="11.09" />
+				<gear speed="17.41" />
+				<gear speed="27.00" />
+			</gears>
+
+			<ranges defaultRange="2" shiftTimeMs="1200" clutchRatio="1">
+				<range ratio="0.29" name="A" forwardOnly="true" />
+				<range ratio="1.00" name="S" forwardOnly="true" />
+				<range ratio="0.58" name="R" reverseOnly="true" />
+			</ranges>
+			
+			<realEngine idleRpm="700" ratedRpm="2300">
+        <!-- 2300: 77(70) | 2300: 77(70) | 1200..1200: 239.68(240) | 80 | 0 | 249 | 2 | 2400 | 1200: 210 -->
+        <torque rpm="350" motorTorque="122" motorTorqueEco="122" fuelUsageRatio="237"/>
+        <torque rpm="700" motorTorque="192" motorTorqueEco="192" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="222" motorTorqueEco="222" fuelUsageRatio="213.4"/>
+        <torque rpm="1000" motorTorque="232" motorTorqueEco="232" fuelUsageRatio="211.5"/>
+        <torque rpm="1100" motorTorque="238" motorTorqueEco="238" fuelUsageRatio="210.4"/>
+        <torque rpm="1200" motorTorque="240" motorTorqueEco="240" fuelUsageRatio="210"/>
+        <torque rpm="1300" motorTorque="240" motorTorqueEco="239" fuelUsageRatio="210.2"/>
+        <torque rpm="1400" motorTorque="240" motorTorqueEco="239" fuelUsageRatio="210.8"/>
+        <torque rpm="1500" motorTorque="239" motorTorqueEco="238" fuelUsageRatio="211.7"/>
+        <torque rpm="1600" motorTorque="239" motorTorqueEco="236" fuelUsageRatio="213.1"/>
+        <torque rpm="1700" motorTorque="239" motorTorqueEco="234" fuelUsageRatio="214.8"/>
+        <torque rpm="1800" motorTorque="238" motorTorqueEco="232" fuelUsageRatio="216.9"/>
+        <torque rpm="1850" motorTorque="238" motorTorqueEco="231" fuelUsageRatio="218.1"/>
+        <torque rpm="1900" motorTorque="238" motorTorqueEco="229" fuelUsageRatio="219.4"/>
+        <torque rpm="1950" motorTorque="238" motorTorqueEco="228" fuelUsageRatio="220.8"/>
+        <torque rpm="2000" motorTorque="237" motorTorqueEco="226" fuelUsageRatio="222.3"/>
+        <torque rpm="2050" motorTorque="237" motorTorqueEco="224" fuelUsageRatio="223.9"/>
+        <torque rpm="2100" motorTorque="237" motorTorqueEco="222" fuelUsageRatio="225.6"/>
+        <torque rpm="2150" motorTorque="236" motorTorqueEco="220" fuelUsageRatio="227.4"/>
+        <torque rpm="2200" motorTorque="236" motorTorqueEco="218" fuelUsageRatio="229.3"/>
+        <torque rpm="2250" motorTorque="235" motorTorqueEco="216" fuelUsageRatio="231.3"/>
+        <torque rpm="2300" motorTorque="235" motorTorqueEco="214" fuelUsageRatio="233.3"/>
+        <torque rpm="2350" motorTorque="226" motorTorqueEco="205" fuelUsageRatio="237.5"/>
+        <torque rpm="2400" motorTorque="197" motorTorqueEco="179" fuelUsageRatio="257.2"/>
+        <torque rpm="2450" motorTorque="150" motorTorqueEco="136" fuelUsageRatio="299.1"/>
+        <torque rpm="2500" motorTorque="83" motorTorqueEco="76" fuelUsageRatio="368.2"/>
+        <torque rpm="2550" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+	
 
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	

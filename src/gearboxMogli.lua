@@ -7079,18 +7079,18 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.lastGearRatio = nil
 		self.lastGMax      = nil
 		
-		if     self.vehicle.mrGbMS.Hydrostatic     then
-			local hMax = self.vehicle.mrGbMS.HydrostaticMax
-			if self.vehicle.mrGbMS.ReverseActive and self.vehicle.mrGbMS.HydrostaticMin < 0 then
-				hMax = -self.vehicle.mrGbMS.HydrostaticMin
-			end
-			self.ratioFactorG  = 1 / hMax
-			self.gearRatio     = self:getMogliGearRatio() * self.ratioFactorG
-			if self.vehicle.mrGbMS.ReverseActive then 
-				self.gearRatio   = -self.gearRatio
-			end
-			self.lastGearRatio = self.gearRatio
-		end
+	--if     self.vehicle.mrGbMS.Hydrostatic     then
+	--	local hMax = self.vehicle.mrGbMS.HydrostaticMax
+	--	if self.vehicle.mrGbMS.ReverseActive and self.vehicle.mrGbMS.HydrostaticMin < 0 then
+	--		hMax = -self.vehicle.mrGbMS.HydrostaticMin
+	--	end
+	--	self.ratioFactorG  = 1 / hMax
+	--	self.gearRatio     = self:getMogliGearRatio() * self.ratioFactorG
+	--	if self.vehicle.mrGbMS.ReverseActive then 
+	--		self.gearRatio   = -self.gearRatio
+	--	end
+	--	self.lastGearRatio = self.gearRatio
+	--end
 	elseif self.vehicle.mrGbMS.Hydrostatic then
 
 		local r = self:getMogliGearRatio()
@@ -7592,7 +7592,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 	self.motorLoad = math.max( 0, self.maxMotorTorque * mlf - self.neededPtoTorque / self.ptoMotorRpmRatio )
 	
-	local wheelLoad        = math.abs( self.usedTransTorque * self:getGearRatio()	)
+	local wheelLoad   = 0
+	if not ( lastNoTransmission ) then
+		wheelLoad       = math.abs( self.usedTransTorque * self.gearRatio	)
+	end
 	if self.wheelLoadS == nil then
 		self.wheelLoadS = wheelLoad
 	else
@@ -7664,7 +7667,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local clutchMode = 0 -- no clutch calculation
 
 	if self.lastClutchClosedTime < self.vehicle.mrGbML.autoShiftTime then
-		self.lastClutchClosedTime = self.vehicle.mrGbML.autoShiftTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort
+		self.lastClutchClosedTime = self.vehicle.mrGbML.autoShiftTime
 	end
 	
   local r = self.vehicle.mrGbMS.RpmIncFactor + self.motorLoadP * self.motorLoadP * ( self.vehicle.mrGbMS.RpmIncFactorFull - self.vehicle.mrGbMS.RpmIncFactor )
@@ -8586,12 +8589,19 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						and self.clutchRpm        > upRpm then
 					-- allow immediate up shift
 					upTimerMode   = 0
+				elseif  accelerationPedal                    < -gearboxMogli.accDeadZone
+						and self.vehicle.mrGbMS.CurrentGearSpeed > self.vehicle.mrGbMS.LaunchGearSpeed then
+					-- allow immediate down shift while braking
+					downTimerMode = 0
 				elseif  self.clutchOverheatTimer ~= nil
 						and self.clutchPercent       < 0.9 
 						and self.clutchOverheatTimer > 0.5 * self.vehicle.mrGbMS.ClutchOverheatStartTime then
 					downTimerMode = 0
 				elseif  self.clutchRpm           < downRpm then
 					-- allow down shift after short timeout
+					if self.vehicle.mrGbMS.CurrentGearSpeed > self.vehicle.mrGbMS.LaunchGearSpeed then
+						downTimerMode = 0
+					end
 				elseif  self.vehicle.cruiseControl.state > 0 
 						and self.vehicle.mrGbMS.CurrentGearSpeed * downRpm / self.vehicle.mrGbMS.RatedRpm > currentSpeedLimit then
 					-- allow down shift after short timeout
