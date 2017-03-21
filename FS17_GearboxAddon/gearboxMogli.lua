@@ -3021,7 +3021,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:updateTick(dt)
 
-	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbML.motor == nil then
+	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbMD == nil then
 		return
 	end	
 	
@@ -3117,93 +3117,88 @@ function gearboxMogli:updateTick(dt)
 			end 	
 		end
 		
-		if self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then	
-			self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
-					
-			local maxSumDt = 333
-			if self.mrGbMS.NoUpdateStream then
-				maxSumDt = 1000
+		self.mrGbML.lastSumDt = self.mrGbML.lastSumDt + dt
+				
+		local maxSumDt = 333
+		if self.isServer and self.mrGbMS.NoUpdateStream then
+			maxSumDt = 1000
+		end
+		
+		if self.mrGbML.lastSumDt > maxSumDt then
+			if self.isServer and self.mrGbMS.IsOn and self.mrGbML.motor ~= nil and self.motor == self.mrGbML.motor then
+				self.mrGbMD.Tgt    = 0
+				self.mrGbMD.Clutch = 0
+				self.mrGbMD.Power  = 0
+				self.mrGbMD.Hydro  = 255
+				
+				if self.isMotorStarted then
+					if self.motor.targetRpm     ~= nil then
+						self.mrGbMD.Tgt  = tonumber( Utils.clamp( math.floor( 200*(self.motor.targetRpm-self.mrGbMS.CurMinRpm)/(self.mrGbMS.RatedRpm-self.mrGbMS.CurMinRpm)+0.5), 0, 255 ))	 				
+					end
+					self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetAutoClutchPercent( self ) * 200+0.5), 0, 255 ))	
+					if      self.mrGbMS.sendReqPower 
+							and self.motor.usedTransTorque        ~= nil
+							and self.motor.lastPtoTorque          ~= nil
+							and self.motor.prevNonClampedMotorRpm ~= nil
+							and self.mrGbMS.CurMinRpm             ~= nil then
+						local power = ( self.motor.usedTransTorque + self.motor.lastPtoTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.mrGbMS.CurMinRpm )
+						self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * gearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
+					end
+					if self.mrGbMS.Hydrostatic and not ( self.motor.noTransmission ) then
+						if self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin > gearboxMogli.eps then
+							self.mrGbMD.Hydro = 200 * Utils.clamp( ( self.motor.hydrostaticFactor - self.mrGbMS.HydrostaticMin ) / ( self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin ), 0, 1 )
+						else
+							self.mrGbMD.Hydro = 200
+						end
+					end
+				end
+
+				self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
+				
+				if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
+						or ( self.mrGbMS.sendHydro     and self.mrGbMD.lastHydro  ~= self.mrGbMD.Hydro )
+						or ( self.mrGbMS.sendTargetRpm and self.mrGbMD.lastTgt    ~= self.mrGbMD.Tgt   )
+						or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
+						or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
+						then
+					self.mrGbMD.lastTgt    = self.mrGbMD.Tgt
+					self.mrGbMD.lastClutch = self.mrGbMD.Clutch
+					self.mrGbMD.lastPower  = self.mrGbMD.Power 
+					self.mrGbMD.lastRate   = self.mrGbMD.Rate
+					self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
+
+					if self.mrGbMS.NoUpdateStream then					
+						local message = {}
+						message.Clutch = self.mrGbMD.Clutch
+						
+						if self.mrGbMS.sendHydro     then message.Hydro = self.mrGbMD.Hydro end		 
+						if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Tgt   end			
+						if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
+						if self.mrGbMS.IsCombine     then message.Rate  = self.mrGbMD.Rate  end		
+						
+						self:mrGbMSetState( "NUSMessage", message )
+					else
+						self:raiseDirtyFlags(self.mrGbML.dirtyFlag) 
+					end 
+				end 
 			end
 			
-			if self.mrGbML.lastSumDt > maxSumDt then
-				if self.isServer then
-					self.mrGbMD.Tgt    = 0
-					self.mrGbMD.Clutch = 0
-					self.mrGbMD.Power  = 0
-					self.mrGbMD.Hydro  = 255
-					
-					if self.isMotorStarted then
-						if self.motor.targetRpm     ~= nil then
-							self.mrGbMD.Tgt  = tonumber( Utils.clamp( math.floor( 200*(self.motor.targetRpm-self.mrGbMS.CurMinRpm)/(self.mrGbMS.RatedRpm-self.mrGbMS.CurMinRpm)+0.5), 0, 255 ))	 				
-						end
-						self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetAutoClutchPercent( self ) * 200+0.5), 0, 255 ))	
-						if      self.mrGbMS.sendReqPower 
-								and self.motor.usedTransTorque        ~= nil
-								and self.motor.lastPtoTorque          ~= nil
-								and self.motor.prevNonClampedMotorRpm ~= nil
-								and self.mrGbMS.CurMinRpm             ~= nil then
-							local power = ( self.motor.usedTransTorque + self.motor.lastPtoTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.mrGbMS.CurMinRpm )
-							self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * gearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
-						end
-						if self.mrGbMS.Hydrostatic and not ( self.motor.noTransmission ) then
-							if self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin > gearboxMogli.eps then
-								self.mrGbMD.Hydro = 200 * Utils.clamp( ( self.motor.hydrostaticFactor - self.mrGbMS.HydrostaticMin ) / ( self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin ), 0, 1 )
-							else
-								self.mrGbMD.Hydro = 200
-							end
-						end
-					end
-
-					self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
-					
-					if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
-							or ( self.mrGbMS.sendHydro     and self.mrGbMD.lastHydro  ~= self.mrGbMD.Hydro )
-							or ( self.mrGbMS.sendTargetRpm and self.mrGbMD.lastTgt    ~= self.mrGbMD.Tgt   )
-							or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
-							or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
-							then
-						self.mrGbMD.lastTgt    = self.mrGbMD.Tgt
-						self.mrGbMD.lastClutch = self.mrGbMD.Clutch
-						self.mrGbMD.lastPower  = self.mrGbMD.Power 
-						self.mrGbMD.lastRate   = self.mrGbMD.Rate
-						self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
-
-						if self.mrGbMS.NoUpdateStream then					
-							local message = {}
-							message.Clutch = self.mrGbMD.Clutch
-							
-							if self.mrGbMS.sendHydro     then message.Hydro = self.mrGbMD.Hydro end		 
-							if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Tgt   end			
-							if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
-							if self.mrGbMS.IsCombine     then message.Rate  = self.mrGbMD.Rate  end		
-							
-							self:mrGbMSetState( "NUSMessage", message )
-						else
-							self:raiseDirtyFlags(self.mrGbML.dirtyFlag) 
-						end 
-					end 
+			if self.mrGbML.lastFuelFillLevel == nil then
+				self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+				self.mrGbMD.Fuel              = 0
+			else
+				local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
+				self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+				if self.isFuelFilling then
+					fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
 				end
-				
-				if self.mrGbML.lastFuelFillLevel == nil then
-					self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-					self.mrGbMD.Fuel              = 0
-				else
-					local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
-					self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-					if self.isFuelFilling then
-						fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
-					end
-					local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
-				--self.mrGbMD.Fuel              = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
-					self.mrGbMD.Fuel              = fuelUsageRatio
-				end 
-				
-				self.mrGbML.lastSumDt = 0
+				local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
+			--self.mrGbMD.Fuel              = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
+				self.mrGbMD.Fuel              = fuelUsageRatio
 			end 
-		else
-			self.mrGbML.lastSumDt         = 0
-			self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-		end
+			
+			self.mrGbML.lastSumDt = 0
+		end 
 	end	
 end 
 
