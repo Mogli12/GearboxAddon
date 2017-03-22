@@ -47,19 +47,20 @@ Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwär
 Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. 
 In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
 ]]></de>
-		<it>
+
 		<it><![CDATA[
-Non tutti i trattore hanno una trasmissione a variazione continua.
-E anche le trasmissioni a variazione continua non sono di costruzione semplice come quella standard di Farming Simulator.
-Questo script aggiunge sulla base del file gearboxAddonConfig.xml un riduttore a tutti i trattori configurati.
-Molti diversi tipi di trasmissione possono essere simulati. Ci sono riduttori classici con ingranaggi, uno o due gruppi e ingranaggi o gruppi di retromarcia.
+Non tutti i trattori hanno una trasmissione a variazione continua e anche le trasmissioni a variazione continua non sono di costruzione semplice come quella standard di Farming Simulator.
+Questo script aggiunge, sulla base del file gearboxAddonConfig.xml, un riduttore a tutti i trattori configurati.
+Molti diversi tipi di trasmissione possono essere simulati:
+Ci sono riduttori classici con ingranaggi, uno o due gruppi e ingranaggi o gruppi di retromarcia;
 Riducendo il tempo di risposta a zero si tradurrà in una trasmissione power shift.
-In trattori moderni cambi power-shift sono spesso combinati con cambio automatico della trasmissione. Un altro tipo di trasmissione è la trasmissione a variazione continua.
+Nei trattori moderni i cambi power-shift sono spesso combinati con un cambio automatico.
+Un altro tipo di trasmissione è la trasmissione a variazione continua.
 Ci sono modelli con una o due marce, come il Fendt Vario.
-Altri modelli combinano quattro commutata automaticamente ingranaggi meccanici con una trasmissione idrostatica a variazione continua.
-Tutti questi trasmissione a variazione continua hanno una cosa in comune. L'efficienza varia piuttosto fortemente a seconda del rapporto di trasmissione.
+Altri modelli combinano automaticamente quattro ingranaggi meccanici con una trasmissione idrostatica a variazione continua.
+Tutti questi tipi di trasmissione a variazione continua hanno una cosa in comune: l'efficienza varia piuttosto fortemente a seconda del rapporto di trasmissione.
 ]]></it>
-		</it>
+
 		<fr><![CDATA[
 Chaque tracteur n'a pas de transmission variable en continu.
 Et même les transmissions à variation continue ne sont pas aussi simples en construction que la norme en simulateur d'élevage.
