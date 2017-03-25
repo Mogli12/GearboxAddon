@@ -568,8 +568,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		
 			self.mrGbMS.Engine.torqueValues[torqueI+1] = {v=torque, time = rpm}
 					
-			if torque>self.mrGbMS.Engine.maxTorque then
+			if torque>self.mrGbMS.Engine.maxTorque + gearboxMogli.eps then
 				self.mrGbMS.Engine.maxTorqueRpm = rpm;
+			end;			
+			if torque>self.mrGbMS.Engine.maxTorque then
 				self.mrGbMS.Engine.maxTorque = torque;
 			end;
 			
@@ -616,6 +618,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100);
 			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#minRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 			self.mrGbMS.CurMaxRpm = self.mrGbMS.Engine.maxRpm + gearboxMogli.rpmPlus
+			self.mrGbMS.MinTargetRpm = math.min( self.mrGbMS.MinTargetRpm, self.mrGbMS.Engine.maxTorqueRpm / gearboxMogli.rpmReduction )
 		end
 		
 		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3600
@@ -1367,7 +1370,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	end
 	self.mrGbMS.LaunchRange2       = self.mrGbMS.DefaultRange2
 	
-	local defaultLaunchSpeed       = 20
+	local defaultLaunchSpeed       = 10
 	
 	if hasDefaultGear then
 		defaultLaunchSpeed           = self.mrGbMS.Gears[self.mrGbMS.LaunchGear].speed
@@ -1396,7 +1399,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			end
 		end
 	end
-		
+	
 	-- start with 7 km/h with "drueckung" 15% => 8 km/h
 	self.mrGbMS.LaunchPtoSpeed     = Utils.getNoNil(getXMLInt(xmlFile, xmlString .. "#ptolaunchSpeed"), 8 ) / 3.6 
 	self.mrGbMS.MatchRanges        = getXMLString(xmlFile, xmlString .. ".ranges(0)#speedMatching")
@@ -2043,6 +2046,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
+		self.mrGbMS.Sound.ReverseDriveSample = self.sampleReverseDrive.sample
 	end
 	
 --**********************************************************************************************************		
@@ -2262,7 +2266,8 @@ function gearboxMogli:update(dt)
 		if self.mrGbMB.Sound == nil then
 			self.mrGbMB.Sound = { self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 														self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax, 
-														self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax }
+														self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
+														self.sampleReverseDrive.sample }
 		end
 		
 		self.motorSoundPitchScale     = self.mrGbMS.Sound.IdlePitchScale
@@ -2271,11 +2276,13 @@ function gearboxMogli:update(dt)
 		self.motorSoundRunPitchMax    = self.mrGbMS.Sound.RunPitchMax
 		self.motorSoundLoadPitchScale = self.mrGbMS.Sound.LoadPitchScale 
 		self.motorSoundLoadPitchMax   = self.mrGbMS.Sound.LoadPitchMax
+		self.sampleReverseDrive.sample = nil
 	else
 		if self.mrGbMB.Sound ~= nil then
 			self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 			self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,
-			self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax = unpack( self.mrGbMB.Sound )
+			self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
+			self.sampleReverseDrive.sample = unpack( self.mrGbMB.Sound )
 			self.mrGbMB.Sound = nil
 		end
 	
@@ -2825,6 +2832,18 @@ function gearboxMogli:update(dt)
 				end
 			end
 		end
+		
+		if self.mrGbMS.Sound.ReverseDriveSample ~= nil then
+			self.sampleReverseDrive.sample = self.mrGbMS.Sound.ReverseDriveSample
+			
+			if self.mrGbMS.ReverseActive and not self.mrGbMS.NeutralActive then
+				SoundUtil.playSample(self.sampleReverseDrive, 0, 0, nil)
+			else
+				SoundUtil.stopSample(self.sampleReverseDrive)
+			end
+			
+			self.sampleReverseDrive.sample = nil
+		end
 				
 --**********************************************************************************************************			
 		-- this is from Motorized.lua 
@@ -3181,24 +3200,30 @@ function gearboxMogli:updateTick(dt)
 						self:raiseDirtyFlags(self.mrGbML.dirtyFlag) 
 					end 
 				end 
-			end
-			
-			if self.mrGbML.lastFuelFillLevel == nil then
-				self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-				self.mrGbMD.Fuel              = 0
-			else
-				local fuelUsed = self.mrGbML.lastFuelFillLevel - self.fuelFillLevel
-				self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
-				if self.isFuelFilling then
-					fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastSumDt * 0.001
-				end
-				local fuelUsageRatio          = fuelUsed * (1000 * 3600) / self.mrGbML.lastSumDt
-			--self.mrGbMD.Fuel              = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
-				self.mrGbMD.Fuel              = fuelUsageRatio
-			end 
-			
+			end			
 			self.mrGbML.lastSumDt = 0
 		end 
+		
+		if self.mrGbML.lastFuelFillLevel == nil or self.mrGbML.lastFuelDt == nil then
+			self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
+			self.mrGbML.fuelFillLevel     = self.fuelFillLevel
+			self.mrGbML.lastFuelDt        = 0
+			self.mrGbMD.Fuel              = 0
+		else
+			self.mrGbML.lastFuelDt = self.mrGbML.lastFuelDt + dt
+			self.mrGbML.fuelFillLevel = self.mrGbML.fuelFillLevel + self.mrGbML.smoothSlow * ( self.fuelFillLevel - self.mrGbML.fuelFillLevel )
+			if self.mrGbML.lastFuelDt > 250 then
+				local fuelUsed = self.mrGbML.lastFuelFillLevel - self.mrGbML.fuelFillLevel
+				self.mrGbML.lastFuelFillLevel = self.mrGbML.fuelFillLevel
+				if self.isFuelFilling then
+					fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastFuelDt * 0.001
+				end
+				local fuelUsageRatio   = fuelUsed * (1000 * 3600) / self.mrGbML.lastFuelDt
+			--self.mrGbMD.Fuel       = self.mrGbMD.Fuel + gearboxMogli.smoothMedium * ( fuelUsageRatio - self.mrGbMD.Fuel )
+				self.mrGbMD.Fuel       = fuelUsageRatio
+				self.mrGbML.lastFuelDt = 0
+			end 		
+		end 		
 	end	
 end 
 
@@ -6316,6 +6341,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.rpmIncFactor            = self.vehicle.mrGbMS.RpmIncFactor	
 	self.lastBrakeForce          = 0
 	
+	self.interalResistence       = 0.3 * self.torqueCurve:get( self.vehicle.mrGbMS.RatedRpm ) / self.vehicle.mrGbMS.RatedRpm
+	
 	self:chooseTorqueCurve( true )
 
 	self.ratioFactorG = 1
@@ -8328,7 +8355,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local alwaysShiftRange2 =  self.vehicle.mrGbMS.GearTimeToShiftRanges2 < self.vehicle.mrGbMG.maxTimeToSkipGear
 																or self.vehicle.mrGbMS.ShiftNoThrottleRanges2
 				
-				local downRpm   = self.vehicle.mrGbMS.IdleRpm -- math.max( self.vehicle.mrGbMS.IdleRpm,  self.vehicle.mrGbMS.MinTargetRpm )
+				local downRpm   = math.max( self.vehicle.mrGbMS.IdleRpm,  self.vehicle.mrGbMS.MinTargetRpm * gearboxMogli.rpmReduction )
 				local upRpm     = math.max( self.vehicle.mrGbMS.RatedRpm, self.maxMaxPowerRpm )
 							
 				if self.vehicle.mrGbMS.AutoShiftDownRpm ~= nil and self.vehicle.mrGbMS.AutoShiftDownRpm > downRpm then
@@ -8532,9 +8559,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								p.priority = 0
 							end
 							
-							if p.gearSpeed < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps then
-								p.priority = math.max( p.priority, 3 )
-							end
+						--if p.gearSpeed < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps then
+						----p.priority = math.max( p.priority, 3 )
+						--	p.priority = p.priority + 3
+						--end
+							-- 0.6667 .. 1.3333 => 0
+							-- < 0.5 or > 23    => 3
+							p.plog     = math.min( math.max( 0, math.abs( math.log( p.gearSpeed / self.vehicle.mrGbMS.CurrentGearSpeed ) ) - 0.2877 ) * 7.4, 3 )
+							p.plog     = 0.1 * math.floor( p.plog * 10 )
+							p.priority = math.max( p.priority, p.plog )
 							
 							if minTimeToShift > p.timeToShiftMax then
 								minTimeToShift = p.timeToShiftMax
@@ -8545,7 +8578,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 					possibleCombinations = tmp
 				end
-				
+								
 				local function sortGears( a, b )
 					for _,comp in pairs( {"gearSpeed","timeToShiftMax","gear","range1","range2"} ) do
 						if     a[comp] < b[comp] - gearboxMogli.eps then
@@ -8557,7 +8590,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					return false
 				end
 				table.sort( possibleCombinations, sortGears )
-										
+				
+				local dumpIt = string.format("%4.2f;; ",self.vehicle.mrGbMS.CurrentGearSpeed)
+				for i,p in pairs( possibleCombinations ) do
+					dumpIt = dumpIt .. string.format("%2d: %4.2f %4.2f %4.2f;; ",i,p.gearSpeed,p.plog,p.priority)
+				end
+				self.vehicle.mrGbDump = dumpIt 
+				
 				local maxGear   = table.getn( possibleCombinations )
 				local currentGearPower = self.absWheelSpeedRpmS * gearRatio
 				
@@ -8636,7 +8675,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					if      downRpm                   <= rpmC and rpmC <= upRpm
 							and p.rpmLo + gearboxMogli.eps < rpmC and rpmC < p.rpmHi - gearboxMogli.eps
 							and p.timeToShiftMax           > self.vehicle.mrGbMG.maxTimeToSkipGear then
-						-- the current gear is still valud => keep it
+						-- the current gear is still valid => keep it
 						p.priority = math.max( p.priority, 8 )
 					elseif p.rpmHi < rpmC and rpmC < downRpm then
 						-- the current gear is better than the new onw
@@ -8644,6 +8683,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					elseif p.rpmHi > rpmC and rpmC > upRpm   then
 						-- the current gear is better than the new onw
 						p.priority = math.max( p.priority, 9 )
+					end
+					
+					if      self.vehicle.mrGbML.DirectionChangeTime ~= nil
+							and g_currentMission.time  < self.vehicle.mrGbML.DirectionChangeTime + 2000
+							and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
+							and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed then
+						isValidEntry = false
 					end
 					
 					-- no down shift if just idling  
@@ -8654,11 +8700,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							and self.stallWarningTimer == nil 
 							then
 					--isValidEntry = false
-						p.priority = math.max( p.priority, 4 )
+						p.priority = math.max( p.priority, 6.5 )
 					end
 						
 					if p.gearSpeed < self.vehicle.mrGbMG.minAutoGearSpeed then
-						p.priority = 10
+					--p.priority = 10
+						isValidEntry = false
 					end
 						
 					if p.gearSpeed > maxDcSpeed then
