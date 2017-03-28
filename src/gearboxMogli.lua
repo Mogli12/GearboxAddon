@@ -2969,7 +2969,9 @@ function gearboxMogli:update(dt)
 	if      self.steeringEnabled 
 			and self.isMotorStarted
 			and self.isClient
-			and not self:getIsActiveForInput(false, true)
+			and self.isEntered
+			and not self.isHired
+			and not self:getIsActiveForInput(false, false)
 			and g_gui:getIsGuiVisible() 
 			and g_gui.currentGuiName ~= "ChatDialog" then
 		gearboxMogli.onLeave( self )
