@@ -123,7 +123,7 @@ gearboxMogliGlobals.hudWidth              = 0.15
 gearboxMogliGlobals.stallWarningTime      = 250
 gearboxMogliGlobals.stallMotorOffTime     = 3000
 gearboxMogliGlobals.realFuelUsage         = true
-gearboxMogliGlobals.idleFuelTorqueRatio   = 0.3
+gearboxMogliGlobals.idleFuelTorqueRatio   = 0.2
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 10   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
@@ -478,7 +478,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.AccelerateToLimit       = 5  -- km/h per second
 	self.mrGbMS.DecelerateToLimit       = 10 -- km/h per second
 	self.mrGbMS.MinTargetRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#minTargetRpm"), 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm )
-	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.15 )
+	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.02 )
 	self.mrGbMS.BrakeForceRatio         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#brakeForceRatio"), self.mrGbMG.brakeForceRatio )
 	
 --**************************************************************************************************	
@@ -7437,7 +7437,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local handThrottleRpm = self.vehicle.mrGbMS.IdleRpm 
 	if handThrottle >= 0 then
 		self.ptoOn = true
-		handThrottleRpm     = self.vehicle.mrGbMS.IdleRpm + handThrottle * math.max( 0, self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm )
+	--handThrottleRpm     = self.vehicle.mrGbMS.IdleRpm + handThrottle * math.max( 0, self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm )
+		handThrottleRpm     = self:getThrottleMaxRpm( handThrottle )
 		self.minRequiredRpm = math.max( self.minRequiredRpm, handThrottleRpm )
 	end
 	if self.vehicle.mrGbMS.AllAuto then
@@ -9025,10 +9026,18 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 	if self.noTransmission then
 		self.minThrottle    = 0
-		if self.lastRealMotorRpm < self.minRequiredRpm + 10 then
-			self.minThrottle  = self.vehicle.mrGbMS.IdleEnrichment
-		end		
+	--if self.lastRealMotorRpm < self.minRequiredRpm + 10 then
+	--	self.minThrottle  = self.vehicle.mrGbMS.IdleEnrichment
+	--end		
+		self.minThrottle = self.vehicle.mrGbMS.IdleEnrichment + math.max( 0, handThrottle ) * ( 1 - self.vehicle.mrGbMS.IdleEnrichment )
+		if     self.lastRealMotorRpm < self.minRequiredRpm - 1 then
+			self.minThrottle = 1
+		elseif self.lastRealMotorRpm > self.minRequiredRpm + 1 then
+			self.minThrottle = 0
+		end
 		self.minThrottleS   = Utils.clamp( self.minThrottleS + 0.1 * ( self.minThrottle - self.minThrottleS ), 0, 1 )
+		self.minThrottle    = self.minThrottleS
+		
 		if self.noTorque then
 			self.lastThrottle = 0
 		elseif self.vehicle:mrGbMGetOnlyHandThrottle() then
