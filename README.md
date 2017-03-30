@@ -1,5 +1,8 @@
 # GearboxAddOn for Farming Simulator 2017
 
+## News and Status
+There is a new way to specify the gear and ranges the tractor should use during launch. If you change the gear while the tractor is in neutral or auto hold the gearbox will remember this gear and use it again after the next stop or after changing direction. I hope that this change does not cause too much trouble.
+
 ## Description
 This is the continuation of the mod MoreRealistic GearboxAddon for FS13. In FS15 it works even without MoreRealistic. 
 Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in FS15. This mod adds on the basis of the file zzzMrGearboxAddonConfig.xml a gearbox to all configured tractors. Many various transmission kinds can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. In modern tractors power shift transmissions are often combined with automatic gear shifting.
