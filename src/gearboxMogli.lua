@@ -2839,7 +2839,7 @@ function gearboxMogli:update(dt)
 			end
 		end
 		
-		if self.mrGbMS.Sound.ReverseDriveSample ~= nil then
+		if self:getIsActiveForSound() and self.mrGbMS.Sound.ReverseDriveSample ~= nil then
 			self.sampleReverseDrive.sample = self.mrGbMS.Sound.ReverseDriveSample
 			
 			if self.mrGbMS.ReverseActive and not self.mrGbMS.NeutralActive then
