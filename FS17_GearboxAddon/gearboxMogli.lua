@@ -379,7 +379,8 @@ function gearboxMogli:initClient()
 	self.mrGbMD.Hydro      = 255
 	self.mrGbMD.lastHydro  = 255
 	
-	self.lastAcceleration  = 0
+	self.mrGbML.lastAcceleration  = 0
+	self.mrGbML.lastBrakePedal    = 1
 end 
 
 --**********************************************************************************************************	
@@ -2476,6 +2477,10 @@ function gearboxMogli:update(dt)
 				and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
 			self:mrGbMSetNeutralActive( false ) 
 		end
+		
+		if not self.mrGbMS.NeutralActive and self.mrGbMS.AutoHold then
+			self:mrGbMSetState( "AutoHold", false )		
+		end
 
 		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
@@ -2765,6 +2770,25 @@ function gearboxMogli:update(dt)
 			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => off"				
 			end
 		end
+--**********************************************************************************************************					
+-- auto start stop or manual clutch if vehicle is not controlled 
+--**********************************************************************************************************			
+	elseif  self.steeringEnabled 
+			and self.isMotorStarted
+			and not self.isHired
+			and self.isClient then
+		-- open clutch if RPM is too low
+		if      self.isEntered
+				and g_gui:getIsGuiVisible() 
+				and g_gui.currentGuiName ~= "ChatDialog" 
+				and not ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch )
+				and self:mrGbMGetCurrentRPM() <= 1.1 * self.mrGbMS.IdleRpm then
+			self:mrGbMSetManualClutch( 0 )
+		end
+		-- set one button clutch timer on all clients
+		if self.mrGbMS.ManualClutch == 0 then
+			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
+		end
 	end
 	
 	if      self.isServer 
@@ -2951,37 +2975,19 @@ function gearboxMogli:update(dt)
 			end
 		end
 
-	
 --**********************************************************************************************************			
 -- keep on going if not entered 
 --**********************************************************************************************************		
 		if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE then
-			doUpdate = true
 			Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
-		elseif  not self.mrGbMS.NeutralActive
-				and ( self.mrGbMS.AutoClutch or self.mrGbMS.AutoStartStop or self.mrGbMS.AllAuto ) then
-			self:mrGbMSetNeutralActive( true, false, true )
-			self:mrGbMSetState( "AutoHold", true )
-			Drivable.updateVehiclePhysics(self, 1, false, 0, false, false, dt)
-		elseif  self.motor.lastMotorRpm > 1.1 * self.mrGbMS.IdleRpm then
+		elseif  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm then
 			if self.mrGbMS.AutoHold then
 				Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
 			else
 				Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
 			end
 		end
-	end	
-	
-	if      self.steeringEnabled 
-			and self.isMotorStarted
-			and self.isClient
-			and self.isEntered
-			and not self.isHired
-			and not self:getIsActiveForInput(false, false)
-			and g_gui:getIsGuiVisible() 
-			and g_gui.currentGuiName ~= "ChatDialog" then
-		gearboxMogli.onLeave( self )
-	end
+	end		
 end 
 
 --**********************************************************************************************************	
@@ -3034,12 +3040,15 @@ function gearboxMogli:onLeave()
 			and self.mrGbMS.IsOn 
 			and self.isMotorStarted
 			and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE
-			and ( self:mrGbMGetAutoClutch() or self:mrGbMGetAutomatic() or self:mrGbMGetAutoStartStop() ) then 
-		self:mrGbMSetNeutralActive( true, false, true )
-		if self:mrGbMGetAutoHold() then
-			self:mrGbMSetState( "AutoHold", true )
+			and not self.isHired then
+		if self:mrGbMGetAutoStartStop() then 
+			self:mrGbMSetNeutralActive( true, false, true )
+			self:mrGbMSetState( "IsNeutral", true )
+		else
+			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
+			self:mrGbMSetManualClutch( 0 )
 		end
-		self:mrGbMSetState( "IsNeutral", true )
+		self:mrGbMSetState( "AutoHold", true )
 	end
 end
 
@@ -5756,6 +5765,11 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 --	acc = -acc
 --end
 	
+	-- self.doHandbrake is set to false if a dialog is shown
+	if self.isMotorStarted and self.steeringEnabled and self.isControlled then
+		doHandbrake = false
+	end
+	
 	local acceleration        = acc
 	local accelerationPedal   = 0
 	local brakePedal          = 0
@@ -5949,7 +5963,9 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	local absAccelerationPedal = math.abs(accelerationPedal)
 	local wheelDriveTorque = 0
 	 
-	self.lastAcceleration  = acceleration
+	self.mrGbML.lastAcceleration  = acceleration
+	self.mrGbML.lastBrakePedal    = brakePedal 
+
 	
 	if next(self.differentials) ~= nil and self.motorizedNode ~= nil then
 		local torque,_,brakeForce = self.motor:getTorque(accelerationPedal, false) 
@@ -6995,7 +7011,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	--Pi = Utils.clamp( self.hydrostatPressureI, 0, self.vehicle.mrGbMS.HydrostaticPressure )
 		
 		local Mo = 0
-		if self.noTransmission or self.noTorque or self.vehicle.lastAcceleration <= 0 then
+		if self.noTransmission or self.noTorque or self.vehicle.mrGbML.lastAcceleration <= 0 then
 			Mo = 0
 		else
 			Mo = 0.95 * Pi * self.hydrostatVolumeMotor / ( 20000 * math.pi )
