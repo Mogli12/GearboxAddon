@@ -154,6 +154,8 @@ gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydr
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 gearboxMogliGlobals.momentOfInertiaBase   = 2     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertiaBaseH  = 1
+gearboxMogliGlobals.momentOfInertiaH      = 1
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
@@ -647,8 +649,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.RatedRpm
 	end
 
-	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), self.mrGbMG.momentOfInertiaBase + self.mrGbMG.momentOfInertia * maxTorque ) 
-	
 --**************************************************************************************************	
 -- PTO RPM
 --**************************************************************************************************		
@@ -809,7 +809,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	else                             
 		self.mrGbMS.DisableManual       = false
 	end
-		
+	
+	if hasHydrostat then
+		default = self.mrGbMG.momentOfInertiaBaseH + self.mrGbMG.momentOfInertiaH * maxTorque
+	else
+		default = self.mrGbMG.momentOfInertiaBase  + self.mrGbMG.momentOfInertia  * maxTorque
+	end
+	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), default )
+	
 --**************************************************************************************************	
 -- Clutch parameter
 --**************************************************************************************************		
@@ -2863,18 +2870,6 @@ function gearboxMogli:update(dt)
 			end
 		end
 		
-		if self:getIsActiveForSound() and self.mrGbMS.Sound.ReverseDriveSample ~= nil then
-			self.sampleReverseDrive.sample = self.mrGbMS.Sound.ReverseDriveSample
-			
-			if self.mrGbMS.ReverseActive and not self.mrGbMS.NeutralActive then
-				SoundUtil.playSample(self.sampleReverseDrive, 0, 0, nil)
-			else
-				SoundUtil.stopSample(self.sampleReverseDrive)
-			end
-			
-			self.sampleReverseDrive.sample = nil
-		end
-				
 --**********************************************************************************************************			
 		-- this is from Motorized.lua 
 		local minRpm = self.motor:getMinRpm();
@@ -2900,9 +2895,26 @@ function gearboxMogli:update(dt)
 		local tmp = self.lastRoundPerMinute
 		
 		self.lastRoundPerMinute = targetRpmOffset + ( realRpmOffset - targetRpmOffset ) / alpha
-		
---**********************************************************************************************************			
 	end
+	
+--**********************************************************************************************************			
+-- reverse driving sound
+--**********************************************************************************************************			
+	if self.mrGbMS.Sound.ReverseDriveSample ~= nil then
+		self.sampleReverseDrive.sample = self.mrGbMS.Sound.ReverseDriveSample
+
+		if      self.isMotorStarted
+				and self.mrGbML.motor ~= nil
+				and self:getIsActiveForSound() 
+				and self.mrGbMS.ReverseActive 
+				and not self.mrGbMS.NeutralActive then
+			SoundUtil.playSample(self.sampleReverseDrive, 0, 0, nil)
+		else
+			SoundUtil.stopSample(self.sampleReverseDrive)
+		end
+		
+		self.sampleReverseDrive.sample = nil
+	end				
 	
 --**********************************************************************************************************			
 -- sound pitch and volume
