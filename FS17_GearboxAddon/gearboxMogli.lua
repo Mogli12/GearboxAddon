@@ -5296,7 +5296,7 @@ end
 function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )		
 	self.mrGbMS.NeutralActive   = new 
 
-	if new then
+	if new and self.mrGbMS.G27Mode <= 0  then
 		self:mrGbMSetLanuchGear( noEventSend )
 	end
 	
