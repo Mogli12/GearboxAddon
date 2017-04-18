@@ -917,8 +917,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	end
 		
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
-	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.50 * clutchEngagingTimeMs ) 		
-	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.25 * self.mrGbMS.ClutchTimeDec) 
+	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
+	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 2 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
@@ -2511,9 +2511,9 @@ function gearboxMogli:update(dt)
 		end
 		
 		local clutchSpeed = 1 / math.max( self.mrGbMS.ClutchShiftTime, 1 )
-		if not ( self:mrGbMGetAutoClutch() ) then
-			clutchSpeed     = math.max( 0.002, clutchSpeed )
-		end
+	--if not ( self:mrGbMGetAutoClutch() ) then
+	--	clutchSpeed     = math.max( 0.002, clutchSpeed )
+	--end
 		
 		if     gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
@@ -5915,6 +5915,17 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end
 	end
 	
+	do
+		local cs = currentSpeed * 3600
+		local sl = self:getSpeedLimit(true) + gearboxMogli.extraSpeedLimit
+		if cs >= sl + 1 then
+			brakePedal  = 1
+			brakeLights = true
+		elseif cs > sl then
+			brakePedal  = math.max( brakePedal, cs - sl )
+		end
+	end
+	
 	self.motor:updateSpeedLimit( dt )
 	
 	if      self.tempomatMogliV17 ~= nil 
@@ -5923,9 +5934,19 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		brakeLights = true
 	end
 	
+	local lastRotatedTime = self.mrGbML.lastRotatedTime
+	self.mrGbML.lastRotatedTime = nil
+	
 	if     doHandbrake or self.mrGbMS.AutoHold or not ( self.isMotorStarted ) or g_currentMission.time < self.motorStartTime then
 		-- hand brake
-		if math.abs(self.rotatedTime) < 0.01 or self.articulatedAxis == nil then
+		if self.articulatedAxis ~= nil then
+			if lastRotatedTime == nil then
+				brakePedal = 1
+			else
+				brakePedal = 1 - 0.5 * ( lastRotatedTime - self.rotatedTime )
+			end
+			self.mrGbML.lastRotatedTime = self.rotatedTime
+		else
 			brakePedal = 1
 		end
 	elseif acceleration < 0 then
@@ -5941,11 +5962,14 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	
 	if      ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
-			and ( ( self.movingDirection * currentSpeed >  2.7777777778e-4 and self.mrGbMS.ReverseActive )
-				 or ( self.movingDirection * currentSpeed < -2.7777777778e-4 and not ( self.mrGbMS.ReverseActive ) ) ) then
-		-- wrong direction                              
-		brakePedal  = 1
-		brakeLights = true
+			and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
+				 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
+		-- wrong direction   
+		local b = math.min( 1, 1800 * math.abs( currentSpeed ) )
+		if b >= 0.5 then
+			brakeLights = true
+		end
+		brakePedal = math.max( b, brakePedal )
 	end
 	
 	if      self:mrGbMGetAutoHold()
@@ -5981,7 +6005,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		
 		brakePedal = math.max( brakePedal, brakeForce )
 						
-		if     self.motor.clutchPercent < gearboxMogli.minClutchPercent + gearboxMogli.minClutchPercent then
+		if     self.motor.clutchPercent < gearboxMogli.minClutchPercent then
 			c = 0
 		else
 			local cp = self.motor.clutchPercent
@@ -7930,7 +7954,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			self.vehicle:mrGbMDoGearShift() 
 			self.vehicle.mrGbML.gearShiftingNeeded = 0						
 			
-		elseif not ( self.vehicle:mrGbMGetAutoClutch() ) and self.vehicle.mrGbMS.ManualClutch < self.vehicle.mrGbMS.MinClutchPercent + 0.1 then
+		elseif not ( self.vehicle:mrGbMGetAutoClutch() ) and self.vehicle.mrGbMS.ManualClutch < gearboxMogli.minClutchPercent then
 	--**********************************************************************************************************		
 	-- manual clutch pressed
 			self.noTransmission = true		
