@@ -121,7 +121,7 @@ gearboxMogliGlobals.hudTitleSize          = 0.03
 gearboxMogliGlobals.hudBorder             = 0.005
 gearboxMogliGlobals.hudWidth              = 0.15
 gearboxMogliGlobals.stallWarningTime      = 250
-gearboxMogliGlobals.stallMotorOffTime     = 3000
+gearboxMogliGlobals.stallMotorOffTime     = 1250
 gearboxMogliGlobals.realFuelUsage         = true
 gearboxMogliGlobals.idleFuelTorqueRatio   = 0.2
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
@@ -133,10 +133,8 @@ gearboxMogliGlobals.dtDeltaTargetSlow     = 0.0002 -- 5 seconds
 gearboxMogliGlobals.ddsDirectory          = "dds/"
 gearboxMogliGlobals.initMotorOnLoad       = true
 gearboxMogliGlobals.ptoSpeedLimit         = true
-gearboxMogliGlobals.clutchFrom            = 0.0
-gearboxMogliGlobals.clutchTo              = 0.8
-gearboxMogliGlobals.clutchExp             = 2.2
-gearboxMogliGlobals.clutchFactor          = 2.4
+gearboxMogliGlobals.clutchExp             = 2.0
+gearboxMogliGlobals.clutchFactor          = 1.2
 gearboxMogliGlobals.grindingMinRpmDelta   = 200
 gearboxMogliGlobals.grindingMaxRpmSound   = 600
 gearboxMogliGlobals.grindingMaxRpmDelta   = gearboxMogli.huge
@@ -5943,14 +5941,10 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	
 	if      ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
-			and ( ( self.movingDirection * currentSpeed >  5.5555555556e-4 and self.mrGbMS.ReverseActive )
-				 or ( self.movingDirection * currentSpeed < -5.5555555556e-4 and not ( self.mrGbMS.ReverseActive ) ) ) then
-		-- wrong direction 
-	--if g_currentMission.time >= self.mrGbML.DirectionChangeTime + 2000 then
-			brakePedal = 1
-	--else
-	--	brakePedal = math.max( g_currentMission.time - self.mrGbML.DirectionChangeTime ) * 0.0005
-	--end
+			and ( ( self.movingDirection * currentSpeed >  2.7777777778e-4 and self.mrGbMS.ReverseActive )
+				 or ( self.movingDirection * currentSpeed < -2.7777777778e-4 and not ( self.mrGbMS.ReverseActive ) ) ) then
+		-- wrong direction                              
+		brakePedal  = 1
 		brakeLights = true
 	end
 	
@@ -5962,7 +5956,6 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			and acceleration < 0.1 then
 		-- auto hold
 		brakePedal  = 1
-	--brakeLights = true
 	end
 		
 	self.setBrakeLightsVisibility(self, brakeLights)
@@ -5987,11 +5980,16 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		local c           = 0
 		
 		brakePedal = math.max( brakePedal, brakeForce )
-				
+						
 		if     self.motor.clutchPercent < gearboxMogli.minClutchPercent + gearboxMogli.minClutchPercent then
 			c = 0
 		else
-			c = gearboxMogli.huge
+			local cp = self.motor.clutchPercent
+			if self.mrGbMS.TorqueConverter then
+				cp = self.mrGbMS.ManualClutch
+			end
+
+			c = self.mrGbMG.clutchFactor * self.motor.maxMotorTorque * ( ( 0.5 * ( 1 - math.cos( math.pi * cp )) ) ^ self.mrGbMG.clutchExp )
 		end
 		
 		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c, self.motor:getRotInertia(), self.motor:getDampingRate());
@@ -7169,8 +7167,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			self.ratioFactorR = 1 / ( self.ratioFactorG * self.hydrostaticFactor )
 		end
 		
-	elseif self.clutchPercent < 1 and self.vehicle.mrGbMS.TorqueConverter then
-		local c = self.clutchRpm / self:getMotorRpm()
+	elseif self.autoClutchPercent < 1 and self.vehicle.mrGbMS.TorqueConverter then
+		local c = self.clutchRpm / self:getMotorRpm( self.autoClutchPercent )
 		if c * self.vehicle.mrGbMS.TorqueConverterFactor > 1 then
 			self.ratioFactorG = 1 / c
 		else
@@ -7741,12 +7739,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			and self.vehicle.mrGbMS.HydrostaticMin < gearboxMogli.eps
 			and accelerationPedal >= -0.001 then
 		brakeNeutral = false
-	elseif  currentAbsSpeed < -1.8 
-			and math.abs( self.vehicle.lastSpeedReal * 3600 ) > 1
-			and autoOpenClutch 
-			and not self.vehicle.mrGbMS.TorqueConverterOrHydro then
-		brakeNeutral  = true 
-		self.noTorque = true
+--elseif  currentAbsSpeed < -1.8 
+--		and math.abs( self.vehicle.lastSpeedReal * 3600 ) > 1
+--		and autoOpenClutch 
+--		and not self.vehicle.mrGbMS.TorqueConverterOrHydro then
+--	brakeNeutral  = true 
+--	self.noTorque = true
 	elseif self.vehicle.cruiseControl.state ~= 0 
 			or not autoOpenClutch then
 	-- no automatic stop or cruise control is on 
@@ -9245,11 +9243,15 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getMotorRpm
 --**********************************************************************************************************	
-function gearboxMogliMotor:getMotorRpm( )
+function gearboxMogliMotor:getMotorRpm( cIn )
 	if self.noTransmission then
 		return self:getThrottleRpm()
 	end
-	return self.clutchPercent * self.clutchRpm + ( 1-self.clutchPercent ) * self:getThrottleRpm()
+	local c = self.clutchPercent
+	if type( cIn ) == "number" then
+		c = cIn
+	end
+	return c * self.clutchRpm + ( 1-c ) * self:getThrottleRpm()
 end
 
 --**********************************************************************************************************	
