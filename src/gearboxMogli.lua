@@ -918,7 +918,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
-	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 2 * self.mrGbMS.ClutchTimeDec) 
+	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
@@ -2545,14 +2545,15 @@ function gearboxMogli:update(dt)
 				self:mrGbMSetManualClutch( 1 )
 			end
 		elseif g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
-			local mi = ( g_currentMission.time - self.mrGbML.oneButtonClutchTimer ) / self.mrGbMS.ClutchTimeManual
-			local ma = math.min( 1, self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeInc )
+			local mi = math.max( ( g_currentMission.time - self.mrGbML.oneButtonClutchTimer ) / self.mrGbMS.ClutchTimeManual,
+													 self.mrGbMS.ManualClutch - dt / self.mrGbMS.ClutchTimeDec )
+			local ma = math.min( 1, 
+													 self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeInc )
 			if self.motor.targetRpm == nil then
 				self:mrGbMSetManualClutch( mi )
 			else
-				self:mrGbMSetManualClutch( self.motor:getClutchPercent( self.motor.targetRpm, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, ma ) )
+				self:mrGbMSetManualClutch( self.motor:getClutchPercent( self.motor.targetRpm, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, self.mrGbMS.ManualClutch, ma ) )
 			end
-		--print(string.format("%d, %5.2f%% <= %5.2f%% <= %5.2f%%",g_currentMission.time - self.mrGbML.oneButtonClutchTimer, mi*100,self.mrGbMS.ManualClutch*100,ma*100))
 		end
 		
 		if InputBinding.gearboxMogliMINRPM ~= nil then
@@ -8944,7 +8945,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			if      clutchMode > 1 
 					and self.vehicle.mrGbML.afterShiftClutch ~= nil then
 				if self.vehicle.mrGbML.afterShiftClutch < 0 then
-					self.autoClutchPercent = self:getClutchPercent( targetRpm, openRpm, closeRpm, fromClutchPercent, toClutchPercent )
+					self.autoClutchPercent = self:getClutchPercent( targetRpm, openRpm, closeRpm, fromClutchPercent, self.autoClutchPercent, toClutchPercent )
 				else
 					self.autoClutchPercent = self.vehicle.mrGbML.afterShiftClutch
 				end
@@ -8977,7 +8978,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 				end
 				
-				local c = self:getClutchPercent( targetRpm, openRpm, closeRpm, fromClutchPercent, toClutchPercent )
+				local c = self:getClutchPercent( targetRpm, openRpm, closeRpm, fromClutchPercent, self.autoClutchPercent, toClutchPercent )
 				
 				if self.vehicle.mrGbML.debugTimer ~= nil and g_currentMission.time < self.vehicle.mrGbML.debugTimer then
 					print(string.format("Clutch mode %d: %3.0f%% => %3.0f%% o: %4.0f U/min c: %4.0f U/min / %3.0f%% .. %3.0f%%",
@@ -9319,7 +9320,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getClutchPercent
 --**********************************************************************************************************	
-function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromPercent, toPercent )
+function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromPercent, curPercent, toPercent )
 
 	if fromPercent ~= nil and toPercent ~= nil and fromPercent >= toPercent then
 		return fromPercent
@@ -9331,7 +9332,7 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 		return Utils.getNoNil( fromPercent, self.vehicle.mrGbMS.MinClutchPercent )
 	end	
 	
-	local minPercent    = self.vehicle.mrGbMS.MinClutchPercent + Utils.clamp( 0.5 + 0.02 * ( self.lastRealMotorRpm - openRpm ), 0, 1 ) * math.max( 0, self.autoClutchPercent - self.vehicle.mrGbMS.MinClutchPercent )
+	local minPercent    = self.vehicle.mrGbMS.MinClutchPercent + Utils.clamp( 0.5 + 0.02 * ( self.lastRealMotorRpm - openRpm ), 0, 1 ) * math.max( 0, curPercent - self.vehicle.mrGbMS.MinClutchPercent )
 	local maxPercent    = self.vehicle.mrGbMS.MaxClutchPercent		
 	
 	if fromPercent ~= nil and minPercent < fromPercent then

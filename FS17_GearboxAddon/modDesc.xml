@@ -2,17 +2,17 @@
 <modDesc descVersion="32">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.0.5.1</version>
+	<version>2.0.5.2</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v2.0.5.1 von Mogli</de>
-				<en>Gearbox v2.0.5.1 by mogli</en>
-				 <it>Cambio v2.0.5.1 by mogli</it>
-	 <fr>Transmission v2.0.5.1 by mogli</fr>
-				 <cz>Řazení v2.0.5.1 by mogli</cz>
-<pl>Skrzynia biegów v2.0.5.1 by mogli</pl>
+			 <de>Getriebe v2.1 RC1 von Mogli</de>
+				<en>Gearbox v2.1 RC1 by mogli</en>
+				 <it>Cambio v2.1 RC1 by mogli</it>
+	 <fr>Transmission v2.1 RC1 by mogli</fr>
+				 <cz>Řazení v2.1 RC1 by mogli</cz>
+<pl>Skrzynia biegów v2.1 RC1 by mogli</pl>
 		</text>                  
   </l10n>
 
@@ -37,6 +37,14 @@ In modern tractors power shift transmissions are often combined with automatic g
 There are models with one or two gears like the Fendt Vario. 
 Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. 
 All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio.
+
+Changelog 2.1:
+- Easier launch of vehicle with CVT
+- reverse driving sound
+- avoid overheating of clutch if a GUI is open
+- launch gear can be adjusted while vehicle is in AutoHold
+- bug fix blinking fuel usage (MP)
+- better motor brake
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. 
@@ -46,6 +54,14 @@ Dabei können ganz unterschiedliche Getriebe simuliert werden.
 Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. 
 Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. 
 In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
+
+Changelog 2.1:
+- leichterer Start von Fahrzeugen mit CVT
+- Rückfahrtsound
+- Keine Überhitzung der Kupplung, wenn ein GUI geöffnet ist
+- Start-Gang kann eingestellt werden, während Fahrzeug in AutoHold ist
+- Fehlerbehebung blinkt Kraftstoffverbrauch (MP)
+- bessere Motorbremse
 ]]></de>
 
 		<it><![CDATA[
@@ -71,6 +87,14 @@ Dans les tracteurs modernes, les transmissions à changement de vitesse sont sou
 Il existe des modèles avec une ou deux vitesses comme le Fendt Vario.
 D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable.
 Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
+
+Changement 2.1:
+- Lancement plus facile du véhicule avec CVT
+- sens inverse
+- éviter la surchauffe de l'embrayage si une GUI est ouverte
+- Le mécanisme de lancement peut être réglé lorsque le véhicule est en mode AutoHold
+- bug corrige l'utilisation de carburant clignotante (MP)
+- meilleur frein moteur
 ]]></fr>
 		<es><![CDATA[Descripción:
 Cambio Manual/automático para FS17 por Mogli]]></es>
