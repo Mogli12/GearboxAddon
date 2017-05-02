@@ -1,6 +1,8 @@
 # GearboxAddOn for Farming Simulator 2017
 
-## News and Status
+## I give up!
+Since MoreRealsitic seems to be back in FS17 I will stop this project. Since creating this mod was my passion over the last years I guess I will stop the FarmingSimulator. I does not make sense to keep a gearbox addon while there is MR. 
+
 There is a new way to specify the gear and ranges the tractor should use during launch. If you change the gear while the tractor is in neutral or auto hold the gearbox will remember this gear and use it again after the next stop or after changing direction. I hope that this change does not cause too much trouble.
 
 ## Description
