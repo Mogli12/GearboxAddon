@@ -150,10 +150,8 @@ gearboxMogliGlobals.DefaultRevDownMs      = 2000  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
-gearboxMogliGlobals.momentOfInertiaBase   = 2     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertiaBase   = 3     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
-gearboxMogliGlobals.momentOfInertiaBaseH  = 1
-gearboxMogliGlobals.momentOfInertiaH      = 1
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
@@ -808,12 +806,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.DisableManual       = false
 	end
 	
-	if hasHydrostat then
-		default = self.mrGbMG.momentOfInertiaBaseH + self.mrGbMG.momentOfInertiaH * maxTorque
-	else
-		default = self.mrGbMG.momentOfInertiaBase  + self.mrGbMG.momentOfInertia  * maxTorque
-	end
-	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), default )
+	self.mrGbMS.MomentOfInertia         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#momentOfInertia"), self.mrGbMG.momentOfInertiaBase  + self.mrGbMG.momentOfInertia  * maxTorque )
 	
 --**************************************************************************************************	
 -- Clutch parameter
@@ -9467,17 +9460,21 @@ end
 -- gearboxMogliMotor:getRotInertia
 --**********************************************************************************************************	
 function gearboxMogliMotor:getRotInertia()
-	local r = 0.001 * self.vehicle.mrGbMS.MomentOfInertia 
+	local f = 1
 	if self.noTransmission then
-		r = 0
-	elseif self.ratioFactorR == nil then
-		r = 0
-	elseif self.ratioFactorR  > 1 then
-		r = r / self.ratioFactorR
-	elseif self.clutchPercent < 1 then
-		r = self.clutchPercent * r
+		f = 0
+	else
+		if self.ratioFactorR ~= nil and self.ratioFactorR  > 1 then
+			f = math.min( f, 1 / self.ratioFactorR )
+		end
+		if not ( self.vehicle.mrGbMS.HydrostaticLaunch ) and self.clutchPercent < 1 then
+			f = math.min( f, self.clutchPercent )
+		end
+		if -0.0015 < self.vehicle.lastSpeedReal and self.vehicle.lastSpeedReal < 0.0015 then
+			f = math.min( f, 0.250 + 500 * math.abs( self.vehicle.lastSpeedReal ) )
+		end
 	end
-	return math.max( self.vehicle.mrGbMG.momentOfInertiaMin, r )
+	return math.max( self.vehicle.mrGbMG.momentOfInertiaMin, 0.001 * f * self.vehicle.mrGbMS.MomentOfInertia )
 end
 
 --**********************************************************************************************************	

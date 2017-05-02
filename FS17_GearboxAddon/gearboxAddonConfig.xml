@@ -4779,6 +4779,7 @@
 	</vehicle>
 	
 	<vehicle>
+		<configFile modName="FS17_IHC_644" xmlName="IHC_644.xml"/>
 		<configFile modName="IHC_644"  xmlName="IHC_644.xml"/>
 		<configFile modName="IHC_644A" xmlName="IHC_644A.xml"/>
 
