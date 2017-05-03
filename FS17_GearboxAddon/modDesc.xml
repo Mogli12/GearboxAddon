@@ -2,7 +2,7 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.0.1</version>
+	<version>2.1.0.2</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">

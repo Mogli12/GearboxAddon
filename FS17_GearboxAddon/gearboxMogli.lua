@@ -158,7 +158,7 @@ gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
 gearboxMogliGlobals.maxRpmThrottle        = 0.9
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
 gearboxMogliGlobals.autoStartStop         = false -- option to enable auto start stop for all vechiles
-
+gearboxMogliGlobals.useMrUWP              = 10
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
 --**********************************************************************************************************	
@@ -6092,8 +6092,20 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			end
 		end
 	end
-	for _, wheel in pairs(self.wheels) do
-		WheelsUtil.updateWheelPhysics(self, wheel, doHandbrake, wheelDriveTorque, brakePedal, requiredDriveMode, dt)
+	
+	if self.mrGbMB.mrUseMrTransmission and self.mrGbMG.useMrUWP > 0 and type( WheelsUtil.mrUpdateWheelPhysics ) == "function" then
+		for _, wheel in pairs(self.wheels) do
+			local s, m = pcall( WheelsUtil.mrUpdateWheelPhysics, self, wheel, doHandbrake, brakePedal ) 
+			if not s then
+				print("ERROR in gearboxMogli: "..tostring(m))
+				self.mrGbMG.useMrUWP = self.mrGbMG.useMrUWP - 1
+				WheelsUtil.updateWheelPhysics(self, wheel, doHandbrake, wheelDriveTorque, brakePedal, requiredDriveMode, dt)
+			end
+		end
+	else
+		for _, wheel in pairs(self.wheels) do
+			WheelsUtil.updateWheelPhysics(self, wheel, doHandbrake, wheelDriveTorque, brakePedal, requiredDriveMode, dt)
+		end
 	end
 
 	return 
@@ -9671,6 +9683,17 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 	if self.isMotorStarted then		
 		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
 		local torque = Utils.clamp( self.motor.usedTransTorque + self.motor.lastPtoTorque, 0, self.motor.lastMotorTorque )
+		
+		if self.mrGbML.FuelConsumptionRpm == nil then
+			self.mrGbML.FuelConsumptionRpm    = rpm
+			self.mrGbML.FuelConsumptionTorque = torque 
+		else
+			self.mrGbML.FuelConsumptionRpm    = self.mrGbML.FuelConsumptionRpm    + self.mrGbML.smoothMedium * ( rpm    - self.mrGbML.FuelConsumptionRpm    )
+			self.mrGbML.FuelConsumptionTorque = self.mrGbML.FuelConsumptionTorque + self.mrGbML.smoothMedium * ( torque - self.mrGbML.FuelConsumptionTorque )
+			rpm    = self.mrGbML.FuelConsumptionRpm   
+		  torque = self.mrGbML.FuelConsumptionTorque
+		end
+		 
 		local power  = torque * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
 		local ratio  = self.motor.fuelCurve:get( rpm )			
 		
@@ -9705,6 +9728,9 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		if self.fuelUsageHud ~= nil then
 			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, fuelUsed*1000/dt*60*60);
 		end
+	else
+		self.mrGbML.FuelConsumptionRpm    = nil
+		self.mrGbML.FuelConsumptionTorque = nil
 	end
 	
 	return true
