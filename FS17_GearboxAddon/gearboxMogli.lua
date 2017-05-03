@@ -457,7 +457,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**************************************************************************************************	
 	self.mrGbMS.ConfigVersion           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#version" ),1.4)
 	self.mrGbMS.NoDisable               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#noDisable" ),self.mrGbMG.noDisable)
-	if self.mrGbMS.NoDisable then
+	if     self.mrUseMrTransmission then
+		self.mrGbMS.DefaultOn             = false
+	elseif self.mrGbMS.NoDisable then
 		self.mrGbMS.DefaultOn             = true
 	else
 		self.mrGbMS.DefaultOn             = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#defaultOn" ),self.mrGbMG.defaultOn )
@@ -2084,13 +2086,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**********************************************************************************************************		
 -- Try to initialize motor during load
 --**********************************************************************************************************		
-	if self.mrGbMG.initMotorOnLoad and self.motor ~= nil and self.motor.minRpm ~= nil and self.motor.minRpm > 0 then
+	if not ( self.mrUseMrTransmission ) and self.mrGbMG.initMotorOnLoad and self.motor ~= nil and self.motor.minRpm ~= nil and self.motor.minRpm > 0 then
 		self.mrGbML.motor = gearboxMogliMotor:new( self, self.motor )			
 		if self.mrGbML.motor ~= nil then
 			self.mrGbMB.motor = self.motor	
 		end
 	end
 	self.mrGbMB.cruiseControlMaxSpeed = self.cruiseControl.maxSpeed
+	self.mrGbMB.mrUseMrTransmission   = self.mrUseMrTransmission
 --**********************************************************************************************************		
   
 	self.mrGbML.smoothSlow   = 1
@@ -5701,6 +5704,9 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 		end	
 		self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
 	
+		if self.mrUseMrTransmission then
+			self.mrUseMrTransmission = false
+		end
 	elseif old and self.mrGbML.motor ~= nil then
 		if self.isServer then
 			self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear, noEventSend ) 
@@ -5726,6 +5732,10 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 			else
 				self.driveControl.shuttle.direction = 1
 			end
+		end
+		
+		if self.mrGbMB.mrUseMrTransmission then
+			self.mrUseMrTransmission = true
 		end
 	end	
 end 
@@ -8306,9 +8316,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				if     self.vehicle.mrGbMS.HydrostaticLaunch then
 					clutchMode             = 0
 					self.autoClutchPercent = self.vehicle.mrGbMS.MaxClutchPercent
-				elseif self.hydrostaticFactor <= hMin0 then
+				elseif self.hydrostaticFactor <= hMin then
 					clutchMode             = 1
-					self.hydrostaticFactor = hMin0 
+					self.hydrostaticFactor = hMin 
 				elseif self.autoClutchPercent + gearboxMogli.eps < 1 then
 					clutchMode             = 1
 					self.hydrostaticFactor = math.max( self.hydrostaticFactor, r / gearboxMogli.maxManualGearRatio )
@@ -8316,12 +8326,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					-- open clutch to stop
 					clutchMode             = 1
 					self.hydrostaticFactor = r / gearboxMogli.maxManualGearRatio
-				else				
-					local smallestGearSpeed  = self.vehicle.mrGbMS.Gears[bestG].speed 
-																	 * self.vehicle.mrGbMS.Ranges[1].ratio 
-																	 * self.vehicle.mrGbMS.Ranges2[1].ratio
+				else
+					local smallestGearSpeed  = self.vehicle.mrGbMS.Gears[self.vehicle.mrGbMS.CurrentGear].speed 
+																	 * self.vehicle.mrGbMS.Ranges[self.vehicle.mrGbMS.CurrentRange].ratio
+																	 * self.vehicle.mrGbMS.Ranges2[self.vehicle.mrGbMS.CurrentRange2].ratio
 																	 * self.vehicle.mrGbMS.GlobalRatioFactor
-																	 * hMin0
+																	 * hMin
 																	 * 3.6
 					if self.vehicle.mrGbMS.ReverseActive then	
 						smallestGearSpeed = smallestGearSpeed * self.vehicle.mrGbMS.ReverseRatio 

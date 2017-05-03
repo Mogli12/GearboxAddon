@@ -2,7 +2,7 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.0.0</version>
+	<version>2.1.0.1</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
@@ -28,15 +28,13 @@
 	</title>
 	<description>
 		<en><![CDATA[
-Not every tractor has a continuously variable transmission. 
-And even the continuously variable transmissions are not as simple in construction as the standard one in farming simulator. 
-This script adds on the basis of the file gearboxAddonConfig.xml a gearbox to all configured tractors. 
-Many various transmission kinds can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. 
-Shorting the response time to zero will result into a power shift transmission. 
+Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in farming simulator. 
+
+This script adds on the basis of the file gearboxAddonConfig.xml a gearbox to all configured tractors. Many various transmission kinds can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. 
 In modern tractors power shift transmissions are often combined with automatic gear shifting. Another transmission type is the continuously variable transmissions. 
-There are models with one or two gears like the Fendt Vario. 
-Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. 
-All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio.
+There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio.
+
+For details please look into: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
 
 Changelog 2.1:
 - Easier launch of vehicle with CVT
@@ -47,13 +45,11 @@ Changelog 2.1:
 - better motor brake
 ]]></en>
 		<de><![CDATA[
-Nicht jeder Traktor hat ein stufenloses Getriebe. 
-Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
-Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. 
-Dabei können ganz unterschiedliche Getriebe simuliert werden. 
-Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. 
-Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. 
-In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
+Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
+
+Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. Dabei können ganz unterschiedliche Getriebe simuliert werden. Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
+
+Eine detailierte Beschreibung befindet sich hier: https://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Beschreibung.pdf
 
 Changelog 2.1:
 - leichterer Start von Fahrzeugen mit CVT
@@ -78,15 +74,11 @@ Tutti questi tipi di trasmissione a variazione continua hanno una cosa in comune
 ]]></it>
 
 		<fr><![CDATA[
-Chaque tracteur n'a pas de transmission variable en continu.
-Et même les transmissions à variation continue ne sont pas aussi simples en construction que la norme en simulateur d'élevage.
-Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vitesses à tous les tracteurs configurés.
-De nombreux types de transmission différents peuvent être simulés. Il existe des boîtes de vitesses classiques avec engrenages, un ou deux groupes et inverser les vitesses ou les groupes.
-Le fait de court-circuiter le temps de réponse à zéro entraînera une transmission de puissance.
-Dans les tracteurs modernes, les transmissions à changement de vitesse sont souvent associées à un changement automatique de vitesses. Un autre type de transmission est la transmission à variation continue.
-Il existe des modèles avec une ou deux vitesses comme le Fendt Vario.
-D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable.
-Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
+Chaque tracteur n'a pas de transmission variable en continu. Et même les transmissions à variation continue ne sont pas aussi simples en construction que la norme en simulateur d'élevage.
+
+Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vitesses à tous les tracteurs configurés. De nombreux types de transmission différents peuvent être simulés. Il existe des boîtes de vitesses classiques avec engrenages, un ou deux groupes et inverser les vitesses ou les groupes. Le fait de court-circuiter le temps de réponse à zéro entraînera une transmission de puissance. Dans les tracteurs modernes, les transmissions à changement de vitesse sont souvent associées à un changement automatique de vitesses. Un autre type de transmission est la transmission à variation continue. Il existe des modèles avec une ou deux vitesses comme le Fendt Vario. D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable. Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
+
+Une description détaillée est disponible ici: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
 
 Changement 2.1:
 - Lancement plus facile du véhicule avec CVT
