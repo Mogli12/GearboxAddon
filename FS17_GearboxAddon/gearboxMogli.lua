@@ -6728,7 +6728,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	self.lastMotorTorque	= torque
 	
-	if self.vehicle.mrGbMS.IsCombine then
+	-- no extra combine power in case of MR
+	if not ( self.mrIsMrVehicle ) and self.vehicle.mrGbMS.IsCombine then
 		local combinePower    = 0
 		local combinePowerInc = 0
 	
@@ -9698,11 +9699,9 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 			tRatio = torque / self.motor.lastMotorTorque
 		end
 		
-		local fuelUsed 
-		if rpm < self.mrGbMS.RatedRpm then
-			fuelUsed = self.motor.fuelCurve:get( rpm ) * torque
-		else
-			fuelUsed = self.motor.ratedFuelRatio * self.motor.maxRatedTorque * tRatio
+		local fuelUsed = self.motor.fuelCurve:get( rpm ) * torque
+		if rpm > self.mrGbMS.RatedRpm then
+			fuelUsed = math.max( fuelUsed, self.motor.ratedFuelRatio * self.motor.maxRatedTorque * tRatio * rpm / self.mrGbMS.RatedRpm )
 		end
 		
 		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
