@@ -2092,7 +2092,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end
 	end
 	self.mrGbMB.cruiseControlMaxSpeed = self.cruiseControl.maxSpeed
-	self.mrGbMB.mrUseMrTransmission   = self.mrUseMrTransmission
 --**********************************************************************************************************		
   
 	self.mrGbML.smoothSlow   = 1
@@ -5703,40 +5702,45 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 		end	
 		self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
 	
+		
 		if self.mrUseMrTransmission then
-			self.mrUseMrTransmission = false
+			self.mrGbMB.mrUseMrTransmission = true
+			self.mrUseMrTransmission        = false
 		end
-	elseif old and self.mrGbML.motor ~= nil then
-		if self.isServer then
-			self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear, noEventSend ) 
-			self:mrGbMSetState( "DefaultRange", self.mrGbMS.CurrentRange, noEventSend ) 
-			self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2, noEventSend ) 
-		end
-		self.mrGbML.gearShiftingNeeded = 0 	
-		if self.mrGbMB.motor ~= nil then
-			gearboxMogliMotor.copyRuntimeValues( self.mrGbML.motor, self.mrGbMB.motor )
-			self.motor = self.mrGbMB.motor
-		end
-		
-		if self.mrGbMB.cruiseControlMaxSpeed ~= nil then
-			self.cruiseControl.maxSpeed = self.mrGbMB.cruiseControlMaxSpeed 
-		end
-		self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
-		
-		if self.mrGbMB.dcShuttle then
-			self.mrGbMB.dcShuttle = false
-			self.driveControl.shuttle.isActive = true
-			if self.mrGbMS.ReverseActive then
-				self.driveControl.shuttle.direction = -1
-			else
-				self.driveControl.shuttle.direction = 1
+	elseif old then
+		if self.mrGbML.motor ~= nil then
+			if self.isServer then
+				self:mrGbMSetState( "DefaultGear", self.mrGbMS.CurrentGear, noEventSend ) 
+				self:mrGbMSetState( "DefaultRange", self.mrGbMS.CurrentRange, noEventSend ) 
+				self:mrGbMSetState( "DefaultRange2", self.mrGbMS.CurrentRange2, noEventSend ) 
 			end
+			self.mrGbML.gearShiftingNeeded = 0 	
+			if self.mrGbMB.motor ~= nil then
+				gearboxMogliMotor.copyRuntimeValues( self.mrGbML.motor, self.mrGbMB.motor )
+				self.motor = self.mrGbMB.motor
+			end
+			
+			if self.mrGbMB.cruiseControlMaxSpeed ~= nil then
+				self.cruiseControl.maxSpeed = self.mrGbMB.cruiseControlMaxSpeed 
+			end
+			self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
+			
+			if self.mrGbMB.dcShuttle then
+				self.mrGbMB.dcShuttle = false
+				self.driveControl.shuttle.isActive = true
+				if self.mrGbMS.ReverseActive then
+					self.driveControl.shuttle.direction = -1
+				else
+					self.driveControl.shuttle.direction = 1
+				end
+			end		
 		end
 		
 		if self.mrGbMB.mrUseMrTransmission then
 			self.mrUseMrTransmission = true
 		end
-	end	
+		self.mrGbMB.mrUseMrTransmission = nil
+	end		
 end 
 
 --**********************************************************************************************************	
