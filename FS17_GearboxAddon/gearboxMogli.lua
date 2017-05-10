@@ -5827,8 +5827,10 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			end
 			 
 			local decHts = Utils.clamp( ( 1.4142 * math.min( 0, acceleration ) )^2, self.mrGbMG.HydroSpeedIdleRedux, 1 )			
-			local newHts = math.min( math.max( acceleration * m, oldHts - decHts * 0.001 * dt * self.mrGbMS.DecelerateToLimit ), oldHts + 0.001 * dt * self.mrGbMS.AccelerateToLimit )
+		--local newHts = math.min( math.max( acceleration * m, oldHts - decHts * 0.001 * dt * self.mrGbMS.DecelerateToLimit ), oldHts + 0.001 * dt * self.mrGbMS.AccelerateToLimit )
 
+			newHts = acceleration * m
+		
 			if acceleration < 0 then
 				if self.axisForwardIsAnalog then
 					self.mrGbML.hydroTargetTimer = nil
@@ -5848,8 +5850,10 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			end
 			
 			self.mrGbML.hydroTargetSpeed = Utils.clamp( newHts, 0, m )
+			
+		--print(string.format("%3d %%, %3d km/h %3d km/h", acceleration*100, m*3.6, newHts*3.6 ))
 		end		
-		
+				
 		if acceleration < -0.001 then
 			brakeLights = true
 		end
