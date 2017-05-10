@@ -54,7 +54,7 @@ gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
 gearboxMogli.smoothLittle         = 0.2
 gearboxMogli.smoothFast           = 0.12
 gearboxMogli.smoothMedium         = 0.04
-gearboxMogli.smoothSlow           = 0.015
+gearboxMogli.smoothSlow           = 0.01
 gearboxMogli.hydroEffDiff         = 500
 gearboxMogli.hydroEffDiffInc      = 0 --150
 gearboxMogli.hydroEffMin          = 0.5
@@ -457,9 +457,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**************************************************************************************************	
 	self.mrGbMS.ConfigVersion           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#version" ),1.4)
 	self.mrGbMS.NoDisable               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#noDisable" ),self.mrGbMG.noDisable)
-	if     self.mrUseMrTransmission then
-		self.mrGbMS.DefaultOn             = false
-	elseif self.mrGbMS.NoDisable then
+	if self.mrGbMS.NoDisable then
 		self.mrGbMS.DefaultOn             = true
 	else
 		self.mrGbMS.DefaultOn             = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#defaultOn" ),self.mrGbMG.defaultOn )
@@ -2085,7 +2083,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**********************************************************************************************************		
 -- Try to initialize motor during load
 --**********************************************************************************************************		
-	if not ( self.mrUseMrTransmission ) and self.mrGbMG.initMotorOnLoad and self.motor ~= nil and self.motor.minRpm ~= nil and self.motor.minRpm > 0 then
+	if Vehicle.mrLoadFinished == nil and self.mrGbMG.initMotorOnLoad and self.motor ~= nil and self.motor.minRpm ~= nil and self.motor.minRpm > 0 then
 		self.mrGbML.motor = gearboxMogliMotor:new( self, self.motor )			
 		if self.mrGbML.motor ~= nil then
 			self.mrGbMB.motor = self.motor	
@@ -2244,7 +2242,10 @@ function gearboxMogli:update(dt)
 		self.mrGbML.turnedOffByIncreaseRPMWhileTipping = false
 	end
 	
-	if self.isMotorStarted and self.motor.minRpm > 0 and self.mrGbMS.IsOnOff then
+	if      self.isMotorStarted
+			and self.motor.minRpm > 0
+			and self.mrGbMS.IsOnOff 
+			and ( Vehicle.mrLoadFinished == nil or self.mrIsMrVehicle ~= nil ) then
 		if self.mrGbML.motor == nil then 
 	-- initialize as late as possible 			
 			if not ( self.mbClientInitDone30 ) then return end
@@ -5094,7 +5095,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:setLaunchGear
 --**********************************************************************************************************	
-function gearboxMogli:setLaunchGear( noEventSend, init )	
+function gearboxMogli:setLaunchGear( noEventSend, init, shuttle )	
 	
 	local gear      = self.mrGbMS.CurrentGear
 	local oldGear   = self.mrGbMS.CurrentGear
@@ -5142,7 +5143,7 @@ function gearboxMogli:setLaunchGear( noEventSend, init )
 		
 		if     self:mrGbMGetAutoShiftGears()
 				or self.mrGbMS.MatchGears == "true"
-				or self.mrGbMS.ReverseResetGear then
+				or ( self.mrGbMS.ReverseResetGear and shuttle ) then
 			if self.mrGbMS.ReverseActive then
 				lg = self.mrGbMS.ResetRevGear
 			else
@@ -5151,7 +5152,7 @@ function gearboxMogli:setLaunchGear( noEventSend, init )
 		end
 		if     self:mrGbMGetAutoShiftRange()
 				or self.mrGbMS.MatchRanges == "true"
-				or self.mrGbMS.ReverseResetRange then
+				or ( self.mrGbMS.ReverseResetRange and shuttle ) then
 			if self.mrGbMS.ReverseActive then
 				lr = self.mrGbMS.ResetRevRange
 			else
@@ -5159,7 +5160,7 @@ function gearboxMogli:setLaunchGear( noEventSend, init )
 			end			
 		end
 		if     self:mrGbMGetAutoShiftRange2()
-				or self.mrGbMS.ReverseResetRange2 then
+				or ( self.mrGbMS.ReverseResetRange2 and shuttle ) then
 			if self.mrGbMS.ReverseActive then
 				l2 = self.mrGbMS.ResetRevRange2
 			else
@@ -5185,7 +5186,9 @@ function gearboxMogli:setLaunchGear( noEventSend, init )
 			maxSpeed = maxSpeed * self.mrGbMS.ReverseRatio 
 		end
 
-		self:mrGbMSetState( "LaunchGearSpeed", maxSpeed, noEventSend ) 
+		if self:mrGbMGetAutomatic() then
+			self:mrGbMSetState( "LaunchGearSpeed", maxSpeed, noEventSend ) 
+		end
 	else
 		if self:mrGbMGetAutoShiftRange() then
 			self:mrGbMSetCurrentRange( range, noEventSend ) 	
@@ -5244,7 +5247,9 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 	end
 	
 	-- restore last gear of new direction 
-	self:mrGbMSetLanuchGear( noEventSend )	
+	if self.steeringEnabled then
+		gearboxMogli.setLaunchGear( self, noEventSend, false, true )
+	end		
 
 	if self.isServer then
 		self.mrGbML.lastReverse = Utils.getNoNil( old, false )
@@ -6006,7 +6011,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	if next(self.differentials) ~= nil and self.motorizedNode ~= nil then
 		local torque,_,brakeForce = self.motor:getTorque(accelerationPedal, false) 
 		local maxRpm      = self.motor:getCurMaxRpm()
-		local ratio       = self.motor:getGearRatio()		
+		local ratio       = self.motor:getGearRatio( true )
 		local maxRotSpeed = maxRpm * gearboxMogli.factorpi30
 		local c           = 0
 		
@@ -6055,7 +6060,12 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			self.mrGbML.debugTimer = nil
 			print("=======================================================================================")
 		end
-													
+		
+		if self.mrIsMrVehicle then
+			self.motor.mrLastAxleTorque         = torque * ratio
+			self.motor.mrLastEngineOutputTorque = self.motor.lastMotorTorque				
+			self.motor.mrLastDummyGearRatio     = ratio
+		end
 	else
 		local numTouching = 0
 		local numNotTouching = 0
@@ -6139,6 +6149,10 @@ setmetatable( gearboxMogliMotor, { __index = function (table, key) return Vehicl
 -- gearboxMogliMotor:new
 --**********************************************************************************************************	
 function gearboxMogliMotor:new( vehicle, motor )
+
+	if Vehicle.mrLoadFinished ~= nil then
+		print("gearboxMogli: init of motor with moreRealistic. self.mrIsMrVehicle = "..tostring(vehicle.mrIsMrVehicle))
+	end
 
 	local interpolFunction = linearInterpolator1
 	local interpolDegree   = 2
@@ -6390,10 +6404,17 @@ function gearboxMogliMotor:new( vehicle, motor )
 	
 	self.interalResistence       = 0.3 * self.torqueCurve:get( self.vehicle.mrGbMS.RatedRpm ) / self.vehicle.mrGbMS.RatedRpm
 	
+	self.boost = nil
 	self:chooseTorqueCurve( true )
 
 	self.ratioFactorG = 1
 	self.ratioFactorR = nil
+	
+	if vehicle.mrIsMrVehicle then
+		self.mrLastAxleTorque         = 0
+		self.mrLastEngineOutputTorque = 0
+		self.mrLastDummyGearRatio     = 0
+	end
 	
 	return self
 end
@@ -6402,6 +6423,7 @@ end
 -- gearboxMogliMotor.chooseTorqueCurve
 --**********************************************************************************************************	
 function gearboxMogliMotor:chooseTorqueCurve( eco )
+	local lastBoost = self.boost
 	if eco and self.ecoTorqueCurve ~= nil then
 		self.boost              = false
 		self.currentTorqueCurve = self.ecoTorqueCurve
@@ -6416,6 +6438,22 @@ function gearboxMogliMotor:chooseTorqueCurve( eco )
 	
 	self.maxMotorTorque = self.currentTorqueCurve:getMaximum()
 	self.maxRatedTorque = self.currentTorqueCurve:get( self.vehicle.mrGbMS.RatedRpm )
+	
+	if lastBoost == nil or self.boost ~= lastBoost then
+		self.debugTorqueGraph             = nil
+		self.debugPowerGraph              = nil
+		self.debugEffectiveTorqueGraph    = nil
+		self.debugEffectivePowerGraph     = nil
+		self.debugEffectiveGearRatioGraph = nil
+		self.debugEffectiveRpmGraph       = nil
+	end
+end
+
+--**********************************************************************************************************	
+-- gearboxMogliMotor.getTorqueCurve
+--**********************************************************************************************************	
+function gearboxMogliMotor:getTorqueCurve()
+	return self.currentTorqueCurve
 end
 
 --**********************************************************************************************************	
@@ -6460,7 +6498,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getLimitedGearRatio
 --**********************************************************************************************************	
-function gearboxMogliMotor:getLimitedGearRatio( r, withSign )
+function gearboxMogliMotor:getLimitedGearRatio( r, withSign, noWarning )
 	if type( r ) ~= "number" then
 		print("FS17_GearboxAddon: Error! gearRatio is not a number: "..tostring(r))
 		gearboxMogli.printCallStack( self.vehicle )
@@ -6477,8 +6515,10 @@ function gearboxMogliMotor:getLimitedGearRatio( r, withSign )
 	end		
 	
 	if a < gearboxMogli.minGearRatio then
-		print("FS17_GearboxAddon: Error! gearRatio is too small: "..tostring(r))
-		gearboxMogli.printCallStack( self.vehicle )
+		if not ( noWarning ) then
+			print("FS17_GearboxAddon: Error! gearRatio is too small: "..tostring(r))
+			gearboxMogli.printCallStack( self.vehicle )
+		end
 		if withSign and r < 0 then
 			return -gearboxMogli.minGearRatio
 		else
@@ -6487,8 +6527,10 @@ function gearboxMogliMotor:getLimitedGearRatio( r, withSign )
 	end
 	
 	if a > gearboxMogli.maxGearRatio then
-		print("FS17_GearboxAddon: Error! gearRatio is too big: "..tostring(r))
-		gearboxMogli.printCallStack( self.vehicle )
+		if not ( noWarning ) then
+			print("FS17_GearboxAddon: Error! gearRatio is too big: "..tostring(r))
+			gearboxMogli.printCallStack( self.vehicle )
+		end
 		if withSign and r < 0 then
 			return -gearboxMogli.maxGearRatio
 		else
@@ -6502,8 +6544,8 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getGearRatio
 --**********************************************************************************************************	
-function gearboxMogliMotor:getGearRatio()
-	return self:getLimitedGearRatio( self.gearRatio, true )
+function gearboxMogliMotor:getGearRatio( withWarning )
+	return self:getLimitedGearRatio( self.gearRatio, true, not ( withWarning ) )
 end
 
 --**********************************************************************************************************	
@@ -6666,13 +6708,24 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor:getBestGear( acceleration, wheelSpeedRpm, accSafeMotorRpm, requiredWheelTorque, requiredMotorRpm )
 
+	local direction = 1
 	local gearRatio = self:getMogliGearRatio() * self.ratioFactorG
 	
 	if self.vehicle.mrGbMS.ReverseActive then
-		return -1, -gearRatio
-	else
-		return 1, gearRatio
+		direction = -1
+		gearRatio = -gearRatio
 	end
+	
+	if self.lastDebugGearRatio == nil or math.abs( self.lastDebugGearRatio - gearRatio ) > 1 then
+		-- Vehicle.drawDebugRendering !!!
+		self.debugEffectiveTorqueGraph    = nil
+		self.debugEffectivePowerGraph     = nil
+		self.debugEffectiveGearRatioGraph = nil
+		self.debugEffectiveRpmGraph       = nil
+		self.lastDebugGearRatio           = gearRatio
+	end
+	
+	return direction, gearRatio
 end
 
 --**********************************************************************************************************	
@@ -7409,12 +7462,6 @@ end
 -- gearboxMogliMotor:mrGbMUpdateGear
 --**********************************************************************************************************	
 function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
-
-	-- Vehicle.drawDebugRendering !!!
-	self.debugEffectiveTorqueGraph    = nil
-	self.debugEffectivePowerGraph     = nil
-	self.debugEffectiveGearRatioGraph = nil
-	self.debugEffectiveRpmGraph       = nil
 
 	local acceleration = math.max( accelerationPedal, 0 )
 

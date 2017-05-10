@@ -930,28 +930,45 @@
 	
 		<!-- 17X16 AutoShift with 50 km/h -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/NH_T6-160_SPS.pdf -->
-		<gearboxMogli  ptoRpm="1900">
+		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="42" maxAIGear="3" ptoRpm="1900" ptoRpmEco="1600">
 			<blowOffVentilSound volume="0.5"/>
 			
-			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="11" automatic="true">		
-				<gear speed="1.61"/>
-				<gear speed="1.99"/>
-				<gear speed="2.46"/>
-				<gear speed="3.04"/>
-				<gear speed="3.75"/>
-				<gear speed="4.63"/>
-				<gear speed="5.71"/>
-				<gear speed="7.05"/>
-				<gear speed="8.71"/>
-				<gear speed="10.8"/>
-				<gear speed="13.3"/>
-				<gear speed="16.4"/>
-				<gear speed="20.2"/>
-				<gear speed="25"/>
-				<gear speed="30.8"/>
-				<gear speed="38.1"/>
-				<gear speed="47" forwardOnly="true"/>
+			<gears defaultGear="3" automatic="true">	
+				<gear speed="4.2" name="1">
+					<extraName range1="1" name="1"/>
+					<extraName range1="2" name="2"/>
+					<extraName range1="3" name="3"/>
+					<extraName range1="4" name="4"/>
+				</gear>
+				<gear speed="9.9" name="2">
+					<extraName range1="1" name="5"/>
+					<extraName range1="2" name="6"/>
+					<extraName range1="3" name="7"/>
+					<extraName range1="4" name="8"/>
+				</gear>
+				<gear speed="16.5" name="3">
+					<extraName range1="1" name="9"/>
+					<extraName range1="2" name="10"/>
+					<extraName range1="3" name="11"/>
+					<extraName range1="4" name="12"/>
+				</gear>
+				<gear speed="40.7" name="4">
+					<extraName range1="1" name="13"/>
+					<extraName range1="2" name="14"/>
+					<extraName range1="3" name="15"/>
+					<extraName range1="4" name="16"/>
+				</gear>
+				<gear speed="48.9" name="5" minRange="4" forwardOnly="true">
+					<extraName range1="4" name="17"/>
+				</gear>
 			</gears>
+			
+			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
+				<range name="A" maxGear="4" ratio="0.5209" />
+				<range name="B" maxGear="4" ratio="0.6388"/>
+				<range name="C" maxGear="4" ratio="0.7789"/>
+				<range name="D" ratio="1"/>
+			</ranges>
 			
 			<engines>
 				<engine name="T6.140" idleRpm="900" ratedRpm="2200">
@@ -3408,22 +3425,61 @@
 <!-- ********** Big Bud DLC ******************** -->	
 
 	<vehicle>
-		<configFile xmlName="???"/>
-		<gearboxMogli autoStartStop="true" speedLimiter="false" clutchOpenRpm="1300" clutchCloseRpm="1500" torqueConverter="true" minClutchRatio="0.3125" torqueConverterMaxFactor="3">
-			<gears defaultGear="1" shiftTimeMs="0" clutchRatio="1.0">	
+		<configFile xmlName="bigBudPack/vehicles/steerable/bigBud/bigBud450.xml"/>
+		<gearboxMogli autoStartStop="true" speedLimiter="false" torqueConverter="true" minClutchRatio="0.3125" torqueConverterMaxFactor="3">
+			<gears defaultGear="4" shiftTimeMs="100" clutchRatio="0.3125">	
 				<gear name="1" forwardOnly="true" speed="4.075"/>
-				<gear name="R" reverseOnly="true" speed="6.370"/>
-				<gear name="2" forwardOnly="true" speed="10.17"/>
-				<gear name="3" forwardOnly="true" speed="13.04"/>
-				<gear name="4" forwardOnly="true" speed="20.53"/>
-				<gear name="5" forwardOnly="true" speed="32.60"/>
-				<gear name="6" forwardOnly="true" speed="5.120"/>
+				<gear name="R" reverseOnly="true" speed="5.120"/>
+				<gear name="2" forwardOnly="true" speed="6.370"/>
+				<gear name="3" forwardOnly="true" speed="10.17"/>
+				<gear name="4" forwardOnly="true" speed="13.04"/>
+				<gear name="5" forwardOnly="true" speed="20.53"/>
+				<gear name="6" forwardOnly="true" speed="32.60"/>
+			</gears>
+			<realEngine idleRpm="800" ratedRpm="2100">
+        <!-- 2100: 450(450) | 2100: 450(450) | 1500..1500: 1830(1830) | 80 | 0.7 | 149 | 2.2 | 2200 | 1260: 210 -->
+        <torque rpm="350" motorTorque="1086" fuelUsageRatio="234.6"/>
+        <torque rpm="700" motorTorque="1464" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="1624" fuelUsageRatio="213.9"/>
+        <torque rpm="1000" motorTorque="1687" fuelUsageRatio="212"/>
+        <torque rpm="1100" motorTorque="1739" fuelUsageRatio="210.8"/>
+        <torque rpm="1200" motorTorque="1779" fuelUsageRatio="210.1"/>
+        <torque rpm="1300" motorTorque="1807" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="1824" fuelUsageRatio="210.6"/>
+        <torque rpm="1500" motorTorque="1830" fuelUsageRatio="211.9"/>
+        <torque rpm="1600" motorTorque="1789" fuelUsageRatio="213.8"/>
+        <torque rpm="1700" motorTorque="1743" fuelUsageRatio="216.4"/>
+        <torque rpm="1800" motorTorque="1692" fuelUsageRatio="219.6"/>
+        <torque rpm="1850" motorTorque="1664" fuelUsageRatio="221.5"/>
+        <torque rpm="1900" motorTorque="1635" fuelUsageRatio="223.5"/>
+        <torque rpm="1950" motorTorque="1604" fuelUsageRatio="225.7"/>
+        <torque rpm="2000" motorTorque="1572" fuelUsageRatio="228.1"/>
+        <torque rpm="2050" motorTorque="1539" fuelUsageRatio="230.6"/>
+        <torque rpm="2100" motorTorque="1505" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="1369" fuelUsageRatio="262.7"/>
+        <torque rpm="2200" motorTorque="879" fuelUsageRatio="418.5"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="bigBudPack/vehicles/steerable/bigBud/bigBud747.xml"/>
+		<gearboxMogli autoStartStop="true" speedLimiter="false" torqueConverter="true" minClutchRatio="0.3125" torqueConverterMaxFactor="3">
+			<gears defaultGear="4" shiftTimeMs="100" clutchRatio="0.3125">	
+				<gear name="1" forwardOnly="true" speed="4.075"/>
+				<gear name="R" reverseOnly="true" speed="5.120"/>
+				<gear name="2" forwardOnly="true" speed="6.370"/>
+				<gear name="3" forwardOnly="true" speed="10.17"/>
+				<gear name="4" forwardOnly="true" speed="13.04"/>
+				<gear name="5" forwardOnly="true" speed="20.53"/>
+				<gear name="6" forwardOnly="true" speed="32.60"/>
 			</gears>
 			
 			<!-- https://en.wikipedia.org/wiki/Detroit_Diesel_Series_92 6 cylinder version upscaled to 16 cyl. -->
 			<realEngine idleRpm="800" ratedRpm="2100">
         <!-- 2100: 900(900) | 2100: 900(900) | 1300..1300: 3680(3680) | 80 | 0 | 149 | 2.5 | 2200 | 1260: 210 -->
-        <torque rpm="350" motorTorque="2021" fuelUsageRatio="234.6"/>
+        <!--torque rpm="350" motorTorque="2021" fuelUsageRatio="234.6"/>
         <torque rpm="700" motorTorque="2944" fuelUsageRatio="219.3"/>
         <torque rpm="900" motorTorque="3353" fuelUsageRatio="213.9"/>
         <torque rpm="1000" motorTorque="3496" fuelUsageRatio="212"/>
@@ -3443,7 +3499,30 @@
         <torque rpm="2100" motorTorque="3009" fuelUsageRatio="233.3"/>
         <torque rpm="2150" motorTorque="2813" fuelUsageRatio="248.6"/>
         <torque rpm="2200" motorTorque="1899" fuelUsageRatio="319.4"/>
-        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="466.7"/-->
+				
+        <!-- 2100: 1100(1100) | 2100: 1100(1100) | 1600..1600: 4000(4000) | 75 | 0.5 | 149 | 2.2 | 2200 | 1260: 210 -->
+        <torque rpm="350" motorTorque="2160" fuelUsageRatio="234.6"/>
+        <torque rpm="700" motorTorque="3000" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="3395" fuelUsageRatio="213.9"/>
+        <torque rpm="1000" motorTorque="3556" fuelUsageRatio="212"/>
+        <torque rpm="1100" motorTorque="3691" fuelUsageRatio="210.8"/>
+        <torque rpm="1200" motorTorque="3802" fuelUsageRatio="210.1"/>
+        <torque rpm="1300" motorTorque="3889" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="3951" fuelUsageRatio="210.6"/>
+        <torque rpm="1500" motorTorque="3988" fuelUsageRatio="211.9"/>
+        <torque rpm="1600" motorTorque="4000" fuelUsageRatio="213.8"/>
+        <torque rpm="1700" motorTorque="3961" fuelUsageRatio="216.4"/>
+        <torque rpm="1800" motorTorque="3910" fuelUsageRatio="219.6"/>
+        <torque rpm="1850" motorTorque="3879" fuelUsageRatio="221.5"/>
+        <torque rpm="1900" motorTorque="3846" fuelUsageRatio="223.5"/>
+        <torque rpm="1950" motorTorque="3809" fuelUsageRatio="225.7"/>
+        <torque rpm="2000" motorTorque="3768" fuelUsageRatio="228.1"/>
+        <torque rpm="2050" motorTorque="3725" fuelUsageRatio="230.6"/>
+        <torque rpm="2100" motorTorque="3678" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="3345" fuelUsageRatio="262.7"/>
+        <torque rpm="2200" motorTorque="2148" fuelUsageRatio="418.5"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="0"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle>
