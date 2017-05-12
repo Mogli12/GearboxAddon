@@ -145,8 +145,8 @@ gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
 gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms
-gearboxMogliGlobals.DefaultRevUpMs1       = 2000  -- ms
-gearboxMogliGlobals.DefaultRevDownMs      = 2000  -- ms
+gearboxMogliGlobals.DefaultRevUpMs1       = 3000  -- ms
+gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
@@ -7073,6 +7073,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			end
 		end
 	end
+	
+	self.noTransTorque = self.lastMotorTorque * self.vehicle.mrGbMS.IdleEnrichment * self.vehicle.mrGbMG.idleFuelTorqueRatio
 
 	if     torque < 0 then
 		self.lastMissingTorque      = self.lastMissingTorque - torque
@@ -7312,6 +7314,13 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.requiredWheelTorque = self.maxMotorTorque*math.abs(self.gearRatio)	
 	self.wheelSpeedRpm       = self.vehicle.lastSpeedReal * 1000 * gearboxMogli.factor30pi * self.vehicle.movingDirection	
 
+	self.unusedTransTorque   = 0
+	if self.nonClampedMotorRpm > self.maxPossibleRpm - gearboxMogli.eps and self.lastTransTorque > self.usedTransTorque then
+		self.unusedTransTorque = self.lastTransTorque - self.usedTransTorque
+		self.lastMotorTorque = self.lastMotorTorque - self.unusedTransTorque 
+		self.lastTransTorque = self.lastTransTorque - self.unusedTransTorque 
+	end
+	
 	if not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps then
 		local w = self.clutchRpm / self.gearRatio
 		if gearboxMogli.trustClutchRpmTimer <= dt then
@@ -7402,6 +7411,13 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		if self.transmissionEfficiency ~= nil and 0.1 <= self.transmissionEfficiency and self.transmissionEfficiency < 1 then
 			self.usedTransTorque = self.usedTransTorque / self.transmissionEfficiency
 		end
+		local kmh = math.abs( self.vehicle.lastSpeedReal ) * 3600
+		if     kmh < 1 then
+			self.usedTransTorque = math.max( self.usedTransTorque, self.noTransTorque )
+		elseif kmh < 2 then
+			self.usedTransTorque = math.max( self.usedTransTorque, self.noTransTorque * ( kmh - 1 ) )
+		end
+		
 		self.lastRealMotorRpm  = math.max( self.vehicle.mrGbMS.CurMinRpm, math.min( self.nonClampedMotorRpm, self.vehicle.mrGbMS.CurMaxRpm ) )
 		
 		local m = gearboxMogli.maxManualGearRatio 
@@ -7506,7 +7522,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	
 --**********************************************************************************************************	
 
-	self.ptoMotorRpmRatio    = self.original.ptoMotorRpmRatio
 	local currentSpeed       = 3.6 * self.wheelSpeedRpm * gearboxMogli.factorpi30 --3600 * self.vehicle.lastSpeedReal * self.vehicle.movingDirection
 	local currentAbsSpeed    = currentSpeed
 	if self.vehicle.mrGbMS.ReverseActive then
@@ -7548,16 +7563,23 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	local ptoRpm = PowerConsumer.getMaxPtoRpm( self.vehicle )
 	
 	if ptoRpm ~= nil and ptoRpm > 0 then
+		self.vehicle.mrGbML.debugPto = string.format( "%4d * %5g = %4d; %4d; %4d", 
+				ptoRpm, 
+				self.original.ptoMotorRpmRatio,
+				ptoRpm * self.original.ptoMotorRpmRatio,
+				self.vehicle.mrGbMS.RatedRpm,
+				self.vehicle.mrGbMS.OrigRatedRpm )
+	
+		ptoRpm = ptoRpm * self.vehicle.mrGbMS.RatedRpm / self.vehicle.mrGbMS.OrigRatedRpm
 		local p0 = self.vehicle.mrGbMS.PtoRpm
 		if self.vehicle.mrGbMS.EcoMode then
 			p0 = self.vehicle.mrGbMS.PtoRpmEco
 		end
-		
-		self.ptoMotorRpmRatio = p0 / ptoRpm
-
 		if self.minRequiredRpm < p0 then
 			self.minRequiredRpm = p0
 		end
+	else
+		self.vehicle.mrGbML.debugPto = ""
 	end
 	
 --if      self.limitMaxRpm 
@@ -7617,9 +7639,16 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				self.targetRpmC   = self.targetRpmC + self.vehicle.mrGbML.smoothSlow * ( targetRpmC - self.targetRpmC )		
 			end
 			self.minRequiredRpm = self.targetRpmC
+			
 		else
 			self.targetRpmC     = nil
 		end
+	end
+
+	if ptoRpm ~= nil and ptoRpm > 0 then
+		self.ptoMotorRpmRatio = self.minRequiredRpm / ptoRpm
+	else
+		self.ptoMotorRpmRatio = self.original.ptoMotorRpmRatio
 	end
 
 	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
@@ -9742,8 +9771,9 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 	end
 	
 	if self.isMotorStarted then		
+		local torque = math.max( self.motor.usedTransTorque + self.motor.lastPtoTorque, 0 )
+		local motor  = math.max( self.motor.lastMotorTorque, torque )
 		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
-		local torque = Utils.clamp( self.motor.usedTransTorque + self.motor.lastPtoTorque, 0, self.motor.lastMotorTorque )
 		
 		local tRatio = 1
 		if self.motor.lastMotorTorque <= 0 then
