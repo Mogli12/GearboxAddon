@@ -107,7 +107,7 @@ gearboxMogliGlobals.minTimeToShift			  = 1    -- ms
 gearboxMogliGlobals.minTimeToShiftReverse = 252  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort = 1000 -- ms -- let it go up to ratedRPM !!!
+gearboxMogliGlobals.autoShiftTimeoutShort =  750 -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 100  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 0    -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
@@ -7005,14 +7005,12 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 		torque = 0
 	else
-	--if     self.vehicle.mrGbMS.Hydrostatic  then
-	--elseif self.nonClampedMotorRpm > limitA then
 		if     self.nonClampedMotorRpm > limitA + gearboxMogli.ptoRpmThrottleDiff then
-			self.lastMotorTorque = self.lastMotorTorque - torque 
-			torque               = 0
+			torque = 0
+		elseif self.nonClampedMotorRpm > limitA then
+			torque = torque * ( limitA + gearboxMogli.ptoRpmThrottleDiff - self.nonClampedMotorRpm ) / gearboxMogli.ptoRpmThrottleDiff
 		elseif not self.limitMaxRpm and self.nonClampedMotorRpm > limitC then
-			self.lastMotorTorque = self.lastMotorTorque - torque 
-			torque               = 0
+			torque = 0
 		end
 		
 		if self.vehicle.mrGbMS.PowerManagement and acc > 0 then
@@ -7318,13 +7316,6 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.requiredWheelTorque = self.maxMotorTorque*math.abs(self.gearRatio)	
 	self.wheelSpeedRpm       = self.vehicle.lastSpeedReal * 1000 * gearboxMogli.factor30pi * self.vehicle.movingDirection	
 
-	self.unusedTransTorque   = 0
-	if self.nonClampedMotorRpm > self.maxPossibleRpm - gearboxMogli.eps and self.lastTransTorque > self.usedTransTorque then
-		self.unusedTransTorque = self.lastTransTorque - self.usedTransTorque
-		self.lastMotorTorque = self.lastMotorTorque - self.unusedTransTorque 
-		self.lastTransTorque = self.lastTransTorque - self.unusedTransTorque 
-	end
-	
 	if not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps then
 		local w = self.clutchRpm / self.gearRatio
 		if gearboxMogli.trustClutchRpmTimer <= dt then
@@ -7639,13 +7630,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	end
 
 	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
-	
-	
---if      handThrottle    >= 0
---		and handThrottleRpm < self.minRequiredRpm 
---		and self.vehicle.mrGbMS.RatedRpm   > self.vehicle.mrGbMS.IdleRpm + gearboxMogli.eps then
---	self.vehicle:mrGbMSetHandThrottle( ( self.minRequiredRpm - self.vehicle.mrGbMS.IdleRpm ) / ( self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm ) )
---end
 	
 	local minRpmReduced = Utils.clamp( self.minRequiredRpm * gearboxMogli.rpmReduction, self.vehicle.mrGbMS.CurMinRpm, self.vehicle.mrGbMS.RatedRpm * gearboxMogli.rpmReduction )		
 
@@ -8194,13 +8178,17 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							
 							if not isValidEntry then
 							--nothing
+							elseif  accelerationPedal < -gearboxMogli.accDeadZone
+							    and spd           > self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
+								if gearboxMogli.debugGearShift then print(tostring(g)..": no down shift I") end
+								isValidEntry = false
 							elseif  self.deltaRpm < -gearboxMogli.autoShiftMaxDeltaRpm
 									and spd           > self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
 								if gearboxMogli.debugGearShift then print(tostring(g)..": no down shift II") end
 								isValidEntry = false
 							elseif  self.deltaRpm > gearboxMogli.autoShiftMaxDeltaRpm
 									and spd           < self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps then
-								if gearboxMogli.debugGearShift then print(tostring(g)..": no up shift II") end
+								if gearboxMogli.debugGearShift then print(tostring(g)..": no up shift III") end
 								isValidEntry = false
 							end
 						end
@@ -8637,6 +8625,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				end
 				
 				local minTimeToShift = math.huge
+				local refSpeed = math.max( self.vehicle.mrGbMS.LaunchGearSpeed, self.vehicle.mrGbMS.CurrentGearSpeed )
 				
 				do
 					local tmp = {}
@@ -8682,12 +8671,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							p.plog = 0
 							-- 0.6667 .. 1.3333 => 0
 							-- < 0.5 or > 23    => 3
-							if self.vehicle.mrGbMS.CurrentGearSpeed > self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps then
-								p.plog     = math.min( math.max( 0, math.abs( math.log( p.gearSpeed / self.vehicle.mrGbMS.CurrentGearSpeed ) ) - 0.2877 ) * 7.4, 3 )
-							--p.plog     = 0.1 * math.floor( p.plog * 10 )
-							--p.priority = math.max( p.priority, p.plog )
-								p.priority = p.priority + 0.1 * math.floor( p.plog * 3 )
-							end
+							p.plog     = math.min( math.max( 0, math.abs( math.log( p.gearSpeed / refSpeed ) ) - 0.2877 ) * 7.4, 3 )
+							p.priority = p.priority + 0.1 * math.floor( p.plog * 3 )
 							
 							if minTimeToShift > p.timeToShiftMax then
 								minTimeToShift = p.timeToShiftMax
@@ -8772,6 +8757,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local bestGear  = -1
 				local bestSpeed = gearboxMogli.eps
 				
+				local currScore = math.huge
+				local currGear  = -1
+				local currSpeed = gearboxMogli.eps
+				
 				local nextScore = math.huge
 				local nextGear  = -1
 				local nextSpeed = gearboxMogli.eps
@@ -8817,8 +8806,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 					
 					-- no down shift if just idling  
-					if      accelerationPedal      <  gearboxMogli.accDeadZone
-							and accelerationPedal      > -gearboxMogli.accDeadZone
+					if      math.abs( accelerationPedal ) <  gearboxMogli.accDeadZone
 							and downTimerMode          > 0
 							and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
 							and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed
@@ -8869,11 +8857,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							if     autoShiftTimeout >= 2 then
 								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutLong
 							elseif p.priority >= 3 then
-								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * ( 2 + autoShiftTimeout )
+								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * ( 3 + autoShiftTimeout )
 							elseif p.priority >= 2 then
-								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * ( 1 + autoShiftTimeout )
+								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * ( 2 + autoShiftTimeout )
 							elseif p.priority >= 1 then
-								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * 1.5
+								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort * 2
 							else
 								autoShiftTimeout = self.lastClutchClosedTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort 
 							end
@@ -8905,10 +8893,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 								t2 = self.currentTorqueCurve:get( p.rpmLo ) * gearboxMogli.autoShiftPowerRatio
 							end		
 						
-							testPwr = Utils.clamp( ( self.requestedPower - p.rpmHi * t1 ) / self.currentMaxPower - 0.2, 0, 1 )
+							testPwr = Utils.clamp( ( self.requestedPower - p.rpmHi * t1 ) / self.currentMaxPower - 0.1, 0, 1 )
 						
 							if p.rpmLo < p.rpmHi then
-								testPwr = 0.5 * ( testPwr + Utils.clamp( ( self.requestedPower - p.rpmLo * t2 ) / self.currentMaxPower - 0.2, 0, 1 ) )
+								testPwr = 0.5 * ( testPwr + Utils.clamp( ( self.requestedPower - p.rpmLo * t2 ) / self.currentMaxPower - 0.1, 0, 1 ) )
 							end
 						end
 						
@@ -8918,7 +8906,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						elseif testPwr > 0 then
 						-- and optimize power afterwards
 							p.score = 2 + testPwr
-						elseif p.priority > 0 then
+						elseif p.priority >= 2
+								or ( p.priority >= 1 and p.gearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps ) then
 						-- sort by priority 
 							p.score = 1 + 0.1 * math.min( p.priority, 10 )
 						elseif accelerationPedal < -gearboxMogli.accDeadZone then
@@ -8950,7 +8939,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 							bestSpeed = p.gearSpeed
 						end		
 						
-						if not p.isCurrent then
+						if p.isCurrent then
+							currScore = p.score
+							currGear  = i
+							currSpeed = p.gearSpeed
+						else
 							if     nextScore == nil
 									or nextScore > p.score
 									or ( math.abs( nextScore - p.score ) < 1e-4
@@ -8965,12 +8958,16 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					end
 				end
 								
-				self.vehicle.mrGbML.autoShiftInfo = string.format("%4d / %4d / %4d..%4d %3d%%\nB: %6.3f %2d %5.2f\nN: %6.3f %2d %5.2f",
+				self.vehicle.mrGbML.autoShiftInfo = string.format("%4d / %4d (%4g) / %4d..%4d %3d%%\ncurrent: %6.3f %2d %5.2f\nbest: %6.3f %2d %5.2f\nnext: %6.3f %2d %5.2f",
 																													rpmC,
 																													self.lastRealMotorRpm,
+																													self.deltaRpm,
 																													downRpm,
 																													upRpm,
 																													accelerationPedal*100,
+																													Utils.getNoNil( currScore, -1 ),
+																													Utils.getNoNil( currGear,  -1 ),
+																													Utils.getNoNil( currSpeed, -1 ),
 																													Utils.getNoNil( bestScore, -1 ),
 																													Utils.getNoNil( bestGear,  -1 ),
 																													Utils.getNoNil( bestSpeed, -1 ),
@@ -9791,20 +9788,33 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
 		
 		local tRatio = 1
-		if self.motor.lastMotorTorque <= 0 then
+		if motor <= 0 then
 			tRatio = 0
-		elseif torque < self.motor.lastMotorTorque then
-			tRatio = torque / self.motor.lastMotorTorque
+		elseif torque < motor then
+			tRatio = torque / motor
 		end
 		
 		local fuelUsed = self.motor.fuelCurve:get( rpm ) * torque
+		local f0 = fuelUsed 
 		if rpm > self.mrGbMS.RatedRpm then
 			fuelUsed = math.max( fuelUsed, self.motor.ratedFuelRatio * self.motor.maxRatedTorque * tRatio * rpm / self.mrGbMS.RatedRpm )
 		end
 		
-		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
-		fuelUsed   = fuelUsed * dt * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
+		local f1 = fuelUsed 
 		
+		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
+		fuelUsed   = fuelUsed * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
+		
+	--self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",
+	--												rpm,
+	--												self.mrGbMS.RatedRpm,
+	--												tRatio*100,
+	--												torque*1000,
+	--												motor*1000,
+	--												fuelUsed * 3600000 )
+										
+		fuelUsed   = fuelUsed * dt
+										
 		if fuelUsed > 0 then
 			if g_currentMission.missionInfo.fuelUsageLow then
 				fuelUsed = fuelUsed * 0.7
