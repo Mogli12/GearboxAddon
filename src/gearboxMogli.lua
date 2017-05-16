@@ -5258,7 +5258,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 	if self.isServer then
 		self.mrGbML.lastReverse = Utils.getNoNil( old, false )
 		gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, self.mrGbMS.ClutchAfterShiftReverse, self.mrGbMS.ReverseDoubleClutch, false ) 
-		if ( not ( new ) and old ) or ( new and not ( old ) ) then
+		if self.mrGbML.motor ~= nil and ( ( not ( new ) and old ) or ( new and not ( old ) ) ) then
 			if self.mrGbMS.Hydrostatic then
 				self.motor.hydrostaticFactorT = self.mrGbMS.HydrostaticStart
 			end
@@ -5311,7 +5311,7 @@ function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 		end
 		
 		if new then
-			if self.mrGbMS.Hydrostatic then
+			if self.mrGbML.motor ~= nil and self.mrGbMS.Hydrostatic then
 				self.motor.hydrostaticFactorT = self.mrGbMS.HydrostaticStart
 			end
 		else
@@ -9788,7 +9788,7 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
 		
 		local tRatio = 1
-		if motor <= 0 then
+		if self.motor.noTorque or motor <= 0 then
 			tRatio = 0
 		elseif torque < motor then
 			tRatio = torque / motor
