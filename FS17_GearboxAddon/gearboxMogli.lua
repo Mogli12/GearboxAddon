@@ -6113,6 +6113,15 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end
 	
 	if self.mrGbMB.mrUseMrTransmission and self.mrGbMG.useMrUWP > 0 and type( WheelsUtil.mrUpdateWheelPhysics ) == "function" then
+		if self.mrLastBrakePedal == nil then self.mrLastBrakePedal = 0 end		
+		--braking is not "ON/OFF" IRL => smooth a little the response time of the braking system (especially useful when playing with a keyboard)
+		if brakePedal>self.mrLastBrakePedal then
+			brakePedal = math.min(brakePedal, self.mrLastBrakePedal + dt/500); --500ms to be able to fully brake from a "null brake position"  --20170305
+		end
+		self.mrLastBrakePedal = brakePedal;
+		--MR : we want to know when the vehicle is braking
+		self.mrIsBraking = brakePedal>0;
+	
 		for _, wheel in pairs(self.wheels) do
 			local s, m = pcall( WheelsUtil.mrUpdateWheelPhysics, self, wheel, doHandbrake, brakePedal ) 
 			if not s then
