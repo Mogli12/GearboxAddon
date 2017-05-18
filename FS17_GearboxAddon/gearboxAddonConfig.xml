@@ -2795,7 +2795,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1660.xml" />
 
 		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true" globalRatioFactor="0.913">
-			<combine defaultWidth="4.3" minRpm="1850" maxRpm="2050"/>
+			<combine defaultWidth="4.3" minRpm="1800" maxRpm="2200"/>
 			<blowOffVentilSound volume="0"/>
 			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true" minMaxTimeMs="0" maxMinTimeMs="0"/-->		
 			<hydrostatic profile="Direct" minRatio="0"/>		
@@ -2805,33 +2805,33 @@
 				<gear name="R"   speed="14" reverseOnly="true"/>
 				<gear name="III" speed="23" forwardOnly="true"/>
 			</gears>
-
-			<realEngine idleRpm="800" ratedRpm="2100">
-        <!-- 2000: 190(190) | 2000: 190(190) | 1500..1500: 790(790) | 85 | 0.6 | 400 | 1.5 | 2200 | 1280: 195 -->
-        <torque rpm="350" motorTorque="464" fuelUsageRatio="227.5"/>
-        <torque rpm="700" motorTorque="638" fuelUsageRatio="207.7"/>
-        <torque rpm="900" motorTorque="703" fuelUsageRatio="200.4"/>
-        <torque rpm="1000" motorTorque="730" fuelUsageRatio="197.9"/>
-        <torque rpm="1100" motorTorque="751" fuelUsageRatio="196.2"/>
-        <torque rpm="1200" motorTorque="768" fuelUsageRatio="195.2"/>
-        <torque rpm="1300" motorTorque="780" fuelUsageRatio="195"/>
-        <torque rpm="1400" motorTorque="788" fuelUsageRatio="195.6"/>
-        <torque rpm="1500" motorTorque="790" fuelUsageRatio="197"/>
-        <torque rpm="1600" motorTorque="773" fuelUsageRatio="199.3"/>
-        <torque rpm="1700" motorTorque="753" fuelUsageRatio="202.4"/>
-        <torque rpm="1800" motorTorque="728" fuelUsageRatio="206.3"/>
-        <torque rpm="1850" motorTorque="714" fuelUsageRatio="208.6"/>
-        <torque rpm="1900" motorTorque="700" fuelUsageRatio="211.1"/>
-        <torque rpm="1950" motorTorque="684" fuelUsageRatio="213.8"/>
-        <torque rpm="2000" motorTorque="667" fuelUsageRatio="216.7"/>
-        <torque rpm="2050" motorTorque="638" fuelUsageRatio="217.9"/>
-        <torque rpm="2100" motorTorque="584" fuelUsageRatio="223.4"/>
-        <torque rpm="2150" motorTorque="514" fuelUsageRatio="235.3"/>
-        <torque rpm="2200" motorTorque="431" fuelUsageRatio="255"/>
-        <torque rpm="2250" motorTorque="337" fuelUsageRatio="283.6"/>
-        <torque rpm="2300" motorTorque="234" fuelUsageRatio="322.2"/>
-        <torque rpm="2350" motorTorque="121" fuelUsageRatio="371.8"/>
-        <torque rpm="2400" motorTorque="0" fuelUsageRatio="433.3"/>
+			
+			<!-- same engine: http://spezeps.com/technische/bau-4768/case/9040b.html -->
+			<realEngine idleRpm="800" ratedRpm="2200" maxRpm="2200">
+        <!-- 2000: 190(190) | 2200: 180(180) | 1500..1500: 778(778) | 75 | 0.5 | 149 | 2.2 | 2300 | 1300: 210 -->
+        <torque rpm="350" motorTorque="407" fuelUsageRatio="233.4"/>
+        <torque rpm="700" motorTorque="584" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="669" fuelUsageRatio="214.1"/>
+        <torque rpm="1000" motorTorque="702" fuelUsageRatio="212.3"/>
+        <torque rpm="1100" motorTorque="729" fuelUsageRatio="211"/>
+        <torque rpm="1200" motorTorque="751" fuelUsageRatio="210.3"/>
+        <torque rpm="1300" motorTorque="766" fuelUsageRatio="210"/>
+        <torque rpm="1400" motorTorque="775" fuelUsageRatio="210.3"/>
+        <torque rpm="1500" motorTorque="778" fuelUsageRatio="211.2"/>
+        <torque rpm="1600" motorTorque="765" fuelUsageRatio="212.6"/>
+        <torque rpm="1700" motorTorque="747" fuelUsageRatio="214.6"/>
+        <torque rpm="1800" motorTorque="725" fuelUsageRatio="217.2"/>
+        <torque rpm="1850" motorTorque="712" fuelUsageRatio="218.7"/>
+        <torque rpm="1900" motorTorque="698" fuelUsageRatio="220.4"/>
+        <torque rpm="1950" motorTorque="683" fuelUsageRatio="222.2"/>
+        <torque rpm="2000" motorTorque="667" fuelUsageRatio="224.1"/>
+        <torque rpm="2050" motorTorque="649" fuelUsageRatio="226.2"/>
+        <torque rpm="2100" motorTorque="627" fuelUsageRatio="228.4"/>
+        <torque rpm="2150" motorTorque="602" fuelUsageRatio="230.8"/>
+        <torque rpm="2200" motorTorque="575" fuelUsageRatio="233.3"/>
+        <torque rpm="2250" motorTorque="523" fuelUsageRatio="304.7"/>
+        <torque rpm="2300" motorTorque="336" fuelUsageRatio="484.9"/>
+        <torque rpm="2350" motorTorque="0" fuelUsageRatio="0"/>
 			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
@@ -2840,7 +2840,7 @@
 		<configFile xmlName="data/vehicles/steerable/sampoRosenlew/sampoRosenlewC6.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true" defaultOn="false">
-			<combine defaultWidth="4.2" minRpm="1850" maxRpm="2050"/>
+			<combine defaultWidth="4.2" minRpm="1800" maxRpm="2100"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Direct" minRatio="0"/>		
@@ -2851,29 +2851,30 @@
 				<gear name="III" speed="28"   forwardOnly="true"/>
 			</gears>
 			
-			<realEngine idleRpm="800" ratedRpm="2100">
-				<!-- 2100: 185(165) | 2100: 185(165) | 1500..1500: 730(680) | 90 | 0.4 | 149 | 2.5 | 2200 | 1320: 210 -->
-				<torque rpm="350" motorTorque="486" motorTorqueEco="453" fuelUsageRatio="242.5"/>
-				<torque rpm="700" motorTorque="636" motorTorqueEco="593" fuelUsageRatio="223.3"/>
-				<torque rpm="900" motorTorque="676" motorTorqueEco="630" fuelUsageRatio="216.1"/>
-				<torque rpm="1000" motorTorque="693" motorTorqueEco="645" fuelUsageRatio="213.5"/>
-				<torque rpm="1100" motorTorque="706" motorTorqueEco="658" fuelUsageRatio="211.7"/>
-				<torque rpm="1200" motorTorque="717" motorTorqueEco="668" fuelUsageRatio="210.5"/>
-				<torque rpm="1300" motorTorque="724" motorTorqueEco="674" fuelUsageRatio="210"/>
-				<torque rpm="1400" motorTorque="729" motorTorqueEco="679" fuelUsageRatio="210.2"/>
-				<torque rpm="1500" motorTorque="730" motorTorqueEco="680" fuelUsageRatio="211.2"/>
-				<torque rpm="1600" motorTorque="721" motorTorqueEco="669" fuelUsageRatio="213"/>
-				<torque rpm="1700" motorTorque="708" motorTorqueEco="654" fuelUsageRatio="215.5"/>
-				<torque rpm="1800" motorTorque="691" motorTorqueEco="635" fuelUsageRatio="218.8"/>
-				<torque rpm="1850" motorTorque="681" motorTorqueEco="624" fuelUsageRatio="220.8"/>
-				<torque rpm="1900" motorTorque="671" motorTorqueEco="609" fuelUsageRatio="222.9"/>
-				<torque rpm="1950" motorTorque="659" motorTorqueEco="593" fuelUsageRatio="225.2"/>
-				<torque rpm="2000" motorTorque="646" motorTorqueEco="579" fuelUsageRatio="227.7"/>
-				<torque rpm="2050" motorTorque="633" motorTorqueEco="565" fuelUsageRatio="230.4"/>
-				<torque rpm="2100" motorTorque="619" motorTorqueEco="552" fuelUsageRatio="233.3"/>
-				<torque rpm="2150" motorTorque="578" motorTorqueEco="516" fuelUsageRatio="248.6"/>
-				<torque rpm="2200" motorTorque="390" motorTorqueEco="348" fuelUsageRatio="319.4"/>
-				<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			<!-- MF 7716 at max power? -->
+			<realEngine idleRpm="800" ratedRpm="2100" maxRpm="2100">
+        <!-- 1900: 186(186) | 2100: 180(180) | 1500..1500: 790(790) | 75 | 0.5 | 149 | 2.2 | 2200 | 1260: 210 -->
+        <torque rpm="350" motorTorque="413" fuelUsageRatio="234.6"/>
+        <torque rpm="700" motorTorque="593" fuelUsageRatio="219.3"/>
+        <torque rpm="900" motorTorque="679" fuelUsageRatio="213.9"/>
+        <torque rpm="1000" motorTorque="713" fuelUsageRatio="212"/>
+        <torque rpm="1100" motorTorque="741" fuelUsageRatio="210.8"/>
+        <torque rpm="1200" motorTorque="762" fuelUsageRatio="210.1"/>
+        <torque rpm="1300" motorTorque="778" fuelUsageRatio="210.1"/>
+        <torque rpm="1400" motorTorque="787" fuelUsageRatio="210.6"/>
+        <torque rpm="1500" motorTorque="790" fuelUsageRatio="211.9"/>
+        <torque rpm="1600" motorTorque="774" fuelUsageRatio="213.8"/>
+        <torque rpm="1700" motorTorque="752" fuelUsageRatio="216.4"/>
+        <torque rpm="1800" motorTorque="723" fuelUsageRatio="219.6"/>
+        <torque rpm="1850" motorTorque="706" fuelUsageRatio="221.5"/>
+        <torque rpm="1900" motorTorque="687" fuelUsageRatio="223.5"/>
+        <torque rpm="1950" motorTorque="668" fuelUsageRatio="225.7"/>
+        <torque rpm="2000" motorTorque="648" fuelUsageRatio="228.1"/>
+        <torque rpm="2050" motorTorque="626" fuelUsageRatio="230.6"/>
+        <torque rpm="2100" motorTorque="602" fuelUsageRatio="233.3"/>
+        <torque rpm="2150" motorTorque="547" fuelUsageRatio="300"/>
+        <torque rpm="2200" motorTorque="352" fuelUsageRatio="478"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="0"/>
 			</realEngine>			
 		</gearboxMogli>
 	</vehicle> 
@@ -2882,7 +2883,7 @@
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandTC590.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" onlyHandThrottle="true" defaultOn="false">
-			<combine defaultWidth="5.5" minRpm="1850" maxRpm="2050"/>
+			<combine defaultWidth="5.5" minRpm="1800" maxRpm="2100"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Direct"/>
@@ -2893,7 +2894,7 @@
 			</gears>
 			<reverse ratio="1"/>
 			
-			<realEngine idleRpm="850" ratedRpm="2100">
+			<realEngine idleRpm="850" ratedRpm="2100" maxRpm="2100">
         <!-- 2000: 258(258) | 2100: 238(238) | 1500..1500: 1050(1050) | 90 | 0.2 | 149 | 2 | 2200 | 1320: 204 -->
         <torque rpm="350" motorTorque="699" fuelUsageRatio="235.5"/>
         <torque rpm="700" motorTorque="915" fuelUsageRatio="216.9"/>
@@ -2923,7 +2924,7 @@
 	<vehicle>caseIH7130
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH7130.xml" />
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="2" defaultOn="false">
-			<combine defaultWidth="10.5" minRpm="1850" maxRpm="2050"/>
+			<combine defaultWidth="10.5" minRpm="1800" maxRpm="2100"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Direct"/>
@@ -4606,7 +4607,7 @@
 		</mod>
 		
 		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" onlyHandThrottle="true">
-			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2100" threshingSoundOffset="1" threshingSoundScale="0"/>
+			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2200" threshingSoundOffset="1" threshingSoundScale="0"/>
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
@@ -4617,8 +4618,9 @@
 				<gear name="III" speed="21.5" forwardOnly="true"/>
 			</gears>
 				
-			<realEngine idleRpm="900" ratedRpm="2200">
-        <torque rpm="0" motorTorque="0"      fuelUsageRatio="302"/><!-- 2200: 162(130.41) | 2200: 162(130.41) | 1400..1400: 662(622.28) | 97 | 0.5 -->
+			<realEngine idleRpm="900" ratedRpm="2200" maxRpm="2200">
+				<!-- 2200: 162(130.41) | 2200: 162(130.41) | 1400..1400: 662(622.28) | 97 | 0.5 -->
+        <torque rpm="0" motorTorque="0"      fuelUsageRatio="302"/>
         <torque rpm="100" motorTorque="178"  fuelUsageRatio="287"/>
         <torque rpm="400" motorTorque="506"  fuelUsageRatio="249"/>
         <torque rpm="700" motorTorque="620"  fuelUsageRatio="223"/>
