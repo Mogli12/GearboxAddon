@@ -2667,21 +2667,41 @@
 		<gearboxMogli speedLimiter="true" maxForwardSpeed="93" maxBackwardSpeed="93" autoStartStop="true" enableAI="true" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			<gears axleSpeed="2.71" tireWidth="600" tireRatio="50" rimDiameter="22.5" defaultGear="7" automatic="true">
-				<gear name="1"  forwardOnly="true" inverseRatio="15.86"/>
-				<gear name="R1" reverseOnly="true" inverseRatio="14.68"/>
-				<gear name="2"  forwardOnly="true" inverseRatio="12.33"/>
-				<gear name="R2" reverseOnly="true" inverseRatio="11.14"/>
-				<gear name="3"  forwardOnly="true" inverseRatio="9.56"/>
-				<gear name="4"  forwardOnly="true" inverseRatio="7.43"/>
-				<gear name="5"  forwardOnly="true" inverseRatio="5.78"/>
-				<gear name="6"  forwardOnly="true" inverseRatio="4.56"/>
-				<gear name="7"  forwardOnly="true" inverseRatio="3.47"/>
-				<gear name="8"  forwardOnly="true" inverseRatio="2.70"/>
-				<gear name="9"  forwardOnly="true" inverseRatio="2.09"/>
-				<gear name="10" forwardOnly="true" inverseRatio="1.63"/>
-				<gear name="11" forwardOnly="true" inverseRatio="1.28"/>
-				<gear name="12" forwardOnly="true" inverseRatio="1.00"/>
+				<gear name="R2" reverseOnly="true" inverseRatio="11.14">
+					<extraName range1="3" name="R1"/>
+					<extraName range1="4" name="R2"/>
+				</gear>	
+				<gear name="7"  forwardOnly="true" inverseRatio="3.47">
+					<extraName range1="1" name="1"/>
+					<extraName range1="2" name="7"/>
+				</gear>	
+				<gear name="8"  forwardOnly="true" inverseRatio="2.70">
+					<extraName range1="1" name="2"/>
+					<extraName range1="2" name="8"/>
+				</gear>	
+				<gear name="9"  forwardOnly="true" inverseRatio="2.09">
+					<extraName range1="1" name="3"/>
+					<extraName range1="2" name="9"/>
+				</gear>	
+				<gear name="10" forwardOnly="true" inverseRatio="1.63">
+					<extraName range1="1" name="4"/>
+					<extraName range1="2" name="10"/>
+				</gear>	
+				<gear name="11" forwardOnly="true" inverseRatio="1.28">
+					<extraName range1="1" name="5"/>
+					<extraName range1="2" name="11"/>
+				</gear>	
+				<gear name="12" forwardOnly="true" inverseRatio="1.00">
+					<extraName range1="1" name="6"/>
+					<extraName range1="2" name="12"/>
+				</gear>	
 			</gears>
+			<ranges defaultRange="1" shiftTimeMs="900" automatic="true">
+				<range ratio="0.219" name="L" forwardOnly="true"/>
+				<range ratio="1.000" name="H" forwardOnly="true"/>
+				<range ratio="0.759" name="L" reverseOnly="true"/>
+				<range ratio="1.000" name="H" reverseOnly="true"/>
+			</ranges>
 		</gearboxMogli>	
 	</vehicle>
 
@@ -2749,8 +2769,7 @@
 
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
-			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/-->	
-			<hydrostatic profile="Direct"/>	
+			<hydrostatic profile="Hydrostat"/>	
 			<gears>	
 				<gear name="" maxForwardSpeedRatio="1.1" />
 			</gears>
@@ -2762,7 +2781,7 @@
 
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
-			<hydrostatic profile="Direct"/>		
+			<hydrostatic profile="Hydrostat"/>		
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="Lo" maxForwardSpeedRatio="0.42" />
 				<gear name="Hi" maxForwardSpeedRatio="1.02" />
@@ -2776,8 +2795,7 @@
 
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
-			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true"/-->		
-			<hydrostatic profile="Direct"/>		
+			<hydrostatic profile="Hydrostat"/>		
 			<gears defaultGear="3">	
 				<gear name="I"   maxForwardSpeedRatio="0.37" />
 				<gear name="II"  maxForwardSpeedRatio="0.62" />
@@ -2797,8 +2815,8 @@
 		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true" globalRatioFactor="0.913">
 			<combine defaultWidth="4.3" minRpm="1800" maxRpm="2200"/>
 			<blowOffVentilSound volume="0"/>
-			<!--hydrostatic coupling="direct" minRatio="-1" maxRatio="1.41" correctGearSpeed="true" minMaxTimeMs="0" maxMinTimeMs="0"/-->		
-			<hydrostatic profile="Direct" minRatio="0"/>		
+			
+			<hydrostatic profile="Hydrostat" minRatio="0"/>		
 			<gears defaultGear="4" reverseReset="true">	
 				<gear name="I"   speed="8"  forwardOnly="true"/>
 				<gear name="II"  speed="14" forwardOnly="true"/>
@@ -2843,7 +2861,7 @@
 			<combine defaultWidth="4.2" minRpm="1800" maxRpm="2100"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Direct" minRatio="0"/>		
+			<hydrostatic profile="Hydrostat" minRatio="0"/>		
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
 				<gear name="I"   speed="7"    forwardOnly="true"/>
 				<gear name="II"  speed="12.6" forwardOnly="true"/>
@@ -2886,7 +2904,7 @@
 			<combine defaultWidth="5.5" minRpm="1800" maxRpm="2100"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Direct"/>
+			<hydrostatic profile="Hydrostat"/>
 			<gears defaultGear="2" shiftTimeMs="1000">
 				<gear name="I"   speed="7"   />
 				<gear name="II"  speed="12.6"/>
@@ -3129,7 +3147,7 @@
 		<configFile xmlName="data/vehicles/steerable/rostselmash/rsm1403.xml" />
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="32" maxBackwardSpeed="32" enableAI="true" maxAIGear="1" defaultOn="false">
-			<hydrostatic profile="Direct"/>
+			<hydrostatic profile="Hydrostat"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" correctGearSpeed="true">	
 				<gear name="work"   speed="16" />
 				<gear name="street" speed="32"/>
@@ -3170,7 +3188,7 @@
 		<gearboxMogli disableManual="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="2" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Direct"/>
+			<hydrostatic profile="Hydrostat"/>
 			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="4" reverseReset="true">	
 				<gear name="1" speed="7" />
 				<gear name="2" speed="14"/>
