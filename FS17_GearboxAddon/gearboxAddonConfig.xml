@@ -1659,6 +1659,7 @@
 		<configFile xmlName="data/vehicles/steerable/lamborghini/Mach230VRT.xml"/>
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
       <!-- 0.05..60 @1890 / 800..2100 / 2 -->
+      <!--hydrostatic coupling="InputA" minRatio="0" maxRatio="1.333" pressure="300" volumePump="110" volumeMotor="110" correctGearSpeed="false"/-->
       <hydrostatic profile="Input"/>
       <gears automatic="true">
         <gear speed="6.25" name=""/> <!-- 0.05 1.59 4 8-->
@@ -2123,7 +2124,7 @@
 
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24" disableManual="false">
-      <!--hydrostatic coupling="input" minRatio="0" maxRatio="1.4" startFactor="0" pressure="400" maxTorque="400" correctGearSpeed="false"/-->
+      <!--hydrostatic coupling="InputB" minRatio="0" maxRatio="2" pressure="300" volumePump="110" volumeMotor="110" correctGearSpeed="true"/-->
       <hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
 			<gears  shiftTimeMs="2000" automatic="false" reverseReset="true">		
 				<gear name="heavy duty" speed="22"/>
@@ -2182,10 +2183,10 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt300.xml"/>
 
 		<gearboxMogli maxBackwardSpeed="26">
-      <!--hydrostatic coupling="output" minRatio="-0.707" maxRatio="1.0" pressure="550" maxTorque="1000" correctGearSpeed="false"/-->
+      <!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="65" volumeMotor="233" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
       <gears>
-				<gear name="" speed="40" atRpm="1700"/>
+				<gear name="" speed="40" atRpm="1750"/>
       </gears>
 
 			<engines>
@@ -2246,6 +2247,7 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt700.xml"/>
 	
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
+			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="120" volumeMotor="233" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="28" />
@@ -2492,6 +2494,7 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt900.xml"/>
 	
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="62" maxBackwardSpeed="33" maxAIGear="1">
+			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="233" volumeMotor="466" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="35" />
