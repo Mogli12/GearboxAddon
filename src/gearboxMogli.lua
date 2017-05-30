@@ -60,6 +60,8 @@ gearboxMogli.hydroEffDiffInc      = 0 --150
 gearboxMogli.hydroEffMin          = 0.5
 gearboxMogli.ptoRpmThrottleDiff   = 50
 gearboxMogli.powerFactor0         = 0.1424083769633507853403141361257
+gearboxMogli.powerFactorP         = gearboxMogli.powerFactor0 / 1.36
+gearboxMogli.powerFactorPI        = 1.36 / gearboxMogli.powerFactor0
 gearboxMogli.fuelFactor           = 1/(830*60*60*1000)-- 830 g per liter per hour => liter per millisecond
 gearboxMogli.accDeadZone          = 0.15
 gearboxMogli.blowOffVentilTime0   = 1500
@@ -564,7 +566,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			if self.mrGbMS.Engine.torqueValues == nil then
 				--print("loading motor with new torque curve")
 				self.mrGbMS.Engine.torqueValues = {}
-				torqueF = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#torqueFactor"), self.mrGbMG.torqueFactor) / 1000
+				local tf = self.mrGbMG.torqueFactor
+				if self.mrIsMrVehicle then
+					tf = 1
+				end
+				torqueF = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#torqueFactor"), tf) / 1000
 			end
 			
 			torque = torque * torqueF 
@@ -698,7 +704,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		local width  = getXMLFloat(xmlFile, xmlString .. ".combine#defaultWidth") 
 		local speed = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#defaultSpeed"), self.mrGbMG.combineDefaultSpeed )
 		maxPtoTorqueSpeed = math.min( maxPtoTorqueSpeed, speed )
-		local f = 1.36 * self.mrGbMG.torqueFactor / gearboxMogli.powerFactor0 * 7 / speed
+		local f = gearboxMogli.powerFactorPI * 7 / speed
 		local du0, dc0, dci, dp0, dpi = 0, 0, 0, 0, 0
 		
 		local storeItem = StoreItemsUtil.storeItemsByXMLFilename[self.configFileName:lower()]
@@ -3319,7 +3325,7 @@ function gearboxMogli:updateTick(dt)
 							and self.motor.prevNonClampedMotorRpm ~= nil
 							and self.mrGbMS.CurMinRpm             ~= nil then
 						local power = ( self.motor.usedTransTorque + self.motor.ptoMotorTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.mrGbMS.CurMinRpm )
-						self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * gearboxMogli.powerFactor0 / self.mrGbMG.torqueFactor + 0.5 ), 0, 65535 ))	
+						self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * gearboxMogli.powerFactor0 + 0.5 ), 0, 65535 ))	
 					end
 					if self.mrGbMS.Hydrostatic and not ( self.motor.noTransmission ) then
 						if self.mrGbMS.HydrostaticMax - self.mrGbMS.HydrostaticMin > gearboxMogli.eps then
@@ -9413,15 +9419,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 			local targetRpm = self.targetRpm
 			
 			if     clutchMode > 1 then
-				openRpm        = self.vehicle.mrGbMS.RatedRpm 
-				closeRpm       = self.vehicle.mrGbMS.RatedRpm 
+				openRpm        = self.vehicle.mrGbMS.MaxTargetRpm 
+				closeRpm       = self.vehicle.mrGbMS.MaxTargetRpm 
 				if self.vehicle.mrGbML.afterShiftRpm ~= nil and not ( self.vehicle.mrGbMS.TorqueConverter ) then
 					targetRpm = math.max( self.minRequiredRpm, self.vehicle.mrGbML.afterShiftRpm )
 				end
 				self.torqueConverterLockupMs = nil
 			elseif self.vehicle.mrGbMS.TorqueConverter and not self.ptoOn then
 				-- reduce close RPM depending on motor load
-				local refRpm   = math.max( self.lastMotorRpm, minRpmReduced )
+				local refRpm   = math.min( math.max( self.lastMotorRpm, minRpmReduced ), self.vehicle.mrGbMS.MaxTargetRpm )
 			
 				if self.vehicle.mrGbMS.CloseRpm > refRpm then
 					closeRpm = refRpm + self.motorLoadS * ( self.vehicle.mrGbMS.CloseRpm - refRpm )
@@ -10193,7 +10199,7 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		
 		local f1 = fuelUsed 
 		
-		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactor0 / ( 1.36 * self.mrGbMG.torqueFactor )
+		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactorP
 		fuelUsed   = fuelUsed * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
 		
 	--self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",

@@ -2,17 +2,17 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.1.7</version>
+	<version>2.1.1.8</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v2.2 b17 von Mogli</de>
-				<en>Gearbox v2.2 b17 by mogli</en>
-				 <it>Cambio v2.2 b17 by mogli</it>
-	 <fr>Transmission v2.2 b17 by mogli</fr>
-				 <cz>Řazení v2.2 b17 by mogli</cz>
-<pl>Skrzynia biegów v2.2 b17 by mogli</pl>
+			 <de>Getriebe v2.2 b18 von Mogli</de>
+				<en>Gearbox v2.2 b18 by mogli</en>
+				 <it>Cambio v2.2 b18 by mogli</it>
+	 <fr>Transmission v2.2 b18 by mogli</fr>
+				 <cz>Řazení v2.2 b18 by mogli</cz>
+<pl>Skrzynia biegów v2.2 b18 by mogli</pl>
 		</text>                  
   </l10n>
 
@@ -36,7 +36,7 @@ There are models with one or two gears like the Fendt Vario. Other models combin
 
 For details please look into: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
 
-Changelog 2.1:
+Changelog 2.2:
 - Easier launch of vehicle with CVT
 - reverse driving sound
 - avoid overheating of clutch if a GUI is open
@@ -51,7 +51,7 @@ Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. Da
 
 Eine detailierte Beschreibung befindet sich hier: https://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Beschreibung.pdf
 
-Changelog 2.1:
+Changelog 2.2:
 - leichterer Start von Fahrzeugen mit CVT
 - Rückfahrtsound
 - Keine Überhitzung der Kupplung, wenn ein GUI geöffnet ist
@@ -80,7 +80,7 @@ Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vit
 
 Une description détaillée est disponible ici: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
 
-Changement 2.1:
+Changement 2.2:
 - Lancement plus facile du véhicule avec CVT
 - sens inverse
 - éviter la surchauffe de l'embrayage si une GUI est ouverte
