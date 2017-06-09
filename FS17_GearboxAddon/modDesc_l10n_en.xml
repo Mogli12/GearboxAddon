@@ -8,21 +8,23 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
-		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Gear up"/>
-		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Gear down"/>
-		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: Range up"/>
-		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: Range 2 up"/>
-		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Range down"/>
-		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Range 2 down"/>
-		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: Neutral"/>
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: gear up"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: gear down"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: range up"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: range 2 up"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: range down"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: range 2 down"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: toggle neutral"/>
+		<text name="input_gearboxMogliAUTOMATIC"       text="Gearbox: toggle automatic"/>
 		<text name="input_gearboxMogliOFF"             text="manual gearbox [off]"/>
 		<text name="input_gearboxMogliON"              text="manual gearbox [on]"/>
-		<text name="input_gearboxMogliON_OFF"          text="Gearbox: On/Off"/>
+		<text name="input_gearboxMogliON_OFF"          text="Gearbox: on/off"/>
 		<text name="input_gearboxMogliHUD"             text="Gearbox: HUD on/off"/>
 		<text name="input_gearboxMogliAllAuto"         text="Gearbox: reality switch"/>
 		<text name="input_gearboxMogliAllAutoON"       text="Gearbox [simplified]"/>
 		<text name="input_gearboxMogliAllAutoOFF"      text="Gearbox [realistic]"/>
-		<text name="input_gearboxMogliREVERSE"         text="Gearbox: Reverse"/>
+		<text name="input_gearboxMogliREVERSE"         text="Gearbox: reverse"/>
+		<text name="input_gearboxMogliHANDBRAKE"       text="Gearbox: hand brake"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: auto clutch"/>
 		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: clutch"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: clutch open"/>

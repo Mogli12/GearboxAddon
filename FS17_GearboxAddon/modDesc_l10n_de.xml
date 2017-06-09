@@ -15,6 +15,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Getriebe: Gruppe runter"/>
 		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Getriebe: Gruppe 2 runter"/>
 		<text name="input_gearboxMogliNEUTRAL"         text="Getriebe: Neutral"/>
+		<text name="input_gearboxMogliAUTOMATIC"       text="Getriebe: Automatik"/>
 		<text name="input_gearboxMogliOFF"             text="Manuelles Getriebe [aus]"/>
 		<text name="input_gearboxMogliON"              text="Manuelles Getriebe [an]"/>
 		<text name="input_gearboxMogliON_OFF"          text="Getriebe: An/Aus"/>
@@ -23,6 +24,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliAllAutoON"       text="Getriebe [einfach]"/>
 		<text name="input_gearboxMogliAllAutoOFF"      text="Getriebe [realistisch]"/>
 		<text name="input_gearboxMogliREVERSE"         text="Getriebe: Rückwärts"/>
+		<text name="input_gearboxMogliHANDBRAKE"       text="Getriebe: Handbremse"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Getriebe: Autom.Kupplung"/>
 		<text name="input_gearboxMogliCLUTCH"          text="Getriebe: Kupplung"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Getriebe: Kupplung öffnen"/>

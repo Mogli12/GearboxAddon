@@ -334,9 +334,37 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 	end 
 	
 	-- configuration inside the vehicle.xml
-	xmlFile = self.xmlFile
-	if gearboxMogliLoader.testXmlFile( xmlFile, "vehicle", propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, "vehicle", "vehicle" )	
+	
+	local key
+	
+	if self.configurations ~= nil and self.configurations.motor ~= nil then
+		key = string.format("vehicle.motorConfigurations.motorConfiguration(%d)", self.configurations.motor-1)
+		xmlFile = self.xmlFile
+		if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
+			local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
+			if state and message then
+				logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v1)", tagName, self.mrGbMLConfigFileName ))
+				return true
+			elseif not state then
+				logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
+			end
+		end
+	end
+	
+	key = "vehicle.motorConfigurations.motorConfiguration(0)"
+	if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
+		local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
+		if state and message then
+			logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v0)", tagName, self.mrGbMLConfigFileName ))
+			return true
+		elseif not state then
+			logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
+		end
+	end
+	
+	key = "vehicle"
+	if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
+		local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
 		if state and message then
 			logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
 			return true
@@ -344,7 +372,7 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 			logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
 		end
 	end
-	
+		
 	-- internal configuration
 	xmlFile = gearboxMogliLoader.xmlFileInt
 	entry   = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configInt, configFileName, motorConfig )
