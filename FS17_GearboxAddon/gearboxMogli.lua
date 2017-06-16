@@ -2380,25 +2380,26 @@ function gearboxMogli:update(dt)
 			self.mrGbMB.Sound = { self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 														self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax, 
 														self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
-														self.sampleReverseDrive.sample }
+														self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D }
 			if self.mrGbMS.ThreshingSoundPitchMod then
 				self.mrGbMB.CombineCuttingPitchOffset = self.sampleThreshing.cuttingPitchOffset
 			end
 		end
 		
-		self.motorSoundPitchScale     = self.mrGbMS.Sound.IdlePitchScale
-		self.motorSoundPitchMax       = self.mrGbMS.Sound.IdlePitchMax
-		self.motorSoundRunPitchScale  = self.mrGbMS.Sound.RunPitchScale  
-		self.motorSoundRunPitchMax    = self.mrGbMS.Sound.RunPitchMax
-		self.motorSoundLoadPitchScale = self.mrGbMS.Sound.LoadPitchScale 
-		self.motorSoundLoadPitchMax   = self.mrGbMS.Sound.LoadPitchMax
-		self.sampleReverseDrive.sample = nil
+		self.motorSoundPitchScale       = self.mrGbMS.Sound.IdlePitchScale
+		self.motorSoundPitchMax         = self.mrGbMS.Sound.IdlePitchMax
+		self.motorSoundRunPitchScale    = self.mrGbMS.Sound.RunPitchScale  
+		self.motorSoundRunPitchMax      = self.mrGbMS.Sound.RunPitchMax
+		self.motorSoundLoadPitchScale   = self.mrGbMS.Sound.LoadPitchScale 
+		self.motorSoundLoadPitchMax     = self.mrGbMS.Sound.LoadPitchMax
+		self.sampleReverseDrive.sample  = nil
+		self.sampleReverseDrive.sound3D = nil
 	else
 		if self.mrGbMB.Sound ~= nil then
 			self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 			self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,
 			self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
-			self.sampleReverseDrive.sample = unpack( self.mrGbMB.Sound )
+			self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D = unpack( self.mrGbMB.Sound )
 			self.mrGbMB.Sound = nil
 			if self.mrGbMB.CombineCuttingPitchOffset ~= nil then
 				self.sampleThreshing.cuttingPitchOffset = self.mrGbMB.CombineCuttingPitchOffset
@@ -2674,15 +2675,19 @@ function gearboxMogli:update(dt)
 			end
 		end
 			
-		local keyShiftRangeUp   = "gearboxMogliSHIFTRANGEUP"
-		local keyShiftRangeDown = "gearboxMogliSHIFTRANGEDOWN"
-		local keyShiftGearUp    = "gearboxMogliSHIFTGEARUP"
-		local keyShiftGearDown  = "gearboxMogliSHIFTGEARDOWN"
+		local keyShiftRangeUp    = "gearboxMogliSHIFTRANGEUP"
+		local keyShiftRangeDown  = "gearboxMogliSHIFTRANGEDOWN"
+		local keyShiftRangeToggle= "gearboxMogliSHIFTRANGETOGGLE"
+		local keyShiftGearUp     = "gearboxMogliSHIFTGEARUP"
+		local keyShiftGearDown   = "gearboxMogliSHIFTGEARDOWN"
+		local keyShiftGearToggle = "gearboxMogliSHIFTGEARTOGGLE"
 		if self.mrGbMS.SwapGearRangeKeys then
-			keyShiftGearUp    = "gearboxMogliSHIFTRANGEUP"
-		  keyShiftGearDown  = "gearboxMogliSHIFTRANGEDOWN"
-		  keyShiftRangeUp   = "gearboxMogliSHIFTGEARUP"
-		  keyShiftRangeDown = "gearboxMogliSHIFTGEARDOWN"
+			keyShiftGearUp     = "gearboxMogliSHIFTRANGEUP"
+		  keyShiftGearDown   = "gearboxMogliSHIFTRANGEDOWN"
+			keyShiftGearToggle = "gearboxMogliSHIFTRANGETOGGLE"
+		  keyShiftRangeUp    = "gearboxMogliSHIFTGEARUP"
+		  keyShiftRangeDown  = "gearboxMogliSHIFTGEARDOWN"
+			keyShiftRangeToggle= "gearboxMogliSHIFTGEARTOGGLE"
 		end
 			
 		-- avoid conflicts with driveControl
@@ -2771,32 +2776,26 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetAccelerateToLimit( self.mrGbMS.AccelerateToLimit - 1 )
 			self:mrGbMSetDecelerateToLimit( self.mrGbMS.AccelerateToLimit * 2 )
 			self:mrGbMSetState( "InfoText", string.format( "Speed Limiter: +%2.0f km/h/s / -%2.0f km/h/s", self.mrGbMS.AccelerateToLimit, self.mrGbMS.DecelerateToLimit ))
-		elseif table.getn( self.mrGbMS.Ranges2 ) == 2 
-				and ( gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2UP" ) 
-				   or gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2DOWN" ) ) then
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2TOGGLE" ) then
 			-- toggle range 2
-			if self.mrGbMS.CurrentRange2 == 1 then
-				self:mrGbMSetCurrentRange2(2)                                       
+			if self.mrGbMS.CurrentRange2 >= table.getn( self.mrGbMS.Ranges2 ) then
+				self:mrGbMSetCurrentRange2(1)                                       
 			else
-				self:mrGbMSetCurrentRange2(1)
+				self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2 + 1)
 			end
-		elseif  table.getn( self.mrGbMS.Ranges ) == 2 
-				and ( gearboxMogli.mbHasInputEvent( keyShiftRangeUp ) 
-				   or gearboxMogli.mbHasInputEvent( keyShiftRangeDown ) ) then
+		elseif gearboxMogli.mbHasInputEvent( keyShiftRangeToggle ) then
 			-- toggle range 1
-			if self.mrGbMS.CurrentRange == 1 then
-				self:mrGbMSetCurrentRange(2)                                       
+			if self.mrGbMS.CurrentRange >= table.getn( self.mrGbMS.Ranges ) then
+				self:mrGbMSetCurrentRange(1)                                       
 			else
-				self:mrGbMSetCurrentRange(1)
+				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange + 1)
 			end
-		elseif  table.getn( self.mrGbMS.Gears ) == 2 
-				and ( gearboxMogli.mbHasInputEvent( keyShiftGearUp ) 
-				   or gearboxMogli.mbHasInputEvent( keyShiftGearDown ) ) then
+		elseif gearboxMogli.mbHasInputEvent( keyShiftGearToggle ) then
 			-- toggle gear
-			if self.mrGbMS.CurrentGear == 1 then
-				self:mrGbMSetCurrentGear(2)                                       
+			if self.mrGbMS.CurrentGear >= table.getn( self.mrGbMS.Gears ) then
+				self:mrGbMSetCurrentGear(1)                                       
 			else
-				self:mrGbMSetCurrentGear(1)
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear + 1)
 			end
 		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2UP" ) then -- high/low range shift
 			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2+1)                                       

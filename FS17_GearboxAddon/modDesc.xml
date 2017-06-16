@@ -2,17 +2,17 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.1.9</version>
+	<version>2.1.2.0</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v2.2 b19 von Mogli</de>
-				<en>Gearbox v2.2 b19 by mogli</en>
-				 <it>Cambio v2.2 b19 by mogli</it>
-	 <fr>Transmission v2.2 b19 by mogli</fr>
-				 <cz>Řazení v2.2 b19 by mogli</cz>
-<pl>Skrzynia biegów v2.2 b19 by mogli</pl>
+			 <de>Getriebe v2.2 b20 von Mogli</de>
+				<en>Gearbox v2.2 b20 by mogli</en>
+				 <it>Cambio v2.2 b20 by mogli</it>
+	 <fr>Transmission v2.2 b20 by mogli</fr>
+				 <cz>Řazení v2.2 b20 by mogli</cz>
+<pl>Skrzynia biegów v2.2 b20 by mogli</pl>
 		</text>                  
   </l10n>
 
@@ -103,8 +103,10 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 	<inputBindings>
 		<input name="gearboxMogliSHIFTGEARUP" 	  key1="KEY_leftbracket"             button="BUTTON_3"  category="VEHICLE" />
 		<input name="gearboxMogliSHIFTGEARDOWN"   key1="KEY_quote"                   button="BUTTON_4"  category="VEHICLE" />
+		<input name="gearboxMogliSHIFTGEARTOGGLE" key1="KEY_rctrl KEY_quote"                            category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGEUP"    key1="KEY_rightbracket"                               category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGEDOWN"  key1="KEY_backslash"                                  category="VEHICLE" />
+		<input name="gearboxMogliSHIFTRANGETOGGLE" key1="KEY_rctrl KEY_backslash"                       category="VEHICLE" />
 		<input name="gearboxMogliNEUTRAL"      	  key1="KEY_semicolon"                                  category="VEHICLE" />
 		<input name="gearboxMogliAUTOMATIC"      	key1="KEY_rctrl KEY_slash"                            category="VEHICLE" />
 		<input name="gearboxMogliAllAuto"      	  key1="KEY_rshift KEY_slash" 		                      category="VEHICLE" />
@@ -117,6 +119,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<input name="gearboxMogliAUTOCLUTCH2"     key1="KEY_rshift KEY_period"  		                    category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGE2UP"   key1="KEY_rshift KEY_rightbracket"                    category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGE2DOWN" key1="KEY_rshift KEY_backslash"                       category="VEHICLE" />
+		<input name="gearboxMogliSHIFTRANGE2TOGGLE" key1="KEY_rctrl KEY_rightbracket"                   category="VEHICLE" />
     <input name="gearboxMogliGEAR1"                                              button="BUTTON_9"  category="VEHICLE" />
     <input name="gearboxMogliGEAR2"                                              button="BUTTON_10" category="VEHICLE" />
     <input name="gearboxMogliGEAR3"                                              button="BUTTON_11" category="VEHICLE" />

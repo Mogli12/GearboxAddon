@@ -10,10 +10,13 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<!--GearboxAddon helpPanel text-->
 		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: gear up"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: gear down"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Gearbox: toggle gear"/>
 		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: range up"/>
 		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: range 2 up"/>
 		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: range down"/>
 		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: range 2 down"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Gearbox: toggle range"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Gearbox: toggle range 2"/>
 		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: toggle neutral"/>
 		<text name="input_gearboxMogliAUTOMATIC"       text="Gearbox: toggle automatic"/>
 		<text name="input_gearboxMogliOFF"             text="manual gearbox [off]"/>

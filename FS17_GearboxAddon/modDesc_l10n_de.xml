@@ -10,10 +10,13 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<!--GearboxAddon helpPanel text-->
 		<text name="input_gearboxMogliSHIFTGEARUP"     text="Getriebe: Gang hoch"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Getriebe: Gang runter"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Getriebe: Gang wechseln"/>
 		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Getriebe: Gruppe hoch"/>
 		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Getriebe: Gruppe 2 hoch"/>
 		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Getriebe: Gruppe runter"/>
 		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Getriebe: Gruppe 2 runter"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Getriebe: Gruppe wechseln"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Getriebe: Gruppe 2 wechseln"/>
 		<text name="input_gearboxMogliNEUTRAL"         text="Getriebe: Neutral"/>
 		<text name="input_gearboxMogliAUTOMATIC"       text="Getriebe: Automatik"/>
 		<text name="input_gearboxMogliOFF"             text="Manuelles Getriebe [aus]"/>
