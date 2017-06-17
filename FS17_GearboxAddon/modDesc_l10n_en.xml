@@ -36,6 +36,9 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliMINRPM"          text="Gearbox: hand throttle"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: hand throttle down"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: hand throttle up"/>
+		<text name="input_gearboxMogliFIXEDRATIO"      text="Gearbox: fixed ratio"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"    text="Gearbox: fixed ratio down"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"    text="Gearbox: fixed ratio up"/>
 		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
 		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
 		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>

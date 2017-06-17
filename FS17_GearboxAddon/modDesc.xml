@@ -2,17 +2,17 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.2.0</version>
+	<version>2.1.2.1</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v2.2 b20 von Mogli</de>
-				<en>Gearbox v2.2 b20 by mogli</en>
-				 <it>Cambio v2.2 b20 by mogli</it>
-	 <fr>Transmission v2.2 b20 by mogli</fr>
-				 <cz>Řazení v2.2 b20 by mogli</cz>
-<pl>Skrzynia biegów v2.2 b20 by mogli</pl>
+			 <de>Getriebe v2.2 b21 von Mogli</de>
+				<en>Gearbox v2.2 b21 by mogli</en>
+				 <it>Cambio v2.2 b21 by mogli</it>
+	 <fr>Transmission v2.2 b21 by mogli</fr>
+				 <cz>Řazení v2.2 b21 by mogli</cz>
+<pl>Skrzynia biegów v2.2 b21 by mogli</pl>
 		</text>                  
   </l10n>
 
@@ -141,6 +141,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
     <input name="gearboxMogliCLUTCH_3"				key1="KEY_period"                                     category="VEHICLE" />
     <axis name="gearboxMogliCLUTCH"                                    axis="AXIS_6" invert="false" category="VEHICLE" />
     <axis name="gearboxMogliMINRPM" key1="KEY_equals" key2="KEY_minus" axis="AXIS_8" invert="false" category="VEHICLE" />
+    <axis name="gearboxMogliFIXEDRATIO" key1="KEY_rshift KEY_equals" key2="KEY_rshift KEY_minus" invert="false" category="VEHICLE" />
 	</inputBindings>
 
 	<extraSourceFiles>

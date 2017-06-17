@@ -36,6 +36,9 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliMINRPM"          text="Getriebe: Handgas"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Getriebe: Handgas runter"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Getriebe: Handgas rauf"/>
+		<text name="input_gearboxMogliFIXEDRATIO"      text="Getriebe: Feste Übersetzung"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"    text="Getriebe: Feste Übersetzung runter"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"    text="Getriebe: Feste Übersetzung rauf"/>
 		<text name="input_gearboxMogliGEAR1"           text="Getriebe: G27 1"/>
 		<text name="input_gearboxMogliGEAR2"           text="Getriebe: G27 2"/>
 		<text name="input_gearboxMogliGEAR3"           text="Getriebe: G27 3"/>

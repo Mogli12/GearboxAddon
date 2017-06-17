@@ -219,7 +219,8 @@ gearboxMogli.stateWithSetGet = { "IsOnOff",
 																 "NeutralActive", 
 																 "ReverseActive", 
 																 "SpeedLimiter",  
-																 "HandThrottle", 
+																 "HandThrottle",
+																 "FixedRatio",
 																 "AutoClutch", 
 																 "ManualClutch",
 																 "AccelerateToLimit",
@@ -305,6 +306,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "AutoClutch",    true  )
 	gearboxMogli.registerState( self, "ManualClutch",  1,     gearboxMogli.mrGbMOnSetManualClutch )
 	gearboxMogli.registerState( self, "HandThrottle",  0 )
+	gearboxMogli.registerState( self, "FixedRatio",    0 )
 	gearboxMogli.registerState( self, "SpeedLimiter",  false )
 	gearboxMogli.registerState( self, "AllAuto",       false )
 	gearboxMogli.registerState( self, "EcoMode",       false )
@@ -2675,6 +2677,20 @@ function gearboxMogli:update(dt)
 			end
 		end
 			
+		if InputBinding.gearboxMogliFIXEDRATIO ~= nil then
+			local fixedRatio = InputBinding.getDigitalInputAxis(InputBinding.gearboxMogliFIXEDRATIO)
+			if InputBinding.isAxisZero(fixedRatio) then
+				fixedRatio = InputBinding.getAnalogInputAxis(InputBinding.gearboxMogliFIXEDRATIO)
+				if not InputBinding.isAxisZero(fixedRatio) then
+					self:mrGbMSetFixedRatio( fixedRatio )
+				end
+			elseif fixedRatio < 0 then
+				self:mrGbMSetFixedRatio( self.mrGbMS.FixedRatio - 0.0004 * dt )
+			elseif fixedRatio > 0 then
+				self:mrGbMSetFixedRatio( self.mrGbMS.FixedRatio + 0.0004 * dt ) 
+			end
+		end
+			
 		local keyShiftRangeUp    = "gearboxMogliSHIFTRANGEUP"
 		local keyShiftRangeDown  = "gearboxMogliSHIFTRANGEDOWN"
 		local keyShiftRangeToggle= "gearboxMogliSHIFTRANGETOGGLE"
@@ -3621,6 +3637,9 @@ function gearboxMogli:draw()
 			elseif self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "hand"
 			end
+			if self.mrGbMS.Hydrostatic and self.mrGbMS.FixedRatio > 0 then
+				ovRows = ovRows + 1 infos[ovRows] = "fixed"
+			end
 			if self.mrGbMG.drawReqPower  then
 				ovRows = ovRows + 1 infos[ovRows] = "power"
 			end
@@ -3767,6 +3786,14 @@ function gearboxMogli:draw()
 						--renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMS.HandThrottle * 100 + 0.5 ) ))
 							local r = self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm )
 							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( r * 0.1 +0.5)*10)) 		
+						end
+					elseif info == "fixed" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Fixed ratio")	
+						elseif self:mrGbMGetAutomatic() then
+							renderText(ovRight,drawY, deltaY, string.format("%3.0f %%", self.mrGbMS.FixedRatio * 100 ))
+						else
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", self.mrGbMS.FixedRatio * speed ))
 						end
 					elseif info == "combine" then
 						if col == 1 then
@@ -4583,6 +4610,13 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetHandThrottle( value, noEventSend )
 	self:mrGbMSetState( "HandThrottle", Utils.clamp( value, 0, 1 ), noEventSend )
+end 
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMSetFixedRatio
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMSetFixedRatio( value, noEventSend )
+	self:mrGbMSetState( "FixedRatio", Utils.clamp( value, 0, 1 ), noEventSend )
 end 
 
 --**********************************************************************************************************	
@@ -8518,6 +8552,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local wMin = self.absWheelSpeedRpm + math.min( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm )
 				local wMax = self.absWheelSpeedRpm + math.max( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm )
 				
+				local hFix = -1
+				if self.vehicle.mrGbMS.FixedRatio > gearboxMogli.eps then
+					hFix = self.vehicle.mrGbMS.FixedRatio * hMax
+				end
+				
 				if self.vehicle:mrGbMGetAutomatic() then
 					local gearMaxSpeed = self.vehicle.mrGbMS.Ranges2[self.vehicle.mrGbMS.CurrentRange2].ratio
 														 * self.vehicle.mrGbMS.GlobalRatioFactor
@@ -8566,6 +8605,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						downTimer = math.min( refTime + self.vehicle.mrGbMS.AutoShiftTimeoutShort, downTimer )
 					end		
 					
+					local spdFix = -1
+					if hFix > 0 then
+						local i2g, i2r = self:splitGear( maxGear )
+						spdFix =    self.vehicle.mrGbMS.Gears[i2g].speed
+											* self.vehicle.mrGbMS.Ranges[i2r].ratio
+											* gearMaxSpeed 
+											* hFix
+					end
+					
 					for g=1,maxGear do
 						local isValidEntry = true
 						local i2g, i2r = self:splitGear( g )
@@ -8580,6 +8628,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						local spd = self.vehicle.mrGbMS.Gears[i2g].speed
 											* self.vehicle.mrGbMS.Ranges[i2r].ratio
 											* gearMaxSpeed 
+											
+						if spdFix > 0 then
+							local h = spdFix / spd
+							if h > hMax or h < hMin then
+								isValidEntry = false
+							end
+						end
 												
 						if g ~= currentGear then						
 							if not isValidEntry then
@@ -8669,6 +8724,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 						self.vehicle.mrGbML.autoShiftInfo = self.vehicle.mrGbML.autoShiftInfo ..
 																								string.format( "bestG: %2d bestS: %5.3f bestE: %4.2f bestR: %4.0f",
 																																bestG, bestS, bestE, bestR )
+						if spdFix > 0 then
+							hFix = spdFix / bestS 
+						end
 					end 
 					
 					if bestG ~= currentGear then	
@@ -8722,7 +8780,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local hMax1 = Utils.clamp( w / n1, hMin, hMax )
 					local hTgt  = Utils.clamp( w / t, hMin1, hMax1 )
 
-					if     hMin1 > hMax1 - gearboxMogli.eps then
+					if     hFix > 0 then
+						hTgt = math.max( hMin, hFix )
+					elseif hMin1 > hMax1 - gearboxMogli.eps then
 						hTgt = hMin1
 					elseif self.ptoOn and ( self.vehicle.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE or self.vehicle.mrGbML.hydroTargetSpeed ~= nil ) then					
 						hTgt = Utils.clamp( self.vehicle.mrGbMS.RatedRpm * currentSpeedLimit / ( t * self.vehicle.mrGbMS.CurrentGearSpeed ), hMin1, hMax1 )						
@@ -8804,6 +8864,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					
 					local hMin2 = Utils.clamp( wMin * r / self:getNextPossibleRpm( t + d, n0, m0 ), hMin, hMax )
 					local hMax2 = Utils.clamp( wMax * r / self:getNextPossibleRpm( t - d, n0, m0 ), hMin, hMax )
+					
+					if hFix > 0 then
+						hMin2 = math.min( hMin2, hFix )
+						hMin2 = math.min( hMax2, hFix )
+					end
 					
 					self.hydrostaticFactor = Utils.clamp( self.hydrostaticFactorT, hMin2, hMax2 )
 					
