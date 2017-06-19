@@ -8778,6 +8778,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					local n0 = minTarget
 					local m0 = self.vehicle.mrGbMS.HydrostaticMaxRpm
 					
+					if hFix > 0 then
+						n0 = self.vehicle.mrGbMS.IdleRpm
+					end
+					
 					if self.torqueRpmReduction ~= nil then
 						n0 = math.min( n0, self.torqueRpmReference - self.torqueRpmReduction )
 						m0 = math.min( m0, self.torqueRpmReference - self.torqueRpmReduction )
