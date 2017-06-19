@@ -2396,6 +2396,8 @@ function gearboxMogli:update(dt)
 		self.motorSoundLoadPitchMax     = self.mrGbMS.Sound.LoadPitchMax
 		self.sampleReverseDrive.sample  = nil
 		self.sampleReverseDrive.sound3D = nil
+		
+		self.mrUseMrTransmission        = nil
 	else
 		if self.mrGbMB.Sound ~= nil then
 			self.motorSoundPitchScale,     self.motorSoundPitchMax, 
@@ -2407,6 +2409,10 @@ function gearboxMogli:update(dt)
 				self.sampleThreshing.cuttingPitchOffset = self.mrGbMB.CombineCuttingPitchOffset
 				self.mrGbMB.CombineCuttingPitchOffset   = nil
 			end
+		end
+		
+		if self.mrGbMB.mrUseMrTransmission then
+			self.mrUseMrTransmission = true
 		end
 	
 		return 
@@ -2483,6 +2489,9 @@ function gearboxMogli:update(dt)
 		elseif not ( self.steeringEnabled ) then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_AI", "AI" )
 			text2 = text
+			if not self:mrGbMGetAutomatic() and not ( self.mrGbMS.Hydrostatic ) then
+				text = text .." (M)"
+			end
 		elseif self.mrGbMS.AllAuto then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "all auto" )
 			if not ( self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftRange2 ) then
@@ -2547,7 +2556,8 @@ function gearboxMogli:update(dt)
 			text = text .. "(eco)"
 			text2 = text2 .. "(eco)"
 		end
-		if      not self.mrGbMS.AllAuto
+		if      not ( self.steeringEnabled )
+				and not self.mrGbMS.AllAuto
 				and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 )
 				and self.mrGbMS.Automatic ~= 4 then
 			if     self.mrGbMS.Automatic == 0 then
@@ -3086,7 +3096,7 @@ function gearboxMogli:update(dt)
 		local d = self.mrGbMS.ThreshingSoundPitchMax - self.mrGbMS.ThreshingSoundPitchMin
 		if not ( self.mrGbMS.ConstantRpm ) then
 			p = self.sampleThreshing.pitchOffset
-		elseif gearboxMogli.mrGbMGetThroughPutS( self ) <= 0 then
+		elseif Utils.getNoNil( gearboxMogli.mrGbMGetThroughPutS( self ), -1 ) <= 0 then
 			p = self.sampleThreshing.pitchOffset
 		elseif d <= 0 then
 			p = self.mrGbMB.CombineCuttingPitchOffset
@@ -3637,7 +3647,7 @@ function gearboxMogli:draw()
 			elseif self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "hand"
 			end
-			if self.mrGbMS.Hydrostatic and self.mrGbMS.FixedRatio > 0 then
+			if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) and self.mrGbMS.FixedRatio > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "fixed"
 			end
 			if self.mrGbMG.drawReqPower  then
@@ -6721,9 +6731,18 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.ratioFactorR = nil
 	
 	if vehicle.mrIsMrVehicle then
+		for n,v in pairs( motor ) do
+			if      type( n ) == "string" 
+					and string.sub( n, 1, 2 ) == "mr" 
+					and ( type( v ) == "number" or type( v ) == "boolean" or type( v ) == "string" ) then
+				self[n] = v
+			end
+		end
+		self.rotInertiaFx             = motor.rotInertiaFx
 		self.mrLastAxleTorque         = 0
 		self.mrLastEngineOutputTorque = 0
 		self.mrLastDummyGearRatio     = 0
+		self.mrMaxTorque              = 0
 	end
 	
 	return self
@@ -8553,7 +8572,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 				local wMax = self.absWheelSpeedRpm + math.max( 0, self.absWheelSpeedRpm - prevWheelSpeedRpm )
 				
 				local hFix = -1
-				if self.vehicle.mrGbMS.FixedRatio > gearboxMogli.eps then
+				if not self.ptoOn and self.vehicle.mrGbMS.FixedRatio > gearboxMogli.eps then
 					hFix = self.vehicle.mrGbMS.FixedRatio * hMax
 				end
 				
