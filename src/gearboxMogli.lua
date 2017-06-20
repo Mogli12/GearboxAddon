@@ -6725,6 +6725,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.motorLoad               = 0
 	self.usedMotorTorque         = 0
 	self.lastMotorTorque         = 0
+	self.lastSmoothTorque        = 0
 	self.lastTransTorque         = 0
 	self.ptoToolTorque           = 0
 	self.ptoMotorRpm             = self.vehicle.mrGbMS.IdleRpm
@@ -7332,7 +7333,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	self.vehicle.mrGbML.rpmLimitInfo = ""
 	
-	if self.noTorque or torque <= 0 or acc <= 0 then
+	if self.noTorque or torque <= 0 or acc <= 0 or self.noTransmission then
 		if torque < 0 then
 			self.lastMissingTorque = self.lastMissingTorque - torque
 		end
@@ -7398,8 +7399,10 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			end
 		end
 		
-		torque = torque * acc		
+		torque = math.min( torque * acc, self.lastSmoothTorque + self.tickDt * 0.0005 )
 	end
+	
+	self.lastSmoothTorque = torque 
 	
 	if     self.noTransmission 
 			or self.noTorque then
