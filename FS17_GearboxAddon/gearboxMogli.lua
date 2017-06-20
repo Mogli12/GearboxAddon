@@ -2802,26 +2802,53 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetAccelerateToLimit( self.mrGbMS.AccelerateToLimit - 1 )
 			self:mrGbMSetDecelerateToLimit( self.mrGbMS.AccelerateToLimit * 2 )
 			self:mrGbMSetState( "InfoText", string.format( "Speed Limiter: +%2.0f km/h/s / -%2.0f km/h/s", self.mrGbMS.AccelerateToLimit, self.mrGbMS.DecelerateToLimit ))
-		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2TOGGLE" ) then
+		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2TOGGLE" ) then
 			-- toggle range 2
-			if self.mrGbMS.CurrentRange2 >= table.getn( self.mrGbMS.Ranges2 ) then
-				self:mrGbMSetCurrentRange2(1)                                       
-			else
-				self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2 + 1)
+			local i = self.mrGbMS.CurrentRange2
+			while true do
+				i = i + 1 
+				if i > table.getn( self.mrGbMS.Ranges2 ) then
+					i = 1
+				end
+				if i == self.mrGbMS.CurrentRange2 then
+					break
+				end			
+				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges2[i], nil, nil, i ) then			
+					self:mrGbMSetCurrentRange2(i, false)
+					break
+				end
 			end
-		elseif gearboxMogli.mbHasInputEvent( keyShiftRangeToggle ) then
-			-- toggle range 1
-			if self.mrGbMS.CurrentRange >= table.getn( self.mrGbMS.Ranges ) then
-				self:mrGbMSetCurrentRange(1)                                       
-			else
-				self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange + 1)
+		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeToggle ) then
+			-- toggle range 1			
+			local i = self.mrGbMS.CurrentRange
+			while true do
+				i = i + 1 
+				if i > table.getn( self.mrGbMS.Ranges ) then
+					i = 1
+				end
+				if i == self.mrGbMS.CurrentRange then
+					break
+				end			
+				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges[i], nil, i, nil ) then			
+					self:mrGbMSetCurrentRange(i, false, true)
+					break
+				end
 			end
-		elseif gearboxMogli.mbHasInputEvent( keyShiftGearToggle ) then
+		elseif not ( self.mrGbMS.DisableManual ) and gearboxMogli.mbHasInputEvent( keyShiftGearToggle ) then
 			-- toggle gear
-			if self.mrGbMS.CurrentGear >= table.getn( self.mrGbMS.Gears ) then
-				self:mrGbMSetCurrentGear(1)                                       
-			else
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear + 1)
+			local i = self.mrGbMS.CurrentGear
+			while true do
+				i = i + 1 
+				if i > table.getn( self.mrGbMS.Gears ) then
+					i = 1
+				end
+				if i == self.mrGbMS.CurrentGear then
+					break
+				end			
+				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Gears[i], i, nil, nil ) then			
+					self:mrGbMSetCurrentGear(i, false, true)
+					break
+				end
 			end
 		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( "gearboxMogliSHIFTRANGE2UP" ) then -- high/low range shift
 			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2+1)                                       
