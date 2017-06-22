@@ -5286,6 +5286,36 @@
 		</gearboxMogli>
 	</vehicle>
 
+	<vehicle>
+		<mod name="FS17_MF_Old_Generation">
+			<xmlFile name="MF294C.xml"/>
+			<xmlFile name="MF600.xml"/>
+			<xmlFile name="MF600C.xml"/>
+			<xmlFile name="MF3000.xml"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="false">
+			<blowOffVentilSound volume="0"/>
+			
+			<gears defaultGear="2" shiftTimeMs="1000">		
+				<gear speed="6.23"/>
+				<gear speed="10.7"/>
+				<gear speed="18.5"/>
+				<gear speed="32"/>
+			</gears>
+
+			<ranges defaultRange="3" reverseReset="true" doubleClutch="true">	
+				<range ratio="0.354" forwardOnly="true" name="L"/>
+				<range ratio="0.595" forwardOnly="true" name="M"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.619" reverseOnly="true" name="R"/>
+			</ranges>
+			
+			<reverse doubleClutch="true"/>	
+		</gearboxMogli>	
+		
+	</vehicle>
+	
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	

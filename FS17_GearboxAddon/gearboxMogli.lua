@@ -5499,7 +5499,10 @@ function gearboxMogli:setLaunchGear( noEventSend, init, shuttle )
 	end
 end
 
-function gearboxMogli:setLaunchGearSpeed()
+--**********************************************************************************************************	
+-- gearboxMogli:setLaunchGearSpeed
+--**********************************************************************************************************	
+function gearboxMogli:setLaunchGearSpeed( noEventSend )
 	maxSpeed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed
 					 * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
 					 * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
@@ -6725,7 +6728,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.motorLoad               = 0
 	self.usedMotorTorque         = 0
 	self.lastMotorTorque         = 0
-	self.lastSmoothTorque        = 0
+	self.lastLimitedTorque       = 0
 	self.lastTransTorque         = 0
 	self.ptoToolTorque           = 0
 	self.ptoMotorRpm             = self.vehicle.mrGbMS.IdleRpm
@@ -7333,11 +7336,16 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	self.vehicle.mrGbML.rpmLimitInfo = ""
 	
-	if self.noTorque or torque <= 0 or acc <= 0 or self.noTransmission then
-		if torque < 0 then
-			self.lastMissingTorque = self.lastMissingTorque - torque
-		end
-		torque = 0
+	if torque < 0 then
+		self.lastMissingTorque = self.lastMissingTorque - torque
+		self.lastLimitedTorque = self.maxMotorTorque
+		torque                 = 0
+	elseif self.noTorque or self.noTransmission then
+		self.lastLimitedTorque = 0
+		torque                 = 0
+	elseif acc <= 0 then
+		self.lastLimitedTorque = 0
+		torque                 = 0
 	else
 		local applyLimit = true
 		if self.vehicle.mrGbMS.Hydrostatic then
@@ -7399,11 +7407,17 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			end
 		end
 		
-		torque = math.min( torque * acc, self.lastSmoothTorque + self.tickDt * 0.0005 )
+		local maxTorquePerSecond = self.maxMotorTorque
+		if self.vehicle.mrIsMrVehicle then
+			maxTorquePerSecond = math.min( 0.5, maxTorquePerSecond )
+		else
+			maxTorquePerSecond = math.min( 1, maxTorquePerSecond )
+		end
+		
+		torque = math.min( torque * acc, self.lastLimitedTorque + self.tickDt * 0.001 * maxTorquePerSecond )
+		self.lastLimitedTorque = torque 
 	end
-	
-	self.lastSmoothTorque = torque 
-	
+		
 	if     self.noTransmission 
 			or self.noTorque then
 		self.ptoSpeedLimit = nil
@@ -8920,7 +8934,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 					
 					if hFix > 0 then
 						hMin2 = math.min( hMin2, hFix )
-						hMin2 = math.min( hMax2, hFix )
+						hMax2 = math.min( hMax2, hFix )
 					end
 					
 					self.hydrostaticFactor = Utils.clamp( self.hydrostaticFactorT, hMin2, hMax2 )
