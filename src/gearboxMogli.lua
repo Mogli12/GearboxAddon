@@ -2157,7 +2157,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
-		self.mrGbMS.Sound.ReverseDriveSample = self.sampleReverseDrive.sample
+		self.mrGbMS.Sound.ReverseDriveSample  = self.sampleReverseDrive.sample
+		self.mrGbMS.Sound.ReverseDriveSound3D = self.sampleReverseDrive.sound3D
 	end
 	
 --**********************************************************************************************************		
@@ -3100,7 +3101,8 @@ function gearboxMogli:update(dt)
 -- reverse driving sound
 --**********************************************************************************************************			
 	if self.mrGbMS.Sound.ReverseDriveSample ~= nil then
-		self.sampleReverseDrive.sample = self.mrGbMS.Sound.ReverseDriveSample
+		self.sampleReverseDrive.sample  = self.mrGbMS.Sound.ReverseDriveSample
+		self.sampleReverseDrive.sound3D = self.mrGbMS.Sound.ReverseDriveSound3D
 
 		if      self.isMotorStarted
 				and self.mrGbML.motor ~= nil
@@ -3112,7 +3114,8 @@ function gearboxMogli:update(dt)
 			SoundUtil.stopSample(self.sampleReverseDrive)
 		end
 		
-		self.sampleReverseDrive.sample = nil
+		self.sampleReverseDrive.sample  = nil
+		self.sampleReverseDrive.sound3D = nil
 	end			
 	
 --**********************************************************************************************************			
@@ -5988,8 +5991,6 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 
-	self.mrGbMS.IsOn = new
-
 	if new then				
 		self:mrGbMSetState( "CurrentGear", self.mrGbMS.DefaultGear, noEventSend ) 
 		self:mrGbMSetState( "CurrentRange", self.mrGbMS.DefaultRange, noEventSend ) 
@@ -6011,8 +6012,8 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 			self.motor = self.mrGbML.motor
 		end
 		if self:mrGbMGetAutoStartStop() then
-			self:mrGbMSetNeutralActive( true, false, true ) 
-			self:mrGbMSetState( "AutoHold", true )
+			self:mrGbMSetNeutralActive( true, noEventSend, true ) 
+			self:mrGbMSetState( "AutoHold", true, noEventSend ) 
 		end
 		self:mrGbMDoGearShift() 
 		
@@ -6064,6 +6065,8 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 		end
 		self.mrGbMB.mrUseMrTransmission = nil
 	end		
+	
+	self.mrGbMS.IsOn = new	
 end 
 
 --**********************************************************************************************************	
