@@ -10,11 +10,15 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<!--GearboxAddon helpPanel text-->
 		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Bieg w górę"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Bieg w dół"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Gearbox: Zmiana biegu"/>
 		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: Zakres 1 w górę"/>
 		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: Zakres 2 w górę"/>
 		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Zakres 1 w dół"/>
 		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Zakres 2 w dół"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Gearbox: Zmiana zakresu 1"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Gearbox: Zmiana zakresu 2"/>
 		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: Luz"/>
+		<text name="input_gearboxMogliAUTOMATIC"       text="Gearbox: Automat"/>
 		<text name="input_gearboxMogliOFF"             text="Skrzynia biegów [wyłączona]"/>
 		<text name="input_gearboxMogliON"              text="Skrzynia biegów [włączona]"/>
 		<text name="input_gearboxMogliON_OFF"          text="Gearbox: Wł/Wył"/>
@@ -23,6 +27,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="input_gearboxMogliAllAutoON"       text="Skrzynia biegów [uproszczona]"/>
 		<text name="input_gearboxMogliAllAutoOFF"      text="Skrzynia biegów [realistyczna]"/>
 		<text name="input_gearboxMogliREVERSE"         text="Gearbox: Rewers"/>
+		<text name="input_gearboxMogliHANDBRAKE"       text="Gearbox: Hamulec ręczny"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: Automatyczne sprzęgło"/>
 		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: Sprzęgło"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: Sprzęgło otwarte"/>
@@ -31,6 +36,9 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="input_gearboxMogliMINRPM"          text="Gearbox: Gaz ręczny"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: Zmniejsz gaz ręczny"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: Zwiększ gaz ręczny"/>
+		<text name="input_gearboxMogliFIXEDRATIO"      text="Gearbox: Poprawiony współczynnik"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"    text="Gearbox: Poprawiony współ. zmniejsz"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"    text="Gearbox: Poprawiony współ. zwiększ"/>
 		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
 		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
 		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
