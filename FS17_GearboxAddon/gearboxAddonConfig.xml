@@ -2126,7 +2126,7 @@
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24" disableManual="false">
       <!--hydrostatic coupling="InputB" minRatio="0" maxRatio="2" pressure="300" volumePump="110" volumeMotor="110" correctGearSpeed="true"/-->
       <hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
-			<gears  shiftTimeMs="2000" automatic="false" reverseReset="true">		
+			<gears  shiftTimeMs="0" automatic="false" reverseReset="true" onlyStopped="true">		
 				<gear name="heavy duty" speed="22"/>
 				<gear name="transport"  speed="50" forwardOnly="true"/>
 			</gears>
@@ -2799,7 +2799,7 @@
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Hydrostat"/>		
-			<gears defaultGear="3">	
+			<gears defaultGear="3" onlyStopped="true">	
 				<gear name="I"   maxForwardSpeedRatio="0.37" />
 				<gear name="II"  maxForwardSpeedRatio="0.62" />
 				<gear name="III" maxForwardSpeedRatio="1.02" />
@@ -2820,7 +2820,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Hydrostat" minRatio="0"/>		
-			<gears defaultGear="4" reverseReset="true">	
+			<gears defaultGear="4" reverseReset="true" onlyStopped="true">	
 				<gear name="I"   speed="8"  forwardOnly="true"/>
 				<gear name="II"  speed="14" forwardOnly="true"/>
 				<gear name="R"   speed="14" reverseOnly="true"/>
@@ -2865,7 +2865,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Hydrostat" minRatio="0"/>		
-			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000">
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1000" onlyStopped="true">
 				<gear name="I"   speed="7"    forwardOnly="true"/>
 				<gear name="II"  speed="12.6" forwardOnly="true"/>
 				<gear name="R"   speed="16.8" reverseOnly="true"/>
@@ -2908,7 +2908,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Hydrostat"/>
-			<gears defaultGear="2" shiftTimeMs="1000">
+			<gears defaultGear="2" shiftTimeMs="1000" onlyStopped="true">
 				<gear name="I"   speed="7"   />
 				<gear name="II"  speed="12.6"/>
 				<gear name="III" speed="22.4"/>
@@ -2949,7 +2949,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Direct"/>
-			<gears defaultGear="2" shiftTimeMs="1000">
+			<gears defaultGear="2" shiftTimeMs="1000" onlyStopped="true">
 				<gear name="I"   speed="7" />
 				<gear name="II"  speed="12.5"/>
 				<gear name="III" speed="23"/>
@@ -3114,7 +3114,7 @@
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="42" maxBackwardSpeed="42" enableAI="true" maxAIGear="1" defaultOn="false">
 			<hydrostatic profile="Direct"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2">	
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" onlyStopped="true">	
 				<gear name="work"   speed="25" />
 				<gear name="street" speed="50"/>
 			</gears>
@@ -3151,7 +3151,7 @@
 		
 		<gearboxMogli disableManual="true" speedLimiter="true" maxForwardSpeed="32" maxBackwardSpeed="32" enableAI="true" maxAIGear="1" defaultOn="false">
 			<hydrostatic profile="Hydrostat"/>
-			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" correctGearSpeed="true">	
+			<gears shiftTimeMs="1000" clutchRatio="1" defaultGear="2" onlyStopped="true">	
 				<gear name="work"   speed="16" />
 				<gear name="street" speed="32"/>
 			</gears>
@@ -4632,7 +4632,7 @@
 			<blowOffVentilSound volume="0"/>
 			
 			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
-			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500" doubleClutch="true">
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500" onlyStopped="true">
 				<gear name="I"   speed="5.5"  forwardOnly="true"/>
 				<gear name="II"  speed="11"   forwardOnly="true"/>
 				<gear name="R"   speed="11"   reverseOnly="true"/>
@@ -5315,6 +5315,48 @@
 		</gearboxMogli>	
 		
 	</vehicle>
+	
+	<vehicle>
+		<mod name="FS17Contest_ClaasMegaPack">
+			<xmlFile name="claasMega208/claasMega208.xml"/>
+		</mod>
+		
+		<gearboxMogli speedLimiter="false" enableAI="true" maxAIGear="2" onlyHandThrottle="true">
+			<combine defaultWidth="6.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0.14"/>
+      <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3" onlyStopped="true">
+        <gear speed="9"  name="1"/> 
+        <gear speed="14" name="2"/> 
+        <gear speed="21" name="3"/>
+      </gears>
+		
+			<realEngine idleRpm="900" ratedRpm="2100">
+        <torque rpm="0" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="261"/><!-- 1900: 234(234) | 2100: 235(235) | 1000..1550: 1070(1070) | 97 | 1 | 300 | 2.2 -->
+        <torque rpm="100" motorTorque="194" motorTorqueEco="194" fuelUsageRatio="251"/>
+        <torque rpm="400" motorTorque="399" motorTorqueEco="399" fuelUsageRatio="228"/>
+        <torque rpm="700" motorTorque="827" motorTorqueEco="827" fuelUsageRatio="210"/>
+        <torque rpm="800" motorTorque="951" motorTorqueEco="951" fuelUsageRatio="206"/>
+        <torque rpm="900" motorTorque="1038" motorTorqueEco="1038" fuelUsageRatio="203"/>
+        <torque rpm="1000" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="200"/>
+        <torque rpm="1100" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="198"/>
+        <torque rpm="1200" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="197"/>
+        <torque rpm="1300" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="196"/>
+        <torque rpm="1400" motorTorque="1070" motorTorqueEco="1070" fuelUsageRatio="196"/>
+        <torque rpm="1500" motorTorque="1050" motorTorqueEco="1050" fuelUsageRatio="197"/><!-- manualData: 1050-->
+        <torque rpm="1600" motorTorque="1010" motorTorqueEco="1010" fuelUsageRatio="199"/><!-- manualData: 1010-->
+        <torque rpm="1700" motorTorque="960" motorTorqueEco="960" fuelUsageRatio="201"/><!-- manualData: 960-->
+        <torque rpm="1800" motorTorque="910" motorTorqueEco="910" fuelUsageRatio="204"/><!-- manualData: 910-->
+        <torque rpm="1900" motorTorque="865" motorTorqueEco="865" fuelUsageRatio="208"/>
+        <torque rpm="2000" motorTorque="822" motorTorqueEco="822" fuelUsageRatio="213"/>
+        <torque rpm="2100" motorTorque="786" motorTorqueEco="786" fuelUsageRatio="218"/>
+        <torque rpm="2200" motorTorque="716" motorTorqueEco="716" fuelUsageRatio="242"/>
+        <torque rpm="2300" motorTorque="464" motorTorqueEco="464" fuelUsageRatio="315"/>
+        <torque rpm="2400" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="436"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
 	
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	

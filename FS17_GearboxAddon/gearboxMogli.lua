@@ -986,6 +986,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.Range2DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#doubleClutch"), alwaysDoubleClutch) 
 	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
 	
+	self.mrGbMS.GearsOnlyStopped        = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#onlyStopped"), false) 
+	self.mrGbMS.Range1OnlyStopped       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#onlyStopped"), false) 
+	self.mrGbMS.Range2OnlyStopped       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#onlyStopped"), false) 
+	self.mrGbMS.ReverseOnlyStopped      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#onlyStopped"), not self.mrGbMS.AutoStartStop) 
+	
 	self.mrGbMS.GearTimeToShiftGear     = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#shiftTimeMs"), 650, -1, hasHydrostat and self.mrGbMS.DisableManual )
 	self.mrGbMS.GearShiftEffectGear     = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".gears#shiftEffect"),     self.mrGbMS.GearTimeToShiftGear < self.mrGbMG.shiftEffectTime )
 	self.mrGbMS.GearTimeToShiftHl       = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#shiftTimeMs"),  750 ) 
@@ -2924,18 +2929,23 @@ function gearboxMogli:update(dt)
 			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => "..tostring(curGear)..", "..tostring(gear)
 				
 				if curGear ~= gear then					
-					local manClutch = self.mrGbMS.ManualClutchGear
+					local manClutch   = self.mrGbMS.ManualClutchGear
+					local onlyStopped = self.mrGbMS.GearsOnlyStopped 
 					if self:mrGbMGetAutoClutch() then
-						manClutch = false
+						manClutch   = false
+						onlyStopped = false
 					elseif ( curGear>0 and gear<0 ) or ( curGear<0 and gear>0 ) then
-						manClutch = self.mrGbMS.ManualClutchReverse
+						manClutch   = self.mrGbMS.ManualClutchReverse
+						onlyStopped = self.mrGbMS.ReverseOnlyStopped
 					elseif self.mrGbMS.SwapGearRangeKeys then
-						manClutch = self.mrGbMS.ManualClutchHl
+						manClutch   = self.mrGbMS.ManualClutchHl
+						onlyStopped = self.mrGbMS.Range1OnlyStopped
 					end
 	
 				--self.mrGbML.G27Gear = self.mrGbML.G27Gear ..", "..tostring(manClutch)
 	
-					if gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
+					if     gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, onlyStopped, noEventSend )
+							or gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
 					-- do nothing 
 					elseif gear == 0 then
 						self:mrGbMSetNeutralActive( true, false, true )	
@@ -4170,13 +4180,34 @@ end
 function gearboxMogli:mrGbMCheckGrindingGears( checkIt, noEventSend )
 	if self.steeringEnabled and checkIt and not ( self:mrGbMGetAutoClutch() ) and not ( self:mrGbMGetAutomatic() ) then
 		if self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1 then
-			self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear; clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ))
-			self.mrGbMS.GrindingGearsVol = 0
-			self:mrGbMSetState( "GrindingGearsVol", 1 )
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear; clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ), noEventSend )
 			return true
 		end		
 	end		
 	return false
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMCheckGrindingGears
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMCheckShiftOnlyIfStopped( onlyStopped, noEventSend )
+	if self.steeringEnabled and onlyStopped and not ( self.mrGbMS.AllAuto ) then
+		local s = math.abs( self.lastSpeedReal*3600 )
+		if s > 1 then
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear; speed > %3.0fkm/h", s ), noEventSend )
+			return true
+		end		
+	end		
+	return false
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMSetGrindingGears
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMSetGrindingGears( reason, noEventSend )
+	self:mrGbMSetState( "InfoText", reason, noEventSend )
+	self.mrGbMS.GrindingGearsVol = 0
+	self:mrGbMSetState( "GrindingGearsVol", 1, noEventSend )
 end
 
 --**********************************************************************************************************	
@@ -4253,6 +4284,9 @@ end
 -- gearboxMogli:mrGbMSetCurrentGear
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
+	if  		gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, self.mrGbMS.GearsOnlyStopped, noEventSend ) then
+		return false
+	end
 	if      not ( self.mrGbMS.NeutralActive )
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchGear, noEventSend ) then
 		return false
@@ -4369,6 +4403,9 @@ end
 -- gearboxMogli:mrGbMSetCurrentRange
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
+	if  		gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, self.mrGbMS.Range1OnlyStopped, noEventSend ) then
+		return false
+	end
 	if      not ( self.mrGbMS.NeutralActive )
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchHl, noEventSend ) then
 		return false
@@ -4431,6 +4468,9 @@ end
 -- gearboxMogli:mrGbMSetCurrentRange2
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
+	if  		gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, self.mrGbMS.Range2OnlyStopped, noEventSend ) then
+		return false
+	end
 	if      not ( self.mrGbMS.NeutralActive )
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchRanges2, noEventSend ) then
 		return 
@@ -4604,6 +4644,11 @@ end
 -- gearboxMogli:mrGbMSetReverseActive
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetReverseActive( value, noEventSend )
+	if  		self.mrGbMS.ReverseActive ~= nil
+			and self.mrGbMS.ReverseActive ~= value 
+			and gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, self.mrGbMS.ReverseOnlyStopped, noEventSend ) then
+		return false
+	end
 	if      self.mrGbMS.ReverseActive ~= nil
 			and self.mrGbMS.ReverseActive ~= value 
 			and not ( self.mrGbMS.NeutralActive )
@@ -7410,17 +7455,30 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			end
 		end
 		
-		local maxTorquePerSecond = self.maxMotorTorque
-		if self.vehicle.mrIsMrVehicle then
-			maxTorquePerSecond = math.min( 0.5, maxTorquePerSecond )
-		else
-			maxTorquePerSecond = math.min( 1, maxTorquePerSecond )
+		if      not self.vehicle.axisForwardIsAnalog
+				and self.vehicle.steeringEnabled
+				and self.vehicle.mrIsMrVehicle then
+			local maxTorquePerSecond = 2 * self.maxMotorTorque
+			local s = math.abs( self.vehicle.lastSpeedReal*3600 )
+			local r = 5
+			if self.vehicle.mrIsMrVehicle then
+				s = 10
+			end
+			
+			if s < r then
+				local limit = math.max( 0.25, s/r )^2 * maxTorquePerSecond
+				if maxTorquePerSecond > limit then
+					maxTorquePerSecond = limit
+				end
+			end
+			
+			torque = math.min( torque * acc, math.max( self.lastLimitedTorque + self.tickDt * 0.001 * maxTorquePerSecond, 0.1 * self.maxMotorTorque ) )
+			self.lastLimitedTorque = torque 
+		else			
+			self.lastLimitedTorque = torque 
 		end
-		
-		torque = math.min( torque * acc, self.lastLimitedTorque + self.tickDt * 0.001 * maxTorquePerSecond )
-		self.lastLimitedTorque = torque 
 	end
-		
+	
 	if     self.noTransmission 
 			or self.noTorque then
 		self.ptoSpeedLimit = nil
