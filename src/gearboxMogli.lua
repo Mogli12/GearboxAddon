@@ -691,7 +691,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 						
 	self.mrGbMS.Sound.MaxRpm = getXMLFloat(xmlFile, xmlString .. "#soundMaxRpm")
 	if self.mrGbMS.Sound.MaxRpm == nil then
-		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.RatedRpm
+		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.OrigRatedRpm
 	end
 
 --**************************************************************************************************	
@@ -7840,7 +7840,7 @@ end
 function gearboxMogliMotor:updateMotorRpm( dt )
 	local vehicle = self.vehicle
 	self.tickDt                  = dt
-	self.prevNonClampedMotorRpm  = self.nonClampedMotorRpm
+	self.prevNonClampedMotorRpm  = math.min( self.vehicle.mrGbMS.CurMaxRpm, self.nonClampedMotorRpm )
 	self.prevMotorRpm            = self.lastRealMotorRpm
 	self.prevClutchRpm           = self.clutchRpm
 	
@@ -7854,7 +7854,6 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	if not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps then
 		local w = self.clutchRpm / self.gearRatio
 		if gearboxMogli.trustClutchRpmTimer <= dt then
-			self.wheelSpeedRpm = w
 			if     self.trustClutchRpmTimer == nil 
 					or self.trustClutchRpmTimer > g_currentMission.time + 1000 then
 				self.trustClutchRpmTimer = g_currentMission.time + 1000

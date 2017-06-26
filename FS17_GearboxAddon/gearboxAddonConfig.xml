@@ -439,7 +439,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
-		<gearboxMogli torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5">
+		<gearboxMogli torqueConverter="true" clutchOpenRpm="1800" clutchCloseRpm="2100" clutchMaxTargetRpm="2600" speedLimiter="false" maxRpmThrottle="0.5">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
@@ -449,6 +449,129 @@
 				<gear speed="88"  forwardOnly="true" name="3"/>
 				<gear speed="130" forwardOnly="true" name="4"/>
 			</gears>
+			
+			<engines>
+				<engine name="240 I6" idleRpm="800" ratedRpm="4000">
+					<!-- 3800: 100(100) | 3800: 100(100) | 2400..2400: 235(235) | 70 | 0.5 | 399 | 1.7 | 4000 | 2000: 210 -->
+					<torque rpm="350" motorTorque="115" />
+					<torque rpm="700" motorTorque="156" />
+					<torque rpm="900" motorTorque="173" />
+					<torque rpm="1000" motorTorque="181"/>
+					<torque rpm="1100" motorTorque="188"/>
+					<torque rpm="1200" motorTorque="195"/>
+					<torque rpm="1300" motorTorque="202"/>
+					<torque rpm="1400" motorTorque="207"/>
+					<torque rpm="1500" motorTorque="213"/>
+					<torque rpm="1600" motorTorque="217"/>
+					<torque rpm="1700" motorTorque="222"/>
+					<torque rpm="1800" motorTorque="225"/>
+					<torque rpm="1850" motorTorque="227"/>
+					<torque rpm="1900" motorTorque="228"/>
+					<torque rpm="1950" motorTorque="229"/>
+					<torque rpm="2000" motorTorque="231"/>
+					<torque rpm="2050" motorTorque="232"/>
+					<torque rpm="2100" motorTorque="233"/>
+					<torque rpm="2150" motorTorque="233"/>
+					<torque rpm="2200" motorTorque="234"/>
+					<torque rpm="2250" motorTorque="234"/>
+					<torque rpm="2300" motorTorque="235"/>
+					<torque rpm="2350" motorTorque="235"/>
+					<torque rpm="2400" motorTorque="235"/>
+					<torque rpm="2450" motorTorque="234"/>
+					<torque rpm="2500" motorTorque="233"/>
+					<torque rpm="2550" motorTorque="232"/>
+					<torque rpm="2600" motorTorque="231"/>
+					<torque rpm="2650" motorTorque="230"/>
+					<torque rpm="2750" motorTorque="227"/>
+					<torque rpm="3000" motorTorque="220"/>
+					<torque rpm="3250" motorTorque="211"/>
+					<torque rpm="3500" motorTorque="200"/>
+					<torque rpm="3750" motorTorque="187"/>
+					<torque rpm="4000" motorTorque="128"/>
+					<torque rpm="4250" motorTorque="0"/>
+				</engine>
+				
+				<engine name="300 I6" idleRpm="800" ratedRpm="4000">
+					<!-- 3800: 140(140) | 3800: 140(140) | 2400..2400: 320(320) | 70 | 0.5 | 399 | 1.7 | 4000 | 2000: 210 -->
+					<torque rpm="350" motorTorque="157" />
+					<torque rpm="700" motorTorque="213" />
+					<torque rpm="900" motorTorque="236" />
+					<torque rpm="1000" motorTorque="247"/>
+					<torque rpm="1100" motorTorque="257"/>
+					<torque rpm="1200" motorTorque="266"/>
+					<torque rpm="1300" motorTorque="275"/>
+					<torque rpm="1400" motorTorque="283"/>
+					<torque rpm="1500" motorTorque="290"/>
+					<torque rpm="1600" motorTorque="296"/>
+					<torque rpm="1700" motorTorque="302"/>
+					<torque rpm="1800" motorTorque="307"/>
+					<torque rpm="1850" motorTorque="309"/>
+					<torque rpm="1900" motorTorque="311"/>
+					<torque rpm="1950" motorTorque="312"/>
+					<torque rpm="2000" motorTorque="314"/>
+					<torque rpm="2050" motorTorque="315"/>
+					<torque rpm="2100" motorTorque="317"/>
+					<torque rpm="2150" motorTorque="318"/>
+					<torque rpm="2200" motorTorque="319"/>
+					<torque rpm="2250" motorTorque="319"/>
+					<torque rpm="2300" motorTorque="320"/>
+					<torque rpm="2350" motorTorque="320"/>
+					<torque rpm="2400" motorTorque="320"/>
+					<torque rpm="2450" motorTorque="319"/>
+					<torque rpm="2500" motorTorque="318"/>
+					<torque rpm="2550" motorTorque="316"/>
+					<torque rpm="2600" motorTorque="315"/>
+					<torque rpm="2650" motorTorque="314"/>
+					<torque rpm="2750" motorTorque="310"/>
+					<torque rpm="3000" motorTorque="301"/>
+					<torque rpm="3250" motorTorque="290"/>
+					<torque rpm="3500" motorTorque="277"/>
+					<torque rpm="3750" motorTorque="262"/>
+					<torque rpm="4000" motorTorque="179"/>
+					<torque rpm="4250" motorTorque="0" />
+				</engine>
+				
+				<engine name="360 V8" idleRpm="800" ratedRpm="4000">
+					<!-- 4000: 196(196) | 4000: 196(196) | 2600..2600: 443(443) | 70 | 0.5 | 399 | 1.7 | 4200 | 2080: 210 -->
+					<torque rpm="350" motorTorque="222" />
+					<torque rpm="700" motorTorque="296" />
+					<torque rpm="900" motorTorque="324" />
+					<torque rpm="1000" motorTorque="338"/>
+					<torque rpm="1100" motorTorque="351"/>
+					<torque rpm="1200" motorTorque="363"/>
+					<torque rpm="1300" motorTorque="374"/>
+					<torque rpm="1400" motorTorque="384"/>
+					<torque rpm="1500" motorTorque="393"/>
+					<torque rpm="1600" motorTorque="402"/>
+					<torque rpm="1700" motorTorque="410"/>
+					<torque rpm="1800" motorTorque="417"/>
+					<torque rpm="1850" motorTorque="420"/>
+					<torque rpm="1900" motorTorque="423"/>
+					<torque rpm="1950" motorTorque="426"/>
+					<torque rpm="2000" motorTorque="428"/>
+					<torque rpm="2050" motorTorque="431"/>
+					<torque rpm="2100" motorTorque="433"/>
+					<torque rpm="2150" motorTorque="435"/>
+					<torque rpm="2200" motorTorque="436"/>
+					<torque rpm="2250" motorTorque="438"/>
+					<torque rpm="2300" motorTorque="439"/>
+					<torque rpm="2350" motorTorque="440"/>
+					<torque rpm="2400" motorTorque="441"/>
+					<torque rpm="2450" motorTorque="442"/>
+					<torque rpm="2500" motorTorque="443"/>
+					<torque rpm="2550" motorTorque="443"/>
+					<torque rpm="2600" motorTorque="443"/>
+					<torque rpm="2650" motorTorque="441"/>
+					<torque rpm="2750" motorTorque="437"/>
+					<torque rpm="3000" motorTorque="425"/>
+					<torque rpm="3250" motorTorque="409"/>
+					<torque rpm="3500" motorTorque="391"/>
+					<torque rpm="3750" motorTorque="367"/>
+					<torque rpm="4000" motorTorque="344"/>
+					<torque rpm="4250" motorTorque="189"/>
+					<torque rpm="4500" motorTorque="0" />
+				</engine>
+			</engines>
 			
 		</gearboxMogli>
 	</vehicle>
