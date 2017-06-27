@@ -2,17 +2,17 @@
 <modDesc descVersion="37">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.1.2.8</version>
+	<version>2.1.2.9</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v2.2 b28 von Mogli</de>
-				<en>Gearbox v2.2 b28 by mogli</en>
-				 <it>Cambio v2.2 b28 by mogli</it>
-	 <fr>Transmission v2.2 b28 by mogli</fr>
-				 <cz>Řazení v2.2 b28 by mogli</cz>
-<pl>Skrzynia biegów v2.2 b28 by mogli</pl>
+			 <de>Getriebe v2.2 b29 von Mogli</de>
+				<en>Gearbox v2.2 b29 by mogli</en>
+				 <it>Cambio v2.2 b29 by mogli</it>
+	 <fr>Transmission v2.2 b29 by mogli</fr>
+				 <cz>Řazení v2.2 b29 by mogli</cz>
+<pl>Skrzynia biegów v2.2 b29 by mogli</pl>
 		</text>                  
   </l10n>
 
@@ -34,7 +34,7 @@ This script adds on the basis of the file gearboxAddonConfig.xml a gearbox to al
 In modern tractors power shift transmissions are often combined with automatic gear shifting. Another transmission type is the continuously variable transmissions. 
 There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio.
 
-For details please look into: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
+For details please look into: https://github.com/Mogli12/GearboxAddon/wiki/EN
 
 Changelog 2.2:
 - Easier launch of vehicle with CVT
@@ -49,7 +49,7 @@ Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Get
 
 Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. Dabei können ganz unterschiedliche Getriebe simuliert werden. Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. Wenn man die Schaltzeit auf null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
 
-Eine detailierte Beschreibung befindet sich hier: https://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Beschreibung.pdf
+Eine detailierte Beschreibung befindet sich hier: https://github.com/Mogli12/GearboxAddon/wiki/DE
 
 Changelog 2.2:
 - leichterer Start von Fahrzeugen mit CVT
@@ -78,7 +78,7 @@ Chaque tracteur n'a pas de transmission variable en continu. Et même les transm
 
 Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vitesses à tous les tracteurs configurés. De nombreux types de transmission différents peuvent être simulés. Il existe des boîtes de vitesses classiques avec engrenages, un ou deux groupes et inverser les vitesses ou les groupes. Le fait de court-circuiter le temps de réponse à zéro entraînera une transmission de puissance. Dans les tracteurs modernes, les transmissions à changement de vitesse sont souvent associées à un changement automatique de vitesses. Un autre type de transmission est la transmission à variation continue. Il existe des modèles avec une ou deux vitesses comme le Fendt Vario. D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable. Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
 
-Une description détaillée est disponible ici: http://github.com/Mogli12/GearboxAddon/raw/master/Documentation/Description.pdf
+Une description détaillée est disponible ici: https://github.com/Mogli12/GearboxAddon/wiki/EN
 
 Changement 2.2:
 - Lancement plus facile du véhicule avec CVT

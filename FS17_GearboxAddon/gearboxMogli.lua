@@ -2162,8 +2162,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
-		self.mrGbMS.Sound.ReverseDriveSample  = self.sampleReverseDrive.sample
-		self.mrGbMS.Sound.ReverseDriveSound3D = self.sampleReverseDrive.sound3D
 	end
 	
 --**********************************************************************************************************		
@@ -3110,9 +3108,9 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- reverse driving sound
 --**********************************************************************************************************			
-	if self.mrGbMS.Sound.ReverseDriveSample ~= nil then
-		self.sampleReverseDrive.sample  = self.mrGbMS.Sound.ReverseDriveSample
-		self.sampleReverseDrive.sound3D = self.mrGbMS.Sound.ReverseDriveSound3D
+	if self.mrGbMB.Sound ~= nil and self.mrGbMB.Sound[7] ~= nil then
+		self.sampleReverseDrive.sample  = self.mrGbMB.Sound[7]
+		self.sampleReverseDrive.sound3D = self.mrGbMB.Sound[8]
 
 		if      self.isMotorStarted
 				and self.mrGbML.motor ~= nil
@@ -8117,6 +8115,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 	if      self.deltaRpm < -gearboxMogli.autoShiftMaxDeltaRpm 
 			and accelerationPedal > 0.9 
 			and self.usedTransTorque > self.lastTransTorque - gearboxMogli.eps then
+		getMaxPower = true
+	end
+	
+	if      self.vehicle.steeringEnabled
+			and self.vehicle.axisForwardIsAnalog
+			and accelerationPedal > 0.97 then
 		getMaxPower = true
 	end
 	
