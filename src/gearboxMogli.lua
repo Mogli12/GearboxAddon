@@ -154,10 +154,10 @@ gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
-gearboxMogliGlobals.momentOfInertiaBase   = 3     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
-gearboxMogliGlobals.momentOfInertia       = 3     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertiaBase   = 1     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
-gearboxMogliGlobals.momentOfInertiaMin    = 1e-5  -- is already multiplied by 1e-3!!!
+gearboxMogliGlobals.momentOfInertiaMin    = 1e-4  -- 1e-5  -- is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
 gearboxMogliGlobals.maxRpmThrottle        = 0.9
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
@@ -989,7 +989,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.GearsOnlyStopped        = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#onlyStopped"), false) 
 	self.mrGbMS.Range1OnlyStopped       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#onlyStopped"), false) 
 	self.mrGbMS.Range2OnlyStopped       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#onlyStopped"), false) 
-	self.mrGbMS.ReverseOnlyStopped      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#onlyStopped"), not self.mrGbMS.AutoStartStop) 
+	self.mrGbMS.ReverseOnlyStopped      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#onlyStopped"), false) 
 	
 	self.mrGbMS.GearTimeToShiftGear     = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#shiftTimeMs"), 650, -1, hasHydrostat and self.mrGbMS.DisableManual )
 	self.mrGbMS.GearShiftEffectGear     = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".gears#shiftEffect"),     self.mrGbMS.GearTimeToShiftGear < self.mrGbMG.shiftEffectTime )
@@ -1868,14 +1868,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			self.mrGbMS.HydrostaticPtoDiff = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#ptoRpmDelta"), dft )
 		end
 		
-		dft = Utils.getNoNil( hit, 5000 )
+		dft = Utils.getNoNil( hit, 1000 )
 		if dft < 100 then
 			-- do not smooth 
 			self.mrGbMS.HydrostaticIncFactor = 1
 		else
 			self.mrGbMS.HydrostaticIncFactor = 1 / dft
 		end
-		dft = Utils.getNoNil( hdt, 5000 )
+		dft = Utils.getNoNil( hdt, 1000 )
 		if hdt == nil and hit ~= nil then
 			-- compatibility
 			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor
@@ -6764,11 +6764,11 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.clutchPercent           = 0
 	self.minThrottle             = 0.3
 	self.minThrottleS            = 0.3
-	self.lastMotorRpm            = motor.lastMotorRpm
-	self.lastRealMotorRpm        = motor.lastRealMotorRpm
-	self.prevMotorRpm            = motor.lastMotorRpm
-	self.prevNonClampedMotorRpm  = motor.nonClampedMotorRpm
-	self.nonClampedMotorRpmS     = motor.nonClampedMotorRpm
+	self.lastMotorRpm            = 0 --motor.lastMotorRpm
+	self.lastRealMotorRpm        = 0 --motor.lastRealMotorRpm
+	self.prevMotorRpm            = 0 --motor.lastMotorRpm
+	self.prevNonClampedMotorRpm  = 0 --motor.nonClampedMotorRpm
+	self.nonClampedMotorRpmS     = 0 --motor.nonClampedMotorRpm
 	self.deltaRpm                = 0
 	self.transmissionInputRpm    = 0
 	self.motorLoad               = 0
@@ -6867,11 +6867,19 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor.copyRuntimeValues( motorFrom, motorTo )
 
-	motorTo.nonClampedMotorRpm      = Utils.getNoNil( motorFrom.nonClampedMotorRpm, 0 )
-	motorTo.clutchRpm               = Utils.getNoNil( motorFrom.clutchRpm        , motorTo.nonClampedMotorRpm )   
-	motorTo.lastMotorRpm            = Utils.getNoNil( motorFrom.lastMotorRpm     , motorTo.nonClampedMotorRpm )  
-	motorTo.lastRealMotorRpm        = Utils.getNoNil( motorFrom.lastRealMotorRpm , motorTo.nonClampedMotorRpm )      
-	motorTo.equalizedMotorRpm       = Utils.getNoNil( motorFrom.equalizedMotorRpm, motorTo.nonClampedMotorRpm )
+	if motorFrom.vehicle ~= nil and not ( motorFrom.vehicle.isMotorStarted ) then
+		motorTo.nonClampedMotorRpm    = 0
+		motorTo.clutchRpm             = 0
+		motorTo.lastMotorRpm          = 0
+		motorTo.lastRealMotorRpm      = 0
+		motorTo.equalizedMotorRpm     = 0
+	else
+		motorTo.nonClampedMotorRpm    = Utils.getNoNil( motorFrom.nonClampedMotorRpm, 0 )
+		motorTo.clutchRpm             = Utils.getNoNil( motorFrom.clutchRpm        , motorTo.nonClampedMotorRpm )   
+		motorTo.lastMotorRpm          = Utils.getNoNil( motorFrom.lastMotorRpm     , motorTo.nonClampedMotorRpm )  
+		motorTo.lastRealMotorRpm      = Utils.getNoNil( motorFrom.lastRealMotorRpm , motorTo.nonClampedMotorRpm )      
+		motorTo.equalizedMotorRpm     = Utils.getNoNil( motorFrom.equalizedMotorRpm, motorTo.nonClampedMotorRpm )
+	end
 	motorTo.lastPtoRpm              = motorFrom.lastPtoRpm
 	motorTo.gear                    = motorFrom.gear               
 	motorTo.gearRatio               = motorFrom.gearRatio          
@@ -7053,7 +7061,7 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 
 	curMaxRpm = gearboxMogli.huge
 						
-	if self.ratioFactorR ~= nil then 		
+	if self.ratioFactorR ~= nil and self.ratioFactorR > 1e-6 then 		
 		if forGetTorque or not ( self.vehicle.mrGbMS.Hydrostatic ) then
 			curMaxRpm = ( self.maxPossibleRpm + gearboxMogli.speedLimitRpmDiff ) / self.ratioFactorR
 		end
@@ -7737,7 +7745,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	torque = torque * math.min( self.transmissionEfficiency, self.vehicle.mrGbMS.TransmissionEfficiency )
 	self.lastTransTorque = torque
 
-	if     self.noTransmission then
+	if     self.noTransmission
+			or not ( self.vehicle.isMotorStarted ) then
 		self.ratioFactorR  = nil
 		self.lastGearRatio = nil
 		self.lastGMax      = nil
@@ -7824,7 +7833,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	if self.ratioFactorR == nil then
 	elseif self.ratioFactorR < 0 then
-		self.ratioFactorR = nil
+		self.ratioFactorR = 0
 	elseif self.ratioFactorR > 1e6 then
 		self.ratioFactorR = 1e6 
 	end
@@ -7910,7 +7919,11 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		
 	if not ( self.vehicle.isMotorStarted ) then
 		self.motorLoadOverflow   = 0
-		self.nonClampedMotorRpm  = 0
+		if self.prevNonClampedMotorRpm == nil then
+			self.nonClampedMotorRpm  = 0
+		else
+			self.nonClampedMotorRpm  = math.max( 0, self.prevNonClampedMotorRpm -dt * self.vehicle.mrGbMS.RpmDecFactor )
+		end
 	elseif not ( self.noTransmission ) and self.ratioFactorR ~= nil then
 		self.nonClampedMotorRpm  = self:getMotorRpm()
 		if self.motorLoadOverflow == nil then
