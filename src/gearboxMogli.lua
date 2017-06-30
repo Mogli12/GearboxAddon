@@ -256,7 +256,7 @@ function gearboxMogli:initClient()
 			gearboxMogli.globalsLoaded = true
 			file = gearboxMogli.modsDirectory.."gearboxAddonConfig.xml"
 			if fileExists(file) then	
-				gearboxMogli.globalsLoad( file, "vehicles.gearboxMogliGlobals", gearboxMogliGlobals )	
+				gearboxMogli.globalsLoad( file, "vehicles.gearboxMogliGlobals", gearboxMogliGlobals, true )	
 			end		
 			gearboxMogliGlobals.hudWidth = Utils.clamp( 16.0 * g_screenHeight * gearboxMogliGlobals.hudWidth / ( 9.0 * g_screenWidth ), 0.05, 0.3 )
 			if gearboxMogliGlobals.hudWidth + gearboxMogliGlobals.hudPositionX > 1 then
@@ -450,7 +450,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			gearboxMogli.globalsLoaded = true
 			file = gearboxMogli.modsDirectory.."gearboxAddonConfig.xml"
 			if fileExists(file) then	
-				gearboxMogli.globalsLoad( file, "vehicles.gearboxMogliGlobals", gearboxMogliGlobals )	
+				gearboxMogli.globalsLoad( file, "vehicles.gearboxMogliGlobals", gearboxMogliGlobals, true )	
 			end		
 			gearboxMogliGlobals.hudWidth = Utils.clamp( 16.0 * g_screenHeight * gearboxMogliGlobals.hudWidth / ( 9.0 * g_screenWidth ), 0.05, 0.3 )
 			if gearboxMogliGlobals.hudWidth + gearboxMogliGlobals.hudPositionX > 1 then
@@ -2636,7 +2636,11 @@ function gearboxMogli:update(dt)
 	--	clutchSpeed     = math.max( 0.002, clutchSpeed )
 	--end
 		
-		if     gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
+		if     self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
+			if self.mrGbMS.ManualClutch < 1 then
+				self:mrGbMSetManualClutch( 1 )
+			end
+		elseif gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
 			self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt * clutchSpeed ))
 		elseif InputBinding.gearboxMogliCLUTCH ~= nil then
@@ -3305,7 +3309,7 @@ function gearboxMogli:onLeave()
 		if self:mrGbMGetAutoStartStop() then 
 			self:mrGbMSetNeutralActive( true, false, true )
 			self:mrGbMSetState( "IsNeutral", true )
-		else
+		elseif not ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
 			self:mrGbMSetManualClutch( 0 )
 		end
