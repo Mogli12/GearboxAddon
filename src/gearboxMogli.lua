@@ -163,6 +163,8 @@ gearboxMogliGlobals.maxRpmThrottle        = 0.9
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
 gearboxMogliGlobals.autoStartStop         = false -- option to enable auto start stop for all vechiles
 gearboxMogliGlobals.useMrUWP              = 10
+gearboxMogliGlobals.reduceMOILowSpeed     = false -- reduce moment of inertia at low speed, default is off
+
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
 --**********************************************************************************************************	
@@ -10274,7 +10276,7 @@ function gearboxMogliMotor:getRotInertia()
 		if not ( self.vehicle.mrGbMS.HydrostaticLaunch ) and self.clutchPercent < 1 then
 			f = math.min( f, self.clutchPercent )
 		end
-		if -0.0015 < self.vehicle.lastSpeedReal and self.vehicle.lastSpeedReal < 0.0015 then
+		if self.vehicle.mrGbMG.reduceMOILowSpeed and -0.0015 < self.vehicle.lastSpeedReal and self.vehicle.lastSpeedReal < 0.0015 then
 			f = math.min( f, 0.250 + 500 * math.abs( self.vehicle.lastSpeedReal ) )
 		end
 	end

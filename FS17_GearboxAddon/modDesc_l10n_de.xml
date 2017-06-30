@@ -29,10 +29,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliREVERSE"         text="Getriebe: Rückwärts"/>
 		<text name="input_gearboxMogliHANDBRAKE"       text="Getriebe: Handbremse"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Getriebe: Autom.Kupplung"/>
-		<text name="input_gearboxMogliCLUTCH"          text="Getriebe: Kupplung"/>
+		<text name="input_gearboxMogliCLUTCH"          text="Getriebe: Kupplung (analog)"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Getriebe: Kupplung öffnen"/>
 		<text name="input_gearboxMogliCLUTCH_2"        text="Getriebe: Kupplung schliessen"/>
-		<text name="input_gearboxMogliCLUTCH_3"        text="Getriebe: Kupplung"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="Getriebe: Kupplung (digital)"/>
 		<text name="input_gearboxMogliMINRPM"          text="Getriebe: Handgas"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Getriebe: Handgas runter"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Getriebe: Handgas rauf"/>

@@ -29,10 +29,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliREVERSE"         text="Gearbox: reverse"/>
 		<text name="input_gearboxMogliHANDBRAKE"       text="Gearbox: hand brake"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: auto clutch"/>
-		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: clutch"/>
+		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: analog clutch"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: clutch open"/>
 		<text name="input_gearboxMogliCLUTCH_2"        text="Gearbox: clutch close"/>
-		<text name="input_gearboxMogliCLUTCH_3"        text="Gearbox: clutch"/>
+		<text name="input_gearboxMogliCLUTCH_3"        text="Gearbox: digital clutch"/>
 		<text name="input_gearboxMogliMINRPM"          text="Gearbox: hand throttle"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: hand throttle down"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: hand throttle up"/>

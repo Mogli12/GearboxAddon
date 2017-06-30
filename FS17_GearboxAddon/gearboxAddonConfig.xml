@@ -3395,6 +3395,23 @@
 	</vehicle> 
 	
 	
+<!-- ********** Special vehicles ******************** -->	
+<!-- ********** Special vehicles ******************** -->	
+<!-- ********** Special vehicles ******************** -->	
+	<vehicle>
+		<configFile xmlName="data/vehicles/steerable/jcb/jcb260.xml"/>
+		<configFile xmlName="data/vehicles/steerable/jcb/jcb325T.xml"/>
+
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="true" momentOfInertia="0.5">
+			<blowOffVentilSound volume="0"/>
+			<hydrostatic profile="Hydrostat"/>	
+			<gears>	
+				<gear name="" maxForwardSpeedRatio="1.1" />
+			</gears>
+		</gearboxMogli>	
+	</vehicle>
+
+
 <!-- ********** Zetor - many thanks to Helge Lippert ******************** -->	
 <!-- ********** Zetor - many thanks to Helge Lippert ******************** -->	
 <!-- ********** Zetor - many thanks to Helge Lippert ******************** -->	
