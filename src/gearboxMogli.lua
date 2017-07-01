@@ -137,7 +137,7 @@ gearboxMogliGlobals.dtDeltaTargetSlow     = 0.0002 -- 5 seconds
 gearboxMogliGlobals.ddsDirectory          = "dds/"
 gearboxMogliGlobals.initMotorOnLoad       = true
 gearboxMogliGlobals.ptoSpeedLimit         = true
-gearboxMogliGlobals.clutchExp             = 2.0
+gearboxMogliGlobals.clutchExp             = 1.0
 gearboxMogliGlobals.clutchFactor          = 1.2
 gearboxMogliGlobals.grindingMinRpmDelta   = 200
 gearboxMogliGlobals.grindingMaxRpmSound   = 600
@@ -7457,6 +7457,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			end
 			p0 = acc * ( p0 - rpm * self.ptoMotorTorque )
 			
+			local old = acc
+			
 			if     p0 <= 0 
 					or p1 <= 0 then
 				acc = 1
@@ -7465,6 +7467,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			else
 				acc = p0 / p1
 			end
+
+			self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
 		end
 		
 		if      not self.vehicle.axisForwardIsAnalog
@@ -8903,7 +8907,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
 
 					-- min / max RPM
 					local n0 = minTarget
-					local m0 = self.vehicle.mrGbMS.HydrostaticMaxRpm
+					local m0 = math.min( self.vehicle.mrGbMS.HydrostaticMaxRpm, self:getThrottleMaxRpm( a / self.vehicle.mrGbMS.MaxRpmThrottle ) ) 
 					
 					if hFix > 0 then
 						n0 = self.vehicle.mrGbMS.IdleRpm
@@ -10089,7 +10093,13 @@ end
 -- gearboxMogliMotor:getThrottleRpm
 --**********************************************************************************************************	
 function gearboxMogliMotor:getThrottleMaxRpm( acc )
-	if acc == nil then acc = self.lastThrottle end
+	if     acc == nil then 
+		acc = self.lastThrottle 
+	elseif acc > 1 then
+		acc = 1
+	elseif acc < 0 then
+		acc = 0
+	end
 	return math.max( self.minRequiredRpm, self.vehicle.mrGbMS.IdleRpm + acc * math.max( 0, self.vehicle.mrGbMS.MaxTargetRpm - self.vehicle.mrGbMS.IdleRpm ) )
 end
 
