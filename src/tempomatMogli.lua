@@ -46,6 +46,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		tempomatMogli.registerState( self, "SpeedLimit2", self.tempomatMogliV17.baseSpeed2 )
 		tempomatMogli.registerState( self, "SpeedLimit3", self.tempomatMogliV17.baseSpeed3 )
 		tempomatMogli.registerState( self, "KeepSpeed",   false )
+		tempomatMogli.registerState( self, "KeepSpeedToggle", false )
 		tempomatMogli.registerState( self, "SpeedLimit",  -1 )
 		self.tempomatMogliV17.modName = l_currentModName
 		
@@ -72,8 +73,21 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				self:tempomatMogliSetSpeedLimit()
 			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSWAPSPEED" ) then -- speed limiter
 				self:tempomatMogliSwapSpeedLimit()
-			end			
-			tempomatMogli.mbSetState( self, "KeepSpeed", tempomatMogli.mbIsInputPressed( "gearboxMogliKEEPSPEED" ) )		
+			elseif tempomatMogli.mbIsInputPressed( "gearboxMogliKEEPSPEEDTOGGLE" ) then
+				tempomatMogli.mbSetState( self, "KeepSpeedToggle", not self.tempomatMogliV17.KeepSpeedToggle )	
+			end
+			local k = self.tempomatMogliV17.KeepSpeedToggle 
+			if tempomatMogli.mbIsInputPressed( "gearboxMogliKEEPSPEED" ) then
+				k = not k
+			end
+			if      self.tempomatMogliV17.KeepSpeedToggle
+					and self.axisForwardIsAnalog 
+					and math.abs( self.axisForward ) > 0.95 then
+				k = false
+			end
+			tempomatMogli.mbSetState( self, "KeepSpeed", k )		
+		elseif self.steeringEnabled  then
+			tempomatMogli.mbSetState( self, "KeepSpeed", self.tempomatMogliV17.KeepSpeedToggle )		
 		else
 			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
 		end
@@ -81,7 +95,8 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		if self.isServer and self.cruiseControl ~= nil then
 			if self.movingDirection <= 0 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) then
 				self.tempomatMogliV17.keepSpeedLimit = nil		
-			elseif self.tempomatMogliV17.KeepSpeed then
+			elseif self.tempomatMogliV17.KeepSpeed
+					and ( math.abs( self.lastSpeedReal*3600 ) > 2 or not self.tempomatMogliV17.KeepSpeedToggle ) then
 				if     self.tempomatMogliV17.keepSpeedLimit == nil then
 					self.tempomatMogliV17.lastAxisFoward = 0
 					self.tempomatMogliV17.keepSpeedLimit = math.max( self.lastSpeedReal*3600, tempomatMogli.getMinSpeed( self, true ) )
@@ -93,23 +108,29 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			if self.tempomatMogliV17.keepSpeedLimit ~= nil then
 				local s = math.floor( self.tempomatMogliV17.keepSpeedLimit + 0.5 )
 				tempomatMogli.mbSetState( self, "SpeedLimit", s )		
+			elseif  self.tempomatMogliV17.KeepSpeedToggle
+					and self.tempomatMogliV17.KeepSpeed then
+				tempomatMogli.mbSetState( self, "SpeedLimit", 0 )		
+			else
+				tempomatMogli.mbSetState( self, "SpeedLimit", -1 )		
 			end
 		else
 			self.tempomatMogliV17.keepSpeedLimit = nil		
+			tempomatMogli.mbSetState( self, "SpeedLimit", -1 )		
 		end
 		
-		if self.tempomatMogliV17.KeepSpeed then
+		if self.tempomatMogliV17.SpeedLimit >= 0 then
 			if self.tempomatMogliV17.cruiseControlState == nil then
 				self.tempomatMogliV17.cruiseControlSpeed = self.cruiseControl.speed
 				self.tempomatMogliV17.cruiseControlState = self.cruiseControl.state
 			end
 			
+			self.cruiseControl.speed = self.tempomatMogliV17.SpeedLimit
 			if self.tempomatMogliV17.SpeedLimit > 0 then
-				self.cruiseControl.speed = self.tempomatMogliV17.SpeedLimit
 				self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_ACTIVE
 			else
 				self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_OFF 
-			end			
+			end
 		elseif self.tempomatMogliV17.cruiseControlState ~= nil then
 			self.cruiseControl.speed = self.tempomatMogliV17.cruiseControlSpeed
 			self.cruiseControl.state = self.tempomatMogliV17.cruiseControlState
@@ -128,7 +149,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:getMinSpeed( inKmH )
 		local minSpeed = 2
 		
-		if      type( self.mrGbMS )            == "table"
+		if self.tempomatMogliV17.KeepSpeedToggle then
+			minSpeed = 1
+		elseif  type( self.mrGbMS )            == "table"
 				and type( self.mrGbMGetGearSpeed ) == "function"
 				and type( self.mrGbMGetAutomatic ) == "function"
 				and not ( self.mrGbMS.Hydrostatic ) 
@@ -197,7 +220,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				or self.tempomatMogliV17.modName        ~= l_currentModName then
 			return superFunc( self, axisForward, axisForwardIsAnalog, axisSide, axisSideIsAnalog, doHandbrake, dt, ... )
 		end
-		
+
 		if type( self.mrGbMSetNeutralActive ) == "function" then
 			self:mrGbMSetNeutralActive( false )
 		end
@@ -302,6 +325,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			if math.abs( self.tempomatMogliV17.SpeedLimit3 - self.tempomatMogliV17.baseSpeed3 ) < 1 then
 				attributes = attributes.." mrGbMSpeed3=\"" .. tostring( self.tempomatMogliV17.SpeedLimit3 ) .. "\""     
 			end
+			if self.tempomatMogliV17.KeepSpeedToggle then
+				attributes = attributes.." mrGbMKeep=\"true\""     
+			end
 		end 
 		
 		return attributes
@@ -321,6 +347,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			i = getXMLInt(xmlFile, key .. "#mrGbMSpeed3" )
 			if i ~= nil then
 				self.tempomatMogliV17.SpeedLimit3 = i
+			end
+			if getXMLBool(xmlFile, key .. "#mrGbMKeep" ) then
+				self.tempomatMogliV17.KeepSpeedToggle = true
 			end
 		end
 		

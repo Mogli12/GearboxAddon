@@ -55,6 +55,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: deceleration"/>
 		<text name="input_gearboxMogliECO"             text="Gearbox: eco on/off"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: keep speed"/>
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Gearbox: toggle keep speed"/>
 		<text name="gearboxMogliTEXT_OFF"        text="motor off"/>
 		<text name="gearboxMogliTEXT_AI"         text="AI"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="handbrake"/>
