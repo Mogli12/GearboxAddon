@@ -74,7 +74,7 @@ Tutti questi tipi di trasmissione a variazione continua hanno una cosa in comune
 ]]></it>
 
 		<fr><![CDATA[
-Chaque tracteur n'a pas de transmission variable en continu. Et même les transmissions à variation continue ne sont pas aussi simples en construction que la norme en simulateur d'élevage.
+Chaque tracteur n'a pas de transmission variable en continu. Et même les transmissions à variation continue ne sont pas aussi simples en construction que la norme de Farming Simulator.
 
 Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vitesses à tous les tracteurs configurés. De nombreux types de transmission différents peuvent être simulés. Il existe des boîtes de vitesses classiques avec engrenages, un ou deux groupes et inverser les vitesses ou les groupes. Le fait de court-circuiter le temps de réponse à zéro entraînera une transmission de puissance. Dans les tracteurs modernes, les transmissions à changement de vitesse sont souvent associées à un changement automatique de vitesses. Un autre type de transmission est la transmission à variation continue. Il existe des modèles avec une ou deux vitesses comme le Fendt Vario. D'autres modèles combinent quatre engrenages mécaniques automatiquement commutés avec un entraînement hydrostatique continuellement variable. Toutes ces transmissions continuellement variables ont une chose en commun. Le rendement varie fortement selon le rapport de démultiplication.
 
