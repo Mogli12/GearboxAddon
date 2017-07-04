@@ -8,22 +8,27 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
-		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Vitesse sup"/>
-		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Vitesse inf"/>
-		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: Gamme sup"/>
-		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: Gamme 2 sup"/>
-		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: Gamme inf"/>
-		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: Gamme 2 inf"/>
-		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: Point mort"/>
+		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: vitesse sup"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: vitesse inf"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Gearbox: changer vitesse"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"    text="Gearbox: gamme sup"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="Gearbox: gamme 2 sup"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="Gearbox: gamme inf"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="Gearbox: gamme 2 inf"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Gearbox: changer gamme"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Gearbox: changer gamme 2"/>
+		<text name="input_gearboxMogliNEUTRAL"         text="Gearbox: point mort"/>
+		<text name="input_gearboxMogliAUTOMATIC"       text="Gearbox: changer automatique"/>
 		<text name="input_gearboxMogliOFF"             text="boite manuelle [off]"/>
 		<text name="input_gearboxMogliON"              text="boite manuelle [on]"/>
 		<text name="input_gearboxMogliON_OFF"          text="Gearbox: On/Off"/>
 		<text name="input_gearboxMogliHUD"             text="Gearbox: HUD on/off"/>
-		<text name="input_gearboxMogliAllAuto"         text="Gearbox: Changer simple/réaliste"/>
+		<text name="input_gearboxMogliAllAuto"         text="Gearbox: changer simple/réaliste"/>
 		<text name="input_gearboxMogliAllAutoON"       text="Gearbox [simplifiée]"/>
 		<text name="input_gearboxMogliAllAutoOFF"      text="Gearbox [réaliste]"/>
 		<text name="input_gearboxMogliREVERSE"         text="Gearbox: Sens inverse"/>
-		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: Changer embrayage auto/manuel"/>
+		<text name="input_gearboxMogliHANDBRAKE"       text="Gearbox: frein à main"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"     text="Gearbox: embrayage auto/manuel"/>
 		<text name="input_gearboxMogliCLUTCH"          text="Gearbox: embrayage"/>
 		<text name="input_gearboxMogliCLUTCH_1"        text="Gearbox: débrayer"/>
 		<text name="input_gearboxMogliCLUTCH_2"        text="Gearbox: embrayer"/>
@@ -31,6 +36,9 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="input_gearboxMogliMINRPM"          text="Gearbox: accélérateur à main"/>
 		<text name="input_gearboxMogliMINRPM_1"        text="Gearbox: réduire accélérateur à main"/>
 		<text name="input_gearboxMogliMINRPM_2"        text="Gearbox: augmenter accélérateur à main"/>
+		<text name="input_gearboxMogliFIXEDRATIO"      text="Gearbox: correction rapport"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"    text="Gearbox: correction rapport inf"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"    text="Gearbox: correction rapport sup"/>
 		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
 		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
 		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
@@ -47,6 +55,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: décélération"/>
 		<text name="input_gearboxMogliECO"             text="Gearbox: éco on/off"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: régulateur de vitesse"/>
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Gearbox: changer régulateur de vitesse"/>
 		<text name="gearboxMogliTEXT_OFF"        text="moteur off"/>
 		<text name="gearboxMogliTEXT_AI"         text="IA"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="frein à main"/>
