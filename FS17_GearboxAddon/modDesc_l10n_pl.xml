@@ -55,6 +55,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: Zmniejszanie pręd. temp."/>
 		<text name="input_gearboxMogliECO"             text="Gearbox: Tryb EKO wł/wył"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: Tempomat"/>
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Gearbox: Przełączanie tempomatu"/>
 		<text name="input_gearboxMogliCONFLICT_1"	   text="Gearbox: Konflikt 1"/>
 		<text name="input_gearboxMogliCONFLICT_2"	   text="Gearbox: Konflikt 2"/>
 		<text name="input_gearboxMogliCONFLICT_3"	   text="Gearbox: Konflikt 3"/>
