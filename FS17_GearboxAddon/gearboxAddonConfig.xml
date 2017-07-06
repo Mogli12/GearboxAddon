@@ -5498,6 +5498,99 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+	<vehicle>
+		<mod name="FS17_JohnDeere6R_FBM">
+			<xmlFile name="johnDeere6R.xml" engines="1"/>
+		</mod>
+		
+		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="22" ptoRpm="1950" ptoRpmEco="1750" minTargetRpm="1500" maxTargetRpm="2100">
+			<hydrostatic profile="Compound"/>		
+			<gears defaultGear="1" automatic="false">	
+				<gear name="F" speed="50" atRpm="1800" forwardOnly="true"/>
+				<gear name="R" speed="50" atRpm="1800" reverseOnly="true"/>
+			</gears>
+			
+			<engines>
+				<engine idleRpm="850" ratedRpm="2100" name="6170R AutoPowr">
+					<!-- 1800: 204(185) | 2100: 200(170) | 1600..1600: 837(796) | 80 | 0,5 | 149 | 2,2 | 2200 | 1260: 210 -->
+					<torque rpm="350" motorTorque="508" motorTorqueEco="483" fuelUsageRatio="234,6"/>
+					<torque rpm="700" motorTorque="670" motorTorqueEco="637" fuelUsageRatio="219,3"/>
+					<torque rpm="900" motorTorque="736" motorTorqueEco="700" fuelUsageRatio="213,9"/>
+					<torque rpm="1000" motorTorque="763" motorTorqueEco="725" fuelUsageRatio="212"/>
+					<torque rpm="1100" motorTorque="785" motorTorqueEco="747" fuelUsageRatio="210,8"/>
+					<torque rpm="1200" motorTorque="804" motorTorqueEco="765" fuelUsageRatio="210,1"/>
+					<torque rpm="1300" motorTorque="818" motorTorqueEco="778" fuelUsageRatio="210,1"/>
+					<torque rpm="1400" motorTorque="829" motorTorqueEco="788" fuelUsageRatio="210,6"/>
+					<torque rpm="1500" motorTorque="835" motorTorqueEco="794" fuelUsageRatio="211,9"/>
+					<torque rpm="1600" motorTorque="837" motorTorqueEco="796" fuelUsageRatio="213,8"/>
+					<torque rpm="1700" motorTorque="822" motorTorqueEco="763" fuelUsageRatio="216,4"/>
+					<torque rpm="1800" motorTorque="796" motorTorqueEco="722" fuelUsageRatio="219,6"/>
+					<torque rpm="1850" motorTorque="774" motorTorqueEco="701" fuelUsageRatio="221,5"/>
+					<torque rpm="1900" motorTorque="752" motorTorqueEco="678" fuelUsageRatio="223,5"/>
+					<torque rpm="1950" motorTorque="731" motorTorqueEco="653" fuelUsageRatio="225,7"/>
+					<torque rpm="2000" motorTorque="710" motorTorqueEco="626" fuelUsageRatio="228,1"/>
+					<torque rpm="2050" motorTorque="689" motorTorqueEco="598" fuelUsageRatio="230,6"/>
+					<torque rpm="2100" motorTorque="669" motorTorqueEco="568" fuelUsageRatio="233,3"/>
+					<torque rpm="2150" motorTorque="608" motorTorqueEco="517" fuelUsageRatio="312,6"/>
+					<torque rpm="2200" motorTorque="391" motorTorqueEco="332" fuelUsageRatio="498"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="0"/>
+				</engine>
+			</engines>
+		</gearboxMogli>
+	</vehicle> 
+	
+	<vehicle>
+		<mod name="FS17_JohnDeere6R_FBM">
+			<xmlFile name="johnDeere6R.xml" engines="2"/>
+		</mod>
+		
+		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="30" minAIRange="2" maxAIRange="2" ptoRpm="1950" ptoRpmEco="1750" minTargetRpm="1500" maxTargetRpm="2100">
+			<gears automatic="true" shiftTimeMs="0" clutchRatio="1" defaultGear="1">
+				<gear name="1" speed="16.5"/>
+				<gear name="2" speed="20.0"/>
+				<gear name="3" speed="24.5"/>
+				<gear name="4" speed="29.7"/>
+				<gear name="5" speed="36.4"/>
+				<gear name="6" speed="44.1"/>
+				<gear name="7" speed="53.8"/>			
+				<gear name="8" speed="65.4"/>
+			</gears>
+			
+			<ranges shiftTimeMs="500" defaultRange="3">
+				<range ratio="0.165" name="A"/>
+				<range ratio="0.33" name="B"/>
+				<range ratio="1.0" name="C"/>
+			</ranges>
+			
+			<engines>
+				<engine idleRpm="850" ratedRpm="2100" name="6210R DirectDrive">
+					<!-- 1800: 245(228) | 2100: 240(210) | 1600..1600: 1004(983) | 80 | 0.5 | 149 | 2.2 | 2200 | 1260: 210 -->
+					<torque rpm="350" motorTorque="610" motorTorqueEco="597" fuelUsageRatio="234.6"/>
+					<torque rpm="700" motorTorque="803" motorTorqueEco="786" fuelUsageRatio="219.3"/>
+					<torque rpm="900" motorTorque="883" motorTorqueEco="864" fuelUsageRatio="213.9"/>
+					<torque rpm="1000" motorTorque="915" motorTorqueEco="896" fuelUsageRatio="212"/>
+					<torque rpm="1100" motorTorque="942" motorTorqueEco="922" fuelUsageRatio="210.8"/>
+					<torque rpm="1200" motorTorque="964" motorTorqueEco="944" fuelUsageRatio="210.1"/>
+					<torque rpm="1300" motorTorque="982" motorTorqueEco="961" fuelUsageRatio="210.1"/>
+					<torque rpm="1400" motorTorque="994" motorTorqueEco="973" fuelUsageRatio="210.6"/>
+					<torque rpm="1500" motorTorque="1002" motorTorqueEco="981" fuelUsageRatio="211.9"/>
+					<torque rpm="1600" motorTorque="1004" motorTorqueEco="983" fuelUsageRatio="213.8"/>
+					<torque rpm="1700" motorTorque="986" motorTorqueEco="941" fuelUsageRatio="216.4"/>
+					<torque rpm="1800" motorTorque="956" motorTorqueEco="889" fuelUsageRatio="219.6"/>
+					<torque rpm="1850" motorTorque="929" motorTorqueEco="864" fuelUsageRatio="221.5"/>
+					<torque rpm="1900" motorTorque="903" motorTorqueEco="835" fuelUsageRatio="223.5"/>
+					<torque rpm="1950" motorTorque="878" motorTorqueEco="805" fuelUsageRatio="225.7"/>
+					<torque rpm="2000" motorTorque="852" motorTorqueEco="772" fuelUsageRatio="228.1"/>
+					<torque rpm="2050" motorTorque="827" motorTorqueEco="738" fuelUsageRatio="230.6"/>
+					<torque rpm="2100" motorTorque="803" motorTorqueEco="702" fuelUsageRatio="233.3"/>
+					<torque rpm="2150" motorTorque="730" motorTorqueEco="639" fuelUsageRatio="312.8"/>
+					<torque rpm="2200" motorTorque="469" motorTorqueEco="410" fuelUsageRatio="498.4"/>
+					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="0"/>
+				</engine>
+			</engines>
+		</gearboxMogli>
+	</vehicle> 
+	
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	
 <!-- ********** The End ******************** -->	
