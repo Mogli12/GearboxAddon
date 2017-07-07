@@ -3685,7 +3685,9 @@ function gearboxMogli:draw()
 			else
 				ovRows = ovRows + 1 infos[ovRows] = "speed"
 			end
-			ovRows = ovRows + 1 infos[ovRows] = "rpm"
+			if self.isMotorStarted then
+				ovRows = ovRows + 1 infos[ovRows] = "rpm"
+			end
 			if self.mrGbMG.drawTargetRpm then
 				ovRows = ovRows + 1 infos[ovRows] = "target"
 			elseif self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 then
@@ -3697,10 +3699,12 @@ function gearboxMogli:draw()
 			if self.mrGbMG.drawReqPower  then
 				ovRows = ovRows + 1 infos[ovRows] = "power"
 			end
-			ovRows = ovRows + 1 infos[ovRows] = "load"
-		--if self.mrGbMD.Fuel > 0 then
+			if self.isMotorStarted then
+				ovRows = ovRows + 1 infos[ovRows] = "load"
+			end
+			if self.isMotorStarted and not ( self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel ) then
 				ovRows = ovRows + 1 infos[ovRows] = "fuel"
-		--end
+			end
 			if not self:mrGbMGetAutoClutch() then
 				ovRows = ovRows + 1 infos[ovRows] = "clutch"
 			elseif self.mrGbMD.Clutch < 200  then
