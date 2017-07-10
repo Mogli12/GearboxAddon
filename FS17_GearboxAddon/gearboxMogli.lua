@@ -157,13 +157,15 @@ gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% fo
 gearboxMogliGlobals.momentOfInertiaBase   = 1     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
-gearboxMogliGlobals.momentOfInertiaMin    = 1e-4  -- 1e-5  -- is already multiplied by 1e-3!!!
+gearboxMogliGlobals.momentOfInertiaMin    = 1e-4  -- 0.5 * 1e-3 is already multiplied by 1e-3!!!
 gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
 gearboxMogliGlobals.maxRpmThrottle        = 0.9
+gearboxMogliGlobals.maxRpmThrottleAuto    = true
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
 gearboxMogliGlobals.autoStartStop         = false -- option to enable auto start stop for all vechiles
 gearboxMogliGlobals.useMrUWP              = 10
 gearboxMogliGlobals.reduceMOILowSpeed     = false -- reduce moment of inertia at low speed, default is off
+gearboxMogliGlobals.accThrottleExp        = 1.5
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -403,6 +405,7 @@ function gearboxMogli:initClient()
 	
 	self.mrGbML.lastAcceleration  = 0
 	self.mrGbML.lastBrakePedal    = 1
+	self.mrGbML.fuelUsageRaw      = 0
 	self.mrGbML.fuelUsageRate     = 0
 	self.mrGbML.fuelUsageAvg      = 0
   self.mrGbML.fuelUsageDt       = 0
@@ -419,8 +422,11 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:mrGbMGetFuelUsageRate
 --**********************************************************************************************************	
-function gearboxMogli:mrGbMGetFuelUsageRate( )
+function gearboxMogli:mrGbMGetFuelUsageRate( getRawValue )
 	if self.isServer then
+		if getRawValue then
+			return self.mrGbML.fuelUsageRaw 
+		end
 		return self.mrGbML.fuelUsageRate
 	end
 	return self.mrGbMD.Fuel
@@ -7311,44 +7317,47 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and gearboxMogli.eps < acc and acc < self.vehicle.mrGbMS.MaxRpmThrottle then
 			
 		local noLimit = false
-		local o = "reverseOnly"
-		if self.vehicle.mrGbMS.ReverseActive then
-			o = "forwardOnly"
-		end
 		
-		for j=1,3 do
-			local n, g, c, f
-			
-			if     j==1 then
-				n = "speed"
-        g = self.vehicle.mrGbMS.Gears
-        c = self.vehicle.mrGbMS.CurrentGear
-				f = self.vehicle.mrGbMGetAutoShiftGears
-			elseif j==2 then
-				n = "ratio"
-			  g = self.vehicle.mrGbMS.Ranges
-			  c = self.vehicle.mrGbMS.CurrentRange
-				f = self.vehicle.mrGbMGetAutoShiftRange
-			else
-				n = "ratio"
-			  g = self.vehicle.mrGbMS.Ranges2
-			  c = self.vehicle.mrGbMS.CurrentRange2
-				f = self.vehicle.mrGbMGetAutoShiftRange2
+		if not ( self.vehicle.mrGbMG.maxRpmThrottleAuto ) then
+			local o = "reverseOnly"
+			if self.vehicle.mrGbMS.ReverseActive then
+				o = "forwardOnly"
 			end
-
-			local r = g[c][n]
-
-			if f( self.vehicle ) then
-				for i=c+1,table.getn( g ) do
-					if g[i][n] > r and not ( g[i][o] ) then
-						noLimit = true
-						break
+			
+			for j=1,3 do
+				local n, g, c, f
+				
+				if     j==1 then
+					n = "speed"
+					g = self.vehicle.mrGbMS.Gears
+					c = self.vehicle.mrGbMS.CurrentGear
+					f = self.vehicle.mrGbMGetAutoShiftGears
+				elseif j==2 then
+					n = "ratio"
+					g = self.vehicle.mrGbMS.Ranges
+					c = self.vehicle.mrGbMS.CurrentRange
+					f = self.vehicle.mrGbMGetAutoShiftRange
+				else
+					n = "ratio"
+					g = self.vehicle.mrGbMS.Ranges2
+					c = self.vehicle.mrGbMS.CurrentRange2
+					f = self.vehicle.mrGbMGetAutoShiftRange2
+				end
+			
+				local r = g[c][n]
+			
+				if f( self.vehicle ) then
+					for i=c+1,table.getn( g ) do
+						if g[i][n] > r and not ( g[i][o] ) then
+							noLimit = true
+							break
+						end
 					end
 				end
-			end
-			
-			if noLimit then
-				break
+				
+				if noLimit then
+					break
+				end
 			end
 		end
 		
@@ -8056,7 +8065,14 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:mrGbMUpdateGear
 --**********************************************************************************************************	
-function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedal )
+function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
+
+	local accelerationPedal = accelerationPedalRaw
+	if     accelerationPedalRaw > 1 then
+		accelerationPedal = 1
+	elseif accelerationPedalRaw > 0 then
+		accelerationPedal = accelerationPedalRaw^self.vehicle.mrGbMG.accThrottleExp
+	end
 
 	local acceleration = math.max( accelerationPedal, 0 )
 
@@ -10492,7 +10508,8 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 		end
 	end
 	
-	self.mrLastFuelRate = 0
+	
+	self.mrGbML.fuelUsageRaw = 0
 	
 	if self.isMotorStarted then		
 		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
@@ -10527,9 +10544,8 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 	--												fuelUsed * 3600000 )
 										
 		if fuelUsed > 0 then
-			if self.mrIsMrVehicle then
-				self.mrLastFuelRate = fuelUsed*3600000 -- liters per hour
-			elseif g_currentMission.missionInfo.fuelUsageLow then
+			self.mrGbML.fuelUsageRaw = fuelUsed*3600000 -- liters per hour
+			if g_currentMission.missionInfo.fuelUsageLow and not ( self.mrIsMrVehicle ) then
 				fuelUsed = fuelUsed * 0.7
 			end
 										
@@ -10587,14 +10603,15 @@ function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
 			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, 0);
 		end
 		
+		self.mrGbML.fuelUsageRaw  = 0
 		self.mrGbML.fuelUsageRate = 0
 		self.mrGbML.fuelUsageAvg  = 0
     self.mrGbML.fuelUsageDt   = 0
 		self.mrGbML.fuelUsageList = nil
-		
-		if self.mrIsMrVehicle then
-			self.mrLastFuelRate = 0
-		end	
+	end
+	
+	if self.mrIsMrVehicle then
+		self.mrLastFuelRate = self.mrGbML.fuelUsageRaw 
 	end
 	
 	return true
