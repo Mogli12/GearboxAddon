@@ -451,7 +451,7 @@
 			</gears>
 			
 			<engines>
-				<engine name="240 I6" idleRpm="800" ratedRpm="4000">
+				<engine displayName="240 I6" idleRpm="800" ratedRpm="4000">
 					<!-- 3800: 100(100) | 3800: 100(100) | 2400..2400: 235(235) | 70 | 0.5 | 399 | 1.7 | 4000 | 2000: 210 -->
 					<torque rpm="350" motorTorque="115" />
 					<torque rpm="700" motorTorque="156" />
@@ -491,7 +491,7 @@
 					<torque rpm="4250" motorTorque="0"/>
 				</engine>
 				
-				<engine name="300 I6" idleRpm="800" ratedRpm="4000">
+				<engine displayName="300 I6" idleRpm="800" ratedRpm="4000">
 					<!-- 3800: 140(140) | 3800: 140(140) | 2400..2400: 320(320) | 70 | 0.5 | 399 | 1.7 | 4000 | 2000: 210 -->
 					<torque rpm="350" motorTorque="157" />
 					<torque rpm="700" motorTorque="213" />
@@ -531,7 +531,7 @@
 					<torque rpm="4250" motorTorque="0" />
 				</engine>
 				
-				<engine name="360 V8" idleRpm="800" ratedRpm="4000">
+				<engine displayName="360 V8" idleRpm="800" ratedRpm="4000">
 					<!-- 4000: 196(196) | 4000: 196(196) | 2600..2600: 443(443) | 70 | 0.5 | 399 | 1.7 | 4200 | 2080: 210 -->
 					<torque rpm="350" motorTorque="222" />
 					<torque rpm="700" motorTorque="296" />
@@ -5511,7 +5511,7 @@
 			</gears>
 			
 			<engines>
-				<engine idleRpm="850" ratedRpm="2100" name="6170R AutoPowr">
+				<engine idleRpm="850" ratedRpm="2100" displayName="6170R AutoPowr">
 					<!-- 1800: 204(185) | 2100: 200(170) | 1600..1600: 837(796) | 80 | 0,5 | 149 | 2,2 | 2200 | 1260: 210 -->
 					<torque rpm="350" motorTorque="508" motorTorqueEco="483" fuelUsageRatio="234,6"/>
 					<torque rpm="700" motorTorque="670" motorTorqueEco="637" fuelUsageRatio="219,3"/>
@@ -5563,7 +5563,7 @@
 			</ranges>
 			
 			<engines>
-				<engine idleRpm="850" ratedRpm="2100" name="6210R DirectDrive">
+				<engine idleRpm="850" ratedRpm="2100" displayName="6210R DirectDrive">
 					<!-- 1800: 245(228) | 2100: 240(210) | 1600..1600: 1004(983) | 80 | 0.5 | 149 | 2.2 | 2200 | 1260: 210 -->
 					<torque rpm="350" motorTorque="610" motorTorqueEco="597" fuelUsageRatio="234.6"/>
 					<torque rpm="700" motorTorque="803" motorTorqueEco="786" fuelUsageRatio="219.3"/>
