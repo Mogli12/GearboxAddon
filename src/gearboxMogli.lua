@@ -2232,7 +2232,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.NewRange      = self.mrGbMS.DefaultRange
 	self.mrGbMS.NewRange2     = self.mrGbMS.DefaultRange2
 	self.mrGbMS.ManualClutch  = 1
-	self.mrGbMS.Automatic     = 7
+	self.mrGbMS.Automatic     = 0
+	self:mrGbMSetAutomatic( 7, true ) 
 -- set the default values for SERVER		
 --**********************************************************************************************************		
 
@@ -4127,7 +4128,10 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMIsOnOff"       , "IsOnOff"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMEcoMode"       , "EcoMode"           )
 
-		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
+		local i = getXMLInt( xmlFile, key )
+		if i ~= nil then
+			self:mrGbMSetAutomatic( i, true ) 
+		end
 
 		if self.mrGbMS.ReverseActive then
 			self.mrGbMS.DefaultGear   = self.mrGbMS.ResetRevGear
