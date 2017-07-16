@@ -127,7 +127,7 @@ gearboxMogliGlobals.hudWidth              = 0.15
 gearboxMogliGlobals.stallWarningTime      = 250
 gearboxMogliGlobals.stallMotorOffTime     = 1250
 gearboxMogliGlobals.realFuelUsage         = true
-gearboxMogliGlobals.idleFuelTorqueRatio   = 1.0
+gearboxMogliGlobals.idleFuelTorqueRatio   = 0.4
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 10   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
@@ -7626,7 +7626,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
-	self.noTransTorque = self.lastMotorTorque * self.vehicle.mrGbMS.IdleEnrichment * self.vehicle.mrGbMG.idleFuelTorqueRatio
+	self.noTransTorque = self.lastMotorTorque * self.vehicle.mrGbMS.IdleEnrichment -- * self.vehicle.mrGbMG.idleFuelTorqueRatio
 
 	local lastG = self.ratioFactorG
 	self.ratioFactorG = 1
@@ -7644,7 +7644,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 		
 	elseif self.noTransmission then
-		self.noTransTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
+	--self.noTransTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
 		self.transmissionEfficiency = 0
 
 		if self.hydrostatPressureI ~= nil then

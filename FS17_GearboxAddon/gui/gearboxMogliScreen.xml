@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+	<GuiElement type="bitmap" profile="backgroundImageIngame" />
+
+
+	<GuiElement type="bitmap" profile="uiElementBg">
+		<GuiElement type="bitmap" profile="uiElementMainBg" >
+			<GuiElement type="bitmap" profile="uiElementBaseHeader">
+				<GuiElement type="text" profile="headerText" text="$l10n_gearboxMogliVERSION" />
+			</GuiElement>
+
+			<GuiElement type="boxLayout" profile="settingsBox" position="20px 550px">
+				<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="IsOnOff" toolTip="$l10n_gearboxMogliON_OFF"  onCreate="onCreateSubElement" 
+										focusId="11" focusChangeTop="101" focusChangeBottom="101">										
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text" profile="multiTextOptionText" />
+					<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliON_OFF"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+
+			</GuiElement>
+
+			<GuiElement type="boxLayout" profile="settingsBox" position="347px 550px">
+			</GuiElement>
+
+			<GuiElement type="boxLayout" profile="settingsBox" position="675px 550px">
+			</GuiElement>
+
+			<GuiElement type="flowLayout" profile="buttonBox" id="buttonsPC" >
+				<GuiElement type="button" profile="buttonBack"   size="500px 40px" text="$l10n_button_back" onClick="onClickBack"  focusId="101" focusChangeTop="11" focusChangeBottom="102" />
+				<GuiElement type="button" profile="buttonSave"   size="500px 40px" text="$l10n_button_ok"   onClick="onClickOk"    focusId="102" focusChangeTop="101" focusChangeBottom="101" />
+			</GuiElement>
+			
+		</GuiElement>
+	</GuiElement>
+</GUI>

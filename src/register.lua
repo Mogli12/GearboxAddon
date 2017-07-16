@@ -1,44 +1,59 @@
+local load_gearboxMogliScreen = false
 
-gearboxMogliRegister = {};
-gearboxMogliRegister.isLoaded = true;
+gearboxMogliRegister = {}
+gearboxMogliRegister.isLoaded = true
 gearboxMogliRegister.modName  = "FS17_GearboxAddon"
-gearboxMogliRegister.g_currentModDirectory = g_currentModDirectory;
+gearboxMogliRegister.g_currentModDirectory = g_currentModDirectory
+
+if load_gearboxMogliScreen then
+	source(Utils.getFilename("gearboxMogliScreen.lua", g_currentModDirectory))
+end
 
 if SpecializationUtil.specializations["gearboxMogliLoader"] == nil then
 	SpecializationUtil.registerSpecialization("gearboxMogliLoader", "gearboxMogliLoader", g_currentModDirectory.."gearboxMogliLoader.lua")
 	SpecializationUtil.registerSpecialization("gearboxMogli", "gearboxMogli", g_currentModDirectory.."gearboxMogli.lua")
 	SpecializationUtil.registerSpecialization("tempomatMogli", "tempomatMogli", g_currentModDirectory.."tempomatMogli.lua")
-	gearboxMogliRegister.isLoaded = false;
-end;
+	gearboxMogliRegister.isLoaded = false
+end
 
 function gearboxMogliRegister:loadMap(name)	
   if not gearboxMogliRegister.isLoaded then	
-		gearboxMogliRegister:add();
-    gearboxMogliRegister.isLoaded = true;
-  end;
-end;
+		gearboxMogliRegister:add()
+    gearboxMogliRegister.isLoaded = true
+  end
+
+	if load_gearboxMogliScreen then
+		-- GUI Stuff
+		g_gearboxMogliScreen = gearboxMogliScreen:new()
+		g_gui:loadGui(gearboxMogliRegister.g_currentModDirectory .. "gui/gearboxMogliScreen.xml", "gearboxMogliScreen", g_gearboxMogliScreen)	
+		FocusManager:setGui("MPLoadingScreen")
+	end
+end
 
 function gearboxMogliRegister:deleteMap()
-  --gearboxMogliRegister.isLoaded = false;
-end;
+  --gearboxMogliRegister.isLoaded = false
+	if load_gearboxMogliScreen then
+		g_gearboxMogliScreen:delete()
+	end
+end
 
 function gearboxMogliRegister:mouseEvent(posX, posY, isDown, isUp, button)
-end;
+end
 
 function gearboxMogliRegister:keyEvent(unicode, sym, modifier, isDown)
-end;
+end
 
 function gearboxMogliRegister:update(dt)
-end;
+end
 
 function gearboxMogliRegister:draw()
-end;
+end
 
 function gearboxMogliRegister:add()
 	print("--- loading "..g_i18n:getText("gearboxMogliVERSION").." ---")
 
-	local searchTable  = { "gearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox" };	
-	local searchTable2 = { "tempomat", "tempomatMogli" };	
+	local searchTable  = { "gearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox" }	
+	local searchTable2 = { "tempomat", "tempomatMogli" }	
 	local replObj1     = SpecializationUtil.getSpecialization("gearboxMogli")
 	local replObj2     = SpecializationUtil.getSpecialization("tempomatMogli")
 	
@@ -50,18 +65,18 @@ function gearboxMogliRegister:add()
 	--end
 	
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
-		local modName            = string.match(k, "([^.]+)");
-		local addSpecialization1 = true;
-		local addSpecialization2 = true;
-		local correctLocation    = false;
+		local modName            = string.match(k, "([^.]+)")
+		local addSpecialization1 = true
+		local addSpecialization2 = true
+		local correctLocation    = false
 		
 		if modName ~= nil and modName ~= "" and modName.gearboxMogli ~= nil then
-			addSpecialization1 = false;
+			addSpecialization1 = false
 			
 		else
 			for _, search in pairs(searchTable) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
-					addSpecialization1 = false;
+					addSpecialization1 = false
 					print(string.format(gearboxMogliRegister.modName..": %s already has a gearbox (2)", modName))
 					
 					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
@@ -82,15 +97,15 @@ function gearboxMogliRegister:add()
 						end
 					end
 					
-					break;
-				end;
-			end;
-		end;
+					break
+				end
+			end
+		end
 		
 		if addSpecialization1 then
 			for _, search in pairs(searchTable2) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
-					addSpecialization2 = false;
+					addSpecialization2 = false
 					print(string.format(gearboxMogliRegister.modName..": %s already has cruise control", modName))
 
 					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
@@ -111,43 +126,43 @@ function gearboxMogliRegister:add()
 						end
 					end
 
-					break;
-				end;
-			end;
-		end;
+					break
+				end
+			end
+		end
 		
 		for i = 1, table.maxn(v.specializations) do
-			local vs = v.specializations[i];
+			local vs = v.specializations[i]
 			if      vs ~= nil 
 					and vs == SpecializationUtil.getSpecialization("steerable") then
-				correctLocation = true;
-				break;
-			end;
-		end;
+				correctLocation = true
+				break
+			end
+		end
 		if correctLocation then
 			correctLocation = false
 			for i = 1, table.maxn(v.specializations) do
-				local vs = v.specializations[i];
+				local vs = v.specializations[i]
 				if      vs ~= nil 
 						and vs == SpecializationUtil.getSpecialization("motorized") then
-					correctLocation = true;
-					break;
-				end;
-			end;
+					correctLocation = true
+					break
+				end
+			end
 		end
 		
 		if addSpecialization1 and correctLocation then
 		--print("adding: "..tostring(modName))
 			
-			table.insert(v.specializations, SpecializationUtil.getSpecialization("gearboxMogliLoader"));			
+			table.insert(v.specializations, SpecializationUtil.getSpecialization("gearboxMogliLoader"))			
 
 			if addSpecialization2 and correctLocation then
-				table.insert(v.specializations, SpecializationUtil.getSpecialization("tempomatMogli"));			
-			end;
+				table.insert(v.specializations, SpecializationUtil.getSpecialization("tempomatMogli"))			
+			end
 			
 			insertedMods = insertedMods + 1
-		end;
-	end;
+		end
+	end
 	
 	print(string.format("--- "..gearboxMogliRegister.modName..": inserted into %d vehicle types / %d vehicle types updated ---", insertedMods, updatedMods ))
 	
@@ -167,6 +182,6 @@ function gearboxMogliRegister:add()
 	g_i18n.globalI18N.texts["gearboxMogliTEXT_ECO"]     = g_i18n:getText("gearboxMogliTEXT_ECO")
 	g_i18n.globalI18N.texts["gearboxMogliAllAutoON"]    = g_i18n:getText("input_gearboxMogliAllAutoON"   )
 	g_i18n.globalI18N.texts["gearboxMogliAllAutoOFF"]   = g_i18n:getText("input_gearboxMogliAllAutoOFF"  )
-end;
+end
 
-addModEventListener(gearboxMogliRegister);
+addModEventListener(gearboxMogliRegister)
