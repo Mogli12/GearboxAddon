@@ -32,8 +32,9 @@ end
 
 function gearboxMogliRegister:deleteMap()
   --gearboxMogliRegister.isLoaded = false
-	if load_gearboxMogliScreen then
+	if g_gearboxMogliScreen ~= nil then
 		g_gearboxMogliScreen:delete()
+		g_gearboxMogliScreen = nil
 	end
 end
 
@@ -166,22 +167,20 @@ function gearboxMogliRegister:add()
 	
 	print(string.format("--- "..gearboxMogliRegister.modName..": inserted into %d vehicle types / %d vehicle types updated ---", insertedMods, updatedMods ))
 	
-	g_i18n.globalI18N.texts["gearboxMogliVERSION"]      = g_i18n:getText("input_gearboxMogliVERSION"     )
-	g_i18n.globalI18N.texts["gearboxMogliON"]           = g_i18n:getText("input_gearboxMogliON"          )
-	g_i18n.globalI18N.texts["gearboxMogliOFF"]          = g_i18n:getText("input_gearboxMogliOFF"         )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_OFF"]	    = g_i18n:getText("gearboxMogliTEXT_OFF"	   )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_AI"]      = g_i18n:getText("gearboxMogliTEXT_AI"     )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_BRAKE"]   = g_i18n:getText("gearboxMogliTEXT_BRAKE"  )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_DC"]      = g_i18n:getText("gearboxMogliTEXT_DC"     )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_NEUTRAL"] = g_i18n:getText("gearboxMogliTEXT_NEUTRAL")
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_AUTO"]    = g_i18n:getText("gearboxMogliTEXT_AUTO"   )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_MANUAL"]  = g_i18n:getText("gearboxMogliTEXT_MANUAL" )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_NOGEAR"]  = g_i18n:getText("gearboxMogliTEXT_NOGEAR" )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_VARIO"]   = g_i18n:getText("gearboxMogliTEXT_VARIO"  )
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_ALLAUTO"] = g_i18n:getText("gearboxMogliTEXT_ALLAUTO")
-	g_i18n.globalI18N.texts["gearboxMogliTEXT_ECO"]     = g_i18n:getText("gearboxMogliTEXT_ECO")
-	g_i18n.globalI18N.texts["gearboxMogliAllAutoON"]    = g_i18n:getText("input_gearboxMogliAllAutoON"   )
-	g_i18n.globalI18N.texts["gearboxMogliAllAutoOFF"]   = g_i18n:getText("input_gearboxMogliAllAutoOFF"  )
+	-- make l10n global 
+	for m,t in pairs( g_i18n.texts ) do
+		local n = nil
+		if     string.sub( m, 1, 18 ) == "input_gearboxMogli" then
+			n = string.sub( m, 7 )
+		elseif string.sub( m, 1, 12 ) == "gearboxMogli"       then
+			n = m
+		end
+		if n ~= nil and g_i18n.globalI18N.texts[n] == nil then
+		--print('"$l10n_'..tostring(n)..'" = "'..tostring(t)..'"')
+			g_i18n.globalI18N.texts[n] = t
+		end
+	end
+	
 end
 
 addModEventListener(gearboxMogliRegister)

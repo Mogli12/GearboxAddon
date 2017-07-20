@@ -11,11 +11,29 @@
 
 			<GuiElement type="boxLayout" profile="settingsBox" position="20px 550px">
 				<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="IsOnOff" toolTip="$l10n_gearboxMogliON_OFF"  onCreate="onCreateSubElement" 
-										focusId="11" focusChangeTop="101" focusChangeBottom="101">										
+										focusId="11" focusChangeTop="101" focusChangeBottom="12">										
 					<GuiElement type="button" profile="multiTextOptionLeft" />
 					<GuiElement type="button" profile="multiTextOptionRight"/>
 					<GuiElement type="text" profile="multiTextOptionText" />
 					<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliON_OFF"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+				
+				<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SwapGearRangeKeys" toolTip="SWAP"  onCreate="onCreateSubElement" 
+										focusId="12" focusChangeTop="11" focusChangeBottom="13">										
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text" profile="multiTextOptionText" />
+					<GuiElement type="text" profile="multiTextOptionTitle" text="SWAP"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+
+				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="HandThrottle" toolTip="$l10n_gearboxMogliMINRPM" onCreate="onCreateSubElement" onCreateArgs="percent5"
+										focusId="13" focusChangeTop="12" focusChangeBottom="101">
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text"   profile="multiTextOptionText" />
+					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliMINRPM"/>
 					<GuiElement type="bitmap" profile="multiTextOptionBg" />
 				</GuiElement>
 
@@ -28,7 +46,7 @@
 			</GuiElement>
 
 			<GuiElement type="flowLayout" profile="buttonBox" id="buttonsPC" >
-				<GuiElement type="button" profile="buttonBack"   size="500px 40px" text="$l10n_button_back" onClick="onClickBack"  focusId="101" focusChangeTop="11" focusChangeBottom="102" />
+				<GuiElement type="button" profile="buttonBack"   size="500px 40px" text="$l10n_button_back" onClick="onClickBack"  focusId="101" focusChangeTop="12" focusChangeBottom="102" />
 				<GuiElement type="button" profile="buttonSave"   size="500px 40px" text="$l10n_button_ok"   onClick="onClickOk"    focusId="102" focusChangeTop="101" focusChangeBottom="101" />
 			</GuiElement>
 			

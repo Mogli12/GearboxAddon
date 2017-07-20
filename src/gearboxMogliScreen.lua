@@ -28,24 +28,19 @@ function gearboxMogliScreen:onOpen()
 		for name,s in pairs( self.gearboxMogliElements ) do
 			local element = s.element
 			
-			local struct = nil 
 			local getter = nil
 			if type( gearboxMogli["mrGbMGet"..name] ) == "function" then
 				getter = gearboxMogli["mrGbMGet"..name]
-			elseif self.vehicle.mrGbMS[name] ~= nil then
-				struct = self.vehicle.mrGbMS
-			else
-				struct = self.vehicle
 			end
 			
-			if     getter == nil and struct[name] == nil then
+			if     getter == nil and self.vehicle.mrGbMS[name] == nil then
 				print("Invalid UI element ID: "..tostring(name))
 			else
 				local value
-				if struct == nil then
+				if getter ~= nil then
 					value = getter( self.vehicle )
 				else
-					value = struct[name]
+					value = self.vehicle.mrGbMS[name]
 				end
 				
 				if     element:isa( ToggleButtonElement2 ) then
@@ -61,6 +56,7 @@ function gearboxMogliScreen:onOpen()
 					elseif s.parameter == "percent5" then
 						i = math.floor( value * 20 + 0.5 )
 					end
+					element:setState( i+1 )
 				end			
 			end
 		end
@@ -76,21 +72,16 @@ function gearboxMogliScreen:onClickOk()
 		for name,s in pairs( self.gearboxMogliElements ) do
 			local element = s.element
 			
-			local struct = nil 
 			local setter = nil
 			if type( gearboxMogli["mrGbMSet"..name] ) == "function" then
 				setter = gearboxMogli["mrGbMSet"..name]
-			elseif self.vehicle.mrGbMS[name] ~= nil then
-				struct = self.vehicle.mrGbMS
-			else
-				struct = self.vehicle
 			end
 			
-			if setter == nil and struct[name] == nil then
+			if setter == nil and self.vehicle.mrGbMS[name] == nil then
 				print("Invalid UI element ID: "..tostring(name))
 			else
 				if setter == nil then
-					setter = function( vehicle, value ) struct[name] = value end
+					setter = function( vehicle, value ) gearboxMogli.mbSetState( vehicle, name, value ) end
 				end
 				
 				if     element:isa( ToggleButtonElement2 ) then
@@ -100,7 +91,7 @@ function gearboxMogliScreen:onClickOk()
 					end
 					setter( self.vehicle, b )
 				elseif element:isa( MultiTextOptionElement ) then
-					local i = element:getState()
+					local i = element:getState()-1
 					if     s.parameter == "percent10" then
 						setter( self.vehicle, i / 10 )
 					elseif s.parameter == "percent5" then
@@ -140,13 +131,13 @@ function gearboxMogliScreen:onCreateSubElement( element, parameter )
 			checked = false
 		elseif parameter == "percent10" then
 			local texts = {}
-			for i=1,10 do
+			for i=0,10 do
 				table.insert( texts, string.format("%d%%",i*10) )
 			end
 			element:setTexts(texts)
 		elseif parameter == "percent5" then
 			local texts = {}
-			for i=1,20 do
+			for i=0,20 do
 				table.insert( texts, string.format("%d%%",i*5) )
 			end
 			element:setTexts(texts)

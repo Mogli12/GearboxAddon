@@ -22,6 +22,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliOFF"             text="Manuelles Getriebe [aus]"/>
 		<text name="input_gearboxMogliON"              text="Manuelles Getriebe [an]"/>
 		<text name="input_gearboxMogliON_OFF"          text="Getriebe: An/Aus"/>
+		<text name="input_gearboxMogliSETTINGS"        text="Getriebe: Einstellungen"/>
 		<text name="input_gearboxMogliHUD"             text="Getriebe: HUD an/aus"/>
 		<text name="input_gearboxMogliAllAuto"         text="Getriebe: Realismus-Schalter"/>
 		<text name="input_gearboxMogliAllAutoON"       text="Getriebe [einfach]"/>

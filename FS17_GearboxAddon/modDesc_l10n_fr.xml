@@ -22,6 +22,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="input_gearboxMogliOFF"             text="boite manuelle [off]"/>
 		<text name="input_gearboxMogliON"              text="boite manuelle [on]"/>
 		<text name="input_gearboxMogliON_OFF"          text="Gearbox: On/Off"/>
+		<text name="input_gearboxMogliSETTINGS"        text="Gearbox: Paramètres"/>
 		<text name="input_gearboxMogliHUD"             text="Gearbox: HUD on/off"/>
 		<text name="input_gearboxMogliAllAuto"         text="Gearbox: changer simple/réaliste"/>
 		<text name="input_gearboxMogliAllAutoON"       text="Gearbox [simplifiée]"/>
