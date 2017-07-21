@@ -3793,13 +3793,15 @@ function gearboxMogli:draw()
 				ovRows = ovRows + 1 infos[ovRows] = "engine"
 			end
 			
-			if     self.mrGbMS.Hydrostatic and self.mrGbMS.HandThrottle > 0 then
+			if      self.mrGbMS.Hydrostatic and self.mrGbMS.HandThrottle > 0
+					and self.mrGbMS.RatedRpm > 1 then
 				ovRows = ovRows + 1 infos[ovRows] = "target2"		
 			elseif self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual then
 				if gearText ~= "" then			
 					ovRows = ovRows + 1 infos[ovRows] = "gear"
 				end
-			elseif self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 then
+			elseif  self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0
+					and self.mrGbMS.RatedRpm > 1 then
 				ovRows = ovRows + 1 infos[ovRows] = "target1"		
 			elseif self.mrGbMS.AllAuto or not self:mrGbMGetAutomatic() then
 				ovRows = ovRows + 1 infos[ovRows] = "speed"
@@ -3875,6 +3877,8 @@ function gearboxMogli:draw()
 			minSp = math.min( minSp, limit )
 			maxSp = math.min( maxSp, limit )
 			
+			local handRpm = self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm ) 
+			
 			for col=1,2 do
 				drawY = drawY0 
 				
@@ -3928,8 +3932,7 @@ function gearboxMogli:draw()
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							local ir = self.mrGbMS.IdleRpm / self.mrGbMS.MaxTargetRpm
-							local sp = math.min( maxSp * ( ir + self.mrGbMS.HandThrottle * ( 1 - ir ) ), limit )
+							local sp = math.min( maxSp * handRpm / self.mrGbMS.RatedRpm, limit )
 							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", sp ))
 						end
 					elseif info == "target1" then
@@ -3942,8 +3945,7 @@ function gearboxMogli:draw()
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							local ir = self.mrGbMS.IdleRpm / self.mrGbMS.MaxTargetRpm
-							local sp = math.min( rawSp * ( ir + self.mrGbMS.HandThrottle * ( 1 - ir ) ), limit )
+							local sp = math.min( rawSp * handRpm / self.mrGbMS.RatedRpm, limit )
 							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", sp ))
 						end
 					elseif info == "target3" then
@@ -3994,9 +3996,7 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, "Hand throttle")	
 						else
-						--renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMS.HandThrottle * 100 + 0.5 ) ))
-							local r = self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm )
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( r * 0.1 +0.5)*10)) 		
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( handRpm * 0.1 +0.5)*10)) 		
 						end
 					elseif info == "fixed" then
 						if col == 1 then
@@ -7541,13 +7541,15 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	if      not self.noTransmission 
 			and not self.noTorque
-		--and not ( self.vehicle.mrGbMS.Hydrostatic )
 			and self.vehicle.cruiseControl.state == 0
-			and self.vehicle.steeringEnabled 
-			and gearboxMogli.eps < acc and acc < self.vehicle.mrGbMS.MaxRpmThrottle
-			and ( self.vehicle.mrGbMG.maxRpmThrottleAuto
-				 or self.vehicle.mrGbMS.CurrentGearSpeed >= self.vehicle.mrGbMS.AutoMaxGearSpeed - gearboxMogli.eps ) then
-		limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
+			and self.vehicle.steeringEnabled then
+		if     acc <= gearboxMogli.eps then
+			limitA = self.vehicle.mrGbMS.IdleRpm
+		elseif acc < self.vehicle.mrGbMS.MaxRpmThrottle
+				and ( self.vehicle.mrGbMG.maxRpmThrottleAuto
+					 or self.vehicle.mrGbMS.CurrentGearSpeed >= self.vehicle.mrGbMS.AutoMaxGearSpeed - gearboxMogli.eps ) then
+			limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
+		end
 	end
 	
 	if not ( self.vehicle.mrGbMS.Hydrostatic ) then
