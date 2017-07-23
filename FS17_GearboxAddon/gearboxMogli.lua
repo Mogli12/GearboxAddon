@@ -408,7 +408,6 @@ function gearboxMogli:initClient()
 	self.mrGbMD.lastTgt    = 0 
 	self.mrGbMD.Clutch     = 0 
 	self.mrGbMD.lastClutch = 0 
-	self.mrGbMD.Fuel       = 0 
 	self.mrGbMD.lastPower  = 0 
 	self.mrGbMD.Power      = 0 
 	self.mrGbMD.lastRate   = 0 
@@ -422,6 +421,7 @@ function gearboxMogli:initClient()
 	self.mrGbML.fuelUsageRate     = 0
 	self.mrGbML.fuelUsageAvg      = 0
   self.mrGbML.fuelUsageDt       = 0
+  self.mrGbML.fuelUsageClient   = 0
 end 
 
 --**********************************************************************************************************	
@@ -442,7 +442,7 @@ function gearboxMogli:mrGbMGetFuelUsageRate( getRawValue )
 		end
 		return self.mrGbML.fuelUsageRate
 	end
-	return self.mrGbMD.Fuel
+	return self.mrGbML.fuelUsageClient
 end
 
 function gearboxMogli.getBit3( value, bit )
@@ -2373,6 +2373,127 @@ function gearboxMogli:showSettingsUI()
 	g_gui:showGui( "gearboxMogliScreen" )
 end
 
+
+--**********************************************************************************************************			
+-- fuel usage
+--**********************************************************************************************************			
+local function gearboxMogliUpdateFuelUsage( self, dt )
+
+	self.mrGbML.fuelUsageRaw = 0
+	
+	if self.isMotorStarted then		
+		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
+		local torque = math.max( self.motor.usedTransTorque + self.motor.ptoMotorTorque, 0 )
+		local motor  = self.motor.currentTorqueCurve:get( rpm ) --math.max( self.motor.lastMotorTorque, torque )		
+		local tRatio = 1
+		
+		if self.motor.noTorque or motor <= 0 then
+			tRatio = 0
+			torque = 0
+		elseif torque < motor then
+			tRatio = torque / motor
+		else
+			rRatio = 1
+			torque = motor 
+		end
+		
+		local fuelUsed = self.motor.fuelCurve:get( rpm ) * torque
+		local f0 = fuelUsed 
+		if rpm > self.mrGbMS.RatedRpm then
+			fuelUsed = math.max( fuelUsed, self.motor.ratedFuelRatio * self.motor.maxRatedTorque * tRatio * rpm / self.mrGbMS.RatedRpm )
+		end
+		
+		local f1 = fuelUsed 
+		
+		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactorP
+		fuelUsed   = fuelUsed * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
+		
+	--self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",
+	--												rpm,
+	--												self.mrGbMS.RatedRpm,
+	--												tRatio*100,
+	--												torque*1000,
+	--												motor*1000,
+	--												fuelUsed * 3600000 )
+										
+		if fuelUsed > 0 then
+			self.mrGbML.fuelUsageRaw = fuelUsed*3600000 -- liters per hour
+			if g_currentMission.missionInfo.fuelUsageLow and not ( self.mrIsMrVehicle ) then
+				fuelUsed = fuelUsed * 0.7
+			end
+										
+			fuelUsed = fuelUsed * dt
+			
+			if self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel then
+				if self.BetterFuelUsage ~= nil and self.BetterFuelUsage.helperFuelUsed ~= nil then
+					self.BetterFuelUsage.helperFuelUsed = self.BetterFuelUsage.helperFuelUsed + fuelUsed
+				end
+				local delta = fuelUsed * g_currentMission.economyManager:getPricePerLiter(FillUtil.FILLTYPE_FUEL)
+				g_currentMission.missionStats:updateStats("expenses", delta);
+				g_currentMission:addSharedMoney(-delta, "purchaseFuel");
+			else
+				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
+				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
+			end
+			
+			self.mrGbML.fuelUsageAvg = self.mrGbML.fuelUsageAvg + fuelUsed * 3600000
+		end
+		self.mrGbML.fuelUsageDt = self.mrGbML.fuelUsageDt  + dt
+
+		if self.mrGbML.fuelUsageDt > 166 then
+			local a = self.mrGbML.fuelUsageAvg
+			local t = self.mrGbML.fuelUsageDt
+			
+			if self.mrGbML.fuelUsageList ~= nil then
+				for i,l in pairs(self.mrGbML.fuelUsageList) do
+					a = a + l.a
+					t = t + l.t
+				end
+			end
+			
+			self.mrGbML.fuelUsageRate = a / t
+			if self.fuelUsageHud ~= nil then
+				VehicleHudUtils.setHudValue(self, self.fuelUsageHud, self.mrGbML.fuelUsageRate )
+			end
+			
+			if self.mrGbML.fuelUsageList ~= nil then
+				local j = table.getn( self.mrGbML.fuelUsageList )
+				if j < 5 then
+					self.mrGbML.fuelUsageList[j+1] = { a = self.mrGbML.fuelUsageList[j].a, t = self.mrGbML.fuelUsageList[j].t }
+				end
+				for i=j,2,-1 do
+					self.mrGbML.fuelUsageList[i].a = self.mrGbML.fuelUsageList[i-1].a     
+					self.mrGbML.fuelUsageList[i].t = self.mrGbML.fuelUsageList[i-1].t
+				end
+				self.mrGbML.fuelUsageList[1].a = self.mrGbML.fuelUsageAvg
+				self.mrGbML.fuelUsageList[1].t = self.mrGbML.fuelUsageDt 
+			else
+				self.mrGbML.fuelUsageList = {{ a = self.mrGbML.fuelUsageAvg, t = self.mrGbML.fuelUsageDt }}
+			end
+			self.mrGbML.fuelUsageAvg = 0
+			self.mrGbML.fuelUsageDt  = 0
+		end
+		
+	elseif self.mrGbML.fuelUsageRate > 0 or self.mrGbML.fuelUsageList ~= nil then
+		if self.fuelUsageHud ~= nil then
+			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, 0);
+		end
+		
+		self.mrGbML.fuelUsageRaw  = 0
+		self.mrGbML.fuelUsageRate = 0
+		self.mrGbML.fuelUsageAvg  = 0
+    self.mrGbML.fuelUsageDt   = 0
+		self.mrGbML.fuelUsageList = nil
+	end
+	
+	if self.mrIsMrVehicle then
+		self.mrLastFuelRate = self.mrGbML.fuelUsageRaw 
+	end
+	
+	return true
+end
+	
+
 --**********************************************************************************************************	
 -- gearboxMogli:update
 --**********************************************************************************************************	
@@ -2499,6 +2620,14 @@ function gearboxMogli:update(dt)
 	end
 	
 	if self.mrGbMS.IsOn then
+		if self.mrGbMB.updateFuelUsage == nil then
+			self.mrGbMB.updateFuelUsage = self.updateFuelUsage
+		elseif self.updateFuelUsage ~= gearboxMogliUpdateFuelUsage then
+			self.mrGbMB.updateFuelUsage = self.updateFuelUsage
+			print("Warning: self.updateFuelUsage was changed outside of FS17_GearboxAddon")
+		end
+		self.updateFuelUsage = gearboxMogliUpdateFuelUsage
+		
 		if self.mrGbMB.Sound == nil then
 			self.mrGbMB.Sound = { self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 														self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax, 
@@ -2520,6 +2649,11 @@ function gearboxMogli:update(dt)
 		
 		self.mrUseMrTransmission        = nil
 	else
+		if self.mrGbMB.updateFuelUsage ~= nil then
+			self.updateFuelUsage        = self.mrGbMB.updateFuelUsage
+			self.mrGbMB.updateFuelUsage = nil
+		end
+		
 		if self.mrGbMB.Sound ~= nil then
 			self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 			self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,
@@ -3643,7 +3777,7 @@ function gearboxMogli:updateTick(dt)
 		if self.mrGbML.lastFuelFillLevel == nil or self.mrGbML.lastFuelDt == nil then
 			self.mrGbML.lastFuelFillLevel = self.fuelFillLevel
 			self.mrGbML.lastFuelDt        = 0
-			self.mrGbMD.Fuel              = 0
+			self.mrGbML.fuelUsageClient   = 0
 		else
 			self.mrGbML.lastFuelDt = self.mrGbML.lastFuelDt + dt
 			if self.mrGbML.lastFuelDt > 500 then
@@ -3652,9 +3786,8 @@ function gearboxMogli:updateTick(dt)
 				if self.isFuelFilling then
 					fuelUsed = fuelUsed + self.fuelFillLitersPerSecond * self.mrGbML.lastFuelDt * 0.001
 				end
-				local fuelUsageRatio   = fuelUsed * 3600000 / self.mrGbML.lastFuelDt
-				self.mrGbMD.Fuel       = fuelUsageRatio
-				self.mrGbML.lastFuelDt = 0
+				self.mrGbML.fuelUsageClient = fuelUsed * 3600000 / self.mrGbML.lastFuelDt
+				self.mrGbML.lastFuelDt      = 0
 			end 		
 		end 		
 	end	
@@ -10624,29 +10757,6 @@ function gearboxMogli:afterLoadMotor(xmlFile)
 end
 
 --**********************************************************************************************************	
--- gearboxMogli:newGetLastSpeed
---**********************************************************************************************************	
-function gearboxMogli:newGetLastSpeed( superFunc, ... )
-	if  	 self.mrGbMS == nil 
-			or self.mrGbML == nil 
-			or self.mrGbML.smoothFast == nil
-			or not ( self.mrGbMS.IsOn ) then	
-		return superFunc( self, ... )
-	end
-	
-	local speed = superFunc( self, ... )
-	if self.mrGbML.lastSpeed == nil then
-		self.mrGbML.lastSpeed = speed
-	elseif self.isServer then
-		self.mrGbML.lastSpeed = self.mrGbML.lastSpeed + self.mrGbML.smoothFast * ( speed - self.mrGbML.lastSpeed )
-	else
-		self.mrGbML.lastSpeed = self.mrGbML.lastSpeed + self.mrGbML.smoothSlow * ( speed - self.mrGbML.lastSpeed )
-	end
-	
-	return self.mrGbML.lastSpeed
-end	
-
---**********************************************************************************************************	
 -- gearboxMogli:newSetHudValue
 --**********************************************************************************************************	
 function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
@@ -10735,135 +10845,6 @@ function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 end
 	
 --**********************************************************************************************************			
--- fuel usage
---**********************************************************************************************************			
-function gearboxMogli:newUpdateFuelUsage(origFunc, superFunc, dt)
-	if  	 self.mrGbMS          == nil 
-			or self.motor           == nil
-			or self.motor.fuelCurve == nil
-			or not ( self.mrGbMS.IsOn )
-			or not ( self.mrGbMG.realFuelUsage ) then	
-		return origFunc( self, superFunc, dt )
-	end
-	if superFunc ~= nil then
-		if not superFunc(self, dt) then
-			return false
-		end
-	end
-	
-	
-	self.mrGbML.fuelUsageRaw = 0
-	
-	if self.isMotorStarted then		
-		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
-		local torque = math.max( self.motor.usedTransTorque + self.motor.ptoMotorTorque, 0 )
-		local motor  = self.motor.currentTorqueCurve:get( rpm ) --math.max( self.motor.lastMotorTorque, torque )		
-		local tRatio = 1
-		
-		if self.motor.noTorque or motor <= 0 then
-			tRatio = 0
-			torque = 0
-		elseif torque < motor then
-			tRatio = torque / motor
-		else
-			rRatio = 1
-			torque = motor 
-		end
-		
-		local fuelUsed = self.motor.fuelCurve:get( rpm ) * torque
-		local f0 = fuelUsed 
-		if rpm > self.mrGbMS.RatedRpm then
-			fuelUsed = math.max( fuelUsed, self.motor.ratedFuelRatio * self.motor.maxRatedTorque * tRatio * rpm / self.mrGbMS.RatedRpm )
-		end
-		
-		local f1 = fuelUsed 
-		
-		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactorP
-		fuelUsed   = fuelUsed * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
-		
-	--self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",
-	--												rpm,
-	--												self.mrGbMS.RatedRpm,
-	--												tRatio*100,
-	--												torque*1000,
-	--												motor*1000,
-	--												fuelUsed * 3600000 )
-										
-		if fuelUsed > 0 then
-			self.mrGbML.fuelUsageRaw = fuelUsed*3600000 -- liters per hour
-			if g_currentMission.missionInfo.fuelUsageLow and not ( self.mrIsMrVehicle ) then
-				fuelUsed = fuelUsed * 0.7
-			end
-										
-			fuelUsed = fuelUsed * dt
-			
-			if self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel then
-				local delta = fuelUsed * g_currentMission.economyManager:getPricePerLiter(FillUtil.FILLTYPE_FUEL)
-				g_currentMission.missionStats:updateStats("expenses", delta);
-				g_currentMission:addSharedMoney(-delta, "purchaseFuel");
-			else
-				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
-				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
-			end
-			
-			self.mrGbML.fuelUsageAvg = self.mrGbML.fuelUsageAvg + fuelUsed * 3600000
-		end
-		self.mrGbML.fuelUsageDt = self.mrGbML.fuelUsageDt  + dt
-
-		if self.mrGbML.fuelUsageDt > 166 then
-			local a = self.mrGbML.fuelUsageAvg
-			local t = self.mrGbML.fuelUsageDt
-			
-			if self.mrGbML.fuelUsageList ~= nil then
-				for i,l in pairs(self.mrGbML.fuelUsageList) do
-					a = a + l.a
-					t = t + l.t
-				end
-			end
-			
-			self.mrGbML.fuelUsageRate = a / t
-			if self.fuelUsageHud ~= nil then
-				VehicleHudUtils.setHudValue(self, self.fuelUsageHud, self.mrGbML.fuelUsageRate )
-			end
-			
-			if self.mrGbML.fuelUsageList ~= nil then
-				local j = table.getn( self.mrGbML.fuelUsageList )
-				if j < 5 then
-					self.mrGbML.fuelUsageList[j+1] = { a = self.mrGbML.fuelUsageList[j].a, t = self.mrGbML.fuelUsageList[j].t }
-				end
-				for i=j,2,-1 do
-					self.mrGbML.fuelUsageList[i].a = self.mrGbML.fuelUsageList[i-1].a     
-					self.mrGbML.fuelUsageList[i].t = self.mrGbML.fuelUsageList[i-1].t
-				end
-				self.mrGbML.fuelUsageList[1].a = self.mrGbML.fuelUsageAvg
-				self.mrGbML.fuelUsageList[1].t = self.mrGbML.fuelUsageDt 
-			else
-				self.mrGbML.fuelUsageList = {{ a = self.mrGbML.fuelUsageAvg, t = self.mrGbML.fuelUsageDt }}
-			end
-			self.mrGbML.fuelUsageAvg = 0
-			self.mrGbML.fuelUsageDt  = 0
-		end
-		
-	elseif self.mrGbML.fuelUsageRate > 0 or self.mrGbML.fuelUsageList ~= nil then
-		if self.fuelUsageHud ~= nil then
-			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, 0);
-		end
-		
-		self.mrGbML.fuelUsageRaw  = 0
-		self.mrGbML.fuelUsageRate = 0
-		self.mrGbML.fuelUsageAvg  = 0
-    self.mrGbML.fuelUsageDt   = 0
-		self.mrGbML.fuelUsageList = nil
-	end
-	
-	if self.mrIsMrVehicle then
-		self.mrLastFuelRate = self.mrGbML.fuelUsageRaw 
-	end
-	
-	return true
-end
-	
---**********************************************************************************************************			
 -- Motorized:readUpdateStream
 --**********************************************************************************************************			
 function gearboxMogli:newReadUpdateStream( superFunc, streamId, timestamp, connection )
@@ -10915,10 +10896,8 @@ end
 
 --**********************************************************************************************************	
 WheelsUtil.updateWheelsPhysics = Utils.overwrittenFunction( WheelsUtil.updateWheelsPhysics,gearboxMogli.newUpdateWheelsPhysics )
---Vehicle.getLastSpeed = Utils.overwrittenFunction( Vehicle.getLastSpeed, gearboxMogli.newGetLastSpeed )
 VehicleHudUtils.setHudValue = Utils.overwrittenFunction( VehicleHudUtils.setHudValue, gearboxMogli.newSetHudValue )
 Motorized.loadMotor = Utils.appendedFunction( Motorized.loadMotor, gearboxMogli.afterLoadMotor )
-Motorized.updateFuelUsage = Utils.overwrittenFunction( Motorized.updateFuelUsage, gearboxMogli.newUpdateFuelUsage )
 Motorized.readUpdateStream = Utils.overwrittenFunction( Motorized.readUpdateStream, gearboxMogli.newReadUpdateStream )
 Motorized.writeUpdateStream = Utils.overwrittenFunction( Motorized.writeUpdateStream, gearboxMogli.newWriteUpdateStream )
 --**********************************************************************************************************	
