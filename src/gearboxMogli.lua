@@ -128,7 +128,7 @@ gearboxMogliGlobals.hudWidth              = 0.15
 gearboxMogliGlobals.stallWarningTime      = 250
 gearboxMogliGlobals.stallMotorOffTime     = 1250
 gearboxMogliGlobals.realFuelUsage         = true
-gearboxMogliGlobals.idleFuelTorqueRatio   = 0.4
+gearboxMogliGlobals.idleFuelTorqueRatio   = 0.3
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 10   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
@@ -313,7 +313,8 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "Automatic",     7,     gearboxMogli.mrGbMOnSetAutomatic )
 	gearboxMogli.registerState( self, "ReverseActive", false, gearboxMogli.mrGbMOnSetReverse )
 	gearboxMogli.registerState( self, "NeutralActive", true,  gearboxMogli.mrGbMOnSetNeutral ) 	
-	gearboxMogli.registerState( self, "AutoHold",     false ) 	
+	gearboxMogli.registerState( self, "Handbrake",     false ) 	
+	gearboxMogli.registerState( self, "AutoHold",      false ) 	
 	gearboxMogli.registerState( self, "AutoClutch",    true  )
 	gearboxMogli.registerState( self, "ManualClutch",  1,     gearboxMogli.mrGbMOnSetManualClutch )
 	gearboxMogli.registerState( self, "HandThrottle",  0 )
@@ -2761,17 +2762,15 @@ function gearboxMogli:update(dt)
 			end
 			if     isRev then
 			-- see below
-			elseif self.mrGbMS.AutoHold then
+			elseif self.mrGbMS.Handbrake then
 				text = text.." (P)"
 			elseif self.mrGbMS.NeutralActive then
 				text = text.." (N)"
 			end
-		elseif self.mrGbMS.AutoHold then
-			if self:mrGbMGetAutoStartStop() then
-				text = gearboxMogli.getText( "gearboxMogliTEXT_AUTO_HOLD", "auto hold" )
-			else
-				text = gearboxMogli.getText( "gearboxMogliTEXT_BRAKE", "handbrake" )
-			end
+		elseif self.mrGbMS.Handbrake then
+			text = gearboxMogli.getText( "gearboxMogliTEXT_BRAKE", "handbrake" )
+		elseif self.mrGbMS.AutoHold and self:mrGbMGetAutoStartStop() then
+			text = gearboxMogli.getText( "gearboxMogliTEXT_AUTO_HOLD", "auto hold" )
 		elseif self.mrGbML.gearShiftingNeeded == gearboxMogli.gearShiftingNoThrottle then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_NT", "release throttle" )
 			text2 = text
@@ -2858,22 +2857,31 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- inputs	
 --**********************************************************************************************************			
-	if gearboxMogli.mbIsActiveForInput( self, false ) then					
-		-- auto start/stop
-		if      self.mrGbMS.NeutralActive
-				and self.isMotorStarted
-				and self:mrGbMGetAutoStartStop()
-				and g_currentMission.time > self.motorStartTime
-				and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
-			self:mrGbMSetNeutralActive( false ) 
-		end
-		
-		if not self.mrGbMS.NeutralActive and self.mrGbMS.AutoHold then
-			self:mrGbMSetState( "AutoHold", false )		
-		end
-
+	if gearboxMogli.mbIsActiveForInput( self, false ) then	
 		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
+		end
+
+		if self.mrGbMS.AllAuto then
+			self:mrGbMSetState( "Handbrake", false )		
+		end
+		
+		if self.mrGbMS.Handbrake then
+			self:mrGbMSetNeutralActive( true ) 
+			self:mrGbMSetState( "AutoHold", true )		
+		else
+			-- auto start/stop
+			if      self.mrGbMS.NeutralActive
+					and self.isMotorStarted
+					and self:mrGbMGetAutoStartStop()
+					and g_currentMission.time > self.motorStartTime
+					and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
+				self:mrGbMSetNeutralActive( false ) 
+			end
+			
+			if not self.mrGbMS.NeutralActive and self.mrGbMS.AutoHold then
+				self:mrGbMSetState( "AutoHold", false )		
+			end
 		end
 
 		if not self.mrGbMS.AllAuto then
@@ -3015,10 +3023,10 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliECO" ) then
 			self:mrGbMSetState( "EcoMode", not self.mrGbMS.EcoMode )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
-			if self.mrGbMS.AutoHold then
-				self:mrGbMSetNeutralActive( false ) 
-				self:mrGbMSetState( "AutoHold", false )		
+			if self.mrGbMS.Handbrake then
+				self:mrGbMSetState( "Handbrake", false )		
 			else
+				self:mrGbMSetState( "Handbrake", true )		
 				self:mrGbMSetNeutralActive( true ) 
 				self:mrGbMSetState( "AutoHold", true )		
 			end
@@ -4228,17 +4236,18 @@ function gearboxMogli:draw()
 			else
 				gearboxMogli.ovArrowUpWhite:render()
 			end
-		elseif self:mrGbMGetAutoStartStop() or not ( self.mrGbMS.AutoHold ) then
-			if revShow then
-				gearboxMogli.ovArrowDownGray:render()
-			else
-				gearboxMogli.ovArrowUpGray:render()
-			end
-		else
+		elseif self.mrGbMS.Handbrake then
 			if revShow then
 				gearboxMogli.ovHandBrakeDown:render()
 			else
 				gearboxMogli.ovHandBrakeUp:render()
+			end
+	--elseif self:mrGbMGetAutoStartStop() or not ( self.mrGbMS.AutoHold ) then
+		else
+			if revShow then
+				gearboxMogli.ovArrowDownGray:render()
+			else
+				gearboxMogli.ovArrowUpGray:render()
 			end
 		end
 			
@@ -6033,10 +6042,14 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:mrGbMOnSetNeutral
 --**********************************************************************************************************	
-function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )		
-	self.mrGbMS.NeutralActive   = new 
+function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )	
+	if self.mrGbMS.Handbrake then
+		self.mrGbMS.NeutralActive = true
+	else
+		self.mrGbMS.NeutralActive = new 
+	end
 
-	if new and self.mrGbMS.G27Mode <= 0  then
+	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0  then
 		self:mrGbMSetLanuchGear( noEventSend )
 	end
 	
@@ -6046,7 +6059,7 @@ function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 			self.mrGbML.motor.speedLimitS = 0
 		end
 		
-		if new then
+		if self.mrGbMS.NeutralActive then
 			if self.mrGbML.motor ~= nil and self.mrGbMS.Hydrostatic then
 				self.motor.hydrostaticFactorT = self.mrGbMS.HydrostaticStart
 			end
@@ -6535,7 +6548,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	-- self.doHandbrake is set to false if a dialog is shown
 	if self.isMotorStarted and self.steeringEnabled and self.isControlled then
-		doHandbrake = self.mrGbMS.AutoHold
+		doHandbrake = self.mrGbMS.Handbrake
 	end
 	
 	local acceleration        = acc
@@ -7141,7 +7154,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.ptoOn                   = false
 	self.clutchPercent           = 0
 	self.minThrottle             = 0.3
-	self.minThrottleS            = 0.3
+	self.idleThrottle            = self.vehicle.mrGbMS.IdleEnrichment
+	self.idleThrottleS           = self.vehicle.mrGbMS.IdleEnrichment
 	self.lastMotorRpm            = 0 --motor.lastMotorRpm
 	self.lastRealMotorRpm        = 0 --motor.lastRealMotorRpm
 	self.prevMotorRpm            = 0 --motor.lastMotorRpm
@@ -7873,7 +7887,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
-	self.noTransTorque = self.lastMotorTorque * self.vehicle.mrGbMS.IdleEnrichment -- * self.vehicle.mrGbMG.idleFuelTorqueRatio
+	self.noTransTorque = self.lastMotorTorque * self.idleThrottleS
 
 	local lastG = self.ratioFactorG
 	self.ratioFactorG = 1
@@ -7891,7 +7905,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 		
 	elseif self.noTransmission then
-	--self.noTransTorque          = torque * self.vehicle.mrGbMG.idleFuelTorqueRatio
+		self.noTransTorque          = math.max( self.noTransTorque, torque * self.vehicle.mrGbMG.idleFuelTorqueRatio )
 		self.transmissionEfficiency = 0
 
 		if self.hydrostatPressureI ~= nil then
@@ -8898,10 +8912,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 		if      self.vehicle.mrGbMS.Hydrostatic 
 				and self.vehicle.mrGbMS.HydrostaticMin < gearboxMogli.minHydrostaticFactor then
 			self.minThrottle  = 0
-			self.minThrottleS = 0
 		elseif lastNoTransmission then
 			self.minThrottle  = math.max( 0.3, self.vehicle.mrGbMS.HandThrottle )
-			self.minThrottleS = math.max( 0.3, self.vehicle.mrGbMS.HandThrottle )
 			self.targetRpm = minRpmReduced
 		else
 			local minThrottleRpm = minRpmReduced 
@@ -8915,7 +8927,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 			else
 				self.minThrottle = 0
 			end			
-			self.minThrottleS = Utils.clamp( self.minThrottleS + self.vehicle.mrGbML.smoothFast * ( self.minThrottle - self.minThrottleS ), 0, 1 )
 		end
 		
 		self.lastThrottle = math.max( self.minThrottle, accelerationPedal )								
@@ -10203,38 +10214,36 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	if self.clutchPercent < gearboxMogli.minClutchPercent then
 		self.noTransmission = true
 	end
-	if self.noTransmission then
-		self.minThrottle    = 0
-	--if self.lastRealMotorRpm < self.minRequiredRpm + 10 then
-	--	self.minThrottle  = self.vehicle.mrGbMS.IdleEnrichment
-	--end		
-		self.minThrottle = self.vehicle.mrGbMS.IdleEnrichment + math.max( 0, handThrottle ) * ( 1 - self.vehicle.mrGbMS.IdleEnrichment )
-		if     self.lastRealMotorRpm < self.minRequiredRpm - 1 then
-			self.minThrottle = 1
-		elseif self.lastRealMotorRpm > self.minRequiredRpm + 1 then
-			self.minThrottle = 0
-		end
-		self.minThrottleS   = Utils.clamp( self.minThrottleS + 0.1 * ( self.minThrottle - self.minThrottleS ), 0, 1 )
-		self.minThrottle    = self.minThrottleS
+
+	self.idleThrottle   = self.vehicle.mrGbMS.IdleEnrichment + math.max( 0, handThrottle ) * ( 1 - self.vehicle.mrGbMS.IdleEnrichment )
+	if     self.lastRealMotorRpm < self.minRequiredRpm - 1 then
+		self.idleThrottle = 0.5
+	elseif self.lastRealMotorRpm > self.minRequiredRpm + 1 then
+		self.idleThrottle = 0
+	end
+	self.idleThrottleS   = Utils.clamp( self.idleThrottleS + 0.1 * ( self.idleThrottle - self.idleThrottleS ), 0, 1 )
+	
+	if self.noTorque then
+		self.lastThrottle = 0
+	elseif self.vehicle:mrGbMGetOnlyHandThrottle() then
+		self.lastThrottle = self.vehicle.mrGbMS.HandThrottle
+	else
+		self.lastThrottle = math.max( self.vehicle.mrGbMS.HandThrottle, accelerationPedal )
+	end
+	local f = 1
+	if self.vehicle.mrGbML.gearShiftingNeeded > 0 then
+		f = 2
+	end
+	if self.lastThrottle > 0 and self.lastThrottle > ( self.lastMotorRpm / self.maxRpm )  then
+		self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + f * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
+																		 self.minRequiredRpm, 
+																		 self:getThrottleMaxRpm( ) )
+	else
+		self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, self.minRequiredRpm, self.vehicle.mrGbMS.CurMaxRpm )
+	end	
 		
-		if self.noTorque then
-			self.lastThrottle = 0
-		elseif self.vehicle:mrGbMGetOnlyHandThrottle() then
-			self.lastThrottle = self.vehicle.mrGbMS.HandThrottle
-		else
-			self.lastThrottle = math.max( self.vehicle.mrGbMS.HandThrottle, accelerationPedal )
-		end
-		local f = 1
-		if self.vehicle.mrGbML.gearShiftingNeeded > 0 then
-			f = 2
-		end
-		if self.lastThrottle > 0 and self.lastThrottle > ( self.lastMotorRpm / self.maxRpm )  then
-			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + f * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
-																			 self.minRequiredRpm, 
-																			 self:getThrottleMaxRpm( ) )
-		else
-			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, self.minRequiredRpm, self.vehicle.mrGbMS.CurMaxRpm )
-		end	
+	if self.noTransmission then
+		self.minThrottle    = self.idleThrottle
 		self.lastThrottle   = math.max( self.minThrottle, self.lastThrottle )	
 	end	
 	
