@@ -330,10 +330,10 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		local attributes = ""
 	
 		if self.tempomatMogliV17 ~= nil then
-			if math.abs( self.tempomatMogliV17.SpeedLimit2 - self.tempomatMogliV17.baseSpeed2 ) < 1 then
+			if math.abs( self.tempomatMogliV17.SpeedLimit2 - self.tempomatMogliV17.baseSpeed2 ) > 0.5 then
 				attributes = attributes.." mrGbMSpeed2=\"" .. tostring( self.tempomatMogliV17.SpeedLimit2 ) .. "\""     
 			end
-			if math.abs( self.tempomatMogliV17.SpeedLimit3 - self.tempomatMogliV17.baseSpeed3 ) < 1 then
+			if math.abs( self.tempomatMogliV17.SpeedLimit3 - self.tempomatMogliV17.baseSpeed3 ) > 0.5 then
 				attributes = attributes.." mrGbMSpeed3=\"" .. tostring( self.tempomatMogliV17.SpeedLimit3 ) .. "\""     
 			end
 			if self.tempomatMogliV17.KeepSpeedToggle then
