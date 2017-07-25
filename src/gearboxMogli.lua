@@ -558,6 +558,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	self.mrGbMS.MaxTargetRpm            = getXMLFloat(xmlFile, xmlString .. "#maxTargetRpm")
 	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.02 )
 	self.mrGbMS.BrakeForceRatio         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#brakeForceRatio"), self.mrGbMG.brakeForceRatio )
+
+	self.mrGbMS.FuelPerDistanceMinSpeed = getXMLFloat( xmlFile, xmlString .. "#fuelPerDistanceMinSpeed" )
 	
 --**************************************************************************************************	
 	self.mrGbMS.RpmInSpeedHud           = getXMLBool( xmlFile, xmlString .. "#rpmInSpeedHud")
@@ -2383,8 +2385,18 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 
 	self.mrGbML.fuelUsageRaw = 0
 	
-	if self.isMotorStarted and self.motor.prevMotorRpm ~= nil then		
-		local rpm    = Utils.clamp( self.motor.prevMotorRpm, self.mrGbMS.CurMinRpm, self.motor.maxPossibleRpm )
+	if self.isMotorStarted and self.mrGbMS ~= nil and self.mrGbMS.IsOn and self.motor.prevMotorRpm ~= nil then		
+		local rpm
+		if self.motor.lastRealMotorRpm ~= nil then
+			rpm = 0.5 * ( self.motor.lastRealMotorRpm + self.motor.prevMotorRpm )
+		else
+			rpm = self.motor.lastRealMotorRpm
+		end
+		if self.motor.maxPossibleRpm ~= nil and rpm > self.motor.maxPossibleRpm then
+			rpm = self.motor.maxPossibleRpm
+		elseif rpm < self.mrGbMS.CurMinRpm then
+			rpm = self.mrGbMS.CurMinRpm
+		end
 		local torque = math.max( self.motor.usedTransTorque + self.motor.ptoMotorTorque, 0 )
 		local motor  = self.motor.currentTorqueCurve:get( rpm ) --math.max( self.motor.lastMotorTorque, torque )		
 		local tRatio = 1
@@ -4131,6 +4143,8 @@ function gearboxMogli:draw()
 					elseif info == "fuel" then
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, "Fuel used")
+						elseif self.mrGbMS.FuelPerDistanceMinSpeed ~= nil and math.abs(self.lastSpeed)*3600 >= self.mrGbMS.FuelPerDistanceMinSpeed then
+							renderText(ovRight, drawY, deltaY, string.format("%3d l/100km", self:mrGbMGetFuelUsageRate() / math.abs(self.lastSpeed*36) ))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3d l/h", self:mrGbMGetFuelUsageRate() ))
 						end
