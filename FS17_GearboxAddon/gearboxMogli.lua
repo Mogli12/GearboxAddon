@@ -4360,6 +4360,8 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMG27Mode"       , "G27Mode"           )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedDec"      , "AccelerateToLimit" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMHudMode"       , "HudMode"           )
+		
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedAcc"      , "accelerateToLimit" )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto"       , "AllAuto"           )
@@ -6812,6 +6814,83 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end
 		
 		self.mrGbML.vehiclePropsInfo = string.format( "%4d, %6d, %5.3f, %4d", torque*1000, maxRpm, ratio, c*1000 )
+				
+		if self.isEntered and Vehicle.debugRendering then
+			debugInfo = {}
+			table.insert( debugInfo, { component1="motor", component2="idleThrottleS",                       format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { component1="motor", component2="lastThrottle",                        format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { name="brakePedal",               value=brakePedal,                    format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { component1="motor", component2="autoClutchPercent",                   format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { component1="motor", component2="clutchPercent",                       format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { name="torque",                   value=torque,                        format="%3dNm", factor=1000 } )
+			table.insert( debugInfo, { component1="motor", component2="usedTransTorque",                     format="%3dNm", factor=1000 } )
+			table.insert( debugInfo, { component1="motor", component2="ptoMotorTorque",                      format="%3dNm", factor=1000 } )
+			table.insert( debugInfo, { component1="motor", component2="lastMissingTorque",                   format="%3dNm", factor=1000 } )
+			table.insert( debugInfo, { component1="motor", component2="nonClampedMotorRpm",                  format="%4d" } )
+		--table.insert( debugInfo, { component1="motor", component2="lastRealMotorRpm",                    format="%4d" } )
+			table.insert( debugInfo, { component1="motor", component2="transmissionEfficiency",              format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { name="maxRpm",                   value=maxRpm,                        format="%6d" } )
+			table.insert( debugInfo, { name="motor:getCurMaxRpm(true)", value=self.motor:getCurMaxRpm(true), format="%6d" } )
+			table.insert( debugInfo, { component1="motor", component2="wheelSpeedRpm",                       format="%7.3f" } )
+			table.insert( debugInfo, { component1="motor", component2="gearRatio",                           format="%7.3f" } )
+			table.insert( debugInfo, { component1="motor", component2="ratioFactorG",                        format="%7.3f" } )
+			table.insert( debugInfo, { component1="motor", component2="ratioFactorR",                        format="%7.3f" } )
+			table.insert( debugInfo, { component1="motor", component2="hydrostaticFactor",                   format="%7.3f" } )
+			table.insert( debugInfo, { component1="mrGbML", component2="fuelUsageRaw",                       format="%7.3f" } )
+		
+			setTextColor(1, 1, 1, 1) 
+			setTextBold(false) 
+			
+			for col=1,2 do
+				drawY = 0.40
+				
+				if col == 1 then
+					setTextAlignment(RenderText.ALIGN_LEFT) 
+				else
+					setTextAlignment(RenderText.ALIGN_RIGHT) 
+				end
+		
+				for row,info in pairs( debugInfo ) do
+					if col == 1 then
+						if info.name ~= nil then
+							renderText(0.50, drawY, getCorrectTextSize(0.02), info.name)
+						elseif info.component1 ~= nil and info.component2 then
+							renderText(0.50, drawY, getCorrectTextSize(0.02), info.component1.."."..info.component2)
+						elseif info.component1 ~= nil then
+							renderText(0.50, drawY, getCorrectTextSize(0.02), info.component1)
+						end
+					else
+						local v = nil
+						
+						if info.value ~= nil then
+							v = info.value 
+						elseif info.component1 ~= nil then
+							v = self[info.component1]
+							if v ~= nil and info.component2 ~= nil then
+								v = v[info.component2]
+							end
+						end
+						
+						if v  == nil   then
+							renderText(0.78, drawY, getCorrectTextSize(0.02), "nil")
+						elseif info.format == nil   then
+							renderText(0.78, drawY, getCorrectTextSize(0.02), tostring(v))
+						elseif type( info.factor ) == "number" then
+							renderText(0.78, drawY, getCorrectTextSize(0.02), string.format( info.format, v * info.factor ))
+						else
+							renderText(0.78, drawY, getCorrectTextSize(0.02), string.format( info.format, v ))
+						end
+					end
+					
+					drawY = drawY - 0.02
+					if drawY < 0.02 then
+						break
+					end
+				end
+			end
+			
+			setTextAlignment(RenderText.ALIGN_LEFT) 
+		end
 		
 		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c, self.motor:getRotInertia(), self.motor:getDampingRate());
 		
