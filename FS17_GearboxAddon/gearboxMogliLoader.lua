@@ -65,6 +65,11 @@ function gearboxMogliLoader:load(savegame)
 	logWrite( 99,"gearboxMogliLoader: "..tostring(self.isServer))
 	
 	if self.isServer then
+		if self.mrIsMrVehicle then
+			logWrite( 0,"GearboxAddon is not longer supported for moreRealistic vehicles")
+			return
+		end
+		
 		self.mrGbMLConfigFileName = Utils.removeModDirectory(self.configFileName);
 		
 		if self.mrGbMLConfigFileName == "" then
