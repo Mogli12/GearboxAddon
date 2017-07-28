@@ -58,6 +58,8 @@ for _,funcName in pairs({ "delete",
 	end	
 end
 
+local showMRWarning = true
+
 function gearboxMogliLoader:load(savegame) 
 	
 	self.mrGbMLGearbox1       = false
@@ -65,9 +67,35 @@ function gearboxMogliLoader:load(savegame)
 	logWrite( 99,"gearboxMogliLoader: "..tostring(self.isServer))
 	
 	if self.isServer then
-		if self.mrIsMrVehicle then
-			logWrite( 0,"GearboxAddon is not longer supported for moreRealistic vehicles")
-			return
+		if self.mrIsMrVehicle and showMRWarning then
+			showMRWarning = false
+			logWrite( 0,' ')
+			logWrite( 0,'*******************************************************************************************')
+			logWrite( 0,'* Warning: The combination of gearboxAddon and moreRealistic is no longer supported       *')
+			logWrite( 0,'* Here are some quotes from dural about gearboxAddon:                                     *')
+			logWrite( 0,'*  "So, is it "realistic" ? of course not. Say thanks to the "engine load" returned value *')
+			logWrite( 0,'*   which does not reflect the actual avg engine load."                                   *')
+			logWrite( 0,'*  "my expectations are too high. I gave it another try. => losing speed, but engine      *')
+			logWrite( 0,'*   rpm keeps the same = not a "real" fixed ratio gear box. "funny" fuel consumption      *')
+			logWrite( 0,'*   (more fuel consumption at 60% on flat ground than 100% load going up a hill). I can   *')
+			logWrite( 0,'*   stop with the highest gear engaged, and then get back to full speed from 0 without    *')
+			logWrite( 0,'*   having to gear down (1455XL + joskin 3 axles trailer empty)                           *')
+			logWrite( 0,'*   very high max fuel consumption (40L per hour for the 1455XL = boosted engine ?)       *')
+			logWrite( 0,'*   We can´t rely on the default "motor" of the game. "everything" is false with it."     *')
+			logWrite( 0,'*  "I know you are using your own curves, but I was supposing you are relying on the      *')
+			logWrite( 0,'*   "setVehicleProps" and "getMotorRotationSpeed" functions. (I didn´t read your code)    *')
+			logWrite( 0,'*   which would explain the wrong engine load  for example. In such case, you are using   *')
+			logWrite( 0,'*   the base game "motor". ("the built-in moment of inertia" is part of the base game     *')
+			logWrite( 0,'*   motor implementation, and has nothing to do with IRL, does not take into account      *')
+			logWrite( 0,'*   actual load or anything real)"                                                        *')
+			logWrite( 0,'*                                                                                         *')
+			logWrite( 0,'* Based on this feedback I decided to remove moreRealistic from my mods folder. I assume  *')
+			logWrite( 0,'* that the combination of gearboxAddon and moreRealistic might lead to errros in log.txt, *')
+			logWrite( 0,'* corrupt saveGames and unrealistic vehicle simulation                                    *')
+			logWrite( 0,'* PLEASE DO NOT COMBINE THESE MODS!!!                                                     *')
+			logWrite( 0,'*******************************************************************************************')
+			logWrite( 0,' ')
+		--return
 		end
 		
 		self.mrGbMLConfigFileName = Utils.removeModDirectory(self.configFileName);
