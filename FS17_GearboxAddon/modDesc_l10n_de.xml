@@ -58,6 +58,9 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliECO"             text="Getriebe: Eco an/aus"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Getriebe: Geschwindigkeit halten"/>
 		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Getriebe: Fahrhebel / Gas und Bremse"/>
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"  text="Getriebe: Allrad an/aus"/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"   text="Getriebe: Sperre vorne an/aus"/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"    text="Getriebe: Sperre hinten an/aus"/>
 		<text name="gearboxMogliTEXT_OFF"        text="Motor aus"/>
 		<text name="gearboxMogliTEXT_AI"         text="Helfer"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="Handbremse"/>

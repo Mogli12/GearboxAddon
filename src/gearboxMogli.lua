@@ -176,6 +176,7 @@ gearboxMogliGlobals.accThrottleExp        = 1.5
 gearboxMogliGlobals.accelerateToLimit     = 5     -- km/h per second
 gearboxMogliGlobals.decAccToLimitRatio    = 2     -- decelerateToLimit = accelerateToLimit * decAccToLimitRatio
 gearboxMogliGlobals.onlyTwoSpeeds         = false -- only two CC speeds instead of three
+gearboxMogliGlobals.manual4wd             = true  -- diff lock
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -334,6 +335,10 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "Range2ShifterMode",  0 )
 	gearboxMogli.registerState( self, "ShuttleShifterMode", 0 )
 	
+	gearboxMogli.registerState( self, "DiffLockMiddle", false )
+	gearboxMogli.registerState( self, "DiffLockFront",  false )
+	gearboxMogli.registerState( self, "DiffLockBack",   false )
+	
 --********************************************** ************************************************************	
 -- special getter functions for motor parameters
 	self.mrGbMGetClutchPercent     = gearboxMogli.mrGbMGetClutchPercent
@@ -397,7 +402,7 @@ function gearboxMogli:initClient()
 	
 	if gearboxMogli.ovArrowUpWhite == nil then
 		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
-		local h = w * g_screenAspectRatio;
+		local h = w * g_screenAspectRatio
 		local x = g_currentMission.speedMeterIconOverlay.x
 		local y = g_currentMission.speedMeterIconOverlay.y
 		
@@ -407,6 +412,13 @@ function gearboxMogli:initClient()
 		gearboxMogli.ovArrowDownGray  = Overlay:new("ovArrowDownGray",  Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_down_gray.dds",  gearboxMogli.baseDirectory), x, y, w, h)
 		gearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_up.dds",    gearboxMogli.baseDirectory), x, y, w, h)
 		gearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_down.dds",  gearboxMogli.baseDirectory), x, y, w, h)
+	
+		y = y + h
+		gearboxMogli.ovDiffLockMiddle = Overlay:new("ovDiffLockMiddle", Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_middle.dds", gearboxMogli.baseDirectory), x, y, w, h)
+		x = x + w
+		gearboxMogli.ovDiffLockFront  = Overlay:new("ovDiffLockFront",  Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_front.dds",  gearboxMogli.baseDirectory), x, y, w, h)
+		x = x + w
+		gearboxMogli.ovDiffLockBack   = Overlay:new("ovDiffLockBack",   Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_back.dds",   gearboxMogli.baseDirectory), x, y, w, h)
 	end
 	
 	self.mrGbMD.Tgt        = 0 
@@ -573,12 +585,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 --**************************************************************************************************	
 	self.mrGbMS.Engine = {}
 	self.mrGbMS.Sound  = {}
-	self.mrGbMS.Engine.maxTorque = 0;
-	self.mrGbMS.Engine.maxTorqueRpm = 0;
-	self.mrGbMS.Engine.minRpm = gearboxMogli.huge;
-	self.mrGbMS.Engine.maxRpm = 0;
+	self.mrGbMS.Engine.maxTorque = 0
+	self.mrGbMS.Engine.maxTorqueRpm = 0
+	self.mrGbMS.Engine.minRpm = gearboxMogli.huge
+	self.mrGbMS.Engine.maxRpm = 0
 
-	local torqueI = 0;
+	local torqueI = 0
 	local torqueF = nil
 	local torqueP = 0
 	local realEngineBaseKey = nil
@@ -635,19 +647,19 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		end
 		
 		while true do
-			local key = string.format(realEngineBaseKey..".torque(%d)", torqueI);
-			local rpm = getXMLFloat(xmlFile, key.."#rpm");
-			local torque = getXMLFloat(xmlFile, key.."#motorTorque");
+			local key = string.format(realEngineBaseKey..".torque(%d)", torqueI)
+			local rpm = getXMLFloat(xmlFile, key.."#rpm")
+			local torque = getXMLFloat(xmlFile, key.."#motorTorque")
 			if torque == nil then
-				torque = getXMLFloat(xmlFile, key.."#ptoTorque");
+				torque = getXMLFloat(xmlFile, key.."#ptoTorque")
 				if torque ~= nil then
 					torque = torque / self.mrGbMS.TransmissionEfficiency
 				end
 			end		
 
 			if torque == nil or rpm == nil then --or fuelUsageRatio==nil then
-				break;
-			end;
+				break
+			end
 			
 			if self.mrGbMS.Engine.torqueValues == nil then
 				--print("loading motor with new torque curve")
@@ -664,15 +676,15 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			self.mrGbMS.Engine.torqueValues[torqueI+1] = {v=torque, time = rpm}
 					
 			if torque>self.mrGbMS.Engine.maxTorque + gearboxMogli.eps then
-				self.mrGbMS.Engine.maxTorqueRpm = rpm;
-			end;			
+				self.mrGbMS.Engine.maxTorqueRpm = rpm
+			end			
 			if torque>self.mrGbMS.Engine.maxTorque then
-				self.mrGbMS.Engine.maxTorque = torque;
-			end;
+				self.mrGbMS.Engine.maxTorque = torque
+			end
 			
-			local ecoTorque = getXMLFloat(xmlFile, key.."#motorTorqueEco");
+			local ecoTorque = getXMLFloat(xmlFile, key.."#motorTorqueEco")
 			if ecoTorque == nil then
-				ecoTorque = getXMLFloat(xmlFile, key.."#ptoTorqueEco");
+				ecoTorque = getXMLFloat(xmlFile, key.."#ptoTorqueEco")
 				if ecoTorque ~= nil then
 					ecoTorque = ecoTorque / self.mrGbMS.TransmissionEfficiency
 				end
@@ -687,7 +699,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 				table.insert( self.mrGbMS.Engine.ecoTorqueValues, {v=ecoTorque, time = rpm} )
 			end
 			
-			local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio");
+			local fuelUsageRatio = getXMLFloat(xmlFile, key.."#fuelUsageRatio")
 			if fuelUsageRatio ~= nil and fuelUsageRatio > 0 then
 				if self.mrGbMS.Engine.fuelUsageValues == nil then
 					self.mrGbMS.Engine.fuelUsageValues = {}
@@ -703,13 +715,13 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 					and torque > 0 then
 				self.mrGbMS.Engine.minRpm = rpm
 			end
-			torqueI = torqueI + 1;	
+			torqueI = torqueI + 1	
 			torqueP = torque
 		end
 
 		if torqueI > 0 then
-			self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#idleRpm"), 800);
-			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100);
+			self.mrGbMS.IdleRpm	  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#idleRpm"), 800)
+			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100)
 			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#minRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 			self.mrGbMS.CurMaxRpm = self.mrGbMS.Engine.maxRpm + gearboxMogli.rpmPlus
 			if self.mrGbMS.MinTargetRpm == nil then
@@ -969,7 +981,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 		self.mrGbMS.TorqueConverterOrHydro = true
 	end
 
-	self.mrGbMS.TorqueConverterEfficiency = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#torqueConverterEfficiency"), math.min( 0.9, self.mrGbMS.TransmissionEfficiency ) )
+	self.mrGbMS.TorqueConverterEfficiency = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#torqueConverterEfficiency"), self.mrGbMS.TransmissionEfficiency )
 
 	
 --if self.mrGbMS.TorqueConverter then 
@@ -2261,6 +2273,35 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	end
 	
 --**********************************************************************************************************		
+-- differentials
+--**********************************************************************************************************		
+	self.mrGbMS.ModifyDifferentials = false
+	
+	if self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 3 then
+		local md = getXMLBool(xmlFile, xmlString .. "#manual4wd")
+		if md == nil then
+			if self.mrGbMS.IsCombine then
+				md = self.mrIsMrVehicle 
+			else
+				md = true
+			end
+		end
+		
+		if md then
+			local pattern = {true, true, false}
+			self.mrGbMS.ModifyDifferentials = true
+			for k,differential in pairs(self.differentials) do
+				self.mrGbMS.ModifyDifferentials = self.mrGbMS.ModifyDifferentials and differential.diffIndex1IsWheel==pattern[k] and differential.diffIndex2IsWheel==pattern[k]
+			end				
+		end
+		
+		if self.mrGbMS.ModifyDifferentials then
+			self.mrGbMS.LimitedSlipFront = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. "#limitedSlipFront" ), 0 )
+			self.mrGbMS.LimitedSlipBack  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. "#limitedSlipBack"  ), 0 )
+		end
+	end
+
+--**********************************************************************************************************		
 -- server fields...	
 --**********************************************************************************************************		
 	if not ( serverAndClient ) then
@@ -2448,11 +2489,11 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 					self.BetterFuelUsage.helperFuelUsed = self.BetterFuelUsage.helperFuelUsed + fuelUsed
 				end
 				local delta = fuelUsed * g_currentMission.economyManager:getPricePerLiter(FillUtil.FILLTYPE_FUEL)
-				g_currentMission.missionStats:updateStats("expenses", delta);
-				g_currentMission:addSharedMoney(-delta, "purchaseFuel");
+				g_currentMission.missionStats:updateStats("expenses", delta)
+				g_currentMission:addSharedMoney(-delta, "purchaseFuel")
 			else
-				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed);
-				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed);
+				self:setFuelFillLevel(self.fuelFillLevel-fuelUsed)
+				g_currentMission.missionStats:updateStats("fuelUsage", fuelUsed)
 			end
 			
 			self.mrGbML.fuelUsageAvg = self.mrGbML.fuelUsageAvg + fuelUsed * 3600000
@@ -2495,7 +2536,7 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 		
 	elseif self.mrGbML.fuelUsageRate > 0 or self.mrGbML.fuelUsageList ~= nil then
 		if self.fuelUsageHud ~= nil then
-			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, 0);
+			VehicleHudUtils.setHudValue(self, self.fuelUsageHud, 0)
 		end
 		
 		self.mrGbML.fuelUsageRaw  = 0
@@ -2638,6 +2679,134 @@ function gearboxMogli:update(dt)
 		end
 	end
 	
+	
+--**********************************************************************************************************			
+-- differentials
+--**********************************************************************************************************			
+	if      self.dCcheckModule ~= nil 
+			and self:dCcheckModule("fourWDandDifferentials") 
+			and self.mrGbMS.ModifyDifferentials then
+		self:mrGbMSetState( "ModifyDifferentials", false )
+	end
+	if self.mrGbMS.ModifyDifferentials and self.isServer then
+		if self.mrGbMS.IsOn then
+			local middle = self.mrGbMS.DiffLockMiddle
+			local front  = ( self.mrGbMS.DiffLockFront or self.mrGbMS.LimitedSlipFront > 0.99 ) and self.mrGbMS.DiffLockMiddle
+			local back   = ( self.mrGbMS.DiffLockBack  or self.mrGbMS.LimitedSlipBack  > 0.99 )
+			
+			if self.mrGbML.DiffLockMiddle == nil or self.mrGbML.DiffLockMiddle ~= middle then
+				if     middle then
+					updateDifferential(self.motorizedNode,2,self.differentials[3].torqueRatio,1.0) --reset 4wd (ON) --Slomo edition
+				elseif self.mrGbML.DiffLockMiddle == nil or self.mrGbML.DiffLockMiddle then
+					updateDifferential(self.motorizedNode,2,0,0) --4wd off, traction to back
+				end		
+				self.mrGbML.DiffLockMiddle = middle
+			end
+			
+			if self.mrGbML.DiffLockFront == nil or self.mrGbML.DiffLockFront ~= front then
+				if     front then
+					updateDifferential(self.motorizedNode,0,0.5,1.0)  --differential lock front
+				elseif self.mrGbML.DiffLockFront == nil or self.mrGbML.DiffLockFront then
+					updateDifferential(self.motorizedNode,0,self.differentials[1].torqueRatio,gearboxMogli.huge) --reset diff-lock front
+					self.differentials[1].lastGbTorqueRatio  = self.differentials[1].torqueRatio
+					self.differentials[1].lastGbTorqueRatioS = self.differentials[1].torqueRatio
+				end		
+				self.mrGbML.DiffLockFront = front
+			end
+			
+			if self.mrGbML.DiffLockBack == nil or self.mrGbML.DiffLockBack ~= back then
+				if     back then
+					updateDifferential(self.motorizedNode,1,0.5,1.0) --differential lock back
+				elseif self.mrGbML.DiffLockBack == nil or self.mrGbML.DiffLockBack then
+					updateDifferential(self.motorizedNode,1,self.differentials[2].torqueRatio,gearboxMogli.huge) --reset diff-lock front (ON)
+					self.differentials[2].lastGbTorqueRatio  = self.differentials[2].torqueRatio
+					self.differentials[2].lastGbTorqueRatioS = self.differentials[2].torqueRatio
+				end
+				self.mrGbML.DiffLockBack = back
+			end
+		elseif self.mrGbML.DiffLockMiddle ~= nil
+				or self.mrGbML.DiffLockFront  ~= nil
+				or self.mrGbML.DiffLockBack   ~= nil then
+			self.mrGbML.DiffLockMiddle = nil
+			self.mrGbML.DiffLockFront  = nil
+			self.mrGbML.DiffLockBack   = nil	
+			updateDifferential(self.motorizedNode,0,self.differentials[1].torqueRatio,self.differentials[1].maxSpeedRatio)
+			updateDifferential(self.motorizedNode,1,self.differentials[2].torqueRatio,self.differentials[2].maxSpeedRatio)
+			updateDifferential(self.motorizedNode,2,self.differentials[3].torqueRatio,self.differentials[3].maxSpeedRatio)
+		end
+		
+		local function unlockDiff( self, idx, lsd )
+			local speed1, speed2
+			local diff  = self.differentials[idx]
+			local wheel = self.wheels[diff.diffIndex1]
+			speed1 = getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius
+			wheel = self.wheels[diff.diffIndex2]
+			speed2 = getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius
+			
+			if     speed1 * speed2 >= 0 then
+				speed1 = math.abs( speed1 )
+				speed2 = math.abs( speed2 )
+			elseif math.abs( speed1 ) > math.abs( speed2 ) then
+				speed1 = math.abs( speed1 )
+				speed2 = 0
+			else
+				speed1 = 0
+				speed2 = math.abs( speed2 )
+			end
+			
+			local r = diff.torqueRatio
+			if speed1 > gearboxMogli.eps and speed2 > gearboxMogli.eps then
+				local q = speed1 / speed2 
+				if     speed1 > 0.99 * speed2 and 0.99 * speed1 < speed2 then
+				elseif speed1 > speed2 then
+					r = 1
+				else
+					r = 0
+				end
+			elseif speed1 > gearboxMogli.eps then
+				r = 1
+			elseif speed2 > gearboxMogli.eps then
+				r = 0
+			end
+			
+			diff.lastGbTorqueRatioS = diff.lastGbTorqueRatioS + self.mrGbML.smoothFast * ( r - diff.lastGbTorqueRatioS )
+			
+			if     diff.lastGbTorqueRatioS <= 0.025 then
+				r = 0
+			elseif diff.lastGbTorqueRatioS >= 0.975 then
+				r = 1
+			else
+				r = 0.05 * math.floor( 0.5 + diff.lastGbTorqueRatioS * 20 )
+			end
+			
+			if     lsd >= 1 then
+				r = 0.5
+			elseif lsd >  0 then
+				r = (1-lsd) * r + 0.5 * lsd
+			end
+				
+			if diff.lastGbTorqueRatio == nil or math.abs( diff.lastGbTorqueRatio - r ) > gearboxMogli.eps then
+				updateDifferential(self.motorizedNode,idx-1,r,gearboxMogli.huge)
+				diff.lastGbTorqueRatio = r
+			end
+		end
+		
+		if self.mrGbML.DiffLockMiddle and self.mrGbML.DiffLockFront ~= nil and not self.mrGbML.DiffLockFront then
+			unlockDiff( self, 1, self.mrGbMS.LimitedSlipFront )
+		elseif self.differentials[1].lastGbTorqueRatio ~= nil then
+			self.differentials[1].lastGbTorqueRatio = nil
+		end
+		if self.mrGbML.DiffLockBack  ~= nil and not self.mrGbML.DiffLockBack  then
+			unlockDiff( self, 2, self.mrGbMS.LimitedSlipBack )
+		elseif self.differentials[2].lastGbTorqueRatio ~= nil then
+			self.differentials[2].lastGbTorqueRatio = nil
+		end
+	end
+	
+	
+--**********************************************************************************************************			
+-- sound - backup/restore some settings
+--**********************************************************************************************************			
 	if self.mrGbMS.IsOn then
 		if self.mrGbMB.updateFuelUsage == nil then
 			self.mrGbMB.updateFuelUsage = self.updateFuelUsage
@@ -2743,7 +2912,6 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 	if      self.dCcheckModule ~=  nil 
 			and self.driveControl  ~= nil then
-			
 		if      self:dCcheckModule("shuttle")
 				and self.driveControl.shuttle ~= nil 
 				and self.driveControl.shuttle.isActive then
@@ -3030,7 +3198,7 @@ function gearboxMogli:update(dt)
 		
 		-- avoid conflicts with driveControl
 		if     not processInput
-				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_1" )
+			--or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_1" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_3" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_4" ) then
@@ -3064,6 +3232,18 @@ function gearboxMogli:update(dt)
 				and self:mrGbMGetHasAllAuto() then
 			-- toggle always AI => has to work with worker too
 			self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKMIDDLE" ) then
+			if self.mrGbMS.ModifyDifferentials then
+				self:mrGbMSetState( "DiffLockMiddle", not self.mrGbMS.DiffLockMiddle )
+			end
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKFRONT" ) then
+			if self.mrGbMS.ModifyDifferentials then
+				self:mrGbMSetState( "DiffLockFront", not self.mrGbMS.DiffLockFront )
+			end
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKBACK" ) then
+			if self.mrGbMS.ModifyDifferentials then
+				self:mrGbMSetState( "DiffLockBack", not self.mrGbMS.DiffLockBack )
+			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOMATIC" ) then
 			if not self.mrGbMS.AllAuto and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
 				if      self.mrGbMS.Automatic >= 7 then				
@@ -3405,23 +3585,23 @@ function gearboxMogli:update(dt)
 		
 --**********************************************************************************************************			
 		-- this is from Motorized.lua 
-		local minRpm = self.motor:getMinRpm();
-		local maxRpm = self.motor:getMaxRpm();
-		local maxSpeed; 
+		local minRpm = self.motor:getMinRpm()
+		local maxRpm = self.motor:getMaxRpm()
+		local maxSpeed 
 		if self.movingDirection >= 0 then
-			maxSpeed = self.motor:getMaximumForwardSpeed()*0.001;
+			maxSpeed = self.motor:getMaximumForwardSpeed()*0.001
 		else
-			maxSpeed = self.motor:getMaximumBackwardSpeed()*0.001;
+			maxSpeed = self.motor:getMaximumBackwardSpeed()*0.001
 		end
-		local motorRpm = self.motor:getEqualizedMotorRpm();
+		local motorRpm = self.motor:getEqualizedMotorRpm()
 		-- Increase the motor rpm to the max rpm if faster than 75% of the full speed
 		if self.movingDirection > 0 and self.lastSpeed > 0.75*maxSpeed and motorRpm < maxRpm then
-			motorRpm = motorRpm + (maxRpm - motorRpm) * math.min((self.lastSpeed-0.75*maxSpeed) / (0.25*maxSpeed), 1);
+			motorRpm = motorRpm + (maxRpm - motorRpm) * math.min((self.lastSpeed-0.75*maxSpeed) / (0.25*maxSpeed), 1)
 		end
 		-- The actual rpm offset is 50% from the motor and 50% from the speed
-		local targetRpmOffset = (motorRpm - minRpm)*0.5 + math.min(self.lastSpeed/maxSpeed, 1)*(maxRpm-minRpm)*0.5;
-		local alpha = math.pow(0.01, dt*0.001);
-		local roundPerMinute = targetRpmOffset + alpha*(self.lastRoundPerMinute-targetRpmOffset);
+		local targetRpmOffset = (motorRpm - minRpm)*0.5 + math.min(self.lastSpeed/maxSpeed, 1)*(maxRpm-minRpm)*0.5
+		local alpha = math.pow(0.01, dt*0.001)
+		local roundPerMinute = targetRpmOffset + alpha*(self.lastRoundPerMinute-targetRpmOffset)
 				
 		local realRpmOffset     = self.motor:getEqualizedMotorRpm() - minRpm
 		
@@ -3500,7 +3680,7 @@ function gearboxMogli:update(dt)
 	else
 		self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
 	end			
-
+	
 	if      self.steeringEnabled 
 			and self.isServer 
 			and self.isMotorStarted
@@ -3516,24 +3696,24 @@ function gearboxMogli:update(dt)
 			--and g_currentMission.controlledVehicle  ~= self 
 				and self.cruiseControl.state             > 0 then
 				
-			local rootVehicle = self:getRootAttacherVehicle();
+			local rootVehicle = self:getRootAttacherVehicle()
 				
 			if self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_FULL then
 				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
 				if trailerFillLevel~= nil and trailerCapacity~= nil then
 					if trailerFillLevel >= trailerCapacity then
-						self:setCruiseControlState(0);
-					end;
-				end;
-				self.driveControl.cruiseControl.refVehicle = nil;
+						self:setCruiseControlState(0)
+					end
+				end
+				self.driveControl.cruiseControl.refVehicle = nil
 			elseif self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_EMPTY then
 				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
 				if trailerFillLevel~= nil and trailerCapacity~= nil then
 					if trailerFillLevel <= 0 then
-						self:setCruiseControlState(0);
-					end;
-				end;
-				self.driveControl.cruiseControl.refVehicle = nil;
+						self:setCruiseControlState(0)
+					end
+				end
+				self.driveControl.cruiseControl.refVehicle = nil
 			elseif  self.driveControl.cruiseControl.mode                == self.driveControl.cruiseControl.MODE_PARALLEL
 					and self.driveControl.cruiseControl.refVehicle          ~= nil
 					and self.driveControl.cruiseControl.refVehicle.rootNode ~= nil then
@@ -3541,14 +3721,14 @@ function gearboxMogli:update(dt)
 				local sdx, _, sdz = localDirectionToWorld(self.driveControl.cruiseControl.refVehicle.rootNode, 0, 0, 1)
 											
 				local diffAngle = (dx*sdx + dz*sdz)/(math.sqrt(dx^2+dz^2)*math.sqrt(sdx^2+sdz^2))
-				diffAngle = math.acos(diffAngle);
+				diffAngle = math.acos(diffAngle)
 				
 				if diffAngle > math.rad(20) then
-					self:setCruiseControlState(0);
+					self:setCruiseControlState(0)
 				else				
 					self:setCruiseControlMaxSpeed(self.driveControl.cruiseControl.refVehicle.lastSpeed*3600/math.cos(diffAngle))
-					self.cruiseControl.wasSpeedChanged = true;
-					self.cruiseControl.changeCurrentDelay = 0;
+					self.cruiseControl.wasSpeedChanged = true
+					self.cruiseControl.changeCurrentDelay = 0
 
 					if g_server ~= nil then
 						g_server:broadcastEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed), nil, nil, self)
@@ -3888,13 +4068,22 @@ end
 -- gearboxMogli:deleteMap
 --**********************************************************************************************************	
 function gearboxMogli:deleteMap()
-	if gearboxMogli.backgroundOverlayId ~= nil then
-		pcall( delete, gearboxMogli.backgroundOverlayId )
-		gearboxMogli.backgroundOverlayId = nil
-	end
-	if gearboxMogli.BOVSample ~= nil then
-		pcall( delete, gearboxMogli.BOVSample )
-		gearboxMogli.BOVSample= nil
+	for _,name in pairs( {"backgroundOverlayId",
+												"ovArrowUpWhite",
+												"ovArrowUpGray",
+												"ovArrowDownWhite",
+												"ovArrowDownGray",
+												"ovHandBrakeUp",
+												"ovHandBrakeDown",
+												"ovDiffLockMiddle",
+												"ovDiffLockFront",
+												"ovDiffLockBack",
+												"BOVSample" } ) do
+		if gearboxMogli[name] ~= nil then
+			local ov = gearboxMogli[name]
+			gearboxMogli[name] = nil
+			pcall( ov.delete, ov )
+		end
 	end
 end
 
@@ -4011,7 +4200,7 @@ function gearboxMogli:draw()
 			end
 			--==============================================
 			
-			local ovH      = titleY + ( ovRows + 1 ) * deltaY + ovBorder + ovBorder -- title is 0.03 points above drawY0; add border of 0.01 x 2
+			local ovH      = titleY + ( ovRows + 1 ) * deltaY + ovBorder + ovBorder -- title is 0.03 points above drawY0 add border of 0.01 x 2
 			local ovY      = ovTop - ovH
 			
 			renderOverlay( gearboxMogli.backgroundOverlayId, ovX, ovY, ovW, ovH )
@@ -4213,14 +4402,14 @@ function gearboxMogli:draw()
 			renderText(ovRight, drawY, 0.5*deltaY, gearboxMogli.getText( "gearboxMogliVERSION", "Gearbox by mogli" ) )  		          
 
 			if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
-				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF);		
+				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
 			end
 
 			if InputBinding.gearboxMogliAllAuto ~= nil then
 				if self.mrGbMS.AllAuto then
-					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto);	
+					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
 				elseif self:mrGbMGetHasAllAuto() and self.steeringEnabled then
-					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),  InputBinding.gearboxMogliAllAuto);		
+					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),  InputBinding.gearboxMogliAllAuto)		
 				end
 			end
 			
@@ -4229,7 +4418,7 @@ function gearboxMogli:draw()
 			setTextBold(false)
 			
 			local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
-			local h = w * g_screenAspectRatio;
+			local h = w * g_screenAspectRatio
 			local x = g_currentMission.speedMeterIconOverlay.x
 			local y = g_currentMission.speedMeterIconOverlay.y
 	
@@ -4237,7 +4426,7 @@ function gearboxMogli:draw()
 			renderText( x, y+h, h, text )
 
 			if InputBinding.gearboxMogliHUD ~= nil then
-				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliHUD", "Gearbox HUD"),  InputBinding.gearboxMogliHUD);		
+				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliHUD", "Gearbox HUD"),  InputBinding.gearboxMogliHUD)		
 			end
 		end
 			
@@ -4269,10 +4458,22 @@ function gearboxMogli:draw()
 				gearboxMogli.ovArrowUpGray:render()
 			end
 		end
+		
+		if self.mrGbMS.ModifyDifferentials then
+			if self.mrGbMS.DiffLockMiddle then
+				gearboxMogli.ovDiffLockMiddle:render()
+				if self.mrGbMS.DiffLockFront then
+					gearboxMogli.ovDiffLockFront:render()
+				end
+			end
+			if self.mrGbMS.DiffLockBack then
+				gearboxMogli.ovDiffLockBack:render()
+			end
+		end
 			
 	else
 		if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
-			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliOFF", "Gearbox [off]"), InputBinding.gearboxMogliON_OFF);		
+			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliOFF", "Gearbox [off]"), InputBinding.gearboxMogliON_OFF)		
 		end
 	end
 	
@@ -4504,7 +4705,7 @@ end
 function gearboxMogli:mrGbMCheckGrindingGears( checkIt, noEventSend )
 	if self.steeringEnabled and checkIt and not ( self:mrGbMGetAutoClutch() ) and not ( self:mrGbMGetAutomatic() ) then
 		if self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1 then
-			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear; clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ), noEventSend )
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ), noEventSend )
 			return true
 		end		
 	end		
@@ -4518,7 +4719,7 @@ function gearboxMogli:mrGbMCheckShiftOnlyIfStopped( onlyStopped, noEventSend )
 	if self.steeringEnabled and onlyStopped and not ( self.mrGbMS.AllAuto ) then
 		local s = math.abs( self.lastSpeedReal*3600 )
 		if s > 1 then
-			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear; speed > %3.0fkm/h", s ), noEventSend )
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear speed > %3.0fkm/h", s ), noEventSend )
 			return true
 		end		
 	end		
@@ -6897,7 +7098,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			setTextAlignment(RenderText.ALIGN_LEFT) 
 		end
 		
-		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c, self.motor:getRotInertia(), self.motor:getDampingRate());
+		setVehicleProps(self.motorizedNode, torque, maxRotSpeed, ratio, c, self.motor:getRotInertia(), self.motor:getDampingRate())
 		
 	--if self.mrGbML.debugTimer ~= nil and g_currentMission.time < self.mrGbML.debugTimer and not ( self.mrGbMS.Hydrostatic ) then
 		if      gearboxMogli.debugGearShift
@@ -6964,13 +7165,13 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end
 	end
 
-	local doBrake = brakePedal > 0; --(brakePedal > 0 and self.lastSpeed > 0.0002) or doHandbrake;			  -- ToDo
+	local doBrake = brakePedal > 0 --(brakePedal > 0 and self.lastSpeed > 0.0002) or doHandbrake			  -- ToDo
 	for _, implement in pairs(self.attachedImplements) do
 		if implement.object ~= nil then
 			if doBrake then
-				implement.object:onBrake(brakePedal);
+				implement.object:onBrake(brakePedal)
 			else
-				implement.object:onReleaseBrake();
+				implement.object:onReleaseBrake()
 			end
 		end
 	end
@@ -6983,12 +7184,12 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			if self.mrLastBrakePedal == nil then self.mrLastBrakePedal = 0 end		
 			--braking is not "ON/OFF" IRL => smooth a little the response time of the braking system (especially useful when playing with a keyboard)
 			if brakePedal>self.mrLastBrakePedal then
-				brakePedal = math.min(brakePedal, self.mrLastBrakePedal + dt/500); --500ms to be able to fully brake from a "null brake position"  --20170305
+				brakePedal = math.min(brakePedal, self.mrLastBrakePedal + dt/500) --500ms to be able to fully brake from a "null brake position"  --20170305
 			end
 		end
-		self.mrLastBrakePedal = brakePedal;
+		self.mrLastBrakePedal = brakePedal
 		--MR : we want to know when the vehicle is braking
-		self.mrIsBraking = brakePedal>0;
+		self.mrIsBraking = brakePedal>0
 	
 		for _, wheel in pairs(self.wheels) do
 			local s, m = pcall( WheelsUtil.mrUpdateWheelPhysics, self, wheel, doHandbrake, brakePedal ) 
@@ -8129,7 +8330,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		elseif hc == "InputA" or hc == "InputB" then
 			Mi = Po * self.hydrostatVolumePump / ( 20000 * math.pi )
 			Mf = Mm - Mi
-			--Mw, Mo and t * Mf are identical; Mm = Mf + Mi => Mf = Mm - Mi and Mw = t * Mf => Mw = t * ( Mm - Mi )
+			--Mw, Mo and t * Mf are identical Mm = Mf + Mi => Mf = Mm - Mi and Mw = t * Mf => Mw = t * ( Mm - Mi )
 			if     h < gearboxMogli.eps then
 			-- force is going backwards
 				Mw = self.vehicle.mrGbMS.TransmissionEfficiency * Mf
@@ -8198,6 +8399,25 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
+	local dLMiddle = false
+	local dLFront  = false 
+	local dLBack   = false 
+	if self.vehicle.mrGbMS.ModifyDifferentials then
+		dLMiddle = self.vehicle.mrGbMS.DiffLockMiddle
+		dLFront  = self.vehicle.mrGbMS.DiffLockMiddle and self.vehicle.mrGbMS.DiffLockFront
+		dLBack   = self.vehicle.mrGbMS.DiffLockBack 
+	elseif  self.vehicle.driveControl                        ~= nil
+			and self.vehicle.driveControl.fourWDandDifferentials ~= nil
+			and not ( self.vehicle.driveControl.fourWDandDifferentials.isSurpressed ) then
+		dLMiddle = self.vehicle.driveControl.fourWDandDifferentials.fourWheelSet
+		dLFront  = self.vehicle.driveControl.fourWDandDifferentials.diffLockFrontSet
+		dLBack   = self.vehicle.driveControl.fourWDandDifferentials.diffLockBackSet
+	end
+	
+	if dLMiddle then self.transmissionEfficiency = self.transmissionEfficiency * 0.98 end
+	if dLFront  then self.transmissionEfficiency = self.transmissionEfficiency * 0.96 end
+	if dLBack   then self.transmissionEfficiency = self.transmissionEfficiency * 0.94 end
+		
 	torque = torque * math.min( self.transmissionEfficiency, self.vehicle.mrGbMS.TransmissionEfficiency )
 	
 	if     self.noTransmission
@@ -9508,7 +9728,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 					
 					if gearboxMogli.debugGearShift then
 						if self.hydrostaticFactor > gearboxMogli.eps then
-							print(string.format("C: s: %6g w0: %6g w: %4d t: %4d h: %6g hT: %6g; %6g..%6g; %6g..%6g; %6g..%6g",
+							print(string.format("C: s: %6g w0: %6g w: %4d t: %4d h: %6g hT: %6g %6g..%6g %6g..%6g %6g..%6g",
 																	self.vehicle.lastSpeedReal * 1000 * gearboxMogli.factor30pi * self.vehicle.movingDirection,
 																	w0,
 																	w,
@@ -9840,9 +10060,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 				end
 				table.sort( possibleCombinations, sortGears )
 				
-				local dumpIt = string.format("%4.2f;; ",self.vehicle.mrGbMS.CurrentGearSpeed)
+				local dumpIt = string.format("%4.2f ",self.vehicle.mrGbMS.CurrentGearSpeed)
 				for i,p in pairs( possibleCombinations ) do
-					dumpIt = dumpIt .. string.format("%2d: %4.2f %4.2f %4.2f;; ",i,p.gearSpeed,p.plog,p.priority)
+					dumpIt = dumpIt .. string.format("%2d: %4.2f %4.2f %4.2f ",i,p.gearSpeed,p.plog,p.priority)
 				end
 				
 				local maxGear   = table.getn( possibleCombinations )
@@ -10919,11 +11139,11 @@ function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 					displayedValue = math.min( displayedValue, hudItem.maxValue )
 				end
 				
-				local speed = tonumber(string.format("%."..hudItem.precision.."f", displayedValue));
-				Utils.setNumberShaderByValue(hudItem.numbers, speed, hudItem.precision, true);
-				hudItem.lastValue = value;
-			end;
-		end;
+				local speed = tonumber(string.format("%."..hudItem.precision.."f", displayedValue))
+				Utils.setNumberShaderByValue(hudItem.numbers, speed, hudItem.precision, true)
+				hudItem.lastValue = value
+			end
+		end
 		
 		if hudItem.animName ~= nil then
 			local displayedValue = value
@@ -10961,9 +11181,9 @@ function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 			end		
 			
 			if hudItem.lastNormValue == nil or math.abs(hudItem.lastNormValue - normValue) > 0.01 then
-				self:setAnimationTime(hudItem.animName, normValue, true);
-				hudItem.lastNormValue = normValue;
-			end;
+				self:setAnimationTime(hudItem.animName, normValue, true)
+				hudItem.lastNormValue = normValue
+			end
 		end
 	end
 end
@@ -10980,12 +11200,12 @@ function gearboxMogli:newReadUpdateStream( superFunc, streamId, timestamp, conne
 	end
 	
 	if connection.isServer then
-		self.motor.lastMotorRpm   = self.mrGbMS.CurMinRpm + streamReadUIntN(streamId, 11) * ( self.mrGbMS.CurMaxRpm - self.mrGbMS.CurMinRpm ) / 2047;
+		self.motor.lastMotorRpm   = self.mrGbMS.CurMinRpm + streamReadUIntN(streamId, 11) * ( self.mrGbMS.CurMaxRpm - self.mrGbMS.CurMinRpm ) / 2047
 		self.motor:setEqualizedMotorRpm( self:mrGbMGetEqualizedRpm( self.motor.lastMotorRpm ) )
 		self.actualLoadPercentage = streamReadUIntN(streamId, 7) / 127
 
 		if streamReadBool(streamId) then
-			local fuelFillLevel = streamReadUIntN(streamId, 15)/32767*self.fuelCapacity;
+			local fuelFillLevel = streamReadUIntN(streamId, 15)/32767*self.fuelCapacity
 			self:setFuelFillLevel(fuelFillLevel)
 		end
 	end
@@ -11005,15 +11225,15 @@ function gearboxMogli:newWriteUpdateStream( superFunc, streamId, connection, dir
 	if not connection.isServer then
 		local rpm = ( self.motor.lastMotorRpm - self.mrGbMS.CurMinRpm ) / ( self.mrGbMS.CurMaxRpm - self.mrGbMS.CurMinRpm )
 		
-		streamWriteUIntN(streamId, Utils.clamp( math.floor( 0.5 + rpm * 2047), 0, 2047 ), 11);
-		streamWriteUIntN(streamId, Utils.clamp( math.floor( 0.5 + self.actualLoadPercentage * 127 ), 0, 127 ), 7);
+		streamWriteUIntN(streamId, Utils.clamp( math.floor( 0.5 + rpm * 2047), 0, 2047 ), 11)
+		streamWriteUIntN(streamId, Utils.clamp( math.floor( 0.5 + self.actualLoadPercentage * 127 ), 0, 127 ), 7)
 
 		if streamWriteBool(streamId, bitAND(dirtyMask, self.motorizedDirtyFlag) ~= 0) then
-			local percent = 0;
+			local percent = 0
 			if self.fuelCapacity ~= 0 then
-				percent = Utils.clamp(self.fuelFillLevel / self.fuelCapacity, 0, 1);
+				percent = Utils.clamp(self.fuelFillLevel / self.fuelCapacity, 0, 1)
 			end
-			streamWriteUIntN(streamId, math.floor(percent*32767), 15);
+			streamWriteUIntN(streamId, math.floor(percent*32767), 15)
 		end
 	end
 end

@@ -58,6 +58,9 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliECO"             text="Gearbox: eco on/off"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: keep speed"/>
 		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Gearbox: toggle keep speed"/>
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"  text="Gearbox: toggle 4wd"/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"   text="Gearbox: toggle diff.lock front"/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"    text="Gearbox: toggle diff.lock back"/>
 		<text name="gearboxMogliTEXT_OFF"        text="motor off"/>
 		<text name="gearboxMogliTEXT_AI"         text="AI"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="handbrake"/>

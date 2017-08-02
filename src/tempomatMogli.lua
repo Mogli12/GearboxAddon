@@ -68,6 +68,16 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	end	
 	
 	--**********************************************************************************************************	
+	-- tempomatMogli:deleteMap
+	--**********************************************************************************************************	
+	function tempomatMogli:deleteMap()
+		if tempomatMogli.cruiseControlHud ~= nil then
+			pcall( tempomatMogli.cruiseControlHud.delete, tempomatMogli.cruiseControlHud )
+			tempomatMogli.cruiseControlHud = nil
+		end
+	end
+	
+	--**********************************************************************************************************	
 	-- tempomatMogli:update
 	--**********************************************************************************************************	
 	function tempomatMogli:update(dt)

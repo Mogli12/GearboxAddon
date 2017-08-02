@@ -92,7 +92,7 @@ function gearboxMogliLoader:load(savegame)
 			logWrite( 0,'* Based on this feedback I decided to remove moreRealistic from my mods folder. I assume  *')
 			logWrite( 0,'* that the combination of gearboxAddon and moreRealistic might lead to errros in log.txt, *')
 			logWrite( 0,'* corrupt saveGames and unrealistic vehicle simulation                                    *')
-			logWrite( 0,'* PLEASE DO NOT COMBINE THESE MODS!!!                                                     *')
+		--logWrite( 0,'* PLEASE DO NOT COMBINE THESE MODS!!!                                                     *')
 			logWrite( 0,'*******************************************************************************************')
 			logWrite( 0,' ')
 		--return
