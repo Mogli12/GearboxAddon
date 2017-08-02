@@ -55,6 +55,16 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		self.tempomatMogliGetSpeedLimit2 = tempomatMogli.tempomatMogliGetSpeedLimit2
 		self.tempomatMogliGetSpeedLimit3 = tempomatMogli.tempomatMogliGetSpeedLimit3
 		self.tempomatMogliSwapSpeedLimit = tempomatMogli.tempomatMogliSwapSpeedLimit 
+		
+		if tempomatMogli.cruiseControlHud == nil then
+			local x = g_currentMission.cruiseControlOverlay.x + 0.2 * g_currentMission.vehicleHudBg.width
+			local y = g_currentMission.cruiseControlOverlay.y
+			local w = g_currentMission.cruiseControlOverlay.width
+			local h = g_currentMission.cruiseControlOverlay.height
+			tempomatMogli.cruiseControlOverlay = Overlay:new("hudCruiseControlOverlay", g_baseUIFilename, x, y, w, h)
+			tempomatMogli.cruiseControlOverlay:setUVs(getNormalizedUVs({793, 958, 26, 23}))
+			tempomatMogli.cruiseControlOverlay:setColor(0.2122, 0.5271, 0.0307, 1)
+		end		
 	end	
 	
 	--**********************************************************************************************************	
@@ -132,26 +142,51 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		
 		if self.tempomatMogliV17.SpeedLimit >= 0 then
 			if self.tempomatMogliV17.cruiseControlState == nil then
-				self.tempomatMogliV17.cruiseControlSpeed = self.cruiseControl.speed
 				self.tempomatMogliV17.cruiseControlState = self.cruiseControl.state
-			end
-			
-			self.cruiseControl.speed = self.tempomatMogliV17.SpeedLimit
-			if self.tempomatMogliV17.SpeedLimit > 0 then
-				self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_ACTIVE
-			else
-				self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_OFF 
-			end
+			end			
+			self.cruiseControl.state = Drivable.CRUISECONTROL_STATE_OFF 
 		elseif self.tempomatMogliV17.cruiseControlState ~= nil then
-			self.cruiseControl.speed = self.tempomatMogliV17.cruiseControlSpeed
 			self.cruiseControl.state = self.tempomatMogliV17.cruiseControlState
-			if self.cruiseControlHud ~= nil then
-				VehicleHudUtils.setHudValue(self, self.cruiseControlHud, self.cruiseControl.speed, 9999);
-			end
-			
-			self.tempomatMogliV17.cruiseControlSpeed = nil
 			self.tempomatMogliV17.cruiseControlState = nil
 		end
+	end
+	
+	--**********************************************************************************************************	
+	-- tempomatMogli:draw
+	--**********************************************************************************************************	
+	function tempomatMogli:draw()
+		local x = g_currentMission.cruiseControlOverlay.x + g_currentMission.cruiseControlOverlay.width + g_currentMission.cruiseControlTextOffsetX
+		local y = g_currentMission.cruiseControlOverlay.y + g_currentMission.cruiseControlTextOffsetY
+		
+		setTextBold(false)
+		setTextAlignment(RenderText.ALIGN_LEFT)
+		
+		if self.tempomatMogliV17.SpeedLimit >= 0 then
+			if g_currentMission.activeHudIconName == "" then
+				tempomatMogli.cruiseControlOverlay:render()
+				setTextColor(0.2122, 0.5271, 0.0307, 1)
+				x = x + 0.2 * g_currentMission.vehicleHudBg.width
+				renderText(x, y, g_currentMission.cruiseControlTextSize, string.format(g_i18n:getText("ui_cruiseControlSpeed"), g_i18n:getSpeed(self.tempomatMogliV17.SpeedLimit)))
+			end
+		else
+			local o = 0.08 * g_currentMission.vehicleHudBg.width
+		
+			setTextColor(0.3, 0.3, 0.3, 1)
+			if g_currentMission.activeHudIconName == "" then
+				x = x + o
+				renderText(x, y, g_currentMission.cruiseControlTextSize, string.format(g_i18n:getText("ui_cruiseControlSpeed"), g_i18n:getSpeed(self:tempomatMogliGetSpeedLimit2())))
+			end
+			
+			if not ( ( self.mrGbMG ~= nil and self.mrGbMG.onlyTwoSpeeds )
+						or ( self.mrGbMG == nil and gearboxMogliGlobals ~= nil and gearboxMogliGlobals.onlyTwoSpeeds ) ) then			
+				x = g_currentMission.cruiseControlOverlay.x - o + g_currentMission.cruiseControlTextOffsetX 
+				renderText(x, y, g_currentMission.cruiseControlTextSize, string.format(g_i18n:getText("ui_cruiseControlSpeed"), g_i18n:getSpeed(self:tempomatMogliGetSpeedLimit3())))
+			end
+		end
+		
+    setTextBold(false)
+    setTextColor(1, 1, 1, 1)
+    setTextAlignment(RenderText.ALIGN_LEFT)
 	end
 	
 	--**********************************************************************************************************	
@@ -239,7 +274,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		
 		local currentSpeed  = self.lastSpeedReal*3600
 		local inAxisForward = axisForward
-		if     axisForward <= -0.2 then
+		if     axisForward <= -0.05 then
 		-- accelerate by 0.5..2 m/s^2
 			local acc = 2 - math.min( 1.5, currentSpeed * 0.05 )
 		
@@ -247,7 +282,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			--self.tempomatMogliV17.keepSpeedLimit = math.min( math.max( currentSpeed, self.tempomatMogliV17.keepSpeedLimit ) - axisForward * dt * 0.0036, tempomatMogli.getMaxSpeed( self, true ) )
 				self.tempomatMogliV17.keepSpeedLimit = math.max( currentSpeed, self.tempomatMogliV17.keepSpeedLimit ) - axisForward * dt * 0.0036 * acc 
 			end
-		elseif axisForward >= 0.2 then	
+		elseif axisForward >= 0.05 then	
 		-- decelerate by 2..4 m/s^2 
 			local acc = Utils.clamp( currentSpeed * 0.05, 2, 4 )
 			
