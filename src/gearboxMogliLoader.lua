@@ -440,7 +440,8 @@ function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, pro
 			elseif storeItem.category == "cars"         then
 				defaultConfigName = "defaultCars"
 			elseif storeItem.category == "wheelLoaders" then
-				defaultConfigName = "defaultTorqueConverter"
+			--defaultConfigName = "defaultTorqueConverter"
+				defaultConfigName = "defaultHydrostatic2"
 			elseif storeItem.category == "teleLoaders"  then
 				defaultConfigName = "defaultHydrostatic2"
 			elseif storeItem.category == "skidSteers"   then

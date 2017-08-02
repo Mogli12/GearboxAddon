@@ -65,6 +65,12 @@ function gearboxMogliRegister:add()
 	--	print(tostring(n).." "..tostring(s.className))
 	--end
 	
+	local noSpec2 = false
+	if type( FS17_CCAddon ) == "table" and type( FS17_CCAddon.ccaddon_Register ) == "table" then
+		noSpec2 = true
+		print("Disabling cruise control modifications")
+	end
+	
 	for k, v in pairs(VehicleTypeUtil.vehicleTypes) do
 		local modName            = string.match(k, "([^.]+)")
 		local addSpecialization1 = true
@@ -103,7 +109,9 @@ function gearboxMogliRegister:add()
 			end
 		end
 		
-		if addSpecialization1 then
+		if noSpec2 then
+			addSpecialization2 = false
+		elseif addSpecialization1 then
 			for _, search in pairs(searchTable2) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
 					addSpecialization2 = false

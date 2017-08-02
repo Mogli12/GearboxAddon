@@ -50,7 +50,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliGEARFWD"         text="Getriebe: forwärts"/> 
 		<text name="input_gearboxMogliGEARBACK"        text="Getriebe: rückwärts"/>
 		<text name="input_gearboxMogliSPEEDLIMIT"      text="Getriebe: Begrenzer"/>
-		<text name="input_gearboxMogliSWAPSPEED"       text="Getriebe: Tempomat 2"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Getriebe: nächster Tempomat"/>
+		<text name="input_gearboxMogliSWAPSPEEDR"      text="Getriebe: vorheriger Tempomat"/>
 		<text name="input_gearboxMogliSETSPEED"        text="Getriebe: Setze Begrenzer"/>
 		<text name="input_gearboxMogliACCTOLIMIT"      text="Getriebe: Beschleunigung"/>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Getriebe: Bremsen"/>

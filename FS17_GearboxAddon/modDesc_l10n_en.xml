@@ -50,7 +50,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliGEARFWD"         text="Gearbox: fwd"/>
 		<text name="input_gearboxMogliGEARBACK"        text="Gearbox: back"/> 
 		<text name="input_gearboxMogliSPEEDLIMIT"      text="Gearbox: limiter"/>
-		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: limiter 2"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: next limiter"/>
+		<text name="input_gearboxMogliSWAPSPEEDR"      text="Gearbox: previous limiter"/>
 		<text name="input_gearboxMogliSETSPEED"        text="Gearbox: set limit"/>
 		<text name="input_gearboxMogliACCTOLIMIT"      text="Gearbox: acceleration"/>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: deceleration"/>

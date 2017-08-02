@@ -73,6 +73,8 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				self:tempomatMogliSetSpeedLimit()
 			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSWAPSPEED" ) then -- speed limiter
 				self:tempomatMogliSwapSpeedLimit()
+			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSWAPSPEEDR" ) then -- speed limiter
+				self:tempomatMogliSwapSpeedLimit( true )
 			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliKEEPSPEEDTOGGLE" ) then
 				tempomatMogli.mbSetState( self, "KeepSpeedToggle", not self.tempomatMogliV17.KeepSpeedToggle )	
 			end
@@ -312,14 +314,24 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSwapSpeedLimit
 	--**********************************************************************************************************	
-	function tempomatMogli:tempomatMogliSwapSpeedLimit( noEventSend )
+	function tempomatMogli:tempomatMogliSwapSpeedLimit( rev, noEventSend )
 		local speed1 = self:tempomatMogliGetSpeedLimit2()
 		local speed2 = self:tempomatMogliGetSpeedLimit3()
 		local speed3 = self:tempomatMogliGetSpeedLimit()
 		
-		self:setCruiseControlMaxSpeed(speed1)
-		tempomatMogli.mbSetState( self, "SpeedLimit2", speed2, noEventSend ) 		
-		tempomatMogli.mbSetState( self, "SpeedLimit3", speed3, noEventSend ) 		
+		if     ( self.mrGbMG ~= nil and self.mrGbMG.onlyTwoSpeeds )
+				or ( self.mrGbMG == nil and gearboxMogliGlobals ~= nil and gearboxMogliGlobals.onlyTwoSpeeds ) then
+			self:setCruiseControlMaxSpeed(speed1)
+			tempomatMogli.mbSetState( self, "SpeedLimit2", speed3, noEventSend ) 		
+		elseif rev then
+			self:setCruiseControlMaxSpeed(speed2)
+			tempomatMogli.mbSetState( self, "SpeedLimit2", speed3, noEventSend ) 		
+			tempomatMogli.mbSetState( self, "SpeedLimit3", speed1, noEventSend ) 		
+		else
+			self:setCruiseControlMaxSpeed(speed1)
+			tempomatMogli.mbSetState( self, "SpeedLimit2", speed2, noEventSend ) 		
+			tempomatMogli.mbSetState( self, "SpeedLimit3", speed3, noEventSend ) 		
+		end 
 	end 
 	
 	--**********************************************************************************************************	
