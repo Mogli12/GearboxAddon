@@ -175,7 +175,7 @@ gearboxMogliGlobals.reduceMOILowSpeed     = false -- reduce moment of inertia at
 gearboxMogliGlobals.accThrottleExp        = 1.5
 gearboxMogliGlobals.accelerateToLimit     = 5     -- km/h per second
 gearboxMogliGlobals.decAccToLimitRatio    = 2     -- decelerateToLimit = accelerateToLimit * decAccToLimitRatio
-gearboxMogliGlobals.onlyTwoSpeeds         = true  -- only two CC speeds instead of three
+gearboxMogliGlobals.onlyTwoSpeeds         = false -- only two CC speeds instead of three
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7

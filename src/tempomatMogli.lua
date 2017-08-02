@@ -315,22 +315,22 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	-- tempomatMogli:tempomatMogliSwapSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliSwapSpeedLimit( rev, noEventSend )
-		local speed1 = self:tempomatMogliGetSpeedLimit2()
-		local speed2 = self:tempomatMogliGetSpeedLimit3()
-		local speed3 = self:tempomatMogliGetSpeedLimit()
+		local speed1 = self:tempomatMogliGetSpeedLimit()
+		local speed2 = self:tempomatMogliGetSpeedLimit2()
+		local speed3 = self:tempomatMogliGetSpeedLimit3()
 		
 		if     ( self.mrGbMG ~= nil and self.mrGbMG.onlyTwoSpeeds )
 				or ( self.mrGbMG == nil and gearboxMogliGlobals ~= nil and gearboxMogliGlobals.onlyTwoSpeeds ) then
-			self:setCruiseControlMaxSpeed(speed1)
-			tempomatMogli.mbSetState( self, "SpeedLimit2", speed3, noEventSend ) 		
+			self:setCruiseControlMaxSpeed(speed2)
+			tempomatMogli.mbSetState( self, "SpeedLimit2", speed1, noEventSend ) 		
 		elseif rev then
+			self:setCruiseControlMaxSpeed(speed3)
+			tempomatMogli.mbSetState( self, "SpeedLimit2", speed1, noEventSend ) 		
+			tempomatMogli.mbSetState( self, "SpeedLimit3", speed2, noEventSend ) 		
+		else
 			self:setCruiseControlMaxSpeed(speed2)
 			tempomatMogli.mbSetState( self, "SpeedLimit2", speed3, noEventSend ) 		
 			tempomatMogli.mbSetState( self, "SpeedLimit3", speed1, noEventSend ) 		
-		else
-			self:setCruiseControlMaxSpeed(speed1)
-			tempomatMogli.mbSetState( self, "SpeedLimit2", speed2, noEventSend ) 		
-			tempomatMogli.mbSetState( self, "SpeedLimit3", speed3, noEventSend ) 		
 		end 
 	end 
 	
