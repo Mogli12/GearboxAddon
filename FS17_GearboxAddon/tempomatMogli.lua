@@ -55,6 +55,8 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		self.tempomatMogliGetSpeedLimit2 = tempomatMogli.tempomatMogliGetSpeedLimit2
 		self.tempomatMogliGetSpeedLimit3 = tempomatMogli.tempomatMogliGetSpeedLimit3
 		self.tempomatMogliSwapSpeedLimit = tempomatMogli.tempomatMogliSwapSpeedLimit 
+		self.tempomatMogliOldSetCCState  = self.setCruiseControlState
+		self.setCruiseControlState       = tempomatMogli.newSetCruiseControlState
 		
 		if tempomatMogli.cruiseControlHud == nil then
 			local x = g_currentMission.cruiseControlOverlay.x + 0.2 * g_currentMission.vehicleHudBg.width
@@ -78,9 +80,26 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	end
 	
 	--**********************************************************************************************************	
+	-- tempomatMogli:newSetCruiseControlState
+	--**********************************************************************************************************	
+	function tempomatMogli:newSetCruiseControlState(state, noEventSend)
+		if self.tempomatMogliOnLeave then
+		elseif self.isServer and self.cruiseControl ~= nil and self.tempomatMogliV17.keepSpeedLimit ~= nil then
+			if     state == Drivable.CRUISECONTROL_STATE_ACTIVE then
+			  self.tempomatMogliV17.keepSpeedLimit = self.cruiseControl.speed 
+			elseif state == Drivable.CRUISECONTROL_STATE_FULL   then
+				self.tempomatMogliV17.keepSpeedLimit = tempomatMogli.getMaxSpeed( self, true )
+			end
+		else
+			self:tempomatMogliOldSetCCState(state, noEventSend)
+		end
+	end
+	
+	--**********************************************************************************************************	
 	-- tempomatMogli:update
 	--**********************************************************************************************************	
 	function tempomatMogli:update(dt)
+		self.tempomatMogliOnLeave = nil
 		
 	-- inputs	
 		if self:getIsActiveForInput(false) then		
@@ -98,10 +117,13 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliKEEPSPEEDTOGGLE" ) then
 				tempomatMogli.mbSetState( self, "KeepSpeedToggle", not self.tempomatMogliV17.KeepSpeedToggle )	
 			end
+			
 			local k = self.tempomatMogliV17.KeepSpeedToggle 
+			
 			if tempomatMogli.mbIsInputPressed( "gearboxMogliKEEPSPEED" ) then
 				k = not k
 			end
+			
 			if      self.tempomatMogliV17.KeepSpeedToggle
 					and self.axisForwardIsAnalog 
 					and math.abs( self.axisForward ) > 0.95 then
@@ -124,13 +146,6 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				if      self.tempomatMogliV17.keepSpeedLimit == nil then
 					self.tempomatMogliV17.lastAxisFoward = 0
 					self.tempomatMogliV17.keepSpeedLimit = math.max( self.lastSpeedReal*3600, tempomatMogli.getMinSpeed( self, true ) )
-				elseif  self.tempomatMogliV17.KeepSpeedToggle
-						and self.tempomatMogliV17.SpeedLimit ~= nil 
-						and self.tempomatMogliV17.SpeedLimit ~= self.cruiseControl.speed then
-					self.tempomatMogliV17.keepSpeedLimit = self.cruiseControl.speed
-					if self.tempomatMogliV17.cruiseControlSpeed ~= nil then
-						tempomatMogli.mbSetState( self, "cruiseControlSpeed", self.cruiseControl.speed )
-					end					
 				end
 			elseif self.tempomatMogliV17.keepSpeedLimit ~= nil then
 				self.tempomatMogliV17.keepSpeedLimit = nil		
@@ -312,15 +327,12 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		local oldFunc
 		
 		if not ( self.deactivateOnLeave ) and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then
-			oldFunc = self.setCruiseControlState
-			self.setCruiseControlState = function (self, state, noEventSend) end
+			self.tempomatMogliOnLeave = true
 		end
 		
 		superFunc( self )
 		
-		if oldFunc ~= nil then
-			self.setCruiseControlState = oldFunc
-		end
+		self.tempomatMogliOnLeave = true
 	end
 	
 	Drivable.updateVehiclePhysics = Utils.overwrittenFunction( Drivable.updateVehiclePhysics, tempomatMogli.newUpdateVehiclePhysics )
@@ -336,9 +348,6 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	-- tempomatMogli:tempomatMogliSetSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliGetSpeedLimit( )
-		if self.tempomatMogliV17.cruiseControlSpeed ~= nil then
-			return self.tempomatMogliV17.cruiseControlSpeed
-		end
 		return self.cruiseControl.speed
 	end 
 	

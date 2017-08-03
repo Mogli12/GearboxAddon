@@ -404,10 +404,13 @@ function gearboxMogli:initClient()
 	self.mrGbML.DirectionChangeTime  = 0
 	
 	if gearboxMogli.ovArrowUpWhite == nil then
-		local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
+		local w  = math.floor(0.012 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
 		local h = w * g_screenAspectRatio
 		local x = g_currentMission.speedMeterIconOverlay.x
 		local y = g_currentMission.speedMeterIconOverlay.y
+
+		x = x + 0.2*w
+		y = y + g_currentMission.vehicleHudBg.height - h
 		
 		gearboxMogli.ovArrowUpWhite   = Overlay:new("ovArrowUpWhite",   Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_white.dds",   gearboxMogli.baseDirectory), x, y, w, h)
 		gearboxMogli.ovArrowUpGray    = Overlay:new("ovArrowUpGray",    Utils.getFilename( self.mrGbMG.ddsDirectory.."arrow_up_gray.dds",    gearboxMogli.baseDirectory), x, y, w, h)
@@ -416,11 +419,11 @@ function gearboxMogli:initClient()
 		gearboxMogli.ovHandBrakeUp    = Overlay:new("ovHandBrakeUp",    Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_up.dds",    gearboxMogli.baseDirectory), x, y, w, h)
 		gearboxMogli.ovHandBrakeDown  = Overlay:new("ovHandBrakeDown",  Utils.getFilename( self.mrGbMG.ddsDirectory.."hand_brake_down.dds",  gearboxMogli.baseDirectory), x, y, w, h)
 	
-		y = y + h
+		x = x + 1.1*w
 		gearboxMogli.ovDiffLockMiddle = Overlay:new("ovDiffLockMiddle", Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_middle.dds", gearboxMogli.baseDirectory), x, y, w, h)
-		x = x + w
+		x = x + 1.1*w
 		gearboxMogli.ovDiffLockFront  = Overlay:new("ovDiffLockFront",  Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_front.dds",  gearboxMogli.baseDirectory), x, y, w, h)
-		x = x + w
+		x = x + 1.1*w
 		gearboxMogli.ovDiffLockBack   = Overlay:new("ovDiffLockBack",   Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_back.dds",   gearboxMogli.baseDirectory), x, y, w, h)
 	end
 	
@@ -4209,6 +4212,12 @@ function gearboxMogli:draw()
 				ovRows = ovRows + 1 infos[ovRows] = "engine"
 			end
 			
+			if     self:mrGbMGetDiffLockMiddle()
+					or self:mrGbMGetDiffLockFront()
+					or self:mrGbMGetDiffLockBack() then
+				ovRows = ovRows + 1 infos[ovRows] = "difflock"
+			end
+			
 			if      self.mrGbMS.Hydrostatic and self.mrGbMS.HandThrottle > 0
 					and self.mrGbMS.RatedRpm > 1 then
 				ovRows = ovRows + 1 infos[ovRows] = "target2"		
@@ -4309,6 +4318,34 @@ function gearboxMogli:draw()
 					if     info == "engine" then
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, self.mrGbMS.EngineName) 	
+						end
+					elseif info == "difflock" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Diff.Lock") 	
+						else
+							t = ""
+							if self.mrGbMS.TorqueRatioMiddle < 0.01 or self.mrGbMS.TorqueRatioMiddle > 0.99 then
+								if self:mrGbMGetDiffLockMiddle() then
+									t = "4wd "
+								else
+									t = "2wd "
+								end
+							elseif self:mrGbMGetDiffLockMiddle() then
+								t = t .. "M"
+							else
+								t = t .. "_"
+							end
+							if self:mrGbMGetDiffLockFront()  then
+								t = t .. "F"
+							else
+								t = t .. "_"
+							end
+							if self:mrGbMGetDiffLockBack()   then
+								t = t .. "B"
+							else
+								t = t .. "_"
+							end
+							renderText(ovRight,drawY, deltaY, t) 	
 						end
 					elseif info == "gear" then
 						if col == 1 then
