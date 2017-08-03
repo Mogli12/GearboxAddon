@@ -329,6 +329,8 @@
 		
 		<!-- http://www.caseiheurope.com/Media/490856a6-ee37-422f-bff2-0e5e02dd34f0/CaseIH_FlipViewer/de_de/Steiger_Quadtrac_620/flipviewerxpress.html -->
 		<gearboxMogli  >
+			<differentials profile="permanent"/>
+		
 			<gears shiftTimeMs="0" shiftEffect="true" clutchRatio="1" defaultGear="13" automatic="true" reverseReset="true">	
 				<gear forwardOnly="true" speed="1.68" name="1"/>
 				<gear forwardOnly="true" speed="2.08" name="2"/>
@@ -358,6 +360,8 @@
 		<gearboxMogli>
 			<blowOffVentilSound volume="0"/>
 			
+			<differentials profile="permanent"/>
+		
 			<gears shiftTimeMs="0" shiftEffect="true" clutchRatio="1" defaultGear="13" automatic="true" reverseReset="true">	
 				<gear forwardOnly="true" speed="1.68" name="1"/>
 				<gear forwardOnly="true" speed="2.08" name="2"/>
@@ -1612,6 +1616,8 @@
 		<configFile xmlName="data/vehicles/steerable/challenger/challengerMT700E.xml"/>
 	
 		<gearboxMogli speedLimiter="false">
+			<differentials profile="off"/>
+		
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="14" automatic="true" >		
 				<gear name="1R" reverseOnly="true" speed="2.30"/>
 				<gear name="1"  forwardOnly="true" speed="2.87"/>
@@ -1641,6 +1647,8 @@
 		<configFile xmlName="data/vehicles/steerable/challenger/challengerMT800E.xml"/>
 	
 		<gearboxMogli speedLimiter="false">
+			<differentials profile="off"/>
+		
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="14" automatic="true" >		
 				<gear name="1R" reverseOnly="true" speed="2.30"/>
 				<gear name="1"  forwardOnly="true" speed="2.87"/>
@@ -1668,8 +1676,10 @@
 	
 	<vehicle>challengerMT900E
 		<configFile xmlName="data/vehicles/steerable/challenger/challengerMT900E.xml"/>
-	
+
 		<gearboxMogli speedLimiter="false">
+			<differentials profile="off"/>
+		
 			<gears shiftTimeMs="0" clutchRatio="1" defaultGear="14" automatic="true" >		
 				<gear name="1R" reverseOnly="true" speed="2.30"/>
 				<gear name="1"  forwardOnly="true" speed="2.87"/>
@@ -1717,6 +1727,8 @@
 			</ranges>
 			
 			<reverse ratio="0.957" shiftTimeMs="200" clutchRatio="0"/>
+			
+			<differentials profile="permanent"/>
 			
 			<engines>
 				<engine name="3200 Xtra" idleRpm="800" ratedRpm="2100">
@@ -1882,6 +1894,8 @@
         <gear speed="26.62" name=""/> <!-- 0 6.79 18 35-->
         <gear speed="53.24" name=""/> <!-- 0 13.59 36 71-->
       </gears>
+			
+			<differentials profile="torsen2"/>
 			
 			<engines>		
 				<engine name="9290 TTV" idleRpm="800" ratedRpm="2100">		
@@ -2710,6 +2724,7 @@
 	
 		<gearboxMogli maxForwardSpeed="72" maxBackwardSpeed="42" maxAIGear="1">
 			<hydrostatic profile="Output" minRatio="-0.642" maxRatio="1"/>		
+			<differentials profile="permanent"/>
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="40" />
 				<gear name="transport"  speed="70"/>
@@ -2874,8 +2889,8 @@
 		<configFile xmlName="defaultTorqueConverter"/>
 
 		<gearboxMogli torqueConverter="true" speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
-			<blowOffVentilSound volume="0"/>
-	
+			<blowOffVentilSound volume="0"/>			
+			<differentials profile="off"/>			
 			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" speedMatching="false" defaultGear="3">
 				<gear name="1" maxForwardSpeedRatio="0.40" />
 				<gear name="2" maxForwardSpeedRatio="0.69" />
@@ -2896,6 +2911,7 @@
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Hydrostat" lossFxTorqueRatio="1" lossFxRpmRatio="0.1"/>	
+			<differentials profile="off"/>
 			<gears>	
 				<gear name="" maxForwardSpeedRatio="1.1" />
 			</gears>
@@ -2908,6 +2924,7 @@
 		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
 			<blowOffVentilSound volume="0"/>
 			<hydrostatic profile="Hydrostat" lossFxTorqueRatio="1" lossFxRpmRatio="0.1"/>		
+			<differentials profile="off"/>
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="Lo" maxForwardSpeedRatio="0.42" />
 				<gear name="Hi" maxForwardSpeedRatio="1.02" />
