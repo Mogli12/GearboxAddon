@@ -99,6 +99,7 @@ gearboxMogli.brakeForceLimitRpm   = 25
 
 gearboxMogliGlobals                       = {}
 gearboxMogliGlobals.debugPrint            = false
+gearboxMogliGlobals.debugInfo             = false 
 gearboxMogliGlobals.transmissionEfficiency= 0.96
 -- Giants is cheating: 0.86 * 0.88 = 0.7568 > 0.72 => torqueFactor = 0.86 * 0.88 / ( 0.72 * 0.94 )
 gearboxMogliGlobals.torqueFactor          = 0.86 * 0.88 / ( 0.72 * gearboxMogliGlobals.transmissionEfficiency )  
@@ -2522,13 +2523,15 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 		fuelUsed   = fuelUsed * rpm * gearboxMogli.powerFactorP
 		fuelUsed   = fuelUsed * gearboxMogli.fuelFactor / gearboxMogli.powerFuelCurve:get( tRatio )
 		
-	--self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",
-	--												rpm,
-	--												self.mrGbMS.RatedRpm,
-	--												tRatio*100,
-	--												torque*1000,
-	--												motor*1000,
-	--												fuelUsed * 3600000 )
+		if self.mrGbMG.debugInfo then
+			self.mrGbML.fuelInfo = string.format( "%4d (%4d), %3.0f%%, %4.0fNm, %4.0fNm => %5.2fl/h",
+															rpm,
+															self.mrGbMS.RatedRpm,
+															tRatio*100,
+															torque*1000,
+															motor*1000,
+															fuelUsed * 3600000 )
+		end
 										
 		if fuelUsed > 0 then
 			self.mrGbML.fuelUsageRaw = fuelUsed*3600000 -- liters per hour
@@ -3335,11 +3338,6 @@ function gearboxMogli:update(dt)
 							ll[j+jj] = ll[j]+4
 						end
 						jj = jj+jj
-					end
-
-					
-					for j=1,jj do
-						print(string.format("%d, %d",j,ll[j]))
 					end
 					
 					n = 0
@@ -5114,39 +5112,39 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 		local newRange = self.mrGbMS.CurrentRange
 		local newGear  = self.mrGbMS.CurrentGear
 		
-		if not self.mrGbMS.NeutralActive then
-			local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
-			local delta = nil
-			local fr    = self.motor:combineGear( self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange )
-			local to    = self.motor:combineGear( table.getn( self.mrGbMS.Gears ), table.getn( self.mrGbMS.Ranges ) )
-			if newRange2 > self.mrGbMS.CurrentRange2 then
-				to = fr
-				fr = 1
-			end
-			for i=fr,to do
-				local i2g, i2r = self.motor:splitGear( i )
-				local skip = false
-				if      not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Gears[i2g], i2g, i2r, newRange2 )
-						and not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges[i2r], i2g, i2r, newRange2 ) then
-					local diff = self.mrGbMS.Gears[i2g].speed * self.mrGbMS.Ranges[i2r].ratio * self.mrGbMS.Ranges2[newRange2].ratio - speed 
-					if newRange2 < self.mrGbMS.CurrentRange2 then
-						if      diff < 0
-								and ( delta == nil or delta < diff ) then
-							delta    = diff
-							newGear  = i2g
-							newRange = i2r
-						end
-					else
-						if      diff > 0
-								and ( delta == nil or delta > diff ) then
-							delta    = diff
-							newGear  = i2g
-							newRange = i2r
-						end
-					end
-				end
-			end
-		end
+	--if not self.mrGbMS.NeutralActive then
+	--	local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
+	--	local delta = nil
+	--	local fr    = gearboxMogliMotor.combineGear( self.motor, self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange )
+	--	local to    = gearboxMogliMotor.combineGear( self.motor, table.getn( self.mrGbMS.Gears ), table.getn( self.mrGbMS.Ranges ) )
+	--	if newRange2 > self.mrGbMS.CurrentRange2 then
+	--		to = fr
+	--		fr = 1
+	--	end
+	--	for i=fr,to do
+	--		local i2g, i2r = self.motor:splitGear( i )
+	--		local skip = false
+	--		if      not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Gears[i2g], i2g, i2r, newRange2 )
+	--				and not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges[i2r], i2g, i2r, newRange2 ) then
+	--			local diff = self.mrGbMS.Gears[i2g].speed * self.mrGbMS.Ranges[i2r].ratio * self.mrGbMS.Ranges2[newRange2].ratio - speed 
+	--			if newRange2 < self.mrGbMS.CurrentRange2 then
+	--				if      diff < 0
+	--						and ( delta == nil or delta < diff ) then
+	--					delta    = diff
+	--					newGear  = i2g
+	--					newRange = i2r
+	--				end
+	--			else
+	--				if      diff > 0
+	--						and ( delta == nil or delta > diff ) then
+	--					delta    = diff
+	--					newGear  = i2g
+	--					newRange = i2r
+	--				end
+	--			end
+	--		end
+	--	end
+	--end
 						
 		newRange = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, "range" )
 		newGear  = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,  self.mrGbMS.CurrentGear,  newGear,  "gear" )
@@ -7143,7 +7141,9 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			c = self.mrGbMG.clutchFactor * self.motor.maxMotorTorque * ( ( 0.5 * ( 1 - math.cos( math.pi * cp )) ) ^ self.mrGbMG.clutchExp )
 		end
 		
-		self.mrGbML.vehiclePropsInfo = string.format( "%4d, %6d, %5.3f, %4d", torque*1000, maxRpm, ratio, c*1000 )
+		if self.mrGbMG.debugInfo then
+			self.mrGbML.vehiclePropsInfo = string.format( "%4d, %6d, %5.3f, %4d", torque*1000, maxRpm, ratio, c*1000 )
+		end
 				
 		if self.isEntered and Vehicle.debugRendering then
 			debugInfo = {}
@@ -8189,14 +8189,20 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		
 		if applyLimit then
 			if not self.limitMaxRpm and self.nonClampedMotorRpm > limitC then
-				self.vehicle.mrGbML.rpmLimitInfo = string.format( "maxRPM: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, limitC )
+				if self.vehicle.mrGbMG.debugInfo then
+					self.vehicle.mrGbML.rpmLimitInfo = string.format( "maxRPM: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, limitC )
+				end
 				torque = 0
 			elseif self.nonClampedMotorRpm > limitA + gearboxMogli.ptoRpmThrottleDiff then
-				self.vehicle.mrGbML.rpmLimitInfo = string.format( "acc: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, limitA )
+				if self.vehicle.mrGbMG.debugInfo then
+					self.vehicle.mrGbML.rpmLimitInfo = string.format( "acc: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, limitA )
+				end
 				torque = 0
 			elseif self.nonClampedMotorRpm > limitA then
 				torque = torque * ( limitA + gearboxMogli.ptoRpmThrottleDiff - self.nonClampedMotorRpm ) / gearboxMogli.ptoRpmThrottleDiff		
-				self.vehicle.mrGbML.rpmLimitInfo = string.format( "acc: %4d > %4d => %4d Nm", self.nonClampedMotorRpm, limitA, torque * 1000 )
+				if self.vehicle.mrGbMG.debugInfo then
+					self.vehicle.mrGbML.rpmLimitInfo = string.format( "acc: %4d > %4d => %4d Nm", self.nonClampedMotorRpm, limitA, torque * 1000 )
+				end
 			end
 			if      self.lastMaxPossibleRpm ~= nil
 					and self.nonClampedMotorRpm >= self.minRequiredRpm
@@ -8205,12 +8211,16 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				if self.nonClampedMotorRpm > self.lastMaxPossibleRpm + gearboxMogli.speedLimitRpmDiff then
 					self.lastMotorTorque = self.lastMotorTorque - torque 
 					torque               = 0
-					self.vehicle.mrGbML.rpmLimitInfo = string.format( "possible: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, self.lastMaxPossibleRpm )
+					if self.vehicle.mrGbMG.debugInfo then
+						self.vehicle.mrGbML.rpmLimitInfo = string.format( "possible: %4d > %4d => 0 Nm", self.nonClampedMotorRpm, self.lastMaxPossibleRpm )
+					end
 				else
 					local old = torque
 					torque = torque * ( self.lastMaxPossibleRpm + gearboxMogli.speedLimitRpmDiff - self.nonClampedMotorRpm ) / gearboxMogli.speedLimitRpmDiff
 					self.lastMotorTorque = self.lastMotorTorque - old + torque
-					self.vehicle.mrGbML.rpmLimitInfo = string.format( "possible: %4d > %4d => %4d Nm", self.nonClampedMotorRpm, self.lastMaxPossibleRpm, torque * 1000 )
+					if self.vehicle.mrGbMG.debugInfo then
+						self.vehicle.mrGbML.rpmLimitInfo = string.format( "possible: %4d > %4d => %4d Nm", self.nonClampedMotorRpm, self.lastMaxPossibleRpm, torque * 1000 )
+					end
 				end
 			end
 		end
@@ -8236,7 +8246,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				acc = p0 / p1
 			end
 
-			self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
+			if self.vehicle.mrGbMG.debugInfo then
+				self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
+			end
 		end
 		
 		if      not self.vehicle.axisForwardIsAnalog
@@ -8482,24 +8494,25 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			torque = Mw / self.transmissionEfficiency
 		end
 		
-		self.vehicle.mrGbML.hydroPumpInfo = string.format("Torque: Mi: %4.0f Mf: %4.0f (%4.0f, %3.0f%%)\nVi: %4.0f Pi: %4.0f Ni: %4.0f\nMo: %4.0f Vo: %4.0f Po: %4.0f No: %4.0f h: %5.3f\n=> %4.0f (%4.0f) => %5.1f%%, %5.1f%%", 
-													Mi*1000,
-													Mf*1000,
-													Mm*1000,
-													acc*100,
-													self.hydrostatVolumePump,
-													Pi,
-													Ni,
-													Mo*1000,
-													self.hydrostatVolumeMotor,
-													Po,
-													No,
-													self.hydrostaticFactor,
-													Mw*1000,
-													Mw-self.hydrostaticFactor*Mm,
-													self.transmissionEfficiency*100,
-													self.hydrostaticFactor*self.transmissionEfficiency*100)
-		
+		if self.vehicle.mrGbMG.debugInfo then
+			self.vehicle.mrGbML.hydroPumpInfo = string.format("Torque: Mi: %4.0f Mf: %4.0f (%4.0f, %3.0f%%)\nVi: %4.0f Pi: %4.0f Ni: %4.0f\nMo: %4.0f Vo: %4.0f Po: %4.0f No: %4.0f h: %5.3f\n=> %4.0f (%4.0f) => %5.1f%%, %5.1f%%", 
+														Mi*1000,
+														Mf*1000,
+														Mm*1000,
+														acc*100,
+														self.hydrostatVolumePump,
+														Pi,
+														Ni,
+														Mo*1000,
+														self.hydrostatVolumeMotor,
+														Po,
+														No,
+														self.hydrostaticFactor,
+														Mw*1000,
+														Mw-self.hydrostaticFactor*Mm,
+														self.transmissionEfficiency*100,
+														self.hydrostaticFactor*self.transmissionEfficiency*100)
+		end
 	elseif torque > 0 then
 					
 		local e = self.vehicle.mrGbMG.transmissionEfficiency
@@ -9287,7 +9300,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 		brakeNeutral = false
 	end
 	
---print(string.format("%1.3f %4d %s %2.1f", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed))
+	if self.vehicle.mrGbMG.debugInfo then
+		self.vehicle.mrGbML.brakeNeutralInfo = 
+			string.format("%1.3f %4d %s %2.1f %4d %4d", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed, self.lastMotorRpm, self.minRequiredRpm)
+	end
 		
 	if brakeNeutral then
 	-- neutral	
@@ -9674,18 +9690,25 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 						end
 					end
 					
-					self.vehicle.mrGbML.autoShiftInfo = string.format( "rpm: %4.0f target: %4.0f gear: %2d speed: %5.3f hydro: %4.2f\n",
-																															self.lastRealMotorRpm, 
-																															t, 
-																															currentGear, 
-																															self.vehicle.mrGbMS.CurrentGearSpeed,
-																															self.hydrostaticFactor )
+					if self.vehicle.mrGbMG.debugInfo then
+						self.vehicle.mrGbML.autoShiftInfo = string.format( "rpm: %4.0f target: %4.0f gear: %2d speed: %5.3f hydro: %4.2f\n",
+																																self.lastRealMotorRpm, 
+																																t, 
+																																currentGear, 
+																																self.vehicle.mrGbMS.CurrentGearSpeed,
+																																self.hydrostaticFactor )
+					end
+					
 					if bestS == nil then
-						self.vehicle.mrGbML.autoShiftInfo = self.vehicle.mrGbML.autoShiftInfo .. "nothing found: "..tostring(tooBig).." "..tostring(tooSmall)
+						if self.vehicle.mrGbMG.debugInfo then
+							self.vehicle.mrGbML.autoShiftInfo = self.vehicle.mrGbML.autoShiftInfo .. "nothing found: "..tostring(tooBig).." "..tostring(tooSmall)
+						end
 					else
-						self.vehicle.mrGbML.autoShiftInfo = self.vehicle.mrGbML.autoShiftInfo ..
-																								string.format( "bestG: %2d bestS: %5.3f bestE: %4.2f bestR: %4.0f",
-																																bestG, bestS, bestE, bestR )
+						if self.vehicle.mrGbMG.debugInfo then
+							self.vehicle.mrGbML.autoShiftInfo = self.vehicle.mrGbML.autoShiftInfo ..
+																									string.format( "bestG: %2d bestS: %5.3f bestE: %4.2f bestR: %4.0f",
+																																	bestG, bestS, bestE, bestR )
+						end
 						if spdFix > 0 then
 							hFix = spdFix / bestS 
 						end
@@ -9694,7 +9717,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 					if bestG ~= currentGear then	
 						local i2g, i2r = self:splitGear( bestG )
 						
-						if self.vehicle.mrGbMG.debugPrint or gearboxMogli.debugGearShift then
+						if self.vehicle.mrGbML.autoShiftInfo ~= nil and ( self.vehicle.mrGbMG.debugPrint or gearboxMogli.debugGearShift ) then
 							print(self.vehicle.mrGbML.autoShiftInfo)
 							print("-------------------------------------------------------")
 						end
@@ -9847,7 +9870,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 					--hFx = math.max( 0, self.hydrostaticFactorT - w / Utils.clamp( r, n1, m1 ) )
 						hFx = 1 / ( 1 + f * self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio )
 						
-						self.vehicle.mrGbML.hydroTorqueFxInfo = string.format( "%5.3f, %4d => %4.2f", f, t, hFx )
+						if self.vehicle.mrGbMG.debugInfo then
+							self.vehicle.mrGbML.hydroTorqueFxInfo = string.format( "%5.3f, %4d => %4.2f", f, t, hFx )
+						end
 					end
 					
 					self.hydrostaticFactor = Utils.clamp( self.hydrostaticFactorT * hFx, hMin2, hMax2 )
@@ -11025,7 +11050,8 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 		end
 	end
 	
-	if      self.autoClutchPercent < self.vehicle.mrGbMS.MaxClutchPercent
+	if      self.vehicle.mrGbMG.debugInfo 
+			and self.autoClutchPercent < self.vehicle.mrGbMS.MaxClutchPercent
 			and fromPercent ~= nil
 			and toPercent   ~= nil then
 		self.vehicle.mrGbML.clutchInfo = 
