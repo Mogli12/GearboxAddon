@@ -50,13 +50,17 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="input_gearboxMogliGEARFWD"         text="Gearbox: marche avant"/>
 		<text name="input_gearboxMogliGEARBACK"        text="Gearbox: marche arrière"/> 
 		<text name="input_gearboxMogliSPEEDLIMIT"      text="Gearbox: régulateur"/>
-		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: régulateur 2"/>
+		<text name="input_gearboxMogliSWAPSPEED"       text="Gearbox: régulateur suivant"/>
+		<text name="input_gearboxMogliSWAPSPEEDR"      text="Gearbox: régulateur précédent"/>
 		<text name="input_gearboxMogliSETSPEED"        text="Gearbox: réglage régulateur"/>
 		<text name="input_gearboxMogliACCTOLIMIT"      text="Gearbox: limiteur d'accéleration"/>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="Gearbox: limiteur de décélération"/>
 		<text name="input_gearboxMogliECO"             text="Gearbox: éco on/off"/>
 		<text name="input_gearboxMogliKEEPSPEED"       text="Gearbox: régulateur de vitesse"/>
 		<text name="input_gearboxMogliKEEPSPEEDTOGGLE" text="Gearbox: changer régulateur de vitesse"/>
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"  text="Gearbox: mode 4x4"/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"   text="Gearbox: blocage différentiel avant"/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"    text="Gearbox: blocage différentiel arrière"/>
 		<text name="gearboxMogliTEXT_OFF"        text="moteur off"/>
 		<text name="gearboxMogliTEXT_AI"         text="IA"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="frein à main"/>
