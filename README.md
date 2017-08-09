@@ -1,11 +1,13 @@
 # GearboxAddOn for Farming Simulator 2017
 
 ## Current Status
-Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. 
+Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. But Dural wrote again and again this gearboxAddon is not realistic enough. This is why I stopped the support for moreRealistic. It is working right now. That's it.
 
 Now I try to finalize version 2.1 to update it on ModHub.
 
 There is a new way to specify the gear and ranges the tractor should use during launch. If you change the gear while the tractor is in neutral or auto hold the gearbox will remember this gear and use it again after the next stop or after changing direction. I hope that this change does not cause too much trouble.
+
+It is not possible to lock differentials in the gearboxAddon. You can use the key combinations left shift plus 4, 5 or 6. It might look very simillar like differentaion locking in driveControl. But the underlying implementation is different. This feature only works if driveControl is not used. The gearboxAddon completely unlocks the differential. Based on the differential settings the torque is sent to the slowest of fastet wheel.
 
 ## Description
 This is the continuation of the mod MoreRealistic GearboxAddon for FS13. In FS15 it works even without MoreRealistic. 

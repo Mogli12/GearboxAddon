@@ -178,6 +178,7 @@ gearboxMogliGlobals.accelerateToLimit     = 5     -- km/h per second
 gearboxMogliGlobals.decAccToLimitRatio    = 2     -- decelerateToLimit = accelerateToLimit * decAccToLimitRatio
 gearboxMogliGlobals.onlyTwoSpeeds         = false -- only two CC speeds instead of three
 gearboxMogliGlobals.manual4wd             = true  -- diff lock
+gearboxMogliGlobals.maxDeltaAccPerMs      = 0.003 -- max delta for acceleration; it takes 333 ms from 0 to 1
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -2515,7 +2516,7 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 		elseif rpm < self.mrGbMS.CurMinRpm then
 			rpm = self.mrGbMS.CurMinRpm
 		end
-		local torque = math.max( self.motor.usedMotorTorque, 0 )
+		local torque = math.max( self.motor.fuelMotorTorque, 0 )
 		local motor  = self.motor.currentTorqueCurve:get( rpm ) --math.max( self.motor.lastMotorTorque, torque )		
 		local tRatio = 1
 		
@@ -4000,11 +4001,10 @@ function gearboxMogli:updateTick(dt)
 					end
 					self.mrGbMD.Clutch = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetAutoClutchPercent( self ) * 200+0.5), 0, 255 ))	
 					if      self.mrGbMS.sendReqPower 
-							and self.motor.usedTransTorque        ~= nil
-							and self.motor.ptoMotorTorque         ~= nil
+							and self.motor.fuelMotorTorque        ~= nil
 							and self.motor.prevNonClampedMotorRpm ~= nil
 							and self.mrGbMS.CurMinRpm             ~= nil then
-						local power = ( self.motor.usedMotorTorque ) * math.max( self.motor.prevNonClampedMotorRpm, self.mrGbMS.CurMinRpm )
+						local power = self.motor.fuelMotorTorque * math.max( self.motor.prevNonClampedMotorRpm, self.mrGbMS.CurMinRpm )
 						self.mrGbMD.Power  = tonumber( Utils.clamp( math.floor( power * gearboxMogli.powerFactor0 + 0.5 ), 0, 65535 ))	
 					end
 					if self.mrGbMS.Hydrostatic and not ( self.motor.noTransmission ) then
@@ -7136,6 +7136,15 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		self.setReverseLightsVisibility(self, self.mrGbMS.ReverseActive)
 	end
 	
+	if acceleration > 0 then
+		local ref = 0
+		if self.mrGbML.lastAcceleration ~= nil and self.mrGbML.lastAcceleration > 0 then
+			ref = self.mrGbML.lastAcceleration
+		end
+		local diff = self.mrGbMG.maxDeltaAccPerMs * dt
+		acceleration = ref + Utils.clamp( acceleration - ref, -diff, diff )
+	end
+	
 	gearboxMogliMotor.mrGbMUpdateGear( self.motor, acceleration )	
 	
 	local absAccelerationPedal = math.abs(accelerationPedal)
@@ -7612,8 +7621,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.transmissionInputRpm    = 0
 	self.motorLoad               = 0
 	self.usedMotorTorque         = 0
+	self.fuelMotorTorque         = 0
 	self.lastMotorTorque         = 0
-	self.lastLimitedTorque       = 0
 	self.lastTransTorque         = 0
 	self.ptoToolTorque           = 0
 	self.ptoMotorRpm             = self.vehicle.mrGbMS.IdleRpm
@@ -8187,16 +8196,12 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	if torque < 0 then
 		self.lastMissingTorque = self.lastMissingTorque - torque
-		self.lastLimitedTorque = self.maxMotorTorque
 		torque                 = 0
 	elseif self.noTorque then
-		self.lastLimitedTorque = 0
 		torque                 = 0
 	elseif acc <= 0 then
-		self.lastLimitedTorque = 0
 		torque                 = 0
 	elseif self.noTransmission then
-		self.lastLimitedTorque = 0
 		torque                 = torque * acc
 	else
 		local applyLimit = true
@@ -8273,30 +8278,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			if self.vehicle.mrGbMG.debugInfo then
 				self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
 			end
-		end
-		
-		if      not self.vehicle.axisForwardIsAnalog
-				and self.vehicle.steeringEnabled
-				and self.vehicle.mrIsMrVehicle then
-			local maxTorquePerSecond = 2 * self.maxMotorTorque
-			local s = math.abs( self.vehicle.lastSpeedReal*3600 )
-			local r = 5
-			if self.vehicle.mrIsMrVehicle then
-				s = 10
-			end
-			
-			if s < r then
-				local limit = math.max( 0.25, s/r )^2 * maxTorquePerSecond
-				if maxTorquePerSecond > limit then
-					maxTorquePerSecond = limit
-				end
-			end
-			
-			torque = math.min( torque * acc, math.max( self.lastLimitedTorque + self.tickDt * 0.001 * maxTorquePerSecond, 0.1 * self.maxMotorTorque ) )
-			self.lastLimitedTorque = torque 
-		else			
-			self.lastLimitedTorque = torque 
-		end
+		end		
 	end
 	
 	if     self.noTransmission 
@@ -8776,7 +8758,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		self.motorLoadOverflow   = 0
 		self.nonClampedMotorRpm  = self:getThrottleRpm()
 	end
-	
+		
 	self.usedTransTorque = self.usedTransTorque + self.motorLoadOverflow
 	if self.usedTransTorque > self.lastTransTorque then
 		self.motorLoadOverflow = self.usedTransTorque - self.lastTransTorque
@@ -8784,7 +8766,6 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	else
 		self.motorLoadOverflow = 0
 	end
-		
 	
 	if not ( self.vehicle.isMotorStarted ) then
 		self.usedTransTorque   = 0
@@ -8853,10 +8834,18 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.lastPtoRpm          = self.lastRealMotorRpm
 	self.equalizedMotorRpm   = self.vehicle:mrGbMGetEqualizedRpm( self.lastMotorRpm )
 	
+	local utt = self.usedTransTorque
+	if self.vehicle.mrIsMrVehicle and gearboxMogli.eps < utt and utt < self.lastTransTorque then
+		-- square because MR has rolling resistance etc. => 0%->0%; 50%->25%; 100%->100%
+		utt = utt * utt / self.lastTransTorque
+	end
+	
 	if self.noTransmission or self.transmissionEfficiency < gearboxMogli.eps then
 		self.usedMotorTorque   = self.usedTransTorque + self.ptoMotorTorque + self.lastMissingTorque
+		self.fuelMotorTorque   = utt + self.ptoMotorTorque + self.lastMissingTorque
 	else
 		self.usedMotorTorque   = math.min( self.usedTransTorque / self.transmissionEfficiency + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
+		self.fuelMotorTorque   = math.min( utt / self.transmissionEfficiency + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	end
 end
 
@@ -8885,7 +8874,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	elseif accelerationPedalRaw > 0 then
 		accelerationPedal = accelerationPedalRaw^self.vehicle.mrGbMG.accThrottleExp
 	end
-
+	
 	local acceleration = math.max( accelerationPedal, 0 )
 
 	if self == nil or self.vehicle == nil then
@@ -8978,7 +8967,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	self.absWheelSpeedRpmS  = self.absWheelSpeedRpmS + self.vehicle.mrGbML.smoothFast * ( self.absWheelSpeedRpm - self.absWheelSpeedRpmS )
 	local deltaRpm          = ( self.absWheelSpeedRpm - prevWheelSpeedRpm ) / self.tickDt         
 	self.deltaRpm           = self.deltaRpm + self.vehicle.mrGbML.smoothMedium * ( deltaRpm - self.deltaRpm )
-	local currentPower      = ( self.usedMotorTorque ) * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm )
+	local currentPower      = self.usedMotorTorque * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm )
 	local getMaxPower       = ( self.lastMissingTorque > 0 )
 	
 	if      self.deltaRpm < -gearboxMogli.autoShiftMaxDeltaRpm 
