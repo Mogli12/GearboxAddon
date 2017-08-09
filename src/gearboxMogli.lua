@@ -2323,10 +2323,13 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			
 			self.mrGbMS.TorqueRatioMiddle = 0
 			self.mrGbMS.TorqueSenseMiddle = 0
+			self.mrGbMS.SpeedRatioMiddle  = self.differentials[3].maxSpeedRatio
 			self.mrGbMS.TorqueRatioFront  = self.differentials[1].torqueRatio
 			self.mrGbMS.TorqueSenseFront  = 1
+			self.mrGbMS.SpeedRatioFront   = 1
 			self.mrGbMS.TorqueRatioBack   = self.differentials[2].torqueRatio
 			self.mrGbMS.TorqueSenseBack   = 1
+			self.mrGbMS.SpeedRatioBack    = 1
 			
 			-- profile == "manual" is default 
 			if     profile == "off"       then
@@ -2340,19 +2343,33 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 			elseif profile == "torsen1"   then
 				self.mrGbMS.TorqueRatioMiddle = 0.5
 				self.mrGbMS.TorqueSenseMiddle = -1
+				self.mrGbMS.SpeedRatioBack    = self.differentials[2].maxSpeedRatio
 			elseif profile == "torsen2"   then
 				self.mrGbMS.TorqueRatioMiddle = 0.5
 				self.mrGbMS.TorqueSenseMiddle = -1
 				self.mrGbMS.TorqueRatioBack   = 0.5
 				self.mrGbMS.TorqueSenseBack   = -1
+				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
+			elseif profile == "torsen3"   then
+				self.mrGbMS.TorqueRatioMiddle = 0.5
+				self.mrGbMS.TorqueSenseMiddle = -1
+				self.mrGbMS.TorqueRatioFront  = 0.5
+				self.mrGbMS.TorqueSenseFront  = -1
+				self.mrGbMS.SpeedRatioFront   = math.max( 1.3, self.differentials[1].maxSpeedRatio )
+				self.mrGbMS.TorqueRatioBack   = 0.5
+				self.mrGbMS.TorqueSenseBack   = -1
+				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
 			end
 		
-			self.mrGbMS.TorqueRatioMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#torqueRatio"), self.mrGbMS.TorqueRatioMiddle )
-			self.mrGbMS.TorqueSenseMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#limitedSlip"), self.mrGbMS.TorqueSenseMiddle )
-			self.mrGbMS.TorqueRatioFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#torqueRatio" ), self.mrGbMS.TorqueRatioFront  )
-			self.mrGbMS.TorqueSenseFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#limitedSlip" ), self.mrGbMS.TorqueSenseFront  )
-			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"  ), self.mrGbMS.TorqueRatioBack   )
-			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"  ), self.mrGbMS.TorqueSenseBack   )
+			self.mrGbMS.TorqueRatioMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#torqueRatio"  ), self.mrGbMS.TorqueRatioMiddle )
+			self.mrGbMS.TorqueSenseMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#limitedSlip"  ), self.mrGbMS.TorqueSenseMiddle )
+			self.mrGbMS.SpeedRatioMiddle  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#maxSpeedRatio"), self.mrGbMS.SpeedRatioMiddle )
+			self.mrGbMS.TorqueRatioFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#torqueRatio"   ), self.mrGbMS.TorqueRatioFront  )
+			self.mrGbMS.TorqueSenseFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#limitedSlip"   ), self.mrGbMS.TorqueSenseFront  )
+			self.mrGbMS.SpeedRatioFront   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#maxSpeedRatio" ), self.mrGbMS.SpeedRatioFront  )
+			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
+			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
+			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
 		end
 	end
 
@@ -2789,7 +2806,18 @@ function gearboxMogli:update(dt)
 				-- -1 => full torque to wheel 2
 				
 				local r = 0
-				if speed1 > gearboxMogli.eps and speed2 > gearboxMogli.eps then
+								
+				if     math.abs( speed1 - speed2 ) < gearboxMogli.eps then
+					r = 0
+				elseif speed1 > gearboxMogli.eps and speed2 > gearboxMogli.eps then
+					if diff.mogliSpeedRatio > 1.01 then
+						if     speed1 < speed2 then
+							speed1 = math.min( speed1 * diff.mogliSpeedRatio, speed2 )
+						elseif speed2 < speed1 then 
+							speed2 = math.min( speed2 * diff.mogliSpeedRatio, speed1 )
+						end
+					end
+					
 					if     speed2 < speed1 then
 						r = 1 - speed2 / speed1
 					elseif speed1 < speed2 then
@@ -2809,8 +2837,9 @@ function gearboxMogli:update(dt)
 				if diff.lastMogliTorqueRatio == nil then
 					diff.lastMogliTorqueRatio = diff.mogliTorqueRatio
 				end
-			--diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + self.mrGbML.smoothFast * ( tr0 + ( 1-lsd ) * ( r-0.5 ) - diff.lastMogliTorqueRatio ), 0, 1 )
-				diff.lastMogliTorqueRatio = Utils.clamp( tr0 + lsd * r * 0.5, 0, 1 )
+				local q = tr0 + lsd * r * 0.5
+				diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + self.mrGbML.smoothLittle * ( q - diff.lastMogliTorqueRatio ), 0, 1 )
+			--diff.lastMogliTorqueRatio = Utils.clamp( q, 0, 1 )
 				updateDifferential(self.motorizedNode,idx-1,diff.lastMogliTorqueRatio,gearboxMogli.huge)
 			end
 		
@@ -2819,16 +2848,19 @@ function gearboxMogli:update(dt)
 			diff.mogliLocked      = self:mrGbMGetDiffLockMiddle() 
 			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioMiddle
 			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseMiddle
+			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioMiddle
 			
 			diff = self.differentials[1]
 			diff.mogliLocked      = self:mrGbMGetDiffLockFront()
 			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioFront
 			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseFront
+			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioFront
 			
 			diff = self.differentials[2]
 			diff.mogliLocked      = self:mrGbMGetDiffLockBack()
 			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
 			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
+			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioBack
 			
 			for i,diff in pairs( self.differentials ) do
 				local m = 0
@@ -2845,7 +2877,7 @@ function gearboxMogli:update(dt)
 					unlockDiff( self, i, diff )
 				elseif diff.mogliMode == nil or diff.mogliMode ~= m then
 					if     m == 1 then
-						updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.maxSpeedRatio)
+						updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.mogliSpeedRatio)
 					elseif m == 2 then
 						updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,1)
 					else
@@ -5534,9 +5566,6 @@ end
 
 function gearboxMogli:mrGbMGetDiffLockMiddle()
 	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
-		if self.mrGbMS.TorqueSenseMiddle < -0.01 then
-			return false
-		end
 		return self.mrGbMS.DiffLockMiddle
 	end
 	return false
@@ -5544,9 +5573,7 @@ end
 
 function gearboxMogli:mrGbMGetDiffLockFront()
 	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
-		if self.mrGbMS.TorqueSenseFront < -0.01 then
-			return false
-		elseif  self.mrGbMS.DiffLockFront 
+		if      self.mrGbMS.DiffLockFront 
 				and ( self.mrGbMS.DiffLockMiddle
 					 or self.mrGbMS.TorqueRatioMiddle < 0
 					 or self.mrGbMS.TorqueSenseMiddle < 0.5
@@ -5559,9 +5586,6 @@ end
 
 function gearboxMogli:mrGbMGetDiffLockBack()
 	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
-		if self.mrGbMS.TorqueSenseBack < -0.01 then
-			return false
-		end
 		return self.mrGbMS.DiffLockBack
 	end
 	return false
@@ -5807,11 +5831,11 @@ function gearboxMogli:mrGbMGetAutoShiftGears()
 		end
 	end
 	
-	if i <= 1 then
+	if     i <= 1 then
 		return false
-	end
-	
-	if      self.mrGbMS.G27Mode > 0 then
+	elseif  self.mrGbMS.G27Mode > 0 then
+		return false
+	elseif  self.mrGbMS.GearsOnlyStopped then
 		return false
 	elseif  self.mrGbMS.AllAuto then
 		return true
@@ -5850,9 +5874,9 @@ function gearboxMogli:mrGbMGetAutoShiftRange()
 	
 	if i <= 1 then
 		return false
-	end
-	
-	if      self.mrGbMS.AllAuto then
+	elseif  self.mrGbMS.Range1OnlyStopped then
+		return false
+	elseif  self.mrGbMS.AllAuto then
 		return true
 	elseif  self.mrGbMS.AutoShiftHl
 			and gearboxMogli.getBit3( self.mrGbMS.Automatic, 2 ) > 0 then
@@ -5889,9 +5913,9 @@ function gearboxMogli:mrGbMGetAutoShiftRange2()
 	
 	if i <= 1 then
 		return false
-	end
-	
-	if      self.mrGbMS.AllAuto then
+	elseif  self.mrGbMS.Range2OnlyStopped then
+		return false
+	elseif  self.mrGbMS.AllAuto then
 		return true
 	elseif  self.mrGbMS.AutoShiftRange2 
 			and gearboxMogli.getBit3( self.mrGbMS.Automatic, 3 ) > 0 then
