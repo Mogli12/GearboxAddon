@@ -1,9 +1,9 @@
 # GearboxAddOn for Farming Simulator 2017
 
 ## Current Status
-Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. But Dural wrote again and again this gearboxAddon is not realistic enough. This is why I stopped the support for moreRealistic. It is working right now. That's it.
+Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. But Dural wrote again and again that the gearboxAddon is not realistic enough. This is why I stopped the support for moreRealistic. It is working right now and maybe it will in future. But I will not continue to work on the moreRealistic support.
 
-Now I try to finalize version 2.1 to update it on ModHub.
+Now I try to finalize a new release version for ModHub.
 
 There is a new way to specify the gear and ranges the tractor should use during launch. If you change the gear while the tractor is in neutral or auto hold the gearbox will remember this gear and use it again after the next stop or after changing direction. I hope that this change does not cause too much trouble.
 
