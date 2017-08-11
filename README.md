@@ -1,6 +1,8 @@
 # GearboxAddOn for Farming Simulator 2017
 
 ## Current Status
+I managed to switch the gearbox via buyable configuration. Please be careful with this version. It might be that the bought transmission is lost when opening a savegame. This is work in progress.
+
 Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. But Dural wrote again and again that the gearboxAddon is not realistic enough. This is why I stopped the support for moreRealistic. It is working right now and maybe it will in future. But I will not continue to work on the moreRealistic support.
 
 Now I try to finalize a new release version for ModHub.
