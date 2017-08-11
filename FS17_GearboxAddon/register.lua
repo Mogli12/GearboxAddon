@@ -265,11 +265,11 @@ function gearboxMogliRegister:addConfigurations()
 					defaultConfigName = "default"
 				end
 				
-				table.insert( modifiedItem.configurations, { name = "off", title = "Standard Transmission", source = -1 } )
+				table.insert( modifiedItem.configurations, { name = "built-in", title = "Standard Transmission", source = -1 } )
 				
 				local isDefault = true
 				if hasVehicleConfig then
-					table.insert( modifiedItem.configurations, { name = "local", title = "Standard Transmission", source = 0, isDefault = isDefault } )
+					table.insert( modifiedItem.configurations, { name = "standard", title = "Standard Transmission", source = 0, isDefault = isDefault } )
 				end
 					
 				for i=1,2 do
@@ -283,7 +283,7 @@ function gearboxMogliRegister:addConfigurations()
 					entry = gearboxMogliLoader.getConfigEntry( configTab, configFileName )
 					if entry ~= nil then
 						if entry.hasGearboxMogliTag then
-							table.insert( modifiedItem.configurations, { name = "gearbox", title = "Gearbox Addon", source = i, baseName = entry.xmlName, isDefault = isDefault } )
+							table.insert( modifiedItem.configurations, { name = "gearbox addon", title = "Gearbox Addon", source = i, baseName = entry.xmlName, isDefault = isDefault } )
 							isDefault = false
 						elseif entry.motorConfig == nil then
 							local j = 0
@@ -295,15 +295,20 @@ function gearboxMogliRegister:addConfigurations()
 								end
 								j = j + 1
 								
-								table.insert( modifiedItem.configurations, { name = string.format("%d_%s",j,s), title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault } )
+								table.insert( modifiedItem.configurations, { name = s, title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault } )
 								isDefault = false
 							end
 						end
 						
 					end
 				end
-				
-				table.insert( modifiedItem.configurations, { name = "default", title = "Default Transmission", source = 3, def = defaultConfigName, isDefault = isDefault } )
+
+				if storeItem.category == "tractors" then
+					table.insert( modifiedItem.configurations, { name = "default manual", title = "Default Transmission", source = 3, def = "defaultTractors", isDefault = isDefault } )
+					table.insert( modifiedItem.configurations, { name = "default vario", title = "Default Transmission", source = 3, def = "default", isDefault = false } )
+				else
+					table.insert( modifiedItem.configurations, { name = "default", title = "Default Transmission", source = 3, def = defaultConfigName, isDefault = isDefault } )
+				end
 				
 				gearboxMogliRegister.modifiedStoreItems[xmlFileLower] = modifiedItem
 

@@ -748,6 +748,18 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3600
 	end
 	
+	do
+		local configuration = self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli]
+	
+		if configuration.baseName ~= nil and configuration.config ~= nil then
+			if self.mrGbMS.EngineName == nil then
+				self.mrGbMS.EngineName = configuration.title 
+			else
+				self.mrGbMS.EngineName = self.mrGbMS.EngineName.." "..configuration.title 
+			end
+		end
+	end
+	
 	if self.mrGbMS.MinTargetRpm == nil then
 		self.mrGbMS.MinTargetRpm = 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm 
 	end
