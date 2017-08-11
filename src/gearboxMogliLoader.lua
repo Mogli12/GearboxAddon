@@ -170,7 +170,10 @@ function gearboxMogliLoader.initXmlFiles()
 			while true do
 				local baseName       = string.format("vehicles.vehicle(%d)", i)
 				
-				if not hasXMLProperty( xmlFile, baseName..".gearboxMogli" ) then
+				local hasGearboxMogliTag  = hasXMLProperty( xmlFile, baseName..".gearboxMogli" )
+				local hasTransmissionsTag = hasXMLProperty( xmlFile, baseName..".transmissions" )
+				
+				if not ( hasGearboxMogliTag or hasTransmissionsTag ) then
 					logWrite( logLevel, string.format("FS17_GearboxAddon: Found %d configurations",i))								
 					break
 				end
@@ -181,7 +184,7 @@ function gearboxMogliLoader.initXmlFiles()
 				local k = 0		
 				local l = 0
 				while true do
-					local entry = { xmlName = baseName }
+					local entry = { xmlName = baseName, hasGearboxMogliTag = hasGearboxMogliTag, hasTransmissionsTag = hasTransmissionsTag }
 					local eTag  = nil
 					
 					if configFileName ~= nil then
@@ -228,14 +231,17 @@ function gearboxMogliLoader.initXmlFiles()
 						if eTag ~= nil then
 							local sList = getXMLString(xmlFile, eTag)
 							if sList ~= nil then
+								if hasTransmissionsTag then
+									logWrite( 0, 'Error: <transmissions> tag cannot be combined with <xmlFile engine="..."/>' )
+								end
 								local vList = Utils.splitString(" ", sList)
-								for i = 1, table.getn(vList) do
-									local j = tonumber( vList[i] )
+								for l = 1, table.getn(vList) do
+									local j = tonumber( vList[l] )
 									if j > 0 then
 										if entry.motorConfig == nil then
 											entry.motorConfig = {}
 										end
-										entry.motorConfig[j] = i
+										entry.motorConfig[j] = l
 									end
 								end
 							end
@@ -338,161 +344,109 @@ function gearboxMogliLoader.getConfigEntry( configTable, configFileName, motorCo
 	return 
 end
 
-function gearboxMogliLoader:loadGeneric( savegame, func, tagName, propName1, propName2, propName3 )
-	gearboxMogliLoader.initXmlFiles()
-	
-	local xmlFile
-	local configFileName = string.lower( self.mrGbMLConfigFileName )
-	local entry
-	local motorConfig
-	
-	if      self.configurations       ~= nil
-			and self.configurations.motor ~= nil then
-		motorConfig = self.configurations.motor
-	end
-	
-	-- external configuration
-	xmlFile = gearboxMogliLoader.xmlFileExt	
-	entry   = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configExt, configFileName, motorConfig )
-	
-	if      entry ~= nil
-			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
-		if state and message then
-			logWrite( 1, string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", tagName, self.mrGbMLConfigFileName ))
-			return true
-		elseif not state then
-			logWrite( 0, "Error 4 loading gearboxMogliLoader: "..tostring(message)) 
-		end
-	end 
-	
-	-- configuration inside the vehicle.xml
-	
-	local key
-	
-	if self.configurations ~= nil and self.configurations.motor ~= nil then
-		key = string.format("vehicle.motorConfigurations.motorConfiguration(%d)", self.configurations.motor-1)
-		xmlFile = self.xmlFile
-		if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
-			local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
-			if state and message then
-				logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v1)", tagName, self.mrGbMLConfigFileName ))
-				return true
-			elseif not state then
-				logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
-			end
-		end
-	end
-	
-	key = "vehicle.motorConfigurations.motorConfiguration(0)"
-	if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
-		if state and message then
-			logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v0)", tagName, self.mrGbMLConfigFileName ))
-			return true
-		elseif not state then
-			logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
-		end
-	end
-	
-	key = "vehicle"
-	if gearboxMogliLoader.testXmlFile( xmlFile, key, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, key, "vehicle" )	
-		if state and message then
-			logWrite( 2, string.format( gearboxMogliRegister.modName..": %s inserted into %s (v)", tagName, self.mrGbMLConfigFileName ))
-			return true
-		elseif not state then
-			logWrite( 0, "Error 6 loading gearboxMogliLoader: "..tostring(message)) 
-		end
-	end
-		
-	-- internal configuration
-	xmlFile = gearboxMogliLoader.xmlFileInt
-	entry   = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configInt, configFileName, motorConfig )
-
-	if      entry ~= nil
-			and gearboxMogliLoader.testXmlFile( xmlFile, entry.xmlName, propName1, propName2, propName3 ) then
-		local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
-		if state and message then
-			logWrite( 4, string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", tagName, self.mrGbMLConfigFileName ))
-			return true
-		elseif not state then
-			logWrite( 0, "Error 5 loading gearboxMogliLoader: "..tostring(message)) 
-		end
-	end
-	
-	-- default config 
-	if SpecializationUtil.hasSpecialization(Steerable, self.specializations) then
-	--local speed = 5 * math.floor( self.motor.maxForwardSpeed * 0.72 )
-	--local defaultConfigName = string.format( "default%2d", speed )
-	
-		local defaultConfigName = "default"
-		if SpecializationUtil.hasSpecialization(Combine, self.specializations) then
-			defaultConfigName = "defaultCombine"
-		else
-			local storeItem = StoreItemsUtil.storeItemsByXMLFilename[self.configFileName:lower()];
-			
-			if storeItem == nil then
-			elseif storeItem.category == "tractors"     then
-				defaultConfigName = "defaultTractors"
-			elseif storeItem.category == "trucks"       then
-				defaultConfigName = "defaultTrucks"
-			elseif storeItem.category == "cars"         then
-				defaultConfigName = "defaultCars"
-			elseif storeItem.category == "wheelLoaders" then
-			--defaultConfigName = "defaultTorqueConverter"
-				defaultConfigName = "defaultHydrostatic2"
-			elseif storeItem.category == "teleLoaders"  then
-				defaultConfigName = "defaultHydrostatic2"
-			elseif storeItem.category == "skidSteers"   then
-				defaultConfigName = "defaultHydrostatic1"
-			elseif storeItem.category == "wood"         then
-				defaultConfigName = "defaultHydrostatic1"
-			elseif storeItem.category == "animals"      then
-				defaultConfigName = "defaultHydrostatic1"
-			elseif storeItem.category == "sprayers"     then
-				defaultConfigName = "defaultHydrostatic2"
-			end
-		end
-		
-		logWrite( 0,gearboxMogliRegister.modName..": looking for default configuration ("..defaultConfigName..")")
-		
-		xmlFile = gearboxMogliLoader.xmlFileExt
-		entry   = gearboxMogliLoader.defaultConfigE[defaultConfigName]		
-		if entry ~= nil then
-			local state, message = pcall( func, self, xmlFile, entry.xmlName, "external", entry.motorConfig )	
-			if state and message then
-				logWrite( 3, string.format( gearboxMogliRegister.modName..": %s inserted into %s (e)", defaultConfigName, self.mrGbMLConfigFileName ))
-				return true
-			elseif not state then
-				logWrite( 0, "Error 7 loading gearboxMogliLoader: "..tostring(message)) 
-			end
-		end
-
-		xmlFile = gearboxMogliLoader.xmlFileInt
-		entry   = gearboxMogliLoader.defaultConfigI[defaultConfigName]
-		if entry ~= nil then
-			local state, message = pcall( func, self, xmlFile, entry.xmlName, "internal", entry.motorConfig )	
-			if state and message then
-				logWrite( 3, string.format( gearboxMogliRegister.modName..": %s inserted into %s (i)", defaultConfigName, self.mrGbMLConfigFileName ))
-				return true
-			elseif not state then
-				logWrite( 0, "Error 7 loading gearboxMogliLoader: "..tostring(message)) 
-			end
-		end
-	end
-	
-	logWrite( 99, string.format( gearboxMogliRegister.modName..": no configuration found for inserting %s into %s", tagName, self.mrGbMLConfigFileName ))
-	return false
-end
-
-
 function gearboxMogliLoader:loadgearboxMogli( savegame )
-	self.mrGbMLGearbox1 = gearboxMogliLoader.loadGeneric( self, savegame, gearboxMogliLoader.loadgearboxMogli2, "gearboxMogli", ".gearboxMogli.gears.gear(0)#speed", ".gearboxMogli.gears.gear(0)#inverseRatio", ".gearboxMogli.hydrostatic.efficiency#ratio" )
-end
 
-function gearboxMogliLoader:loadgearboxMogli2( xmlFile, baseName, xmlSource, motorConfig )	
-	gearboxMogli.initFromXml( self, xmlFile, baseName .. ".gearboxMogli", xmlSource, false, motorConfig )
-	return true
+	self.mrGbMLGearbox1 = false
+	if self.configurations == nil or self.configurations.gearboxMogli == nil then
+		logWrite( 5, "No gearbox" )
+		return 
+	end
+	
+	self.mrGbMLStoreItem = gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()]
+	
+	if     self.mrGbMLStoreItem == nil
+			or self.mrGbMLStoreItem.configurations == nil
+			or self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli] == nil then
+		logWrite( 5, "No gearbox configuration" )
+		return 
+	end
+	
+	local configuration = self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli]
+
+	if     configuration.source < 0 then
+		logWrite( 5, "Gearbox is off" )
+	elseif configuration.source == 0 then
+		local key
+		local xmlFile = self.xmlFile 
+		if self.configurations ~= nil and self.configurations.motor ~= nil then
+			key = string.format("vehicle.motorConfigurations.motorConfiguration(%d).gearboxMogli", self.configurations.motor-1)
+			if gearboxMogliLoader.testXmlFile( self.xmlFile, key, ".gears.gear(0)#speed", ".gears.gear(0)#inverseRatio", ".hydrostatic.efficiency#ratio" ) then
+				gearboxMogli.initFromXml( self, self.xmlFile, key, nil, "vehicle", false )
+				self.mrGbMLGearbox1 = true
+				return 
+			end
+		end
+		
+		key = "vehicle.motorConfigurations.motorConfiguration(0).gearboxMogli"
+		if gearboxMogliLoader.testXmlFile( self.xmlFile, key, ".gears.gear(0)#speed", ".gears.gear(0)#inverseRatio", ".hydrostatic.efficiency#ratio" ) then
+			gearboxMogli.initFromXml( self, self.xmlFile, key, nil, "vehicle", false )
+			self.mrGbMLGearbox1 = true
+			return 
+		end
+		
+		key = "vehicle.gearboxMogli"
+		if gearboxMogliLoader.testXmlFile( self.xmlFile, key, ".gears.gear(0)#speed", ".gears.gear(0)#inverseRatio", ".hydrostatic.efficiency#ratio" ) then
+			gearboxMogli.initFromXml( self, self.xmlFile, key, nil, "vehicle", false )
+			self.mrGbMLGearbox1 = true
+			return 
+		end
+		
+		logWrite( 0, "Invalid vehicle XML" )
+		
+	elseif configuration.def ~= nil then
+		logWrite( 5, "Default gearbox" )
+		local xmlFile = gearboxMogliLoader.xmlFileExt
+		local entry   = gearboxMogliLoader.defaultConfigE[configuration.def]
+		local source  = "external"
+		if entry == nil then
+			xmlFile = gearboxMogliLoader.xmlFileInt
+		  entry   = gearboxMogliLoader.defaultConfigI[configuration.def]
+			source  = "internal"
+		end
+		if entry ~= nil then
+			gearboxMogli.initFromXml( self, xmlFile, entry.xmlName..".gearboxMogli", nil, source, false )
+			self.mrGbMLGearbox1 = true
+		else
+			logWrite( 0, "Wrong default" )
+		end
+	elseif configuration.baseName ~= nil then
+		local xmlFile = gearboxMogliLoader.xmlFileExt
+		local source  = "external"
+		if configuration.source > 1 then
+			xmlFile = gearboxMogliLoader.xmlFileInt
+			source  = "internal"
+		end
+		
+		local transName, motorName, motorConfig
+		
+		if configuration.config == nil then
+			local entry
+			if configuration.source > 1 then
+				entry = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configInt, string.lower( self.mrGbMLConfigFileName ), self.configurations.motor )
+			else
+				entry = gearboxMogliLoader.getConfigEntry( gearboxMogliLoader.configExt, string.lower( self.mrGbMLConfigFileName ), self.configurations.motor )
+				motorConfig = entry.motorConfig
+			end
+			
+			if entry == nil then
+				logWrite( 0, "Invalid configuration I" )
+				return 
+			end
+			
+			transName   = entry.xmlName ..".gearboxMogli"
+			motorName   = transName 
+			motorConfig = entry.motorConfig
+		else
+			transName   = configuration.baseName ..string.format(".transmissions.transmission(%d)", configuration.config - 1 )
+			motorName   = configuration.baseName
+		end
+		
+		logWrite( 5, string.format("Config file %s, transmission tag %s, motor tag %s", source, transName, motorName ) )
+
+		gearboxMogli.initFromXml( self, xmlFile, transName, motorName, source, false, motorConfig )
+		self.mrGbMLGearbox1 = true
+	else
+		logWrite( 0, "Invalid configuration II" )
+	end
 end
 

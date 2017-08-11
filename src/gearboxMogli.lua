@@ -195,19 +195,19 @@ function gearboxMogli:load(savegame)
 	
 	key = string.format("vehicle.motorConfigurations.motorConfiguration(%d).gearboxMogli", self.configurations.motor-1)	
 	if hasXMLProperty(self.xmlFile, key) then
-		gearboxMogli.initFromXml(self,self.xmlFile,key,"vehicle",true)
+		gearboxMogli.initFromXml(self,self.xmlFile,key,nil,"vehicle",true)
 		return
 	end
 
 	key = "vehicle.motorConfigurations.motorConfiguration(0).gearboxMogli"	
 	if hasXMLProperty(self.xmlFile, key) then
-		gearboxMogli.initFromXml(self,self.xmlFile,key,"vehicle",true)
+		gearboxMogli.initFromXml(self,self.xmlFile,key,nil,"vehicle",true)
 		return
 	end
 
 	key = "vehicle.gearboxMogli"
 	if hasXMLProperty(self.xmlFile, key) then
-		gearboxMogli.initFromXml(self,self.xmlFile,key,"vehicle",true)
+		gearboxMogli.initFromXml(self,self.xmlFile,key,nil,"vehicle",true)
 		return
 	end
 end
@@ -511,7 +511,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:initFromXml
 --**********************************************************************************************************	
-function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,motorConfig) 
+function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAndClient,motorConfig) 
 
 --**************************************************************************************************	
 	if xmlSource == "vehicle" then
@@ -603,25 +603,27 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlSource,serverAndClient,mo
 	local torqueP = 0
 	local realEngineBaseKey = nil
 	
-	for i=1,3 do
-		local key 
-		if     i == 1 then
-			if self.configurations.motor ~= nil then
-				if motorConfig == nil then				
-					key = string.format(xmlString..".engines.engine(%d)", self.configurations.motor-1)
-				elseif motorConfig[self.configurations.motor] ~= nil then
-					key = string.format(xmlString..".engines.engine(%d)", motorConfig[self.configurations.motor]-1)
+	if xmlMotor ~= nil then
+		for i=1,3 do
+			local key 
+			if     i == 1 then
+				if self.configurations.motor ~= nil then
+					if motorConfig == nil then				
+						key = string.format(xmlMotor..".engines.engine(%d)", self.configurations.motor-1)
+					elseif motorConfig[self.configurations.motor] ~= nil then
+						key = string.format(xmlMotor..".engines.engine(%d)", motorConfig[self.configurations.motor]-1)
+					end
 				end
+			elseif i == 2 then
+				key = xmlMotor..".engines.engine(0)"
+			else
+				key = xmlMotor..".realEngine"
 			end
-		elseif i == 2 then
-			key = xmlString..".engines.engine(0)"
-		else
-			key = xmlString..".realEngine"
-		end
-		
-		if key ~= nil and getXMLFloat(xmlFile, key..".torque(0)#rpm") ~= nil then
-			realEngineBaseKey = key
-			break
+			
+			if key ~= nil and getXMLFloat(xmlFile, key..".torque(0)#rpm") ~= nil then
+				realEngineBaseKey = key
+				break
+			end
 		end
 	end
 
@@ -2665,41 +2667,44 @@ function gearboxMogli:update(dt)
 			self.mrGbML.turnedOffByIncreaseRPMWhileTipping = true
 		end
 		processInput = false
-	elseif self.mrGbMS.NoDisable then
+	else
 		self:mrGbMSetIsOnOff( true ) 
-	elseif gearboxMogli.mbIsActiveForInput(self, false) then
-		if     gearboxMogli.mbHasInputEvent( "gearboxMogliSETTINGS" ) then
-			if     self:getIsHired() then
-				gearboxMogli.showSettingsUI( self )
-			elseif not ( self.isMotorStarted ) then
-				gearboxMogli.showSettingsUI( self )
-			elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
-				gearboxMogli.showSettingsUI( self )
-				self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
-				self:stopMotor()
-			else
-				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
-			end
-			processInput = false
-		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
-			if     self:getIsHired() then
-				if self.mrGbMS.IsOnOff then
-					self:mrGbMSetIsOnOff( false ) 
-				else
-					self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while vehicle is hired" )
-				end
-			elseif not ( self.isMotorStarted ) then
-				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-			elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
-				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-				self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
-				self:stopMotor()
-			else
-				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
-			end
-			processInput = false
-		end
 	end
+--elseif self.mrGbMS.NoDisable then
+--	self:mrGbMSetIsOnOff( true ) 
+--elseif gearboxMogli.mbIsActiveForInput(self, false) then
+--	if     gearboxMogli.mbHasInputEvent( "gearboxMogliSETTINGS" ) then
+--		if     self:getIsHired() then
+--			gearboxMogli.showSettingsUI( self )
+--		elseif not ( self.isMotorStarted ) then
+--			gearboxMogli.showSettingsUI( self )
+--		elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+--			gearboxMogli.showSettingsUI( self )
+--			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+--			self:stopMotor()
+--		else
+--			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+--		end
+--		processInput = false
+--	elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
+--		if     self:getIsHired() then
+--			if self.mrGbMS.IsOnOff then
+--				self:mrGbMSetIsOnOff( false ) 
+--			else
+--				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while vehicle is hired" )
+--			end
+--		elseif not ( self.isMotorStarted ) then
+--			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+--		elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+--			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+--			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+--			self:stopMotor()
+--		else
+--			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+--		end
+--		processInput = false
+--	end
+--end
 	
 	if      self.mrGbMS.WarningText ~= nil
 			and self.mrGbMS.WarningText ~= "" then

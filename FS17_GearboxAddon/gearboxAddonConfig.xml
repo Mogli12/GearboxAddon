@@ -51,7 +51,7 @@
 
 	<vehicle>deutzAgroStar661
 		<configFile xmlName="data/vehicles/steerable/deutz/deutzAgroStar661.xml"/>
-
+		
 		<!-- http://www.deutz-traktoren.de/prospekte/download.php?datei=agrostar-prospekt -->
 		<gearboxMogli autoStartStop="false" maxAIRange2="3">
 			<realEngine idleRpm="1000" ratedRpm="2300" >
@@ -721,27 +721,50 @@
 		
 	<vehicle>caseIH1455
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
-
-		<gearboxMogli autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.6">
-			<gears defaultGear="4" shiftTimeMs="800">	
-				<gear speed="3.9"  name="1" />
-				<gear speed="6.2"  name="2" />
-				<gear speed="9.7"  name="3" />
-				<gear speed="14.7" name="4" />
-				<gear speed="23.5" name="5" minRange2="2"/>
-				<gear speed="38.8" name="6" minRange2="2" forwardOnly="true" />
-			</gears>
-			<ranges defaultRange="2" shiftTimeMs="900">
-				<range ratio="0.7825" name="L" forwardOnly="true"/>
-				<range ratio="1.0000" name="H" forwardOnly="true"/>
-				<range ratio="1.3114" name="R" reverseOnly="true"/>
-			</ranges>
-			<ranges defaultRange="2" shiftTimeMs="1400">
-				<range ratio="0.5034" name="A" />
-				<range ratio="1.0000" name=""  />
-			</ranges>
 		
-			<realEngine idleRpm="900" ratedRpm="2200">
+		<transmissions>
+			<transmission name="Torque Converter" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.6">
+				<gears defaultGear="4" shiftTimeMs="800">	
+					<gear speed="3.9"  name="1" />
+					<gear speed="6.2"  name="2" />
+					<gear speed="9.7"  name="3" />
+					<gear speed="14.7" name="4" />
+					<gear speed="23.5" name="5" minRange2="2"/>
+					<gear speed="38.8" name="6" minRange2="2" forwardOnly="true" />
+				</gears>
+				<ranges defaultRange="2" shiftTimeMs="900">
+					<range ratio="0.7825" name="L" forwardOnly="true"/>
+					<range ratio="1.0000" name="H" forwardOnly="true"/>
+					<range ratio="1.3114" name="R" reverseOnly="true"/>
+				</ranges>
+				<ranges defaultRange="2" shiftTimeMs="1400">
+					<range ratio="0.5034" name="A" />
+					<range ratio="1.0000" name=""  />
+				</ranges>
+			</transmission>
+			<transmission name="Standard Clutch" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true">
+				<gears defaultGear="4" shiftTimeMs="800">	
+					<gear speed="3.9"  name="1" />
+					<gear speed="6.2"  name="2" />
+					<gear speed="9.7"  name="3" />
+					<gear speed="14.7" name="4" />
+					<gear speed="23.5" name="5" minRange2="2"/>
+					<gear speed="38.8" name="6" minRange2="2" forwardOnly="true" />
+				</gears>
+				<ranges defaultRange="2" shiftTimeMs="900">
+					<range ratio="0.7825" name="L" forwardOnly="true"/>
+					<range ratio="1.0000" name="H" forwardOnly="true"/>
+					<range ratio="1.3114" name="R" reverseOnly="true"/>
+				</ranges>
+				<ranges defaultRange="2" shiftTimeMs="1400">
+					<range ratio="0.5034" name="A" />
+					<range ratio="1.0000" name=""  />
+				</ranges>
+			</transmission>
+		</transmissions>
+
+		<engines>
+			<engine idleRpm="900" ratedRpm="2200">
 				<!-- 2200: 145(145) | 2200: 145(145) | 1600..1600: 529(529) | 95 | 0 | 249 | 1.8 | 2300 | 1360: 219 -->
 				<torque rpm="350" motorTorque="396" fuelUsageRatio="250.7"/>
 				<torque rpm="700" motorTorque="495" fuelUsageRatio="232.5"/>
@@ -768,8 +791,8 @@
 				<torque rpm="2350" motorTorque="277" fuelUsageRatio="311.9"/>
 				<torque rpm="2400" motorTorque="151" fuelUsageRatio="384"/>
 				<torque rpm="2450" motorTorque="0" fuelUsageRatio="486.7"/>
-			</realEngine>
-		</gearboxMogli>	
+			</engine>
+		</engines>	
 	</vehicle>
 
 	<vehicle>newHollandT5
