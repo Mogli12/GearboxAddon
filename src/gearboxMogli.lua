@@ -156,9 +156,9 @@ gearboxMogliGlobals.DefaultRevUpMs1       = 3000  -- ms
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
-gearboxMogliGlobals.hydroMaxTorqueInput   = 2
-gearboxMogliGlobals.hydroMaxTorqueOutput  = 3
-gearboxMogliGlobals.hydroMaxTorqueDirect  = 4
+gearboxMogliGlobals.hydroMaxTorqueInput   = 0 -- 2
+gearboxMogliGlobals.hydroMaxTorqueOutput  = 0 -- 3
+gearboxMogliGlobals.hydroMaxTorqueDirect  = 0 -- 4
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 gearboxMogliGlobals.momentOfInertiaBase   = 1     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
@@ -7675,7 +7675,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.hydroEff:addKeyframe( { time = ktime+2*gearboxMogli.eps, v = 0 } )
 	end
 	
-	gearboxMogliMotor.copyRuntimeValues( motor, self )
+--gearboxMogliMotor.copyRuntimeValues( motor, self )
 	
 	self.minRpm                  = vehicle.mrGbMS.OrigMinRpm
 	self.maxRpm                  = vehicle.mrGbMS.OrigMaxRpm	
@@ -7822,7 +7822,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor.copyRuntimeValues( motorFrom, motorTo )
 
-	if motorFrom.vehicle ~= nil and not ( motorFrom.vehicle.isMotorStarted ) then
+	if motorFrom.vehicle ~= nil and not ( motorTo.vehicle.isMotorStarted ) then
 		motorTo.nonClampedMotorRpm    = 0
 		motorTo.clutchRpm             = 0
 		motorTo.lastMotorRpm          = 0
@@ -8272,7 +8272,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				or self.vehicle.mrGbMS.BrakeForceRatio <= 0 then
 			brakeForce = 0
 		else
-			if r0 > self.vehicle.mrGbMS.IdleRpm + gearboxMogli.eps then
+			if     self.nonClampedMotorRpm > r0 then
+				brakeForce = self.vehicle.mrGbMS.BrakeForceRatio
+			elseif r0 > self.vehicle.mrGbMS.IdleRpm + gearboxMogli.eps then
 				brakeForce = self.vehicle.mrGbMS.BrakeForceRatio * ( self.nonClampedMotorRpm - self.vehicle.mrGbMS.IdleRpm ) / ( r0 - self.vehicle.mrGbMS.IdleRpm )
 			else
 				brakeForce = self.vehicle.mrGbMS.BrakeForceRatio
