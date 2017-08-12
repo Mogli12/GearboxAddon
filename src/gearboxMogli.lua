@@ -325,12 +325,13 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "HandThrottle",  0 )
 	gearboxMogli.registerState( self, "FixedRatio",    0 )
 	gearboxMogli.registerState( self, "SpeedLimiter",  false )
-	gearboxMogli.registerState( self, "AllAuto",       false, gearboxMogli.mrGbMOnSetAllAuto )
+	gearboxMogli.registerState( self, "AllAuto",       0,     gearboxMogli.mrGbMOnSetAllAuto )
 	gearboxMogli.registerState( self, "EcoMode",       false )
 	gearboxMogli.registerState( self, "HudMode",       self.mrGbMG.defaultHudMode )
 	gearboxMogli.registerState( self, "CurrentGearSpeed", 0 )
 	gearboxMogli.registerState( self, "AutoMinGearSpeed", 0 )
 	gearboxMogli.registerState( self, "AutoMaxGearSpeed", 0 )
+	gearboxMogli.registerState( self, "AutoShiftRequest", 0 )
 	
 	gearboxMogli.registerState( self, "GearShifterMode",    0 )
 	gearboxMogli.registerState( self, "Range1ShifterMode",  0 )
@@ -363,6 +364,7 @@ function gearboxMogli:initClient()
 	self.mrGbMGetRangeNumber       = gearboxMogli.mrGbMGetRangeNumber
 	self.mrGbMGetRange2Number      = gearboxMogli.mrGbMGetRange2Number
 	self.mrGbMGetHasAllAuto        = gearboxMogli.mrGbMGetHasAllAuto
+	self.mrGbMGetHasAllAuto2       = gearboxMogli.mrGbMGetHasAllAuto2
 	self.mrGbMGetAutoHold          = gearboxMogli.mrGbMGetAutoHold
 	self.mrGbMGetOnlyHandThrottle  = gearboxMogli.mrGbMGetOnlyHandThrottle
 	self.mrGbMGetHydrostaticFactor = gearboxMogli.mrGbMGetHydrostaticFactor
@@ -3052,10 +3054,15 @@ function gearboxMogli:update(dt)
 			if not self:mrGbMGetAutomatic() and not ( self.mrGbMS.Hydrostatic ) then
 				text = text .." (M)"
 			end
-		elseif self.mrGbMS.AllAuto then
-			text = gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "all auto" )
-			if not ( self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftRange2 ) then
-				text2 = "A"
+		elseif self.mrGbMS.AllAuto > 0 then
+			if self.mrGbMS.AllAuto == 1 then
+				text = gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "all auto" )
+				if not ( self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftRange2 ) then
+					text2 = "A"
+				end
+			else
+				text = gearboxMogli.getText( "gearboxMogliTEXT_SEMIAUTO", "semi auto" )
+				text2 = "S"
 			end
 			if     isRev then
 			-- see below
@@ -3114,7 +3121,7 @@ function gearboxMogli:update(dt)
 			text = text .. "(eco)"
 			text2 = text2 .. "(eco)"
 		end
-		if      not self.mrGbMS.AllAuto
+		if      self.mrGbMS.AllAuto <= 0
 				and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 )
 				and self.mrGbMS.Automatic < 7
 				and ( 0 < self.mrGbMS.Automatic or not ( self.steeringEnabled ) ) then
@@ -3155,11 +3162,17 @@ function gearboxMogli:update(dt)
 -- inputs	
 --**********************************************************************************************************			
 	if gearboxMogli.mbIsActiveForInput( self, false ) then	
-		if self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
-			self:mrGbMSetState( "AllAuto", false )		
+		if     self.mrGbMS.AllAuto ~= 0 and not ( self:mrGbMGetHasAllAuto() ) then
+			if not ( self:mrGbMGetHasAllAuto2() ) then
+				self:mrGbMSetState( "AllAuto", 0 )
+			elseif self.mrGbMS.AllAuto ~= 2 then
+				self:mrGbMSetState( "AllAuto", 2 )		
+			end
+		elseif self.mrGbMS.AllAuto ~= 0 and self.mrGbMS.AllAuto ~= 1 and not ( self:mrGbMGetHasAllAuto2() ) then
+			self:mrGbMSetState( "AllAuto", 0 )
 		end
 
-		if self.mrGbMS.AllAuto then
+		if self.mrGbMS.AllAuto > 0 then
 			self:mrGbMSetState( "Handbrake", false )		
 		end
 		
@@ -3181,7 +3194,7 @@ function gearboxMogli:update(dt)
 			end
 		end
 
-		if not self.mrGbMS.AllAuto then
+		if self.mrGbMS.AllAuto <= 0 then
 			local autoClutch = self.mrGbMS.AutoClutch
 			if gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOCLUTCH2" ) then
 				autoClutch = not ( autoClutch )
@@ -3288,7 +3301,15 @@ function gearboxMogli:update(dt)
 		keyShiftRange2Down   = "gearboxMogliSHIFTRANGE2DOWN"
 		keyShiftRange2Toggle = "gearboxMogliSHIFTRANGE2TOGGLE"
 		
-		if self.mrGbMS.SwapGearRangeKeys then
+		if self.mrGbMS.AllAuto > 0 then
+			keyShiftGearToggle   = ""
+			keyShiftRangeUp      = ""
+			keyShiftRangeDown    = ""
+			keyShiftRangeToggle  = ""
+			keyShiftRange2Up     = ""
+			keyShiftRange2Down   = ""
+			keyShiftRange2Toggle = ""
+		elseif self.mrGbMS.SwapGearRangeKeys then
 			keyShiftGearUp, 
 			keyShiftGearDown,   
 			keyShiftGearToggle, 
@@ -3340,10 +3361,17 @@ function gearboxMogli:update(dt)
 				m = 1
 			end
 			self:mrGbMSetState( "HudMode", m )
-		elseif  gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" )
-				and self:mrGbMGetHasAllAuto() then
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" ) then
 			-- toggle always AI => has to work with worker too
-			self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
+			if self.mrGbMS.AllAuto >= 2 then
+				self:mrGbMSetState( "AllAuto", 0 )
+			elseif self.mrGbMS.AllAuto <= 0 and self:mrGbMGetHasAllAuto() then
+				self:mrGbMSetState( "AllAuto", 1 )
+			elseif not ( self:mrGbMGetHasAllAuto2() ) then
+				self:mrGbMSetState( "AllAuto", 0 )
+			else
+				self:mrGbMSetState( "AllAuto", 2 )
+			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKMIDDLE" ) then
 			if self.mrGbMS.ModifyDifferentials then
 				self:mrGbMSetState( "DiffLockMiddle", not self.mrGbMS.DiffLockMiddle )
@@ -3357,7 +3385,7 @@ function gearboxMogli:update(dt)
 				self:mrGbMSetState( "DiffLockBack", not self.mrGbMS.DiffLockBack )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOMATIC" ) then
-			if not self.mrGbMS.AllAuto and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
+			if self.mrGbMS.AllAuto <= 0 and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
 				if      self.mrGbMS.Automatic >= 7 then				
 					self:mrGbMSetAutomatic( 0 ) 
 				elseif  self.mrGbMS.AutoShiftGears
@@ -3471,15 +3499,23 @@ function gearboxMogli:update(dt)
 		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRange2Down ) then -- high/low range shift
 			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2-1)
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeUp ) then -- high/low range shift
-			self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true)                                        
+			self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true)   
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeDown ) then -- high/low range shift
 			self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1, false, true) 
 		elseif not ( self.mrGbMS.DisableManual ) and gearboxMogli.mbHasInputEvent( keyShiftGearUp ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
-			self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) 
+			if self.mrGbMS.AllAuto > 0 or self:mrGbMGetAutoShiftGears() then
+				self:mrGbMSetState( "AutoShiftRequest", 1 ) 
+			else
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) 
+			end
 		elseif not ( self.mrGbMS.DisableManual ) and gearboxMogli.mbHasInputEvent( keyShiftGearDown ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
-			self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) 	
+			if self.mrGbMS.AllAuto > 0 or self:mrGbMGetAutoShiftGears() then
+				self:mrGbMSetState( "AutoShiftRequest", -1 ) 
+			else
+				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) 	
+			end
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 2 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliGEARFWD" )  then 
 		--self:setCruiseControlState(0) 
 			self:mrGbMSetReverseActive( false ) 
@@ -3985,7 +4021,7 @@ function gearboxMogli:updateTick(dt)
 				self:mrGbMSetAutomatic( 7 ) 
 			end
 	
-			if not self.mrGbMS.AllAuto and self:mrGbMGetAutomatic() and not ( self.mrGbMS.HydrostaticLaunch ) then
+			if self.mrGbMS.AllAuto <= 0 and self:mrGbMGetAutomatic() and not ( self.mrGbMS.HydrostaticLaunch ) then
 				if self:mrGbMGetAutoShiftGears() and self.mrGbMS.ManualClutchGear then
 					self:mrGbMSetAutoClutch( true ) 
 				end
@@ -4275,7 +4311,7 @@ function gearboxMogli:draw()
 			elseif  self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0
 					and self.mrGbMS.RatedRpm > 1 then
 				ovRows = ovRows + 1 infos[ovRows] = "target1"		
-			elseif self.mrGbMS.AllAuto or not self:mrGbMGetAutomatic() then
+			elseif self.mrGbMS.AllAuto > 0 or not self:mrGbMGetAutomatic() then
 				ovRows = ovRows + 1 infos[ovRows] = "speed"
 			else
 				ovRows = ovRows + 1 infos[ovRows] = "speed" --"speed2"
@@ -4539,15 +4575,15 @@ function gearboxMogli:draw()
 			drawY = drawY + 0.25*deltaY
 			renderText(ovRight, drawY, 0.5*deltaY, gearboxMogli.getText( "gearboxMogliVERSION", "Gearbox by mogli" ) )  		          
 
-			if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
-				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
-			end
+		--if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
+		--	g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
+		--end
 
 			if InputBinding.gearboxMogliAllAuto ~= nil then
-				if self.mrGbMS.AllAuto then
+				if self.mrGbMS.AllAuto > 0 then
 					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
-				elseif self:mrGbMGetHasAllAuto() and self.steeringEnabled then
-					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),  InputBinding.gearboxMogliAllAuto)		
+				elseif self.steeringEnabled and ( self:mrGbMGetHasAllAuto() or self:mrGbMGetHasAllAuto() ) then
+					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),InputBinding.gearboxMogliAllAuto)		
 				end
 			end
 			
@@ -4706,13 +4742,24 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedAcc"      , "accelerateToLimit" )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
-		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto"       , "AllAuto"           )
+	--gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto"       , "AllAuto"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMIsOnOff"       , "IsOnOff"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMEcoMode"       , "EcoMode"           )
 
 		local i = getXMLInt( xmlFile, key .. "#mrGbMAutomatic" )
 		if i ~= nil then
 			self:mrGbMSetAutomatic( i, true ) 
+		end
+		
+		local s = getXMLString( xmlFile, key .. "#mrGbMAllAuto" )
+		if s == nl then
+			self.mrGbMS.AllAuto = 0
+		elseif s == "true" or s == "1" then
+			self.mrGbMS.AllAuto = 1
+		elseif s == "2" then
+			self.mrGbMS.AllAuto = 2
+		else
+			self.mrGbMS.AllAuto = 0
 		end
 
 		local lg, lr, l2
@@ -4852,7 +4899,7 @@ end
 -- gearboxMogli:mrGbMCheckGrindingGears
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMCheckShiftOnlyIfStopped( onlyStopped, noEventSend )
-	if self.steeringEnabled and onlyStopped and not ( self.mrGbMS.AllAuto ) then
+	if self.steeringEnabled and onlyStopped and self.mrGbMS.AllAuto <= 0 then
 		local s = math.abs( self.lastSpeedReal*3600 )
 		if s > 1 then
 			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear speed > %3.0fkm/h", s ), noEventSend )
@@ -5828,10 +5875,54 @@ function gearboxMogli:mrGbMGetHasAllAuto()
 end
 
 --**********************************************************************************************************	
+-- gearboxMogli:mrGbMGetHasAllAuto2
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMGetHasAllAuto2()
+
+	if self.mrGbMS.Hydrostatic then
+		return false 
+	end
+	
+	local cf, cr = 0, 0
+	
+	for _,g in pairs(self.mrGbMS.Gears) do
+		if g.forwardOnly then
+			cf = cf + 1
+		elseif g.reverseOnly then
+			cr = cr + 1
+		else
+			cf = cf + 1
+			cr = cr + 1 
+		end
+	end
+	if cf <= 1 and cr <= 1 then
+		return false 
+	end
+	
+	cf = 0
+	cr = 0	
+	for _,r in pairs(self.mrGbMS.Ranges) do
+		if r.forwardOnly then
+			cf = cf + 1
+		elseif r.reverseOnly then
+			cr = cr + 1
+		else
+			cf = cf + 1
+			cr = cr + 1 
+		end
+	end
+	if cf <= 1 and cr <= 1 then
+		return false 
+	end
+		
+	return true
+end
+
+--**********************************************************************************************************	
 -- gearboxMogli:mrGbMGetAutoStartStop
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoStartStop()
-	return self.mrGbMS.AllAuto or self.mrGbMS.AutoStartStop or self.mrGbMG.autoStartStop or not ( self.steeringEnabled )
+	return self.mrGbMS.AllAuto > 0 or self.mrGbMS.AutoStartStop or self.mrGbMG.autoStartStop or not ( self.steeringEnabled )
 end
 
 --**********************************************************************************************************	
@@ -5854,7 +5945,7 @@ function gearboxMogli:mrGbMGetAutoShiftGears()
 		return false
 	elseif  self.mrGbMS.GearsOnlyStopped then
 		return false
-	elseif  self.mrGbMS.AllAuto then
+	elseif  self.mrGbMS.AllAuto > 0 then
 		return true
 	elseif  self.mrGbMS.AutoShiftGears
 			and gearboxMogli.getBit3( self.mrGbMS.Automatic, 1 ) > 0 then
@@ -5893,7 +5984,7 @@ function gearboxMogli:mrGbMGetAutoShiftRange()
 		return false
 	elseif  self.mrGbMS.Range1OnlyStopped then
 		return false
-	elseif  self.mrGbMS.AllAuto then
+	elseif  self.mrGbMS.AllAuto > 0 then
 		return true
 	elseif  self.mrGbMS.AutoShiftHl
 			and gearboxMogli.getBit3( self.mrGbMS.Automatic, 2 ) > 0 then
@@ -5932,7 +6023,7 @@ function gearboxMogli:mrGbMGetAutoShiftRange2()
 		return false
 	elseif  self.mrGbMS.Range2OnlyStopped then
 		return false
-	elseif  self.mrGbMS.AllAuto then
+	elseif  self.mrGbMS.AllAuto > 0 then
 		return true
 	elseif  self.mrGbMS.AutoShiftRange2 
 			and gearboxMogli.getBit3( self.mrGbMS.Automatic, 3 ) > 0 then
@@ -5957,7 +6048,7 @@ end
 -- gearboxMogli:mrGbMGetAutoClutch
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoClutch()
-	return self.mrGbMS.AllAuto 
+	return self.mrGbMS.AllAuto > 0 
 			or self.mrGbMS.AutoClutch 
 			or not ( self.steeringEnabled ) 
 			or ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch )
@@ -5967,7 +6058,7 @@ end
 -- gearboxMogli:mrGbMGetIsOn
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutomatic()
-	if      self.mrGbMS.AllAuto then
+	if      self.mrGbMS.AllAuto > 0 then
 		return true
 	elseif  self.mrGbMS.Automatic > 0
 			and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
@@ -5996,6 +6087,8 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 	--			tostring(self.mrGbMS.ReverseActive)..", "..
 	--			tostring(self.mrGbMS.NeutralActive))
 	
+		self:mrGbMSetState( "AutoShiftRequest", 0 ) 		
+		
 		if self.mrGbML.motor ~= nil then
 			self.mrGbML.beforeShiftRpm = self.motor.lastRealMotorRpm 
 			if gearboxMogli.debugGearShift then
@@ -6071,7 +6164,6 @@ function gearboxMogli:mrGbMDoGearShift()
 	--			tostring(self.mrGbMS.ReverseActive)..", "..
 	--			tostring(self.mrGbMS.NeutralActive))
 	
-		
 		if     self.mrGbMS               == nil
 				or self.mrGbMS.Gears         == nil
 				or self.mrGbMS.CurrentGear   == nil
@@ -6195,7 +6287,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetAutomatic( old, new, noEventSend )
 	
-	if self.mrGbMS.AllAuto then
+	if self.mrGbMS.AllAuto > 0 then
 	elseif not ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
 		self.mrGbMS.Automatic = 7
 	elseif type( new ) ~= "number" then
@@ -6418,7 +6510,7 @@ end
 function gearboxMogli:mrGbMGetOnlyHandThrottle( )
 	if not ( self.steeringEnabled ) then
 		return false
-	elseif self.mrGbMS.AllAuto then
+	elseif self.mrGbMS.AllAuto > 0 then
 		return false 
 	end
 	return self.mrGbMS.OnlyHandThrottle 
@@ -7064,7 +7156,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	if     not ( self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 ) 
 			or not self.steeringEnabled
 			or self.mrGbMS.CruiseControlBrake
-			or self.mrGbMS.AllAuto
+			or self.mrGbMS.AllAuto > 0
 			or gearboxMogli.speedLimitMode == "M" then
 		self.motor.limitMaxRpm = true
 	elseif gearboxMogli.speedLimitMode == "T" then
@@ -8962,7 +9054,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 		handThrottleRpm     = self:getThrottleMaxRpm( handThrottle )
 		self.minRequiredRpm = math.max( self.minRequiredRpm, handThrottleRpm )
 	end
-	if self.vehicle.mrGbMS.AllAuto then
+	if self.vehicle.mrGbMS.AllAuto > 0 then
 		handThrottle = -1
 	end
 	
@@ -9970,7 +10062,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	--**********************************************************************************************************		
 	-- automatic shifting			
 	--**********************************************************************************************************		
-			elseif self.vehicle:mrGbMGetAutomatic() then		
+			elseif  self.vehicle:mrGbMGetAutomatic() 
+					and not ( self.vehicle.steeringEnabled 
+								and self.vehicle.mrGbMS.AllAuto          == 2
+								and self.vehicle.mrGbMS.AutoShiftRequest == 0 ) then		
 				local maxAutoRpm   = self.vehicle.mrGbMS.CurMaxRpm - math.min( 50, 0.5 * ( self.vehicle.mrGbMS.CurMaxRpm - self.vehicle.mrGbMS.RatedRpm ) )
 				local halfOverheat = 0.5 * self.vehicle.mrGbMS.ClutchOverheatStartTime										
 				local gearMaxSpeed = self.vehicle.mrGbMS.GlobalRatioFactor
@@ -10289,11 +10384,19 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 				elseif  self.vehicle.cruiseControl.state > 0 
 						and self.vehicle.mrGbMS.CurrentGearSpeed * downRpm / self.vehicle.mrGbMS.RatedRpm > currentSpeedLimit then
 					-- allow down shift after short timeout
-				elseif self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
+				elseif self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps then
 					downTimerMode = 2
 				elseif self.vehicle.mrGbML.lastGearSpeed > self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
 					upTimerMode   = 2
 				end		
+				
+				if     self.vehicle.mrGbMS.AutoShiftRequest > 0 then
+					downTimerMode = 2
+					upTimeMode    = 0
+				elseif self.vehicle.mrGbMS.AutoShiftRequest < 0 then
+					downTimerMode = 0
+					upTimeMode    = 2
+				end
 				
 				local sMin = nil
 				local sMax = nil
@@ -10342,24 +10445,35 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 						-- the current gear is better than the new one
 						p.priority = math.max( p.priority, 9 )
 					end
+
+					if     self.vehicle.mrGbMS.AutoShiftRequest > 0 then
+						if p.gearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
+							isValidEntry = false 
+						end
+					elseif self.vehicle.mrGbMS.AutoShiftRequest < 0 then
+						if p.gearSpeed > self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps then
+							isValidEntry = false 
+						end
+					else
 					
-					if      self.vehicle.mrGbML.DirectionChangeTime ~= nil
-							and g_currentMission.time  < self.vehicle.mrGbML.DirectionChangeTime + self.vehicle.mrGbMG.autoShiftTimeoutLong
-							and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
-							and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed then
-						isValidEntry = false
-						dumpIt = dumpIt .. string.format("\n%d is not valid (a)",i)
-					end
-					
-					-- no down shift if just idling  
-					if      accelerationPedal      <  gearboxMogli.accDeadZone
-							and downTimerMode          > 0
-							and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
-							and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed
-							and self.stallWarningTimer == nil 
-							then
-						isValidEntry = false
-						dumpIt = dumpIt .. string.format("\n%d is not valid (b)",i)
+						if      self.vehicle.mrGbML.DirectionChangeTime ~= nil
+								and g_currentMission.time  < self.vehicle.mrGbML.DirectionChangeTime + self.vehicle.mrGbMG.autoShiftTimeoutLong
+								and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
+								and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed then
+							isValidEntry = false
+							dumpIt = dumpIt .. string.format("\n%d is not valid (a)",i)
+						end
+						
+						-- no down shift if just idling  
+						if      accelerationPedal      <  gearboxMogli.accDeadZone
+								and downTimerMode          > 0
+								and p.gearSpeed            < self.vehicle.mrGbMS.LaunchGearSpeed - gearboxMogli.eps 
+								and p.gearSpeed            < self.vehicle.mrGbMS.CurrentGearSpeed
+								and self.stallWarningTimer == nil 
+								then
+							isValidEntry = false
+							dumpIt = dumpIt .. string.format("\n%d is not valid (b)",i)
+						end
 					end
 						
 					if p.gearSpeed < self.vehicle.mrGbMG.minAutoGearSpeed then

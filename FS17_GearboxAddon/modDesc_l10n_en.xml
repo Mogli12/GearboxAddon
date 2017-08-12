@@ -71,6 +71,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_NOGEAR"     text="no gear"/>
 		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="simple"/>
+		<text name="gearboxMogliTEXT_SEMIAUTO"   text="sequential"/>
 		<text name="gearboxMogliTEXT_ECO"        text="eco"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="auto hold"/>
 	</texts>

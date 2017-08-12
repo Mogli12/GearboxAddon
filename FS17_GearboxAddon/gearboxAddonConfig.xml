@@ -939,108 +939,122 @@
 	<vehicle>valtraNSeries
 		<configFile xmlName="data/vehicles/steerable/valtra/valtraNSeries.xml"/>
 		
-		<gearboxMogli maxForwardSpeed="53" maxBackwardSpeed="53" swapGearRangeKeys="true">
-			<blowOffVentilSound volume="0.5"/>
+		<transmissions>
+			<transmission name="Versu" maxForwardSpeed="53" maxBackwardSpeed="53" swapGearRangeKeys="true">
+				<blowOffVentilSound volume="0.5"/>
+				
+				<gears automatic="true" shiftTimeMs="0" clutchRatio="1">
+					<gear speed="25.01"/>
+					<gear speed="31.32"/>
+					<gear speed="37.63"/>
+					<gear speed="47.11"/>
+					<gear speed="56.60"/>
+				</gears>
+				
+				<ranges shiftTimeMs="500">
+					<range ratio="0.15" name="A"/>
+					<range ratio="0.33" name="B"/>
+					<range ratio="0.50" name="C" minRange2="2"/>
+					<range ratio="1"    name="D" minRange2="2"/>
+				</ranges>
+				
+				<ranges defaultRange="2">
+					<range ratio="0.2" name="LL" maxRange="2" />
+					<range ratio="1"   name="" />
+				</ranges>
+				
+				<reverse ratio="1.05413"/>
+			</transmission>
 			
-			<gears automatic="true" shiftTimeMs="0" clutchRatio="1">
-				<gear speed="25.01"/>
-				<gear speed="31.32"/>
-				<gear speed="37.63"/>
-				<gear speed="47.11"/>
-				<gear speed="56.60"/>
-			</gears>
-			
-			<ranges shiftTimeMs="500">
-				<range ratio="0.15" name="A"/>
-				<range ratio="0.33" name="B"/>
-				<range ratio="0.50" name="C" minRange2="2"/>
-				<range ratio="1"    name="D" minRange2="2"/>
-			</ranges>
-			
-			<ranges defaultRange="2">
-				<range ratio="0.2" name="LL" maxRange="2" />
-				<range ratio="1"   name="" />
-			</ranges>
-			
-			<reverse ratio="1.05413"/>
+			<transmission name="Direct" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
+				<hydrostatic profile="Input" correctGearSpeed="true"/>
+				<gears automatic="false" defaultGear="3" shiftTimeMs="500">
+					<gear speed="9"  name="A"/>
+					<gear speed="18" name="B"/>
+					<gear speed="25" name="C"/>
+					<gear speed="50" name="D"/> 
+				</gears>
+				
+				<reverse ratio="1.05413"/>
+			</transmission>
+		</transmissions>
 
-			<engines>
-				<engine name="N134" idleRpm="800" ratedRpm="2100">
-					<!-- 2100: 145(135) | 2100: 145(135) | 1500..1500: 620(570) | 90 | 0.8 | 149 | 2.5 | 2200 | 1320: 210 -->
-					<torque rpm="350" motorTorque="413" motorTorqueEco="379" fuelUsageRatio="242.5"/>
-					<torque rpm="700" motorTorque="540" motorTorqueEco="497" fuelUsageRatio="223.3"/>
-					<torque rpm="900" motorTorque="574" motorTorqueEco="528" fuelUsageRatio="216.1"/>
-					<torque rpm="1000" motorTorque="588" motorTorqueEco="541" fuelUsageRatio="213.5"/>
-					<torque rpm="1100" motorTorque="600" motorTorqueEco="551" fuelUsageRatio="211.7"/>
-					<torque rpm="1200" motorTorque="609" motorTorqueEco="560" fuelUsageRatio="210.5"/>
-					<torque rpm="1300" motorTorque="615" motorTorqueEco="565" fuelUsageRatio="210"/>
-					<torque rpm="1400" motorTorque="619" motorTorqueEco="569" fuelUsageRatio="210.2"/>
-					<torque rpm="1500" motorTorque="620" motorTorqueEco="570" fuelUsageRatio="211.2"/>
-					<torque rpm="1600" motorTorque="601" motorTorqueEco="554" fuelUsageRatio="213"/>
-					<torque rpm="1700" motorTorque="581" motorTorqueEco="536" fuelUsageRatio="215.5"/>
-					<torque rpm="1800" motorTorque="559" motorTorqueEco="517" fuelUsageRatio="218.8"/>
-					<torque rpm="1850" motorTorque="548" motorTorqueEco="507" fuelUsageRatio="220.8"/>
-					<torque rpm="1900" motorTorque="535" motorTorqueEco="496" fuelUsageRatio="222.9"/>
-					<torque rpm="1950" motorTorque="521" motorTorqueEco="485" fuelUsageRatio="225.2"/>
-					<torque rpm="2000" motorTorque="509" motorTorqueEco="474" fuelUsageRatio="227.7"/>
-					<torque rpm="2050" motorTorque="496" motorTorqueEco="462" fuelUsageRatio="230.4"/>
-					<torque rpm="2100" motorTorque="485" motorTorqueEco="451" fuelUsageRatio="233.3"/>
-					<torque rpm="2150" motorTorque="453" motorTorqueEco="422" fuelUsageRatio="248.6"/>
-					<torque rpm="2200" motorTorque="306" motorTorqueEco="285" fuelUsageRatio="319.4"/>
-					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
-				</engine>
-				
-				<engine name="N154e" idleRpm="800" ratedRpm="2100">
-					<!-- 1900: 165(155) | 2100: 165(155) | 1250..1250: 700(660) | 90 | 0.4 | 149 | 2.5 | 2200 | 1250: 200 -->
-					<torque rpm="350" motorTorque="426" motorTorqueEco="402" fuelUsageRatio="235.6"/>
-					<torque rpm="700" motorTorque="599" motorTorqueEco="564" fuelUsageRatio="213.3"/>
-					<torque rpm="900" motorTorque="658" motorTorqueEco="620" fuelUsageRatio="205.4"/>
-					<torque rpm="1000" motorTorque="678" motorTorqueEco="640" fuelUsageRatio="202.7"/>
-					<torque rpm="1100" motorTorque="692" motorTorqueEco="653" fuelUsageRatio="201"/>
-					<torque rpm="1200" motorTorque="699" motorTorqueEco="659" fuelUsageRatio="200.1"/>
-					<torque rpm="1300" motorTorque="697" motorTorqueEco="657" fuelUsageRatio="200.1"/>
-					<torque rpm="1400" motorTorque="689" motorTorqueEco="649" fuelUsageRatio="200.7"/>
-					<torque rpm="1500" motorTorque="678" motorTorqueEco="639" fuelUsageRatio="201.9"/>
-					<torque rpm="1600" motorTorque="665" motorTorqueEco="626" fuelUsageRatio="203.8"/>
-					<torque rpm="1700" motorTorque="649" motorTorqueEco="611" fuelUsageRatio="206.2"/>
-					<torque rpm="1800" motorTorque="631" motorTorqueEco="593" fuelUsageRatio="209.3"/>
-					<torque rpm="1850" motorTorque="621" motorTorqueEco="584" fuelUsageRatio="211.1"/>
-					<torque rpm="1900" motorTorque="610" motorTorqueEco="573" fuelUsageRatio="213"/>
-					<torque rpm="1950" motorTorque="594" motorTorqueEco="559" fuelUsageRatio="215.1"/>
-					<torque rpm="2000" motorTorque="579" motorTorqueEco="545" fuelUsageRatio="217.3"/>
-					<torque rpm="2050" motorTorque="565" motorTorqueEco="531" fuelUsageRatio="219.7"/>
-					<torque rpm="2100" motorTorque="552" motorTorqueEco="518" fuelUsageRatio="222.2"/>
-					<torque rpm="2150" motorTorque="516" motorTorqueEco="484" fuelUsageRatio="236.7"/>
-					<torque rpm="2200" motorTorque="348" motorTorqueEco="327" fuelUsageRatio="304.2"/>
-					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
-				</engine>
-				
-				<engine name="N174" idleRpm="800" ratedRpm="2100">
-					<!-- 2100: 185(165) | 2100: 185(165) | 1500..1500: 730(680) | 90 | 0.4 | 149 | 2.5 | 2200 | 1320: 210 -->
-					<torque rpm="350" motorTorque="486" motorTorqueEco="453" fuelUsageRatio="242.5"/>
-					<torque rpm="700" motorTorque="636" motorTorqueEco="593" fuelUsageRatio="223.3"/>
-					<torque rpm="900" motorTorque="676" motorTorqueEco="630" fuelUsageRatio="216.1"/>
-					<torque rpm="1000" motorTorque="693" motorTorqueEco="645" fuelUsageRatio="213.5"/>
-					<torque rpm="1100" motorTorque="706" motorTorqueEco="658" fuelUsageRatio="211.7"/>
-					<torque rpm="1200" motorTorque="717" motorTorqueEco="668" fuelUsageRatio="210.5"/>
-					<torque rpm="1300" motorTorque="724" motorTorqueEco="674" fuelUsageRatio="210"/>
-					<torque rpm="1400" motorTorque="729" motorTorqueEco="679" fuelUsageRatio="210.2"/>
-					<torque rpm="1500" motorTorque="730" motorTorqueEco="680" fuelUsageRatio="211.2"/>
-					<torque rpm="1600" motorTorque="721" motorTorqueEco="669" fuelUsageRatio="213"/>
-					<torque rpm="1700" motorTorque="708" motorTorqueEco="654" fuelUsageRatio="215.5"/>
-					<torque rpm="1800" motorTorque="691" motorTorqueEco="635" fuelUsageRatio="218.8"/>
-					<torque rpm="1850" motorTorque="681" motorTorqueEco="624" fuelUsageRatio="220.8"/>
-					<torque rpm="1900" motorTorque="671" motorTorqueEco="609" fuelUsageRatio="222.9"/>
-					<torque rpm="1950" motorTorque="659" motorTorqueEco="593" fuelUsageRatio="225.2"/>
-					<torque rpm="2000" motorTorque="646" motorTorqueEco="579" fuelUsageRatio="227.7"/>
-					<torque rpm="2050" motorTorque="633" motorTorqueEco="565" fuelUsageRatio="230.4"/>
-					<torque rpm="2100" motorTorque="619" motorTorqueEco="552" fuelUsageRatio="233.3"/>
-					<torque rpm="2150" motorTorque="578" motorTorqueEco="516" fuelUsageRatio="248.6"/>
-					<torque rpm="2200" motorTorque="390" motorTorqueEco="348" fuelUsageRatio="319.4"/>
-					<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
-				</engine>
-			</engines>
-		</gearboxMogli>
+		<engines>
+			<engine name="N134" idleRpm="800" ratedRpm="2100">
+				<!-- 2100: 145(135) | 2100: 145(135) | 1500..1500: 620(570) | 90 | 0.8 | 149 | 2.5 | 2200 | 1320: 210 -->
+				<torque rpm="350" motorTorque="413" motorTorqueEco="379" fuelUsageRatio="242.5"/>
+				<torque rpm="700" motorTorque="540" motorTorqueEco="497" fuelUsageRatio="223.3"/>
+				<torque rpm="900" motorTorque="574" motorTorqueEco="528" fuelUsageRatio="216.1"/>
+				<torque rpm="1000" motorTorque="588" motorTorqueEco="541" fuelUsageRatio="213.5"/>
+				<torque rpm="1100" motorTorque="600" motorTorqueEco="551" fuelUsageRatio="211.7"/>
+				<torque rpm="1200" motorTorque="609" motorTorqueEco="560" fuelUsageRatio="210.5"/>
+				<torque rpm="1300" motorTorque="615" motorTorqueEco="565" fuelUsageRatio="210"/>
+				<torque rpm="1400" motorTorque="619" motorTorqueEco="569" fuelUsageRatio="210.2"/>
+				<torque rpm="1500" motorTorque="620" motorTorqueEco="570" fuelUsageRatio="211.2"/>
+				<torque rpm="1600" motorTorque="601" motorTorqueEco="554" fuelUsageRatio="213"/>
+				<torque rpm="1700" motorTorque="581" motorTorqueEco="536" fuelUsageRatio="215.5"/>
+				<torque rpm="1800" motorTorque="559" motorTorqueEco="517" fuelUsageRatio="218.8"/>
+				<torque rpm="1850" motorTorque="548" motorTorqueEco="507" fuelUsageRatio="220.8"/>
+				<torque rpm="1900" motorTorque="535" motorTorqueEco="496" fuelUsageRatio="222.9"/>
+				<torque rpm="1950" motorTorque="521" motorTorqueEco="485" fuelUsageRatio="225.2"/>
+				<torque rpm="2000" motorTorque="509" motorTorqueEco="474" fuelUsageRatio="227.7"/>
+				<torque rpm="2050" motorTorque="496" motorTorqueEco="462" fuelUsageRatio="230.4"/>
+				<torque rpm="2100" motorTorque="485" motorTorqueEco="451" fuelUsageRatio="233.3"/>
+				<torque rpm="2150" motorTorque="453" motorTorqueEco="422" fuelUsageRatio="248.6"/>
+				<torque rpm="2200" motorTorque="306" motorTorqueEco="285" fuelUsageRatio="319.4"/>
+				<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</engine>
+			
+			<engine name="N154e" idleRpm="800" ratedRpm="2100">
+				<!-- 1900: 165(155) | 2100: 165(155) | 1250..1250: 700(660) | 90 | 0.4 | 149 | 2.5 | 2200 | 1250: 200 -->
+				<torque rpm="350" motorTorque="426" motorTorqueEco="402" fuelUsageRatio="235.6"/>
+				<torque rpm="700" motorTorque="599" motorTorqueEco="564" fuelUsageRatio="213.3"/>
+				<torque rpm="900" motorTorque="658" motorTorqueEco="620" fuelUsageRatio="205.4"/>
+				<torque rpm="1000" motorTorque="678" motorTorqueEco="640" fuelUsageRatio="202.7"/>
+				<torque rpm="1100" motorTorque="692" motorTorqueEco="653" fuelUsageRatio="201"/>
+				<torque rpm="1200" motorTorque="699" motorTorqueEco="659" fuelUsageRatio="200.1"/>
+				<torque rpm="1300" motorTorque="697" motorTorqueEco="657" fuelUsageRatio="200.1"/>
+				<torque rpm="1400" motorTorque="689" motorTorqueEco="649" fuelUsageRatio="200.7"/>
+				<torque rpm="1500" motorTorque="678" motorTorqueEco="639" fuelUsageRatio="201.9"/>
+				<torque rpm="1600" motorTorque="665" motorTorqueEco="626" fuelUsageRatio="203.8"/>
+				<torque rpm="1700" motorTorque="649" motorTorqueEco="611" fuelUsageRatio="206.2"/>
+				<torque rpm="1800" motorTorque="631" motorTorqueEco="593" fuelUsageRatio="209.3"/>
+				<torque rpm="1850" motorTorque="621" motorTorqueEco="584" fuelUsageRatio="211.1"/>
+				<torque rpm="1900" motorTorque="610" motorTorqueEco="573" fuelUsageRatio="213"/>
+				<torque rpm="1950" motorTorque="594" motorTorqueEco="559" fuelUsageRatio="215.1"/>
+				<torque rpm="2000" motorTorque="579" motorTorqueEco="545" fuelUsageRatio="217.3"/>
+				<torque rpm="2050" motorTorque="565" motorTorqueEco="531" fuelUsageRatio="219.7"/>
+				<torque rpm="2100" motorTorque="552" motorTorqueEco="518" fuelUsageRatio="222.2"/>
+				<torque rpm="2150" motorTorque="516" motorTorqueEco="484" fuelUsageRatio="236.7"/>
+				<torque rpm="2200" motorTorque="348" motorTorqueEco="327" fuelUsageRatio="304.2"/>
+				<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="444.4"/>
+			</engine>
+			
+			<engine name="N174" idleRpm="800" ratedRpm="2100">
+				<!-- 2100: 185(165) | 2100: 185(165) | 1500..1500: 730(680) | 90 | 0.4 | 149 | 2.5 | 2200 | 1320: 210 -->
+				<torque rpm="350" motorTorque="486" motorTorqueEco="453" fuelUsageRatio="242.5"/>
+				<torque rpm="700" motorTorque="636" motorTorqueEco="593" fuelUsageRatio="223.3"/>
+				<torque rpm="900" motorTorque="676" motorTorqueEco="630" fuelUsageRatio="216.1"/>
+				<torque rpm="1000" motorTorque="693" motorTorqueEco="645" fuelUsageRatio="213.5"/>
+				<torque rpm="1100" motorTorque="706" motorTorqueEco="658" fuelUsageRatio="211.7"/>
+				<torque rpm="1200" motorTorque="717" motorTorqueEco="668" fuelUsageRatio="210.5"/>
+				<torque rpm="1300" motorTorque="724" motorTorqueEco="674" fuelUsageRatio="210"/>
+				<torque rpm="1400" motorTorque="729" motorTorqueEco="679" fuelUsageRatio="210.2"/>
+				<torque rpm="1500" motorTorque="730" motorTorqueEco="680" fuelUsageRatio="211.2"/>
+				<torque rpm="1600" motorTorque="721" motorTorqueEco="669" fuelUsageRatio="213"/>
+				<torque rpm="1700" motorTorque="708" motorTorqueEco="654" fuelUsageRatio="215.5"/>
+				<torque rpm="1800" motorTorque="691" motorTorqueEco="635" fuelUsageRatio="218.8"/>
+				<torque rpm="1850" motorTorque="681" motorTorqueEco="624" fuelUsageRatio="220.8"/>
+				<torque rpm="1900" motorTorque="671" motorTorqueEco="609" fuelUsageRatio="222.9"/>
+				<torque rpm="1950" motorTorque="659" motorTorqueEco="593" fuelUsageRatio="225.2"/>
+				<torque rpm="2000" motorTorque="646" motorTorqueEco="579" fuelUsageRatio="227.7"/>
+				<torque rpm="2050" motorTorque="633" motorTorqueEco="565" fuelUsageRatio="230.4"/>
+				<torque rpm="2100" motorTorque="619" motorTorqueEco="552" fuelUsageRatio="233.3"/>
+				<torque rpm="2150" motorTorque="578" motorTorqueEco="516" fuelUsageRatio="248.6"/>
+				<torque rpm="2200" motorTorque="390" motorTorqueEco="348" fuelUsageRatio="319.4"/>
+				<torque rpm="2250" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</engine>
+		</engines>
 	</vehicle>
 	
 	<vehicle>valtraTSeries

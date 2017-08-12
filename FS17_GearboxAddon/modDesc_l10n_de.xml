@@ -71,6 +71,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_NOGEAR"     text="Kein Gang"/>
 		<text name="gearboxMogliTEXT_VARIO"      text="Stufenlos"/>
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="Vereinfacht"/>
+		<text name="gearboxMogliTEXT_SEMIAUTO"   text="Halbautom."/>
 		<text name="gearboxMogliTEXT_ECO"        text="Eco"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Auto Hold"/>
 	</texts>
