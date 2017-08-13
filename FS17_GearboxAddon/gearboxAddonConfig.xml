@@ -4929,6 +4929,50 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+	<vehicle>FS17_ClaasDominator118sl
+		<mod name="FS17_ClaasDominator118sl">
+			<xmlFile name="claasDominator118sl.xml" />
+		</mod>
+		
+		<gearboxMogli disableManual="true" speedLimiter="false" enableAI="true" maxAIGear="3" ptoSpeedLimit="false" onlyHandThrottle="true">
+			<combine defaultWidth="6.0"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
+			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500" onlyStopped="true">
+				<gear name="1" speed="5.5"  forwardOnly="true"/>
+				<gear name="2" speed="11"   forwardOnly="true"/>
+				<gear name="R" speed="11"   reverseOnly="true"/>
+				<gear name="3" speed="21.5" forwardOnly="true"/>
+			</gears>
+				
+			<realEngine idleRpm="800" ratedRpm="2100" maxRpm="2100">
+        <!-- 1900: 275(275) | 2100: 260(260) | 1000..1600: 1177(1177) | 90 | 0.5 | 149 | 2.2 | 2200 | 1260: 196 -->
+        <torque rpm="350" motorTorque="709" fuelUsageRatio="219"/>
+        <torque rpm="700" motorTorque="1059" fuelUsageRatio="204.7"/>
+        <torque rpm="900" motorTorque="1164" fuelUsageRatio="199.6"/>
+        <torque rpm="1000" motorTorque="1177" fuelUsageRatio="197.9"/>
+        <torque rpm="1100" motorTorque="1177" fuelUsageRatio="196.7"/>
+        <torque rpm="1200" motorTorque="1177" fuelUsageRatio="196.1"/>
+        <torque rpm="1300" motorTorque="1177" fuelUsageRatio="196"/>
+        <torque rpm="1400" motorTorque="1177" fuelUsageRatio="196.6"/>
+        <torque rpm="1500" motorTorque="1177" fuelUsageRatio="197.8"/>
+        <torque rpm="1600" motorTorque="1177" fuelUsageRatio="199.6"/>
+        <torque rpm="1700" motorTorque="1134" fuelUsageRatio="202"/>
+        <torque rpm="1800" motorTorque="1072" fuelUsageRatio="205"/>
+        <torque rpm="1850" motorTorque="1043" fuelUsageRatio="206.7"/>
+        <torque rpm="1900" motorTorque="1016" fuelUsageRatio="208.6"/>
+        <torque rpm="1950" motorTorque="987" fuelUsageRatio="210.7"/>
+        <torque rpm="2000" motorTorque="952" fuelUsageRatio="212.9"/>
+        <torque rpm="2050" motorTorque="913" fuelUsageRatio="215.3"/>
+        <torque rpm="2100" motorTorque="869" fuelUsageRatio="217.8"/>
+        <torque rpm="2150" motorTorque="791" fuelUsageRatio="286.6"/>
+        <torque rpm="2200" motorTorque="508" fuelUsageRatio="456.6"/>
+        <torque rpm="2250" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
+		</gearboxMogli>
+	</vehicle> 
+	
 	<vehicle>FS17_CLAAS_Axion_900
 		<mod name="FS17_CLAAS_Axion_900">
 			<link href="http://farming-simulator.com/mod.php?mod_id=66111"/>

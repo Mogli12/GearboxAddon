@@ -111,10 +111,10 @@ gearboxMogliGlobals.noDisable             = false
 gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
 gearboxMogliGlobals.minTimeToShift			  = 1    -- ms
-gearboxMogliGlobals.minTimeToShiftReverse = 252  -- ms
+gearboxMogliGlobals.minTimeToShiftReverse = 500  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort =  750 -- ms -- let it go up to ratedRPM !!!
+gearboxMogliGlobals.autoShiftTimeoutShort = 750  -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 100  -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 0    -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
@@ -8738,6 +8738,11 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		local f = 1
 		
 		if      torque < gearboxMogli.eps then
+		elseif  self.vehicle.mrGbML.DirectionChangeTime <= g_currentMission.time and g_currentMission.time < self.vehicle.mrGbML.DirectionChangeTime + 2000 then
+			f = 1 + ( g_currentMission.time - self.vehicle.mrGbML.DirectionChangeTime ) * 0.001
+			if self.ratioFactorR ~= nil then
+				f = math.min( f, self.ratioFactorR )
+			end
 		elseif  self.ratioFactorR == nil  then
 			f = gearboxMogli.maxRatioFactorR
 		elseif  self.ratioFactorR < 0.999 or self.ratioFactorR > 1.001 then
