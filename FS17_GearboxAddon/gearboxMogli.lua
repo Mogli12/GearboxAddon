@@ -2681,44 +2681,39 @@ function gearboxMogli:update(dt)
 			self.mrGbML.turnedOffByIncreaseRPMWhileTipping = true
 		end
 		processInput = false
-	else
-		self:mrGbMSetIsOnOff( true ) 
+	elseif gearboxMogli.mbIsActiveForInput(self, false) then
+		if     gearboxMogli.mbHasInputEvent( "gearboxMogliSETTINGS" ) then
+			if     self:getIsHired() then
+				gearboxMogli.showSettingsUI( self )
+			elseif not ( self.isMotorStarted ) then
+				gearboxMogli.showSettingsUI( self )
+			elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+				gearboxMogli.showSettingsUI( self )
+				self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+				self:stopMotor()
+			else
+				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+			end
+			processInput = false
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
+			if     self:getIsHired() then
+				if self.mrGbMS.IsOnOff then
+					self:mrGbMSetIsOnOff( false ) 
+				else
+					self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while vehicle is hired" )
+				end
+			elseif not ( self.isMotorStarted ) then
+				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+			elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+				self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+				self:stopMotor()
+			else
+				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+			end
+			processInput = false
+		end
 	end
---elseif self.mrGbMS.NoDisable then
---	self:mrGbMSetIsOnOff( true ) 
---elseif gearboxMogli.mbIsActiveForInput(self, false) then
---	if     gearboxMogli.mbHasInputEvent( "gearboxMogliSETTINGS" ) then
---		if     self:getIsHired() then
---			gearboxMogli.showSettingsUI( self )
---		elseif not ( self.isMotorStarted ) then
---			gearboxMogli.showSettingsUI( self )
---		elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
---			gearboxMogli.showSettingsUI( self )
---			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
---			self:stopMotor()
---		else
---			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
---		end
---		processInput = false
---	elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
---		if     self:getIsHired() then
---			if self.mrGbMS.IsOnOff then
---				self:mrGbMSetIsOnOff( false ) 
---			else
---				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while vehicle is hired" )
---			end
---		elseif not ( self.isMotorStarted ) then
---			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
---		elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
---			self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
---			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
---			self:stopMotor()
---		else
---			self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
---		end
---		processInput = false
---	end
---end
 	
 	if      self.mrGbMS.WarningText ~= nil
 			and self.mrGbMS.WarningText ~= "" then
