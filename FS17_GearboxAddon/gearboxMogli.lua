@@ -7675,7 +7675,13 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.hydroEff:addKeyframe( { time = ktime+2*gearboxMogli.eps, v = 0 } )
 	end
 	
---gearboxMogliMotor.copyRuntimeValues( motor, self )
+	gearboxMogliMotor.copyRuntimeValues( motor, self )
+	
+	self.nonClampedMotorRpm      = 0
+	self.clutchRpm               = 0
+	self.lastMotorRpm            = 0
+	self.lastRealMotorRpm        = 0
+	self.equalizedMotorRpm       = 0
 	
 	self.minRpm                  = vehicle.mrGbMS.OrigMinRpm
 	self.maxRpm                  = vehicle.mrGbMS.OrigMaxRpm	
@@ -7691,7 +7697,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.minBackwardGearRatio    = motor.minBackwardGearRatio
 	self.maxBackwardGearRatio    = motor.maxBackwardGearRatio
 	self.rpmFadeOutRange         = motor.rpmFadeOutRange
-	self.clutchRpm               = 0
 	self.usedTransTorque         = 0
 	self.noTransTorque           = 0
 	self.motorLoadP              = 0
@@ -7721,8 +7726,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.minThrottle             = 0.3
 	self.idleThrottle            = self.vehicle.mrGbMS.IdleEnrichment
 	self.idleThrottleS           = self.vehicle.mrGbMS.IdleEnrichment
-	self.lastMotorRpm            = 0 --motor.lastMotorRpm
-	self.lastRealMotorRpm        = 0 --motor.lastRealMotorRpm
 	self.prevMotorRpm            = 0 --motor.lastMotorRpm
 	self.prevNonClampedMotorRpm  = 0 --motor.nonClampedMotorRpm
 	self.nonClampedMotorRpmS     = 0 --motor.nonClampedMotorRpm
