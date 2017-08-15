@@ -1,4 +1,4 @@
-local load_gearboxMogliScreen = false
+local load_gearboxMogliScreen = true
 
 gearboxMogliRegister = {}
 gearboxMogliRegister.isLoaded = true
@@ -265,7 +265,7 @@ function gearboxMogliRegister:addConfigurations()
 					defaultConfigName = "default"
 				end
 				
-				table.insert( modifiedItem.configurations, { name = "built-in", title = "Standard Transmission", source = -1 } )
+				table.insert( modifiedItem.configurations, { name = "off", title = "Standard Transmission", source = -1 } )
 				
 				local isDefault = true
 				if hasVehicleConfig then

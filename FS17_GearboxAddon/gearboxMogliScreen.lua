@@ -15,9 +15,29 @@ end
 
 function gearboxMogliScreen:setVehicle( vehicle )
 	self.vehicle       = vehicle 
+	if self.vehicle ~= nil then
+		for name,s in pairs( self.gearboxMogliElements ) do
+			if s.parameter == "list" or s.parameter == "list0" then
+				if type( self.vehicle.mrGbMU[name] ) == "table" then
+					s.element:setTexts(self.vehicle.mrGbMU[name])
+				else
+					s.element:setTexts({"<empty>"})
+				end
+			end
+		end
+	end
 end
 
 function gearboxMogliScreen:update(dt)
+	if self.vehicle ~= nil then
+		for name,s in pairs( self.gearboxMogliElements ) do
+			if s.parameter == "callback" then
+				local getter = gearboxMogli["mrGbMUIDraw"..name]
+				local texts  = getter( self.vehicle )
+				s.element:setTexts(texts)
+			end
+		end
+	end
 end
 
 function gearboxMogliScreen:onOpen()
@@ -29,7 +49,9 @@ function gearboxMogliScreen:onOpen()
 			local element = s.element
 			
 			local getter = nil
-			if type( gearboxMogli["mrGbMGet"..name] ) == "function" then
+			if type( gearboxMogli["mrGbMUIGet"..name] ) == "function" then
+				getter = gearboxMogli["mrGbMUIGet"..name]
+			elseif type( gearboxMogli["mrGbMGet"..name] ) == "function" then
 				getter = gearboxMogli["mrGbMGet"..name]
 			end
 			
@@ -43,6 +65,8 @@ function gearboxMogliScreen:onOpen()
 					value = self.vehicle.mrGbMS[name]
 				end
 				
+			--print("GET: "..tostring(name)..": '"..tostring(value).."'")
+				
 				if     element:isa( ToggleButtonElement2 ) then
 					local b = value
 					if s.parameter then
@@ -52,11 +76,15 @@ function gearboxMogliScreen:onOpen()
 				elseif element:isa( MultiTextOptionElement ) then
 					local i = 1
 					if     s.parameter == "percent10" then
-						i = math.floor( value * 10 + 0.5 )
+						i = math.floor( value * 10 + 0.5 ) + 1
 					elseif s.parameter == "percent5" then
-						i = math.floor( value * 20 + 0.5 )
+						i = math.floor( value * 20 + 0.5 ) + 1
+					elseif s.parameter == "list0" then
+						i = value + 1
+					else
+						i = value 
 					end
-					element:setState( i+1 )
+					element:setState( i )
 				end			
 			end
 		end
@@ -73,30 +101,37 @@ function gearboxMogliScreen:onClickOk()
 			local element = s.element
 			
 			local setter = nil
-			if type( gearboxMogli["mrGbMSet"..name] ) == "function" then
+			if     type( gearboxMogli["mrGbMUISet"..name] ) == "function" then
+				setter = gearboxMogli["mrGbMUISet"..name]
+			elseif type( gearboxMogli["mrGbMSet"..name] ) == "function" then
 				setter = gearboxMogli["mrGbMSet"..name]
+			elseif self.vehicle.mrGbMS[name] ~= nil then
+				setter = function( vehicle, value ) gearboxMogli.mbSetState( vehicle, name, value ) end
 			end
 			
-			if setter == nil and self.vehicle.mrGbMS[name] == nil then
+			if setter == nil then
 				print("Invalid UI element ID: "..tostring(name))
 			else
-				if setter == nil then
-					setter = function( vehicle, value ) gearboxMogli.mbSetState( vehicle, name, value ) end
-				end
-				
 				if     element:isa( ToggleButtonElement2 ) then
 					local b = element:getIsChecked()
 					if s.parameter then
 						b = not b
 					end
+				--print("SET: "..tostring(name)..": '"..tostring(b).."'")
 					setter( self.vehicle, b )
 				elseif element:isa( MultiTextOptionElement ) then
-					local i = element:getState()-1
+					local i = element:getState()
+					local value = i
 					if     s.parameter == "percent10" then
-						setter( self.vehicle, i / 10 )
+						value = (i-1) * 0.1
 					elseif s.parameter == "percent5" then
-						setter( self.vehicle, i / 20 )
-					end			
+						value = (i-1) * 0.05
+					elseif s.parameter == "list0" then
+						value = i - 1
+					end
+				--print("SET: "..tostring(name)..": '"..tostring(value).."'")
+					
+					setter( self.vehicle, value )
 				end
 			end
 		end
@@ -126,9 +161,12 @@ function gearboxMogliScreen:onCreateSubElement( element, parameter )
 			checked = false
 		end
 	elseif element:isa( MultiTextOptionElement ) then
-		if     parameter == nil then
-			print("Invalid MultiTextOptionElement parameter: <nil>")
+		if parameter == nil then
+			print("Invalid MultiTextOptionElement parameter: <nil>")			
 			checked = false
+		elseif parameter == "list"
+				or parameter == "list0" then
+			element:setTexts({"vehicle is <nil>"})
 		elseif parameter == "percent10" then
 			local texts = {}
 			for i=0,10 do
@@ -141,6 +179,19 @@ function gearboxMogliScreen:onCreateSubElement( element, parameter )
 				table.insert( texts, string.format("%d%%",i*5) )
 			end
 			element:setTexts(texts)
+		elseif parameter == "callback" then
+			if type( gearboxMogli["mrGbMUIDraw"..element.id] ) == "function" then
+				local getter = gearboxMogli["mrGbMUIDraw"..element.id]
+				local state, message = pcall( getter, self.vehicle )
+				if state then
+					element:setTexts(message)
+				else
+					print("Invalid MultiTextOptionElement callback: mrGbMUIDraw"..tostring(element.id)..", '"..tostring(message).."'")
+				end
+			else
+				print("Invalid MultiTextOptionElement callback: mrGbMUIDraw"..tostring(element.id))
+				checked = false
+			end
 		else
 			print("Invalid MultiTextOptionElement parameter: "..tostring(parameter))
 			checked = false

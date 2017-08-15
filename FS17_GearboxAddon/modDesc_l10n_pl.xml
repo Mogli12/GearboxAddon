@@ -75,7 +75,6 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_NOGEAR"     text="Luz"/>
 		<text name="gearboxMogliTEXT_VARIO"      text="CVT"/>
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="Prosta"/>
-		<text name="gearboxMogliTEXT_SEMIAUTO"   text="Półautomat"/>
 		<text name="gearboxMogliTEXT_ECO"        text="Tryb EKO"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Auto hamulec"/>
 	</texts>
