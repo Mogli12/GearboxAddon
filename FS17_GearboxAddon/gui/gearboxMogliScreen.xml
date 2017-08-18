@@ -92,6 +92,33 @@
 					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliAllAuto"/>
 					<GuiElement type="bitmap" profile="multiTextOptionBg" />
 				</GuiElement>
+				
+				<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="DrawTargetRpm" toolTip="DrawTargetRpm"  onCreate="onCreateSubElement" 
+										focusId="21" focusChangeTop="21" focusChangeBottom="22">										
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text" profile="multiTextOptionText" />
+					<GuiElement type="text" profile="multiTextOptionTitle" text="DrawTargetRpm"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+
+				<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="DrawReqPower" toolTip="DrawReqPower"  onCreate="onCreateSubElement" 
+										focusId="21" focusChangeTop="21" focusChangeBottom="22">										
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text" profile="multiTextOptionText" />
+					<GuiElement type="text" profile="multiTextOptionTitle" text="DrawReqPower"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+
+				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="EnableAI" toolTip="EnableAI" onCreate="onCreateSubElement" onCreateArgs="list"
+										focusId="23" focusChangeTop="22" focusChangeBottom="23">
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text"   profile="multiTextOptionText" />
+					<GuiElement type="text"   profile="multiTextOptionTitle" text="EnableAI"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
 			</GuiElement>
 
 			<GuiElement type="boxLayout" profile="settingsBox" position="675px 550px">

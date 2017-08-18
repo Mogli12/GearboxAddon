@@ -29,7 +29,7 @@ function gearboxMogliRegister:loadMap(name)
 		end
   end
 		
-	if load_gearboxMogliScreen then
+	if gearboxMogliScreen ~= nil then
 		-- GUI Stuff
 		g_gearboxMogliScreen = gearboxMogliScreen:new()
 		g_gui:loadGui(gearboxMogliRegister.g_currentModDirectory .. "gui/gearboxMogliScreen.xml", "gearboxMogliScreen", g_gearboxMogliScreen)	

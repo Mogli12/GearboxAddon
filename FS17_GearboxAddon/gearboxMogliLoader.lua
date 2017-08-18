@@ -17,6 +17,8 @@ end
 --***************************************************************
 source(Utils.getFilename("mogliBase.lua", g_currentModDirectory))
 source(Utils.getFilename("gearboxMogli.lua", g_currentModDirectory))
+source(Utils.getFilename("gearboxMogliMotor.lua", g_currentModDirectory))
+
 _G[g_currentModName..".mogliBase"].newClass( "gearboxMogliLoader" )
 --***************************************************************
 
