@@ -176,6 +176,8 @@ gearboxMogliGlobals.decAccToLimitRatio    = 2     -- decelerateToLimit = acceler
 gearboxMogliGlobals.onlyTwoSpeeds         = false -- only two CC speeds instead of three
 gearboxMogliGlobals.manual4wd             = true  -- diff lock
 gearboxMogliGlobals.maxDeltaAccPerMs      = 0.003 -- max delta for acceleration; it takes 333 ms from 0 to 1
+gearboxMogliGlobals.uiFixedRatioStep      = 2
+gearboxMogliGlobals.uiHandThrottleStep    = 50    -- 50 RPM step, little more to avoid runding problems
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -4335,7 +4337,6 @@ function gearboxMogli:draw()
 			
 			speed = math.min( speed, limit )
 			minSp = math.min( minSp, limit )
-			maxSp = math.min( maxSp, limit )
 			
 			local handRpm = self.mrGbMS.IdleRpm + self.mrGbMS.HandThrottle * ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm ) 
 			
@@ -4408,7 +4409,7 @@ function gearboxMogli:draw()
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f..%3.1f km/h", minSp, maxSp ))
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f..%3.1f km/h", minSp, math.min( limit, maxSp ) ))
 						end
 					elseif info == "target2" then
 						if col == 1 then
@@ -4488,11 +4489,16 @@ function gearboxMogli:draw()
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( handRpm * 0.1 +0.5)*10)) 		
 						end
-					elseif info == "fixed" then
+					elseif info == "fixed" then					
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, "Fixed ratio")	
 						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", self.mrGbMS.FixedRatio * maxSp ))
+							local kmh = self.mrGbMS.FixedRatio * maxSp
+							if kmh <= limit then
+								renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", kmh ))
+							else
+								renderText(ovRight,drawY, deltaY, string.format("%3.1f (%4d)", limit, self.mrGbMS.RatedRpm * limit / kmh ))
+							end
 						end
 					elseif info == "combine" then
 						if col == 1 then
@@ -7698,75 +7704,98 @@ function gearboxMogli:showSettingsUI()
 		self.mrGbMUI.AllAutoMode = {}
 		for j=1,jj do
 			if     self.mrGbMUI.AllAutoModeID[j] == 0 then
-				self.mrGbMUI.AllAutoMode[j] = "sequential" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_0", "sequential" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 1 then
-				self.mrGbMUI.AllAutoMode[j] = "gears" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_1", "gears" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 2 then
-				self.mrGbMUI.AllAutoMode[j] = "ranges" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_2", "ranges" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 3 then
-				self.mrGbMUI.AllAutoMode[j] = "gears & ranges" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_3", "gears & ranges" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 4 then
-				self.mrGbMUI.AllAutoMode[j] = "ranges2" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_4", "ranges2" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 5 then
-				self.mrGbMUI.AllAutoMode[j] = "gears & ranges2" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_5", "gears & ranges2" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 6 then
-				self.mrGbMUI.AllAutoMode[j] = "ranges & ranges2" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_6", "ranges & ranges2" )
 			elseif self.mrGbMUI.AllAutoModeID[j] == 7 then
-				self.mrGbMUI.AllAutoMode[j] = "all" 
+				self.mrGbMUI.AllAutoMode[j] = gearboxMogli.getText( "gearboxMogliTEXT_AllAutoMode_7", "all" )
 			else
 				self.mrGbMUI.AllAutoMode[j] = "ERROR" 
 			end
 		end
 	else
 		self.mrGbMUI.AllAutoModeID = { 7 }
-		self.mrGbMUI.AllAutoMode   = { "n/a" }
+		self.mrGbMUI.AllAutoMode   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	end
+
+	local default = self.mrGbMS.EnableAI
+	if default == gearboxMogli.AIGearboxOff then
+		default = self.mrGbMS.EnableAI0
+	end
+	if default == gearboxMogli.AIGearboxOff then
+		default = gearboxMogli.AIGearboxOn
 	end
 	
-	if self.mrGbMS.AllAuto then
-		self.mrGbMUI.EnableAIID = { self.mrGbMS.EnableAI }
-		self.mrGbMUI.EnableAI   = { "all auto" }
+	if     self.mrGbMS.Hydrostatic then
+		self.mrGbMUI.EnableAIID = { gearboxMogli.AIGearboxOff, default }
+		self.mrGbMUI.EnableAI   = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
+																gearboxMogli.getText( "gearboxMogliTEXT_VARIO", "CVT" ) }
+	elseif self.mrGbMS.AllAuto     then
+		self.mrGbMUI.EnableAIID = { gearboxMogli.AIGearboxOff, default }
+		self.mrGbMUI.EnableAI   = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
+																gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "simple" ) }
 	else
 		self.mrGbMUI.EnableAIID = { gearboxMogli.AIGearboxOff, gearboxMogli.AIPowerShift, gearboxMogli.AIAllAuto, gearboxMogli.AIGearboxOn }
-		self.mrGbMUI.EnableAI   = { "off", "power shift", "all auto", "current gear" }
+		self.mrGbMUI.EnableAI   = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
+																gearboxMogli.getText( "gearboxMogliTEXT_POWERSHIFT", "power shift" ), 
+																gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "simple" ), 
+																gearboxMogli.getText( "gearboxMogliTEXT_MANUAL", "manual" ) }
 	end
 	
-	self.mrGbMUI.GearShifterMode    = { "Keyboard & G27", "Keyboard", "G27" }
-	self.mrGbMUI.ShuttleShifterMode = { "Toggle and Fwd-/Back-Buttons", "Toggle", "Fwd-/Back-Buttons" }
+	self.mrGbMUI.GearShifterMode    = { gearboxMogli.getText( "gearboxMogliTEXT_GearShifter_both", "Keyboard & G27" ), 
+																			gearboxMogli.getText( "gearboxMogliTEXT_GearShifter_key", "Keyboard" ),
+																			gearboxMogli.getText( "gearboxMogliTEXT_GearShifter_G27", "G27" ) }
+	self.mrGbMUI.ShuttleShifterMode = { gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_both", "Toggle and Fwd-/Back-Buttons" ), 
+																			gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_toggle", "Toggle" ), 
+																			gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_back_fwd", "Fwd-/Back-Buttons" ) }
 	
 	if not ( self.mrGbMS.IsOn and self.steeringEnabled ) then
-		self.mrGbMUI.DiffLockMiddle = { "n/a" }
-		self.mrGbMUI.DiffLockFront  = { "n/a" }
-		self.mrGbMUI.DiffLockBack   = { "n/a" }
+		self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+		self.mrGbMUI.DiffLockFront  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+		self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 	elseif  self.mrGbMS.ModifyDifferentials              then
 		local function getOpenText( torqueRatio, torqueSense, speedRatio )
-			if torqueRatio == 0 or torqueRatio == 1 then
-				return "2wd"
-			end
 			if     torqueSense >= 1 then
-				return "open"
+				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_open", "open" )
 			elseif torqueSense >  gearboxMogli.eps then
-				return "limited slip" 
+				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_lsd", "limited slip" )
 			elseif torqueSense < -gearboxMogli.eps then
-				return "self locking"
+				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_auto", "self locking" )
 			else
-				return "fxied ratio"
+				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_fixed", "fxied ratio" )
 			end
 		end
 		
-		if self.mrGbMS.TorqueRatioMiddle < 0 then
-			self.mrGbMUI.DiffLockMiddle = { "n/a" }
+		if     self.mrGbMS.TorqueRatioMiddle < 0 then
+			self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+		elseif self.mrGbMS.TorqueRatioMiddle == 0 or self.mrGbMS.TorqueRatioMiddle == 1 then
+			self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_2wd", "2wd" ),
+																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_4wd", "4wd" ) }
 		else
-			self.mrGbMUI.DiffLockMiddle = { getOpenText( self.mrGbMS.TorqueRatioMiddle, self.mrGbMS.TorqueSenseMiddle, self.mrGbMS.SpeedRatioMiddle ), "locked" }
+			self.mrGbMUI.DiffLockMiddle = { getOpenText( self.mrGbMS.TorqueRatioMiddle, self.mrGbMS.TorqueSenseMiddle, self.mrGbMS.SpeedRatioMiddle ),
+																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_locked", "locked" ) }
 		end
 		if self.mrGbMS.TorqueRatioFront < 0 then
-			self.mrGbMUI.DiffLockFront = { "n/a" }
+			self.mrGbMUI.DiffLockFront  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		else
-			self.mrGbMUI.DiffLockFront = { getOpenText( self.mrGbMS.TorqueRatioFront, self.mrGbMS.TorqueSenseFront, self.mrGbMS.SpeedRatioFront ), "locked" }
+			self.mrGbMUI.DiffLockFront  = { getOpenText( self.mrGbMS.TorqueRatioFront, self.mrGbMS.TorqueSenseFront, self.mrGbMS.SpeedRatioFront ),
+																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_locked", "locked" ) }
 		end
 		if self.mrGbMS.TorqueRatioBack < 0 then
-			self.mrGbMUI.DiffLockBack = { "n/a" }
+			self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		else
-			self.mrGbMUI.DiffLockBack = { getOpenText( self.mrGbMS.TorqueRatioBack, self.mrGbMS.TorqueSenseBack, self.mrGbMS.SpeedRatioBack ), "locked" }
+			self.mrGbMUI.DiffLockBack   = { getOpenText( self.mrGbMS.TorqueRatioBack, self.mrGbMS.TorqueSenseBack, self.mrGbMS.SpeedRatioBack ),
+																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_locked", "locked" ) }
 		end
 		
 	elseif  self.dCcheckModule ~= nil 
@@ -7775,11 +7804,62 @@ function gearboxMogli:showSettingsUI()
 		self.mrGbMUI.DiffLockFront  = { "zzzDriveControl" }
 		self.mrGbMUI.DiffLockBack   = { "zzzDriveControl" }
 	else
-		self.mrGbMUI.DiffLockMiddle = { "n/a" }
-		self.mrGbMUI.DiffLockFront  = { "n/a" }
-		self.mrGbMUI.DiffLockBack   = { "n/a" }
+		self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+		self.mrGbMUI.DiffLockFront  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+		self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 	end	
+	
+	self.mrGbMUI.FixedRatioSteps = 1
+	if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) then
+		local _,_,maxSp = self:mrGbMGetGearSpeed()
+		local limit = gearboxMogli.huge
+			
+		if self.mrGbMS.MaxSpeedLimiter then
+			if self.mrGbMS.ReverseActive then
+				if self.motor.maxBackwardSpeed ~= nil then
+					limit = 3.6 * self.motor.maxBackwardSpeed
+				end
+			else
+				if self.motor.maxForwardSpeed ~= nil then
+					limit = 3.6 * self.motor.maxForwardSpeed
+				end
+			end
+		end		
 		
+		self.mrGbMUI.FixedRatio = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ) }
+		self.mrGbMUI.FixedRatioSteps = math.max( 1, maxSp / self.mrGbMG.uiFixedRatioStep )
+		if math.floor( self.mrGbMUI.FixedRatioSteps ) >= 0.98 * self.mrGbMUI.FixedRatioSteps then
+			self.mrGbMUI.FixedRatioSteps = self.mrGbMUI.FixedRatioSteps - 1
+		end
+		for i=1,math.floor( self.mrGbMUI.FixedRatioSteps ) do
+			local kmh = maxSp * i / self.mrGbMUI.FixedRatioSteps
+			if kmh <= limit then
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", kmh, self.mrGbMS.RatedRpm ) )
+			else
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", limit, self.mrGbMS.RatedRpm * limit / kmh ) )
+			end
+		end
+		if maxSp <= limit then
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", maxSp, self.mrGbMS.RatedRpm ) )
+		else
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", limit, self.mrGbMS.RatedRpm * limit / maxSp ) )
+		end
+	else
+		self.mrGbMUI.FixedRatio = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	end
+	
+	self.mrGbMUI.HandThrottle = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ) }
+	
+	self.mrGbMUI.HandThrottleSteps = math.max( 1, ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm ) / self.mrGbMG.uiHandThrottleStep )
+	if math.floor( self.mrGbMUI.HandThrottleSteps ) >= 0.98 * self.mrGbMUI.HandThrottleSteps then
+		self.mrGbMUI.HandThrottleSteps = self.mrGbMUI.HandThrottleSteps - 1
+	end
+	for i=1,math.floor( self.mrGbMUI.HandThrottleSteps ) do
+		local handRpm = self.mrGbMS.IdleRpm + ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm ) * i / self.mrGbMUI.HandThrottleSteps
+		table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f rpm", math.floor( handRpm * 0.1 +0.5)*10) )
+	end
+	table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f rpm", self.mrGbMS.MaxTargetRpm ) )
+	
 	g_gearboxMogliScreen:setVehicle( self )
 	g_gui:showGui( "gearboxMogliScreen" )
 end
@@ -7918,6 +7998,45 @@ function gearboxMogli:mrGbMUIGetEnableAI( )
 				return j
 			end
 		end
+	end
+	return 1
+end
+
+function gearboxMogli:mrGbMUISetFixedRatio( value )
+	if value <= 1 then
+		self:mrGbMSetFixedRatio( 0 )
+	elseif value - 1 >= self.mrGbMUI.FixedRatioSteps then
+		self:mrGbMSetFixedRatio( 1 )
+	else
+		self:mrGbMSetFixedRatio( ( value - 1 ) / self.mrGbMUI.FixedRatioSteps )
+	end
+end
+function gearboxMogli:mrGbMUIGetFixedRatio( )
+	if     self.mrGbMS.FixedRatio <  gearboxMogli.eps then
+		return 1
+	elseif self.mrGbMS.FixedRatio >= 1 then
+		return 1 + self.mrGbMUI.FixedRatioSteps
+	elseif self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) then
+		return 1 + math.floor( 0.5 + self.mrGbMS.FixedRatio * self.mrGbMUI.FixedRatioSteps )
+	end
+	return 1
+end
+
+function gearboxMogli:mrGbMUISetHandThrottle( value )
+	if     value <= 1 then
+		self:mrGbMSetHandThrottle( 0 )
+	elseif value - 1 >= self.mrGbMUI.HandThrottleSteps then
+		self:mrGbMSetHandThrottle( 1 )
+	else
+		self:mrGbMSetHandThrottle( ( value - 1 ) / self.mrGbMUI.HandThrottleSteps )
+	end
+end
+function gearboxMogli:mrGbMUIGetHandThrottle( )
+	if     self.mrGbMS.HandThrottle >  gearboxMogli.eps then
+	elseif self.mrGbMS.HandThrottle >= 1 then
+		return 1 + self.mrGbMUI.HandThrottleSteps
+	else
+		return 1 + math.floor( 0.5 + self.mrGbMS.HandThrottle * self.mrGbMUI.HandThrottleSteps )
 	end
 	return 1
 end
