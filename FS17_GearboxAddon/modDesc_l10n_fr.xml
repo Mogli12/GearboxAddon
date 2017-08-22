@@ -61,6 +61,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="input_gearboxMogliDIFFLOCKMIDDLE"  text="Gearbox: mode 4x4"/>
 		<text name="input_gearboxMogliDIFFLOCKFRONT"   text="Gearbox: blocage différentiel avant"/>
 		<text name="input_gearboxMogliDIFFLOCKBACK"    text="Gearbox: blocage différentiel arrière"/>
+
 		<text name="gearboxMogliTEXT_OFF"        text="moteur off"/>
 		<text name="gearboxMogliTEXT_AI"         text="IA"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="frein à main"/>
@@ -73,5 +74,43 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="simple"/>
 		<text name="gearboxMogliTEXT_ECO"        text="éco"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="auto-blocage"/>
+		                                                 
+		<text name="gearboxMogliTEXT_DISABLED"           text="off"/>
+		<text name="gearboxMogliTEXT_ENABLED"            text="on"/>
+		<text name="gearboxMogliTEXT_POWERSHIFT"         text="powershift automatique"/>
+		<text name="gearboxMogliTEXT_N_A"                text="n/c"/>
+		
+		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="afficher les RPM"/>
+		<text name="gearboxMogliTEXT_DrawReqPower"       text="afficher la puissance"/>
+		<text name="gearboxMogliTEXT_EnableAI"           text="cacher ouvrier"/>
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="changer vitesses et gamme 1"/>	<- may need tweak
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>		<- may need tweak
+		 
+		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="séquentielle"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="vitesses"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="gamme 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_3"      text="vitesses et gamme 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_4"      text="gamme 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="vitesses et gamme 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="gammes 1 et 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="vitesses, gammes 1 et 2"/>
+		
+		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2RM"/>
+		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4RM"/>
+		<text name="gearboxMogliTEXT_DiffLock_open"      text="ouvert"/>			<- may need tweak
+		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="glissement limité"/>
+		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatique"/>
+		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="correction rapport"/>
+		<text name="gearboxMogliTEXT_DiffLock_locked"    text="verrouillé"/>
+		
+		<text name="gearboxMogliTEXT_GearShifter_both"   text="G27 et touches"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_GearShifter_key"    text="touches"/>			<- may need tweak
+		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
+		
+		<text name="gearboxMogliTEXT_Shuttle_both"       text="échanger et séparer"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="échanger bouton"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="séparer boutons"/>		<- may need tweak
+		
 	</texts>
 </l10n>
