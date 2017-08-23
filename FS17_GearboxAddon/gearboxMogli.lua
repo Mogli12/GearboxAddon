@@ -7212,7 +7212,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 				
 		if self.isEntered and Vehicle.debugRendering then
 			debugInfo = {}
-			table.insert( debugInfo, { component1="motor", component2="idleThrottleS",                       format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { component1="motor", component2="idleThrottle",                        format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="lastThrottle",                        format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="autoClutchPercent",                   format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="clutchPercent",                       format="%3d%%", factor=100 } )
