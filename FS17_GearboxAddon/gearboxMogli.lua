@@ -4669,6 +4669,12 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.DrawReqPower ~= self.mrGbMG.drawReqPower then
 			attributes = attributes.." mrGbMDrawReqPower=\"" .. tostring( self.mrGbMS.DrawReqPower ) .. "\""     
 		end
+		if self.mrGbMS.GearShifterMode ~= 0 then
+			attributes = attributes.." mrGbMGearShifter=\"" .. tostring( self.mrGbMS.GearShifterMode ) .. "\""     
+		end
+		if self.mrGbMS.ShuttleShifterMode ~= 0 then
+			attributes = attributes.." mrGbMShuttleShifter=\"" .. tostring( self.mrGbMS.ShuttleShifterMode ) .. "\""     
+		end
 	end 
 	
 	return attributes
@@ -4708,10 +4714,11 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetRevRange2", "ResetRevRange2"    )
                                                                             
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMG27Mode"       , "G27Mode"           )
-		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedDec"      , "AccelerateToLimit" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMHudMode"       , "HudMode"           )	
-		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedAcc"      , "accelerateToLimit" )
-		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMAllAutoMode"   , "AllAutoMode" )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedAcc"      , "AccelerateToLimit" )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMAllAutoMode"   , "AllAutoMode"       )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMGearShifter"   , "GearShifterMode"   )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMShuttleShifter", "ShuttleShifterMode")
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )

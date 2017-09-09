@@ -25,6 +25,7 @@ function gearboxMogliRegister:loadMap(name)
 		if g_server ~= nil then
 			gearboxMogliRegister.addConfigurations(self)
 		else
+			print("gearboxMogli: client is requesting configuration items from server")
 			g_client:getServerConnection():sendEvent(gearboxMogliRegisterNewClient:new())
 		end
   end
@@ -344,11 +345,15 @@ function gearboxMogliRegisterNewClient:new()
   return self
 end
 function gearboxMogliRegisterNewClient:readStream(streamId, connection)
-	if not connection:getIsServer() then
+	local test = streamReadInt32( streamId )
+	if test == 28081988 then
 		connection:sendEvent(gearboxMogliRegisterSendConfigs:new(),true)
+	else
+		print("gearboxMogli: Error registering new client")
 	end
 end
 function gearboxMogliRegisterNewClient:writeStream(streamId, connection)
+	streamWriteInt32(streamId, 28081988 )
 end
 
 gearboxMogliRegisterSendConfigs = {}
@@ -364,6 +369,7 @@ function gearboxMogliRegisterSendConfigs:new()
 end
 function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
   numStoreItems = streamReadInt32(streamId)
+	print(string.format("gearboxMogli: received configurations for %d vehicles", numStoreItems))
   
 	local evData = {}
 	
@@ -400,10 +406,14 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 	end
 end
 function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
+	
 	if type( gearboxMogliRegister.modifiedStoreItems ) ~= "table" then
+		print("gearboxMogli: Sending 0 configuration items to the client")
 		streamWriteInt32(streamId, 0)
 	else
-		streamWriteInt32(streamId, table.getn( gearboxMogliRegister.modifiedStoreItems ))
+		local i = table.getn( gearboxMogliRegister.modifiedStoreItems )
+		print(string.format("gearboxMogli: Sending %d configuration items to the client",i))
+		streamWriteInt32(streamId, i)
 		
 		for file,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
 			streamWriteString(streamId, file )
