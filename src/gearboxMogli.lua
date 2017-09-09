@@ -2770,10 +2770,6 @@ function gearboxMogli:update(dt)
 		self:mrGbMSetState( "ModifyDifferentials", false )
 	end
 	if self.mrGbMS.ModifyDifferentials and self.isServer then
-		for _,diff in pairs(self.differentials) do
-			diff.mogliMode = nil
-		end
-		
 		if self.mrGbMS.IsOn and self.steeringEnabled then
       local getSpeedsOfDifferential;
       getSpeedsOfDifferential = function(self, diff)
