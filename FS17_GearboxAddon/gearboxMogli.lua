@@ -3046,6 +3046,12 @@ function gearboxMogli:update(dt)
 		
 		if not ( self.isMotorStarted ) then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_OFF", "off" )
+		elseif self.cp ~= nil and self.cp.isDriving then
+			text = gearboxMogli.getText( "gearboxMogliTEXT_CP", "courseplay" )
+			text2 = text
+			if not self:mrGbMGetAutomatic() and not ( self.mrGbMS.Hydrostatic ) then
+				text = text .." (M)"
+			end
 		elseif not ( self.steeringEnabled ) then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_AI", "AI" )
 			text2 = text
@@ -6313,7 +6319,7 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 		end			
 	end
 	
-	if not self.steeringEnabled then
+	if not ( self.steeringEnabled or ( self.cp ~= nil and self.cp.isDriving ) ) then
 		if self.mrGbMS.MaxAIGear   ~= nil then
 			lg = math.min( self.mrGbMS.MaxAIGear, lg )
 		end

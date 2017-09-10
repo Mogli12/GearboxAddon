@@ -63,6 +63,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliDIFFLOCKBACK"      text="Getriebe: Sperre hinten an/aus"/>
 		<text name="gearboxMogliTEXT_OFF"                text="Motor aus"/>
 		<text name="gearboxMogliTEXT_AI"                 text="Helfer"/>
+		<text name="gearboxMogliTEXT_CP"                 text="Courseplay"/>
 		<text name="gearboxMogliTEXT_BRAKE"              text="Handbremse"/>
 		<text name="gearboxMogliTEXT_DC"                 text="Zwischengas"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"            text="Neutral"/>

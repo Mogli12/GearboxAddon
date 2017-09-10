@@ -60,7 +60,7 @@ for _,funcName in pairs({ "delete",
 	end	
 end
 
-local showMRWarning = true
+local showMRWarning = false --true
 
 function gearboxMogliLoader:load(savegame) 
 	

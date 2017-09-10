@@ -64,6 +64,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_OFF"                text="motor off"/>
 		<text name="gearboxMogliTEXT_AI"                 text="AI"/>
+		<text name="gearboxMogliTEXT_CP"                 text="courseplay"/>
 		<text name="gearboxMogliTEXT_BRAKE"              text="handbrake"/>
 		<text name="gearboxMogliTEXT_DC"                 text="double clutch"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"            text="neutral"/>

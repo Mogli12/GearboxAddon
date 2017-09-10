@@ -64,6 +64,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 
 		<text name="gearboxMogliTEXT_OFF"        text="moteur off"/>
 		<text name="gearboxMogliTEXT_AI"         text="IA"/>
+		<text name="gearboxMogliTEXT_CP"         text="Courseplay"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="frein à main"/>
 		<text name="gearboxMogliTEXT_DC"         text="double embrayage"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"    text="point mort"/>
