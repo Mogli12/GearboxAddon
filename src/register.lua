@@ -4,6 +4,7 @@ gearboxMogliRegister = {}
 gearboxMogliRegister.isLoaded = true
 gearboxMogliRegister.modName  = "FS17_GearboxAddon"
 gearboxMogliRegister.g_currentModDirectory = g_currentModDirectory
+gearboxMogliRegister.requestConfigurations = false
 
 if load_gearboxMogliScreen then
 	source(Utils.getFilename("gearboxMogliScreen.lua", g_currentModDirectory))
@@ -25,8 +26,7 @@ function gearboxMogliRegister:loadMap(name)
 		if g_server ~= nil then
 			gearboxMogliRegister.addConfigurations(self)
 		else
-			print("gearboxMogli: client is requesting configuration items from server")
-			g_client:getServerConnection():sendEvent(gearboxMogliRegisterNewClient:new())
+			gearboxMogliRegister.requestConfigurations = true
 		end
   end
 		
@@ -53,6 +53,11 @@ function gearboxMogliRegister:keyEvent(unicode, sym, modifier, isDown)
 end
 
 function gearboxMogliRegister:update(dt)
+	if gearboxMogliRegister.requestConfigurations then
+		gearboxMogliRegister.requestConfigurations = false
+		print("gearboxMogli: client is requesting configuration items from server")
+		g_client:getServerConnection():sendEvent(gearboxMogliRegisterNewClient:new())
+	end
 end
 
 function gearboxMogliRegister:draw()
@@ -355,6 +360,9 @@ end
 function gearboxMogliRegisterNewClient:writeStream(streamId, connection)
 	streamWriteInt32(streamId, 28081988 )
 end
+function gearboxMogliRegisterNewClient:run(connection)
+	print("gearboxMogli ERROR: Event gearboxMogliRegisterNewClient cannot run locally")
+end
 
 gearboxMogliRegisterSendConfigs = {}
 gearboxMogliRegisterSendConfigs_mt = Class(gearboxMogliRegisterSendConfigs, Event)
@@ -430,4 +438,7 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 			end
 		end
 	end
+end
+function gearboxMogliRegisterSendConfigs:run(connection)
+	print("gearboxMogli ERROR: Event gearboxMogliRegisterSendConfigs cannot run locally")
 end
