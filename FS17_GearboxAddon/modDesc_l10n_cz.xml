@@ -46,10 +46,10 @@ Přidává do všech vozidel rozšířené ovládání řízení vozidel pomocí
 		<text name="input_gearboxMogliACCTOLIMIT"      text="GB: Zrychlení"/>
 		<text name="input_gearboxMogliDECTOLIMIT"      text="GB: Zpomalení"/>
 		<text name="input_gearboxMogliECO"             text="GB: EKO mod zap./vyp."/>
-		<text name="input_gearboxMogliKEEPSPEED"       text="GB: keep speed"/>
+		<text name="input_gearboxMogliKEEPSPEED"       text="GB: Udrž rychlost"/>
 		<text name="gearboxMogliTEXT_OFF"        text="Vypnutý motor"/>
 		<text name="gearboxMogliTEXT_AI"         text="AI"/>
-		<text name="gearboxMogliTEXT_BRAKE"      text="Ruční spojka"/>
+		<text name="gearboxMogliTEXT_BRAKE"      text="Ruční brzda"/>
 		<text name="gearboxMogliTEXT_DC"         text="Meziplyn"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"    text="Neutrál"/>
 		<text name="gearboxMogliTEXT_AUTO"       text="Automat"/>
