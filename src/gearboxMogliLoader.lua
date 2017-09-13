@@ -77,10 +77,10 @@ function gearboxMogliLoader:preLoad(savegame)
 				local id = getXMLInt(savegame.xmlFile, key.."#id");
 				if id == 1 then
 					id = table.getn( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] )
-					logWrite( 0, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", 1, id ))
+					logWrite( 0, string.format("  self.configurations.gearboxMogli (%d) => self.configurations.GearboxAddon (%d)", 1, id ))
 				else
 					id = id - 1
-					logWrite( 0, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
+					logWrite( 0, string.format("  self.configurations.gearboxMogli (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
 				end
 				self:addBoughtConfiguration("GearboxAddon", id)
 			elseif name == "GearboxAddon" then
