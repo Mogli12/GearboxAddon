@@ -73,6 +73,8 @@ else
 	-- update
 	--********************************
 		function _newClass_:update(dt)
+			_newClass_:superClass().update(self, dt)
+		
 			if type( _newClass_.preUpdate ) == "function" then
 				_newClass_.postUpdate( self, dt )
 			end

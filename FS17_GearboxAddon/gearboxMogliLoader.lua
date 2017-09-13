@@ -62,6 +62,31 @@ end
 
 local showMRWarning = false --true
 
+function gearboxMogliLoader:preLoad(savegame) 
+	if savegame ~= nil and type( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] ) == "table" then
+		local i = 0;
+		while true do
+			local key = string.format(savegame.key..".boughtConfiguration(%d)", i);
+			if not hasXMLProperty(savegame.xmlFile, key) then
+				break;
+			end;
+			local name = getXMLString(savegame.xmlFile, key.."#name");
+			if name == "gearboxMogli" then
+				local id = getXMLInt(savegame.xmlFile, key.."#id");
+				if id == 1 then
+					id = table.getn( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] )
+					logWrite( 1, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", 1, id ))
+				else
+					id = id - 1
+					logWrite( 1, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
+				end
+				self:addBoughtConfiguration("GearboxAddon", id)
+			end
+			i = i + 1;
+		end;
+	end
+end
+
 function gearboxMogliLoader:load(savegame) 
 	
 	self.mrGbMLGearbox1       = false
@@ -349,7 +374,13 @@ end
 function gearboxMogliLoader:loadgearboxMogli( savegame )
 
 	self.mrGbMLGearbox1 = false
-	if self.configurations == nil or self.configurations.gearboxMogli == nil then
+	
+	if self.configurations == nil then
+		logWrite( 5, "No configurations" )
+		return 
+	end
+	
+	if self.configurations.GearboxAddon == nil then		
 		logWrite( 5, "No gearbox" )
 		return 
 	end
@@ -358,12 +389,12 @@ function gearboxMogliLoader:loadgearboxMogli( savegame )
 	
 	if     self.mrGbMLStoreItem == nil
 			or self.mrGbMLStoreItem.configurations == nil
-			or self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli] == nil then
+			or self.mrGbMLStoreItem.configurations[self.configurations.GearboxAddon] == nil then
 		logWrite( 5, "No gearbox configuration" )
 		return 
 	end
 	
-	local configuration = self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli]
+	local configuration = self.mrGbMLStoreItem.configurations[self.configurations.GearboxAddon]
 
 	if     configuration.source < 0 then
 		logWrite( 5, "Gearbox is off" )

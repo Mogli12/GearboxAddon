@@ -101,8 +101,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		
 	-- inputs	
 		if self:getIsActiveForInput(false) then		
-			if     tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_1" )
-					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
+			if     tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
 					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_3" )
 					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_4" ) then
 				-- ignore

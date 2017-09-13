@@ -8,6 +8,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
+		<text name="gearboxMogliInputPrefix"             text="Getriebe: "/>
+		
 		<text name="input_gearboxMogliSHIFTGEARUP"       text="Getriebe: Gang hoch"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"     text="Getriebe: Gang runter"/>
 		<text name="input_gearboxMogliSHIFTGEARTOGGLE"   text="Getriebe: Gang wechseln"/>
@@ -61,6 +63,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="input_gearboxMogliDIFFLOCKMIDDLE"    text="Getriebe: Allrad an/aus"/>
 		<text name="input_gearboxMogliDIFFLOCKFRONT"     text="Getriebe: Sperre vorne an/aus"/>
 		<text name="input_gearboxMogliDIFFLOCKBACK"      text="Getriebe: Sperre hinten an/aus"/>
+		
 		<text name="gearboxMogliTEXT_OFF"                text="Motor aus"/>
 		<text name="gearboxMogliTEXT_AI"                 text="Helfer"/>
 		<text name="gearboxMogliTEXT_CP"                 text="Courseplay"/>
@@ -84,9 +87,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_DrawReqPower"       text="Anzeige der Leistung"/>
 		<text name="gearboxMogliTEXT_EnableAI"           text="Getriebe und Helfer"/>
 		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="Gänge und Gruppe 1 tauschen"/>
-		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 und Gangtasten"/>
-		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="Vor-/Rückwärts-Tasten"/>
 		 
+		<text name="gearboxMogliTEXT_AllAutoMode"        text="Anpassung Vereinfachung"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="sequentiell"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="Gänge"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="Gruppe 1"/>
@@ -95,7 +97,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="Gänge und Gruppe 2"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="Gruppen 1 und 2"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="Gänge, Gruppen 1 und 2"/>
-		
+	
+		<text name="gearboxMogliTEXT_DiffLock"           text="Differentialsperren"/>	
 		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="Vorderradantrieb"/>
 		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="Allradantrieb"/>
 		<text name="gearboxMogliTEXT_DiffLock_open"      text="offen"/>
@@ -104,10 +107,12 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="feste Verteilung"/>
 		<text name="gearboxMogliTEXT_DiffLock_locked"    text="gesperrt"/>
 		
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 und Gangtasten"/>
 		<text name="gearboxMogliTEXT_GearShifter_both"   text="Tastatur und G27"/>
 		<text name="gearboxMogliTEXT_GearShifter_key"    text="Tastatur"/>
 		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
 		
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="Vor-/Rückwärts-Tasten"/>
 		<text name="gearboxMogliTEXT_Shuttle_both"       text="Ein- und Zweitastenbed."/>
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="Eine Taste"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="Separate Tasten"/>

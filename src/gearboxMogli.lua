@@ -429,16 +429,18 @@ function gearboxMogli:initClient()
 		gearboxMogli.ovDiffLockBack   = Overlay:new("ovDiffLockBack",   Utils.getFilename( self.mrGbMG.ddsDirectory.."diff_lock_back.dds",   gearboxMogli.baseDirectory), x, y, w, h)
 	end
 	
-	self.mrGbMD.Tgt        = 0 
 	self.mrGbMD.lastTgt    = 0 
-	self.mrGbMD.Clutch     = 0 
+	self.mrGbMD.Tgt        = 0 
 	self.mrGbMD.lastClutch = 0 
+	self.mrGbMD.Clutch     = 0 
 	self.mrGbMD.lastPower  = 0 
 	self.mrGbMD.Power      = 0 
 	self.mrGbMD.lastRate   = 0 
 	self.mrGbMD.Rate       = 0 
-	self.mrGbMD.Hydro      = 255
 	self.mrGbMD.lastHydro  = 255
+	self.mrGbMD.Hydro      = 255
+	self.mrGbMD.lastSlip   = 0
+	self.mrGbMD.Slip       = 0
 	
 	self.mrGbML.lastAcceleration  = 0
 	self.mrGbML.lastBrakePedal    = 1
@@ -750,7 +752,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 	do
-		local configuration = self.mrGbMLStoreItem.configurations[self.configurations.gearboxMogli]
+		local configuration = self.mrGbMLStoreItem.configurations[self.configurations.GearboxAddon]
 	
 		if configuration.baseName ~= nil and configuration.config ~= nil then
 			if self.mrGbMS.EngineName == nil then
@@ -3334,7 +3336,6 @@ function gearboxMogli:update(dt)
 		
 		-- avoid conflicts with driveControl
 		if     not processInput
-			--or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_1" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_3" )
 				or gearboxMogli.mbHasInputEvent( "gearboxMogliCONFLICT_4" ) then
@@ -3853,6 +3854,7 @@ function gearboxMogli:update(dt)
 			end
 		end
 	end		
+
 end 
 
 --**********************************************************************************************************	
@@ -4003,6 +4005,7 @@ function gearboxMogli:updateTick(dt)
 				self.mrGbMD.Clutch = 0
 				self.mrGbMD.Power  = 0
 				self.mrGbMD.Hydro  = 255
+				self.mrGbMD.Slip   = 0
 				
 				if self.isMotorStarted then
 					if self.motor.targetRpm     ~= nil then
@@ -4024,6 +4027,18 @@ function gearboxMogli:updateTick(dt)
 						end
 					end
 				end
+				if self.mrIsMrVehicle then
+					local s = 0
+					local c = 0
+					for _,wheel in ipairs(self.wheels) do
+						s = s + wheel.mrAvgLongSlip
+						c = c + 1
+					end
+					if c > 1 then
+						s = s / c
+					end
+					self.mrGbMD.Slip = math.floor( 100 * Utils.clamp( s, 0, 1 ) + 0.5 )
+				end
 
 				self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
 				
@@ -4032,12 +4047,14 @@ function gearboxMogli:updateTick(dt)
 						or ( self.mrGbMS.sendTargetRpm and self.mrGbMD.lastTgt    ~= self.mrGbMD.Tgt   )
 						or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
 						or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
+						or ( self.mrIsMrVehicle        and self.mrGbMD.lastSlip   ~= self.mrGbMD.Slip  )
 						then
 					self.mrGbMD.lastTgt    = self.mrGbMD.Tgt
 					self.mrGbMD.lastClutch = self.mrGbMD.Clutch
 					self.mrGbMD.lastPower  = self.mrGbMD.Power 
 					self.mrGbMD.lastRate   = self.mrGbMD.Rate
 					self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
+					self.mrGbMD.lastSlip   = self.mrGbMD.Slip
 
 					if self.mrGbMS.NoUpdateStream then					
 						local message = {}
@@ -4047,6 +4064,7 @@ function gearboxMogli:updateTick(dt)
 						if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Tgt   end			
 						if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
 						if self.mrGbMS.IsCombine     then message.Rate  = self.mrGbMD.Rate  end		
+						if self.mrIsMrVehicle        then message.Slip  = self.mrGbMD.Slip  end
 						
 						self:mrGbMSetState( "NUSMessage", message )
 					else
@@ -4093,6 +4111,8 @@ function gearboxMogli:readUpdateStream(streamId, timestamp, connection)
 			if self.mrGbMS.sendTargetRpm then self.mrGbMD.Tgt    = streamReadUInt8( streamId  ) end			
 			if self.mrGbMS.sendReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
 			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end		
+			if self.mrIsMrVehicle        then self.mrGbMD.Slip   = streamReadUInt8( streamId  ) end
+
 		elseif checkId == nil or checkId ~= 142 then
 			print("FS17_GearboxAddon: Error! There is another specialization with incorrect readUpdateStream implementation ("..tostring(checkId)..")")
 			if self.mrGbMD ~= nil then
@@ -4113,8 +4133,9 @@ function gearboxMogli:writeUpdateStream(streamId, connection, dirtyMask)
 			
 			if self.mrGbMS.sendHydro     then streamWriteUInt8(streamId, self.mrGbMD.Hydro  ) end		 
 			if self.mrGbMS.sendTargetRpm then streamWriteUInt8(streamId, self.mrGbMD.Tgt    ) end			
-			if self.mrGbMS.sendReqPower  then streamWriteUInt16(streamId,self.mrGbMD.Power ) end			
+			if self.mrGbMS.sendReqPower  then streamWriteUInt16(streamId,self.mrGbMD.Power  ) end			
 			if self.mrGbMS.IsCombine     then streamWriteUInt8(streamId, self.mrGbMD.Rate   ) end
+			if self.mrIsMrVehicle        then streamWriteUInt8(streamId, self.mrGbMD.Slip  )  end
 		else
 			streamWriteUInt8(streamId, 142 )
 		end 
@@ -4257,7 +4278,8 @@ function gearboxMogli:draw()
 				ovRows = ovRows + 1 infos[ovRows] = "difflock"
 			end
 			
-			if      self.mrGbMS.Hydrostatic and self.mrGbMS.HandThrottle > 0
+			if      self.mrGbMS.Hydrostatic 
+					and ( self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 )
 					and self.mrGbMS.RatedRpm > 1 then
 				ovRows = ovRows + 1 infos[ovRows] = "target2"		
 			elseif self.mrGbMS.Hydrostatic and self.mrGbMS.DisableManual then
@@ -4297,10 +4319,13 @@ function gearboxMogli:draw()
 			elseif self.mrGbMD.Clutch < 200  then
 				ovRows = ovRows + 1 infos[ovRows] = "clutch2"
 			end
-			if self.mrGbMG.debugPrint and self.isServer and self.mrGbMS.IsCombine then
+			if self.mrGbMG.debugPrint and self.isServer and self.mrGbMS.IsCombine and not ( self.mrIsMrVehicle ) then
 				ovRows = ovRows + 1 infos[ovRows] = "pto"
 			elseif self.mrGbMD.Rate ~= nil and self.mrGbMD.Rate > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "combine"
+			end
+			if self.mrIsMrVehicle then
+				ovRows = ovRows + 1 infos[ovRows] = "mrWheelSlip"
 			end
 			--==============================================
 			
@@ -4524,6 +4549,12 @@ function gearboxMogli:draw()
 							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", 100 * p / self.motor.maxPower ) )  		          
 							setTextColor(1, 1, 1, 1) 
 						end
+					elseif info == "mrWheelSlip" then
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, "Wheel slip")	
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Slip ))	
+						end
 					end
 					
 					drawY = drawY - deltaY
@@ -4532,7 +4563,7 @@ function gearboxMogli:draw()
 			--==============================================
 
 			
-			drawY = drawY + 0.25*deltaY
+			drawY = drawY + 0.25*deltaY			
 			renderText(ovRight, drawY, 0.5*deltaY, gearboxMogli.getText( "gearboxMogliVERSION", "Gearbox by mogli" ) )  		          
 
 		--if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
@@ -4619,6 +4650,28 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 	local attributes = ""
 
 	if self.mrGbMS ~= nil then
+		local rG, r1, r2
+		if self.mrGbMS.ReverseActive then 
+			attributes = attributes.." mrGbMReverse=\""  .. tostring(self.mrGbMS.ReverseActive ) .. "\""
+			rG = self.mrGbMS.ResetRevGear
+			r1 = self.mrGbMS.ResetRevRange
+			r2 = self.mrGbMS.ResetRevRange2
+		else
+			rG = self.mrGbMS.ResetFwdGear
+			r1 = self.mrGbMS.ResetFwdRange
+			r2 = self.mrGbMS.ResetFwdRange2
+		end
+		
+		if rG ~= self.mrGbMS.CurrentGear   then
+			attributes = attributes.." mrGbMCurrentGear=\""    .. tostring(self.mrGbMS.CurrentGear   ) .. "\""
+		end
+		if r1 ~= self.mrGbMS.CurrentRange  then
+			attributes = attributes.." mrGbMCurrentRange=\""   .. tostring(self.mrGbMS.CurrentRange  ) .. "\""
+		end
+		if r2 ~= self.mrGbMS.CurrentRange2 then
+			attributes = attributes.." mrGbMCurrentRange2=\""  .. tostring(self.mrGbMS.CurrentRange2 ) .. "\""
+		end
+
 		if self.mrGbMS.ResetFwdGear   ~= self.mrGbMS.DefaultGear   then
 			attributes = attributes.." mrGbMResetFwdGear=\""    .. tostring(self.mrGbMS.ResetFwdGear   ) .. "\""
 		end
@@ -4681,6 +4734,15 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.ShuttleShifterMode ~= 0 then
 			attributes = attributes.." mrGbMShuttleShifter=\"" .. tostring( self.mrGbMS.ShuttleShifterMode ) .. "\""     
 		end
+		if self.mrGbMS.DiffLockMiddle then
+			attributes = attributes.." mrGbMDiffLockMiddle=\"" .. tostring( self.mrGbMS.DiffLockMiddle ) .. "\""     
+		end
+		if self.mrGbMS.DiffLockFront then
+			attributes = attributes.." mrGbMDiffLockFront=\"" .. tostring( self.mrGbMS.DiffLockFront ) .. "\""     
+		end
+		if self.mrGbMS.DiffLockBack then
+			attributes = attributes.." mrGbMDiffLockBack=\"" .. tostring( self.mrGbMS.DiffLockBack ) .. "\""     
+		end
 	end 
 	
 	return attributes
@@ -4718,7 +4780,23 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetRevGear"  , "ResetRevGear"      )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetRevRange" , "ResetRevRange"     )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetRevRange2", "ResetRevRange2"    )
-                                                                            
+		
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMReverse"       , "ReverseActive"     )
+		
+		if self.mrGbMS.ReverseActive then
+			self.mrGbMS.CurrentGear   = self.mrGbMS.ResetRevGear
+			self.mrGbMS.CurrentRange  = self.mrGbMS.ResetRevRange 
+			self.mrGbMS.CurrentRange2 = self.mrGbMS.ResetRevRange2 
+		else 
+			self.mrGbMS.CurrentGear   = self.mrGbMS.ResetFwdGear 
+			self.mrGbMS.CurrentRange  = self.mrGbMS.ResetFwdRange
+			self.mrGbMS.CurrentRange2 = self.mrGbMS.ResetFwdRange2
+		end
+
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMCurrentGear"   , "CurrentGear"       )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMCurrentRange"  , "CurrentRange"      )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMCurrentRange2" , "CurrentRange2"     )
+		
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMG27Mode"       , "G27Mode"           )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMHudMode"       , "HudMode"           )	
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSpeedAcc"      , "AccelerateToLimit" )
@@ -4733,19 +4811,11 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMSwapGearRange" , "SwapGearRangeKeys" )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDrawTargetRpm" , "DrawTargetRpm"     )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDrawReqPower"  , "DrawReqPower"      )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockMiddle", "DiffLockMiddle"    )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockFront" , "DiffLockFront"     )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockBack"  , "DiffLockBack"      )
 
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
-		
-		local lg, lr, l2
-		if self.mrGbMS.ReverseActive then
-			self.mrGbMS.CurrentGear   = self.mrGbMS.ResetRevGear
-			self.mrGbMS.CurrentRange  = self.mrGbMS.ResetRevRange 
-			self.mrGbMS.CurrentRange2 = self.mrGbMS.ResetRevRange2 
-		else 
-			self.mrGbMS.CurrentGear   = self.mrGbMS.ResetFwdGear 
-			self.mrGbMS.CurrentRange  = self.mrGbMS.ResetFwdRange
-			self.mrGbMS.CurrentRange2 = self.mrGbMS.ResetFwdRange2
-		end
 
 		gearboxMogli.setLaunchGearSpeed( self, true )
 		gearboxMogli.mrGbMDoGearShift( self )

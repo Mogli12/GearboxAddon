@@ -4893,7 +4893,7 @@
 			<combine defaultWidth="4.2" minRpm="1900" maxRpm="2200" threshingSoundOffset="1" threshingSoundScale="0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
+			<hydrostatic profile="Hydrostat" correctGearSpeed="true" minRatio="0"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500" onlyStopped="true">
 				<gear name="I"   speed="5.5"  forwardOnly="true"/>
 				<gear name="II"  speed="11"   forwardOnly="true"/>
@@ -4938,7 +4938,7 @@
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0"/>
+			<hydrostatic profile="Hydrostat" correctGearSpeed="true" minRatio="0"/>
 			<gears defaultGear="2" reverseReset="true" shiftTimeMs="1500" onlyStopped="true">
 				<gear name="1" speed="5.5"  forwardOnly="true"/>
 				<gear name="2" speed="11"   forwardOnly="true"/>
@@ -5846,7 +5846,7 @@
 			<combine defaultWidth="6.0"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Combine" correctGearSpeed="true" minRatio="0.14"/>
+			<hydrostatic profile="Hydrostat" correctGearSpeed="true" minRatio="0.14"/>
       <gears shiftTimeMs="1000" clutchRatio="1" defaultGear="3" onlyStopped="true">
         <gear speed="9"  name="1"/> 
         <gear speed="14" name="2"/> 

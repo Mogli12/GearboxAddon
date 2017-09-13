@@ -8,6 +8,8 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
+		<text name="gearboxMogliInputPrefix"           text="Gearbox: "/>
+		
 		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: vitesse sup"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: vitesse inf"/>
 		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Gearbox: changer vitesse"/>
@@ -88,6 +90,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>		<- may need tweak
 		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>		<- may need tweak
 		 
+		<text name="gearboxMogliTEXT_AllAutoMode"        text="Paramètres simplifiée"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="séquentielle"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="vitesses"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="gamme 1"/>

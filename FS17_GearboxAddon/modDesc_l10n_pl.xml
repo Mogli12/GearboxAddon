@@ -8,6 +8,8 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
+		<text name="gearboxMogliInputPrefix"           text="Gearbox: "/>
+		
 		<text name="input_gearboxMogliSHIFTGEARUP"     text="Gearbox: Bieg w górę"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="Gearbox: Bieg w dół"/>
 		<text name="input_gearboxMogliSHIFTGEARTOGGLE" text="Gearbox: Zmiana biegu"/>
@@ -65,8 +67,10 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="input_gearboxMogliCONFLICT_2"	   text="Gearbox: Konflikt 2"/>
 		<text name="input_gearboxMogliCONFLICT_3"	   text="Gearbox: Konflikt 3"/>
 		<text name="input_gearboxMogliCONFLICT_4"	   text="Gearbox: Konflikt 4"/>
+		
 		<text name="gearboxMogliTEXT_OFF"        text="Silnik wyłączony"/>
 		<text name="gearboxMogliTEXT_AI"         text="Pomocnik"/>
+		<text name="gearboxMogliTEXT_CP"         text="CP"/>
 		<text name="gearboxMogliTEXT_BRAKE"      text="Hamulec ręczny"/>
 		<text name="gearboxMogliTEXT_DC"         text="Podwójne sprzęgło"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"    text="Luz"/>
@@ -77,5 +81,44 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_ALLAUTO"    text="Prosta"/>
 		<text name="gearboxMogliTEXT_ECO"        text="Tryb EKO"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Auto hamulec"/>
+		                                                 
+		<text name="gearboxMogliTEXT_DISABLED"           text="off"/>
+		<text name="gearboxMogliTEXT_ENABLED"            text="on"/>
+		<text name="gearboxMogliTEXT_POWERSHIFT"         text="auto power shift"/>
+		<text name="gearboxMogliTEXT_N_A"                text="n/a"/>
+		
+		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="show target RPM"/>
+		<text name="gearboxMogliTEXT_DrawReqPower"       text="show power"/>
+		<text name="gearboxMogliTEXT_EnableAI"           text="hired worker"/>
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="swap gears and range 1"/>
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 and gears"/>
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="for-/backwards buttons"/>
+		 
+		<text name="gearboxMogliTEXT_AllAutoMode"        text="settings simplified"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="sequential"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="gears"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="range 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_3"      text="gears and range 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_4"      text="range 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="gears and range 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="ranges 1 and 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="gears, ranges 1 and 2"/>
+		
+		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_open"      text="open"/>
+		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="limited slip"/>
+		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatic"/>
+		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="fixed ratio"/>
+		<text name="gearboxMogliTEXT_DiffLock_locked"    text="locked"/>
+		
+		<text name="gearboxMogliTEXT_GearShifter_both"   text="keys and G27"/>
+		<text name="gearboxMogliTEXT_GearShifter_key"    text="keys"/>
+		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
+		
+		<text name="gearboxMogliTEXT_Shuttle_both"       text="toggle and separate"/>
+		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
+		
 	</texts>
 </l10n>

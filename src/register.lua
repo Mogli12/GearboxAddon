@@ -19,15 +19,18 @@ end
 
 function gearboxMogliRegister:loadMap(name)	
   if not gearboxMogliRegister.isLoaded then	
+		print("--- "..g_i18n:getText("gearboxMogliVERSION").." ---")
+		
 		gearboxMogliRegister.add(self)
     gearboxMogliRegister.isLoaded = true
-		ConfigurationUtil.registerConfigurationType("gearboxMogli", "Transmission")
+		ConfigurationUtil.registerConfigurationType("GearboxAddon", "Transmission")
 		
 		if g_server ~= nil then
 			gearboxMogliRegister.addConfigurations(self)
 		else
 			gearboxMogliRegister.requestConfigurations = true
 		end
+		print("--- "..g_i18n:getText("gearboxMogliVERSION").." ---")
   end
 		
 	if gearboxMogliScreen ~= nil then
@@ -64,7 +67,6 @@ function gearboxMogliRegister:draw()
 end
 
 function gearboxMogliRegister:add()
-	print("--- loading "..g_i18n:getText("gearboxMogliVERSION").." ---")
 
 	local searchTable  = { "gearboxMogli", "mrGearboxXerion", "mrGearbox2", "gearbox" }	
 	local searchTable2 = { "tempomat", "tempomatMogli" }	
@@ -74,14 +76,10 @@ function gearboxMogliRegister:add()
 	local updatedMods  = 0
 	local insertedMods = 0
 	
-	--for n,s in pairs(SpecializationUtil.specializations) do
-	--	print(tostring(n).." "..tostring(s.className))
-	--end
-	
 	local noSpec2 = false
 	if type( FS17_CCAddon ) == "table" and type( FS17_CCAddon.ccaddon_Register ) == "table" then
 		noSpec2 = true
-		print("Disabling cruise control modifications")
+		print("  Disabling cruise control modifications")
 	end
 	
 	for k, typeDef in pairs(VehicleTypeUtil.vehicleTypes) do
@@ -89,6 +87,7 @@ function gearboxMogliRegister:add()
 		local addSpecialization1 = true
 		local addSpecialization2 = true
 		local correctLocation    = false
+		local wasUpdated         = false
 		
 		if modName ~= nil and modName ~= "" and modName.gearboxMogli ~= nil then
 			addSpecialization1 = false
@@ -97,22 +96,20 @@ function gearboxMogliRegister:add()
 			for _, search in pairs(searchTable) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
 					addSpecialization1 = false
-					print(string.format(gearboxMogliRegister.modName..": %s already has a gearbox (2)", modName))
+					print(string.format("  %s already has a gearbox (2)", modName))
 					
 					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
 					
 					if     obj == nil then
-						print(gearboxMogliRegister.modName..": obj is nil")
+						print("  obj is nil")
 					elseif obj.version ~= nil and obj.version >= replObj1.version then
-						print(gearboxMogliRegister.modName..": obj.version >= replObj1.version")
+						print("  obj.version >= replObj1.version")
 					else
-				--if obj ~= nil and obj.version ~= nil and obj.version < replObj1.version then
 						for i,o in pairs(typeDef.specializations) do
 							if o == obj then
 								typeDef.specializations[i] = replObj1 
-								print(string.format(gearboxMogliRegister.modName..": !!!updating gearbox in %s!!!", modName))
-								
-								updatedMods = updatedMods + 1
+								print(string.format("  !!!updating gearbox in %s!!!", modName))					
+								wasUpdated = true
 							end
 						end
 					end
@@ -128,22 +125,20 @@ function gearboxMogliRegister:add()
 			for _, search in pairs(searchTable2) do
 				if SpecializationUtil.specializations[modName .. "." .. search] ~= nil then
 					addSpecialization2 = false
-					print(string.format(gearboxMogliRegister.modName..": %s already has cruise control", modName))
+					print(string.format("  %s already has cruise control", modName))
 
 					local obj = SpecializationUtil.getSpecialization( modName .. "." .. search )
 					
 					if     obj == nil then
-						print(gearboxMogliRegister.modName..": obj2 is nil")
+						print("  obj2 is nil")
 					elseif obj.version ~= nil and obj.version >= replObj2.version then
-						print(gearboxMogliRegister.modName..": obj2.version >= replObj2.version")
+						print("  obj2.version >= replObj2.version")
 					else
-				--if obj ~= nil and obj.version ~= nil and obj.version < replObj1.version then
 						for i,o in pairs(typeDef.specializations) do
 							if o == obj then
 								typeDef.specializations[i] = replObj2
-								print(string.format(gearboxMogliRegister.modName..": !!!updating cruise control in %s!!!", modName))
-								
-							--updatedMods2 = updatedMods2 + 1
+								print(string.format("  !!!updating cruise control in %s!!!", modName))
+								wasUpdated = true
 							end
 						end
 					end
@@ -151,6 +146,10 @@ function gearboxMogliRegister:add()
 					break
 				end
 			end
+		end
+
+		if wasUpdated then
+			updatedMods = updatedMods + 1
 		end
 		
 		for i,vs in pairs(typeDef.specializations) do
@@ -183,18 +182,25 @@ function gearboxMogliRegister:add()
 		end
 	end
 	
-	print(string.format("--- "..gearboxMogliRegister.modName..": inserted into %d vehicle types / %d vehicle types updated ---", insertedMods, updatedMods ))
+	print(string.format("  %d vehicle types enhanced / %d vehicle types updated", insertedMods, updatedMods ))
 	
 	-- make l10n global 
+	local prefix = g_i18n.texts.gearboxMogliInputPrefix
+	local prelen = 0
+	if prefix ~= nil and prefix ~= "" then
+		prelen = string.len( prefix )
+	end
 	for m,t in pairs( g_i18n.texts ) do
 		local n = nil
 		if     string.sub( m, 1, 18 ) == "input_gearboxMogli" then
 			n = string.sub( m, 7 )
+			if prelen > 0 and string.sub( t, 1, prelen ) == prefix then
+				t = string.sub( t, prelen+1, -1 )
+			end
 		elseif string.sub( m, 1, 12 ) == "gearboxMogli"       then
 			n = m
 		end
 		if n ~= nil and g_i18n.globalI18N.texts[n] == nil then
-		--print('"$l10n_'..tostring(n)..'" = "'..tostring(t)..'"')
 			g_i18n.globalI18N.texts[n] = t
 		end
 	end
@@ -271,11 +277,9 @@ function gearboxMogliRegister:addConfigurations()
 					defaultConfigName = "default"
 				end
 				
-				table.insert( modifiedItem.configurations, { name = "off", title = "Standard Transmission", source = -1 } )
-				
 				local isDefault = true
 				if hasVehicleConfig then
-					table.insert( modifiedItem.configurations, { name = "standard", title = "Standard Transmission", source = 0, isDefault = isDefault } )
+					table.insert( modifiedItem.configurations, { name = "Gearbox (vehicle)", title = "Gearbox (vehicle)", source = 0, isDefault = isDefault } )
 				end
 					
 				for i=1,2 do
@@ -289,7 +293,13 @@ function gearboxMogliRegister:addConfigurations()
 					entry = gearboxMogliLoader.getConfigEntry( configTab, configFileName )
 					if entry ~= nil then
 						if entry.hasGearboxMogliTag then
-							table.insert( modifiedItem.configurations, { name = "gearbox addon", title = "Gearbox Addon", source = i, baseName = entry.xmlName, isDefault = isDefault } )
+							local name = ""
+							if i == 1 then
+								name = "Gearbox (external)"
+							else
+								name = "Gearbox (addon)"
+							end
+							table.insert( modifiedItem.configurations, { name = name, title = name, source = i, baseName = entry.xmlName, isDefault = isDefault } )
 							isDefault = false
 						elseif entry.motorConfig == nil then
 							local j = 0
@@ -301,7 +311,7 @@ function gearboxMogliRegister:addConfigurations()
 								end
 								j = j + 1
 								
-								table.insert( modifiedItem.configurations, { name = s, title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault } )
+								table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault } )
 								isDefault = false
 							end
 						end
@@ -316,17 +326,19 @@ function gearboxMogliRegister:addConfigurations()
 					table.insert( modifiedItem.configurations, { name = "default", title = "Default Transmission", source = 3, def = defaultConfigName, isDefault = isDefault } )
 				end
 				
+				table.insert( modifiedItem.configurations, { name = "off", title = "Standard Transmission", source = -1 } )
+				
 				gearboxMogliRegister.modifiedStoreItems[xmlFileLower] = modifiedItem
 
 				if storeItem.configurations == nil then
 					storeItem.configurations = {}
 				end
-				if storeItem.configurations.gearboxMogli == nil then
-					storeItem.configurations.gearboxMogli = {}
+				if storeItem.configurations.GearboxAddon == nil then
+					storeItem.configurations.GearboxAddon = {}
 				end
 				
 				for j,c in pairs( modifiedItem.configurations ) do
-					local item = StoreItemsUtil.addConfigurationItem(storeItem.configurations.gearboxMogli, c.name, c.title, 0, 0, "")
+					local item = StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, c.name, c.title, 0, 0, "")
 					if c.isDefault then
 						item.isDefault = true 
 					end
@@ -403,12 +415,12 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 			if storeItem.configurations == nil then
 				storeItem.configurations = {}
 			end
-			if storeItem.configurations.gearboxMogli == nil then
-				storeItem.configurations.gearboxMogli = {}
+			if storeItem.configurations.GearboxAddon == nil then
+				storeItem.configurations.GearboxAddon = {}
 			end
 			
 			for j,configItem in pairs( evItem.configItems ) do
-				StoreItemsUtil.addConfigurationItem(storeItem.configurations.gearboxMogli, configItem.name, configItem.title, 0, 0, "")			
+				StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, configItem.name, configItem.title, 0, 0, "")			
 			end
 		end
 	end

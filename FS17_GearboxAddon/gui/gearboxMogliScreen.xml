@@ -84,12 +84,12 @@
 					<GuiElement type="bitmap" profile="multiTextOptionBg" />
 				</GuiElement>
 				
-				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="AllAutoMode" toolTip="$l10n_gearboxMogliAllAuto" onCreate="onCreateSubElement" onCreateArgs="list"
+				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="AllAutoMode" toolTip="$l10n_gearboxMogliTEXT_AllAutoMode" onCreate="onCreateSubElement" onCreateArgs="list"
 										focusId="23" focusChangeTop="22" focusChangeBottom="23">
 					<GuiElement type="button" profile="multiTextOptionLeft" />
 					<GuiElement type="button" profile="multiTextOptionRight"/>
 					<GuiElement type="text"   profile="multiTextOptionText" />
-					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliAllAuto"/>
+					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_AllAutoMode"/>
 					<GuiElement type="bitmap" profile="multiTextOptionBg" />
 				</GuiElement>
 				

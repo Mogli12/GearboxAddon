@@ -8,6 +8,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
+		<text name="gearboxMogliInputPrefix"             text="Gearbox: "/>
+		
 		<text name="input_gearboxMogliSHIFTGEARUP"       text="Gearbox: gear up"/>
 		<text name="input_gearboxMogliSHIFTGEARDOWN"     text="Gearbox: gear down"/>
 		<text name="input_gearboxMogliSHIFTGEARTOGGLE"   text="Gearbox: toggle gear"/>
@@ -88,6 +90,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 and gears"/>
 		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="for-/backwards buttons"/>
 		 
+		<text name="gearboxMogliTEXT_AllAutoMode"        text="settings simplified"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="sequential"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="gears"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="range 1"/>
