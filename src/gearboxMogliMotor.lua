@@ -25,9 +25,9 @@ setmetatable( gearboxMogliMotor, { __index = function (table, key) return Vehicl
 --**********************************************************************************************************	
 function gearboxMogliMotor:new( vehicle, motor )
 
-	if Vehicle.mrLoadFinished ~= nil then
-		print("gearboxMogli: init of motor with moreRealistic. self.mrIsMrVehicle = "..tostring(vehicle.mrIsMrVehicle))
-	end
+--if Vehicle.mrLoadFinished ~= nil then
+--	print("gearboxMogli: init of motor with moreRealistic. self.mrIsMrVehicle = "..tostring(vehicle.mrIsMrVehicle))
+--end
 
 	local interpolFunction = linearInterpolator1
 	local interpolDegree   = 2

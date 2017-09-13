@@ -565,11 +565,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 --**************************************************************************************************	
 	self.mrGbMS.ConfigVersion           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#version" ),1.4)
 	self.mrGbMS.NoDisable               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#noDisable" ),self.mrGbMG.noDisable)
-	if self.mrGbMS.NoDisable then
-		self.mrGbMS.DefaultOn             = true
-	else
-		self.mrGbMS.DefaultOn             = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#defaultOn" ),self.mrGbMG.defaultOn )
-	end
 	self.mrGbMS.showHud                 = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#showHud" ),true)
 	self.mrGbMS.DrawTargetRpm           = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#drawTargetRpm" ),self.mrGbMG.drawTargetRpm)
 	self.mrGbMS.DrawReqPower            = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#drawTargetRpm" ),self.mrGbMG.drawReqPower)
@@ -2429,7 +2424,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 --**************************************************************************************************	
 	
 -- set the default values for SERVER		
-	self.mrGbMS.IsOnOff       = self.mrGbMS.DefaultOn
+	self.mrGbMS.IsOnOff       = true
 	self.mrGbMS.NeutralActive = self.mrGbMS.AutoStartStop	
 	self.mrGbMS.CurrentGear   = self.mrGbMS.DefaultGear
 	self.mrGbMS.CurrentRange  = self.mrGbMS.DefaultRange
@@ -2697,19 +2692,11 @@ function gearboxMogli:update(dt)
 			gearboxMogli.showSettingsUI( self )
 			processInput = false
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
-		--if     not ( self.isMotorStarted ) then
-		--	self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-		--elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
-		--	self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-		--	if not self:getIsHired() then
-		--		self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
-		--		self:stopMotor()
-		--	end
-		--else
-		--	self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
-		--end
 			if     self.steeringEnabled then
 				gearboxMogli.enabledAtClient = not gearboxMogli.enabledAtClient
+				if self.mrGbMS.NoDisable and not gearboxMogli.enabledAtClient then
+					self:mrGbMSetState( "WarningText", "This gearbox is always enabled" )
+				end
 			elseif self.mrGbMS.EnableAI  ~= gearboxMogli.AIGearboxOff then
 				self:mrGbMSetState( "EnableAI", gearboxMogli.AIGearboxOff )
 			elseif self.mrGbMS.EnableAI0 ~= gearboxMogli.AIGearboxOff then
@@ -2721,22 +2708,26 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" ) then
 			if     self.steeringEnabled then
 				gearboxMogli.simplifiedAtClient = not gearboxMogli.simplifiedAtClient
+				if gearboxMogli.simplifiedAtClient and not self:mrGbMGetHasAllAuto() then
+					self:mrGbMSetState( "WarningText", "This gearbox does not have a simplified mode" )
+				end
 			elseif self:mrGbMGetHasAllAuto() then
 				self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
 			end
 		end
 	end
 	
-	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff ~= gearboxMogli.enabledAtClient then
-		self:mrGbMSetIsOnOff( gearboxMogli.enabledAtClient ) 
+	local enabledAtClient = gearboxMogli.enabledAtClient
+	if self.mrGbMS.NoDisable then
+		enabledAtClient = true
+	end
+	
+	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff ~= enabledAtClient then
+		self:mrGbMSetIsOnOff( enabledAtClient ) 
 		if self.isMotorStarted then
 			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
 			self:stopMotor()
 		end
-	end
-	
-	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff and self.mrGbMS.AllAuto ~= gearboxMogli.simplifiedAtClient then
-		self:mrGbMSetState( "AllAuto", gearboxMogli.simplifiedAtClient )
 	end
 	
 	if      self.mrGbMS.WarningText ~= nil
@@ -3011,15 +3002,8 @@ function gearboxMogli:update(dt)
 	
 	if self.isServer and not ( self.mrGbML.firstTimeRun ) then
 		self.mrGbML.firstTimeRun = true
-		if self.mrGbMS.ReverseActive then
-			self:mrGbMSetState( "CurrentGear",   gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,   self.mrGbMS.CurrentGear,   self.mrGbMS.ResetRevGear,   "gear" ) )
-			self:mrGbMSetState( "CurrentRange",  gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges,  self.mrGbMS.CurrentRange,  self.mrGbMS.ResetRevRange,  "range" ) )
-			self:mrGbMSetState( "CurrentRange2", gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2, self.mrGbMS.ResetRevRange2, "range2" ) )		
-		else
-			self:mrGbMSetState( "CurrentGear",   gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,   self.mrGbMS.CurrentGear,   self.mrGbMS.ResetFwdGear,   "gear" ) )
-			self:mrGbMSetState( "CurrentRange",  gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges,  self.mrGbMS.CurrentRange,  self.mrGbMS.ResetFwdRange,  "range" ) )
-			self:mrGbMSetState( "CurrentRange2", gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2, self.mrGbMS.ResetFwdRange2, "range2" ) )		
-		end	
+		self:mrGbMSetLanuchGear( noEventSend )
+		self:mrGbMDoGearShift() 
 	end	
 
 	if self.mrGbMG.debugPrint and not ( gearboxMogli.consoleCommand1 ) then
@@ -3193,6 +3177,10 @@ function gearboxMogli:update(dt)
 	if gearboxMogli.mbIsActiveForInput( self, false ) then	
 		if     self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
 			self:mrGbMSetState( "AllAuto", false )		
+		elseif  self.isEntered 
+				and self.steeringEnabled 
+				and self.mrGbMS.AllAuto ~= gearboxMogli.simplifiedAtClient then
+			self:mrGbMSetState( "AllAuto", gearboxMogli.simplifiedAtClient )
 		end
 
 		if self.mrGbMS.AllAuto then
@@ -4750,9 +4738,6 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.AllAutoMode < 7 then
 			attributes = attributes.." mrGbMAllAutoMode=\"" .. tostring( self.mrGbMS.AllAutoMode ) .. "\""  
 		end
-		if self.mrGbMS.DefaultOn ~= self.mrGbMS.IsOnOff then
-			attributes = attributes.." mrGbMIsOnOff=\"" .. tostring( self.mrGbMS.IsOnOff ) .. "\""     
-		end
 		if self.mrGbMS.EcoMode then
 			attributes = attributes.." mrGbMEcoMode=\"" .. tostring( self.mrGbMS.EcoMode ) .. "\""     
 		end
@@ -4852,7 +4837,6 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
-		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMIsOnOff"       , "IsOnOff"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMEcoMode"       , "EcoMode"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMSwapGearRange" , "SwapGearRangeKeys" )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDrawTargetRpm" , "DrawTargetRpm"     )
@@ -6752,7 +6736,7 @@ end
 -- gearboxMogli:mrGbMOnSetRange
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
-		
+
 	local timeToShift = self.mrGbMS.GearTimeToShiftHl
 	
 	self.mrGbMS.CurrentRange = new
@@ -6810,7 +6794,7 @@ end
 -- gearboxMogli:mrGbMOnSetGear
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
-
+	
 	local timeToShift = self.mrGbMS.GearTimeToShiftGear
 		
 	self.mrGbMS.CurrentGear = new
@@ -6953,28 +6937,6 @@ end
 function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 
 	if new then						
-		if      self.dCcheckModule ~= nil
-				and self.driveControl  ~= nil
-				and self:dCcheckModule("shuttle")
-				and self.driveControl.shuttle ~= nil 
-				and self.driveControl.shuttle.isActive then
-			if self.driveControl.shuttle.direction < 0 then
-				self:mrGbMSetReverseActive( true, noEventSend )  -- first gear, H range, reverse
-			else
-				self:mrGbMSetReverseActive( false, noEventSend )  -- first gear, H range, forward
-			end
-		end
-
-		if self.mrGbMS.ReverseActive then
-			self:mrGbMSetState( "CurrentGear",   self.mrGbMS.ResetRevGear, noEventSend ) 
-			self:mrGbMSetState( "CurrentRange",  self.mrGbMS.ResetRevRange, noEventSend ) 
-			self:mrGbMSetState( "CurrentRange2", self.mrGbMS.ResetRevRange2, noEventSend ) 
-		else
-			self:mrGbMSetState( "CurrentGear",   self.mrGbMS.ResetFwdGear, noEventSend ) 
-			self:mrGbMSetState( "CurrentRange",  self.mrGbMS.ResetFwdRange, noEventSend ) 
-			self:mrGbMSetState( "CurrentRange2", self.mrGbMS.ResetFwdRange2, noEventSend ) 
-		end
-		
 		if self.mrGbML.motor ~= nil then
 			gearboxMogliMotor.copyRuntimeValues( self.mrGbMB.motor, self.mrGbML.motor )
 			self.motor = self.mrGbML.motor
@@ -6983,6 +6945,8 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 			self:mrGbMSetNeutralActive( true, noEventSend, true ) 
 			self:mrGbMSetState( "AutoHold", true, noEventSend ) 
 		end
+		
+		self:mrGbMSetLanuchGear( noEventSend )
 		self:mrGbMDoGearShift() 
 		
 		self.cruiseControl.maxSpeed   = self.mrGbMS.MaxGearSpeed * self.mrGbMS.MaxTargetRpmRatio * 3.6
