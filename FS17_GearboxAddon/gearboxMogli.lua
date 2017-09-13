@@ -94,6 +94,9 @@ gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 0
 gearboxMogli.brakeForceLimitRpm   = 25
 
+gearboxMogli.enabledAtClient      = true
+gearboxMogli.simplifiedAtClient   = false
+
 gearboxMogliGlobals                       = {}
 gearboxMogliGlobals.debugPrint            = false
 gearboxMogliGlobals.debugInfo             = false 
@@ -2694,19 +2697,46 @@ function gearboxMogli:update(dt)
 			gearboxMogli.showSettingsUI( self )
 			processInput = false
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliON_OFF" ) then
-			if     not ( self.isMotorStarted ) then
-				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-			elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
-				self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
-				if not self:getIsHired() then
-					self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
-					self:stopMotor()
-				end
+		--if     not ( self.isMotorStarted ) then
+		--	self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+		--elseif g_currentMission.missionInfo.automaticMotorStartEnabled then
+		--	self:mrGbMSetIsOnOff( not self.mrGbMS.IsOnOff ) 
+		--	if not self:getIsHired() then
+		--		self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+		--		self:stopMotor()
+		--	end
+		--else
+		--	self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+		--end
+			if     self.steeringEnabled then
+				gearboxMogli.enabledAtClient = not gearboxMogli.enabledAtClient
+			elseif self.mrGbMS.EnableAI  ~= gearboxMogli.AIGearboxOff then
+				self:mrGbMSetState( "EnableAI", gearboxMogli.AIGearboxOff )
+			elseif self.mrGbMS.EnableAI0 ~= gearboxMogli.AIGearboxOff then
+				self:mrGbMSetState( "EnableAI", self.mrGbMS.EnableAI0 )
 			else
-				self:mrGbMSetState( "WarningText", "Cannot exchange gearbox while motor is running" )
+				self:mrGbMSetState( "EnableAI", gearboxMogli.AIGearboxOn )
 			end
 			processInput = false
+		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" ) then
+			if     self.steeringEnabled then
+				gearboxMogli.simplifiedAtClient = not gearboxMogli.simplifiedAtClient
+			elseif self:mrGbMGetHasAllAuto() then
+				self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
+			end
 		end
+	end
+	
+	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff ~= gearboxMogli.enabledAtClient then
+		self:mrGbMSetIsOnOff( gearboxMogli.enabledAtClient ) 
+		if self.isMotorStarted then
+			self.mrGbML.turnOnMotorTimer = g_currentMission.time + 200
+			self:stopMotor()
+		end
+	end
+	
+	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff and self.mrGbMS.AllAuto ~= gearboxMogli.simplifiedAtClient then
+		self:mrGbMSetState( "AllAuto", gearboxMogli.simplifiedAtClient )
 	end
 	
 	if      self.mrGbMS.WarningText ~= nil
@@ -3379,12 +3409,12 @@ function gearboxMogli:update(dt)
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOMATIC" ) then
 			self:mrGbMSetAutomatic( not self.mrGbMS.Automatic )
-		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" ) then
-			if self.mrGbMS.AllAuto then
-				self:mrGbMSetAllAuto( false )
-			elseif self:mrGbMGetHasAllAuto() then
-				self:mrGbMSetAllAuto( true )
-			end
+	--elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAllAuto" ) then
+	--	if self.mrGbMS.AllAuto then
+	--		self:mrGbMSetAllAuto( false )
+	--	elseif self:mrGbMGetHasAllAuto() then
+	--		self:mrGbMSetAllAuto( true )
+	--	end
 		elseif self.mrGbMS.GearShifterMode ~= 2 and gearboxMogli.mbHasInputEvent( "gearboxMogliNEUTRAL" ) then
 			if not self.mrGbMS.NeutralActive then
 				self:setCruiseControlState(0)
@@ -4027,18 +4057,24 @@ function gearboxMogli:updateTick(dt)
 						end
 					end
 				end
-				if self.mrIsMrVehicle then
-					local s = 0
-					local c = 0
-					for _,wheel in ipairs(self.wheels) do
-						s = s + wheel.mrAvgLongSlip
-						c = c + 1
+				
+				local s = 0
+				local t = math.abs( self.lastSpeedReal*1000 )
+				for _,wheel in ipairs(self.wheels) do
+					w = math.abs( getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius )
+					local r = 0
+					if w > 0.1 and w > t then
+						r = 1 - t / w
 					end
-					if c > 1 then
-						s = s / c
+					if wheel.gearboxMogliLongSlip == nil then
+						wheel.gearboxMogliLongSlip = r
+					else
+						wheel.gearboxMogliLongSlip = wheel.gearboxMogliLongSlip + self.mrGbML.smoothFast * ( r - wheel.gearboxMogliLongSlip )
 					end
-					self.mrGbMD.Slip = math.floor( 100 * Utils.clamp( s, 0, 1 ) + 0.5 )
+						
+					s = math.max( s, wheel.gearboxMogliLongSlip )
 				end
+				self.mrGbMD.Slip = math.floor( 100 * Utils.clamp( s, 0, 1 ) + 0.5 )
 
 				self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
 				
@@ -4324,7 +4360,7 @@ function gearboxMogli:draw()
 			elseif self.mrGbMD.Rate ~= nil and self.mrGbMD.Rate > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "combine"
 			end
-			if self.mrIsMrVehicle then
+			if self.mrIsMrVehicle or self.mrGbMS.ModifyDifferentials then
 				ovRows = ovRows + 1 infos[ovRows] = "mrWheelSlip"
 			end
 			--==============================================
@@ -4564,20 +4600,11 @@ function gearboxMogli:draw()
 
 			
 			drawY = drawY + 0.25*deltaY			
-			renderText(ovRight, drawY, 0.5*deltaY, gearboxMogli.getText( "gearboxMogliVERSION", "Gearbox by mogli" ) )  		          
-
-		--if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
-		--	g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
-		--end
-
-			if InputBinding.gearboxMogliAllAuto ~= nil then
-				if self.mrGbMS.AllAuto then
-					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
-				elseif self.steeringEnabled and self:mrGbMGetHasAllAuto() then
-					g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),InputBinding.gearboxMogliAllAuto)		
-				end
+			local text = gearboxMogli.getText( "gearboxMogliVERSION", "Gearbox by mogli" ) 
+			if self.mrIsMrVehicle then
+				text = text .. " (MR)"
 			end
-			
+			renderText(ovRight, drawY, 0.5*deltaY, text )  		          
 		elseif self.mrGbMS.HudMode == 2 then
 			setTextAlignment(RenderText.ALIGN_LEFT) 
 			setTextBold(false)
@@ -4633,10 +4660,29 @@ function gearboxMogli:draw()
 		if self:mrGbMGetDiffLockBack()   then
 			gearboxMogli.ovDiffLockBack:render()
 		end
-			
-	else
-		if InputBinding.gearboxMogliON_OFF ~= nil and not self.mrGbMS.NoDisable then
+	end
+	
+	local e = self.mrGbMS.IsOnOff
+	local a = self.mrGbMS.AllAuto 
+	
+	if self.steeringEnabled then
+		e = gearboxMogli.enabledAtClient
+		a = gearboxMogli.simplifiedAtClient
+	end
+	
+	if InputBinding.gearboxMogliON_OFF ~= nil then
+		if e then
+			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
+		else
 			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliOFF", "Gearbox [off]"), InputBinding.gearboxMogliON_OFF)		
+		end
+	end
+
+	if InputBinding.gearboxMogliAllAuto ~= nil and ( a or self.steeringEnabled or self:mrGbMGetHasAllAuto() ) then
+		if a then
+			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
+		else
+			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),InputBinding.gearboxMogliAllAuto)		
 		end
 	end
 	

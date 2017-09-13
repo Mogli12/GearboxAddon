@@ -64,6 +64,7 @@ local showMRWarning = false --true
 
 function gearboxMogliLoader:preLoad(savegame) 
 	if savegame ~= nil and type( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] ) == "table" then
+		local setDefault = true
 		local i = 0;
 		while true do
 			local key = string.format(savegame.key..".boughtConfiguration(%d)", i);
@@ -71,19 +72,25 @@ function gearboxMogliLoader:preLoad(savegame)
 				break;
 			end;
 			local name = getXMLString(savegame.xmlFile, key.."#name");
-			if name == "gearboxMogli" then
+			if     name == "gearboxMogli" then
+				setDefault = false
 				local id = getXMLInt(savegame.xmlFile, key.."#id");
 				if id == 1 then
 					id = table.getn( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] )
-					logWrite( 1, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", 1, id ))
+					logWrite( 0, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", 1, id ))
 				else
 					id = id - 1
-					logWrite( 1, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
+					logWrite( 0, string.format("  self.configurations.gearboxAddon (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
 				end
 				self:addBoughtConfiguration("GearboxAddon", id)
+			elseif name == "GearboxAddon" then
+				setDefault = false
 			end
 			i = i + 1;
 		end;
+		if setDefault then
+			self:addBoughtConfiguration("GearboxAddon", 1)
+		end
 	end
 end
 
