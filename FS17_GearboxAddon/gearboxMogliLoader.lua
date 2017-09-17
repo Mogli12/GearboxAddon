@@ -185,16 +185,22 @@ function gearboxMogliLoader.initXmlFiles()
 	gearboxMogliLoader.defaultConfigI = {} 
 	gearboxMogliLoader.defaultConfigE = {} 
 	
-	for f=1,2 do 	
+	for f=1,3 do 	
 		local file1
 		local logLevel
 
-		if f == 1 then
+		if     f == 1 then
 			file1 = gearboxMogliLoader.baseDirectory.."gearboxAddonConfig.xml"
 			logLevel = 4
-		else
+		elseif f == 2 then
 			file1 = gearboxMogliLoader.modsDirectory.."gearboxAddonConfig.xml"
 			logLevel = 2
+		elseif gearboxMogliLoader.xmlFileExt ~= nil then
+			logWrite( 2,'ignoring gearboxAddonConfig.zip')
+			break
+		else
+			file1 = gearboxMogliLoader.modsDirectory.."/gearboxAddonConfig/gearboxAddonConfig.xml"
+			logLevel = 1
 		end
 		
 		logWrite( logLevel, file1)
@@ -205,6 +211,12 @@ function gearboxMogliLoader.initXmlFiles()
 				gearboxMogliLoader.xmlFileInt = xmlFile
 			else
 				gearboxMogliLoader.xmlFileExt = xmlFile
+				
+				if f == 2 then
+					logWrite( 1,'Found gearboxAddonConfig.xml in mods folder.')
+				else
+					logWrite( 1,'Found gearboxAddonConfig.xml in extra mod gearboxAddonConfig.')
+				end
 			end
 			
 			local i = 0
