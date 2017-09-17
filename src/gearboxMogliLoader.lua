@@ -63,7 +63,9 @@ end
 local showMRWarning = false --true
 
 function gearboxMogliLoader:preLoad(savegame) 
-	if savegame ~= nil and type( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] ) == "table" then
+	if      savegame ~= nil
+			and type( gearboxMogliRegister.modifiedStoreItems ) == "table"
+			and type( gearboxMogliRegister.modifiedStoreItems[self.configFileName:lower()] ) == "table" then
 		local setDefault = true
 		local i = 0;
 		while true do
@@ -82,13 +84,16 @@ function gearboxMogliLoader:preLoad(savegame)
 					id = id - 1
 					logWrite( 0, string.format("  self.configurations.gearboxMogli (%d) => self.configurations.GearboxAddon (%d)", id+1, id ))
 				end
+				self.mrGbMLGearboxAddonConfiguration = id
 				self:addBoughtConfiguration("GearboxAddon", id)
 			elseif name == "GearboxAddon" then
+				self.mrGbMLGearboxAddonConfiguration = getXMLInt(savegame.xmlFile, key.."#id")
 				setDefault = false
 			end
 			i = i + 1;
 		end;
 		if setDefault then
+			self.mrGbMLGearboxAddonConfiguration = 1
 			self:addBoughtConfiguration("GearboxAddon", 1)
 		end
 	end
@@ -144,6 +149,8 @@ function gearboxMogliLoader:load(savegame)
 			logWrite( 0,"Error 3 loading gearboxMogliLoader: "..tostring(message)) 
 			self.mrGbMLGearbox1 = false
 		end
+	elseif self.mrGbMLGearboxAddonConfiguration ~= nil then
+		self:addBoughtConfiguration("GearboxAddon", self.mrGbMLGearboxAddonConfiguration)
 	end
 end 
 

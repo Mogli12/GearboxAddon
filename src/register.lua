@@ -60,6 +60,12 @@ function gearboxMogliRegister:update(dt)
 		gearboxMogliRegister.requestConfigurations = false
 		print("gearboxMogli: client is requesting configuration items from server")
 		g_client:getServerConnection():sendEvent(gearboxMogliRegisterNewClient:new())
+	elseif gearboxMogliRegister.requestedStoreItemConnections ~= nil then
+		local temp = gearboxMogliRegister.requestedStoreItemConnections
+		gearboxMogliRegister.requestedStoreItemConnections = nil
+		for connection,doit in pairs(temp) do
+			connection:sendEvent(gearboxMogliRegisterSendConfigs:new(),true)
+		end
 	end
 end
 
@@ -245,7 +251,7 @@ function gearboxMogliRegister:addConfigurations()
 			
 			if addMogliGearbox then
 				local modifiedItem = {}
-				modifiedItem.xmlFilename = storeItem.xmlFilename				
+				modifiedItem.xmlFilename  = storeItem.xmlFilename				
 				modifiedItem.configurations = {}
 			
 				local entry, configTab, defaultConfigName
@@ -328,8 +334,6 @@ function gearboxMogliRegister:addConfigurations()
 				
 				table.insert( modifiedItem.configurations, { name = "off", title = "Standard Transmission", source = -1 } )
 				
-				gearboxMogliRegister.modifiedStoreItems[xmlFileLower] = modifiedItem
-
 				if storeItem.configurations == nil then
 					storeItem.configurations = {}
 				end
@@ -343,6 +347,10 @@ function gearboxMogliRegister:addConfigurations()
 						item.isDefault = true 
 					end
 				end
+				
+				gearboxMogliRegister.modifiedStoreItems[ xmlFileLower ] = modifiedItem
+				
+			--print(string.format("%3d: %2d, %s", table.getn( gearboxMogliRegister.modifiedStoreItems ), table.getn( modifiedItem.configurations ), xmlFileLower ))
 			end
 		end		
 	end
@@ -364,7 +372,7 @@ end
 function gearboxMogliRegisterNewClient:readStream(streamId, connection)
 	local test = streamReadInt32( streamId )
 	if test == 28081988 then
-		connection:sendEvent(gearboxMogliRegisterSendConfigs:new(),true)
+		self:run(connection)
 	else
 		print("gearboxMogli: Error registering new client")
 	end
@@ -373,7 +381,11 @@ function gearboxMogliRegisterNewClient:writeStream(streamId, connection)
 	streamWriteInt32(streamId, 28081988 )
 end
 function gearboxMogliRegisterNewClient:run(connection)
-	print("gearboxMogli ERROR: Event gearboxMogliRegisterNewClient cannot run locally")
+	print("gearboxMogli: received configuration request")
+ 	if gearboxMogliRegister.requestedStoreItemConnections == nil then
+		gearboxMogliRegister.requestedStoreItemConnections = {}
+	end
+	gearboxMogliRegister.requestedStoreItemConnections[connection] = true
 end
 
 gearboxMogliRegisterSendConfigs = {}
@@ -428,15 +440,19 @@ end
 function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 	
 	if type( gearboxMogliRegister.modifiedStoreItems ) ~= "table" then
-		print("gearboxMogli: Sending 0 configuration items to the client")
+		print("gearboxMogli: Sending nil configuration items to the client")
 		streamWriteInt32(streamId, 0)
 	else
-		local i = table.getn( gearboxMogliRegister.modifiedStoreItems )
+		local i = 0
+		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
+			i = i + 1
+		end
+		
 		print(string.format("gearboxMogli: Sending %d configuration items to the client",i))
 		streamWriteInt32(streamId, i)
 		
-		for file,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
-			streamWriteString(streamId, file )
+		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
+			streamWriteString(streamId, xmlFileLower )
 			
 			if type( item.configurations ) ~= "table" then
 				streamWriteInt32(streamId, 0)
@@ -452,5 +468,13 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 	end
 end
 function gearboxMogliRegisterSendConfigs:run(connection)
-	print("gearboxMogli ERROR: Event gearboxMogliRegisterSendConfigs cannot run locally")
+	if type( gearboxMogliRegister.modifiedStoreItems ) ~= "table" then
+		print("gearboxMogli: Sending nil configuration items to the client (local)")
+	else
+		local i = 0
+		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
+			i = i + 1
+		end
+		print(string.format("gearboxMogli: Sending %d configuration items to the client (local)",i))
+	end
 end
