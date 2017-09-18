@@ -251,7 +251,8 @@ function gearboxMogliRegister:addConfigurations()
 			
 			if addMogliGearbox then
 				local modifiedItem = {}
-				modifiedItem.xmlFilename  = storeItem.xmlFilename				
+				modifiedItem.xmlFilename    = storeItem.xmlFilename				
+				modifiedItem.configFileName = storeItem.configFileName				
 				modifiedItem.configurations = {}
 			
 				local entry, configTab, defaultConfigName
@@ -406,25 +407,24 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 	local evData = {}
 	
 	for i=1,numStoreItems do
-		local evItem = {}	
-		evItem.configItems = {}
-
 		local numConfigItems = streamReadInt32(streamId)
-		evItem.xmlFilename   = streamReadString(streamId)
+		local configFileName = streamReadString(streamId)
+		
+		evData[configFileName] = {}
 		
 		for j=1,numConfigItems do
 			local n = streamReadString(streamId)
 			local t = streamReadString(streamId)
-			table.insert( evItem.configItems, {name=n, title=t})
+			table.insert( evData[configFileName], {name=n, title=t})
 		end
-		
-		table.insert( evData, evItem )
 	end
 		
-	for i,evItem in pairs( evData ) do
-		local storeItem = StoreItemsUtil.storeItemsByXMLFilename[evItem.xmlFilename]
-			
-		if storeItem ~= nil then
+	for xmlFileLower,storeItem in pairs( StoreItemsUtil.storeItemsByXMLFilename ) do
+		local configFileName = nil
+		if storeItem.xmlFilename ~= nil then
+			configFileName = string.lower( Utils.removeModDirectory( storeItem.xmlFilename ) )
+		end
+		if configFileName ~= nil and evData[configFileName] ~= nil then
 			if storeItem.configurations == nil then
 				storeItem.configurations = {}
 			end
@@ -432,7 +432,7 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 				storeItem.configurations.GearboxAddon = {}
 			end
 			
-			for j,configItem in pairs( evItem.configItems ) do
+			for j,configItem in pairs( evData[configFileName] ) do
 				StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, configItem.name, configItem.title, 0, 0, "")			
 			end
 		end
@@ -453,7 +453,7 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 		
 		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
 			local numConfigItems = 0
-			if type( item.configurations ) == "table" then
+			if type( item.configFileName ) == "string" and type( item.configurations ) == "table" then
 				for j,c in pairs( item.configurations ) do
 					numConfigItems = numConfigItems + 1
 					sumConfigItems = sumConfigItems + 1
@@ -461,8 +461,8 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 			end
 			
 			if numConfigItems > 0 then
-				streamWriteInt32(streamId, numConfigItems)
-				streamWriteString(streamId, Utils.getNoNil( xmlFileLower, "!!!error!!!" ) )
+				streamWriteInt32(streamId,  numConfigItems)
+				streamWriteString(streamId, item.configFileName )
 				
 				for j,c in pairs( item.configurations ) do
 					streamWriteString(streamId, Utils.getNoNil( c.name, "!!!empty!!!" ) )

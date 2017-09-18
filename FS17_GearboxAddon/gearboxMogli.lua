@@ -6190,7 +6190,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:mrGbMDoGearShift
 --**********************************************************************************************************	
-function gearboxMogli:mrGbMDoGearShift()
+function gearboxMogli:mrGbMDoGearShift( noEventSend )
 	if self.isServer then
 	--print("do gear shift (server): "..
 	--			tostring(self.mrGbMS.CurrentGear)	..", "..
@@ -6206,9 +6206,9 @@ function gearboxMogli:mrGbMDoGearShift()
 				or self.mrGbMS.CurrentRange  == nil
 				or self.mrGbMS.Ranges2       == nil 
 				or self.mrGbMS.CurrentRange2 == nil then
-			self:mrGbMSetState( "CurrentGearSpeed", 0 )
-			self:mrGbMSetState( "AutoMinGearSpeed", 0 )
-			self:mrGbMSetState( "AutoMaxGearSpeed", 0 )
+			self:mrGbMSetState( "CurrentGearSpeed", 0, noEventSend )
+			self:mrGbMSetState( "AutoMinGearSpeed", 0, noEventSend )
+			self:mrGbMSetState( "AutoMaxGearSpeed", 0, noEventSend )
 			return
 		end
 
@@ -6232,9 +6232,9 @@ function gearboxMogli:mrGbMDoGearShift()
 		self.mrGbML.lastShiftTime    = g_currentMission.time
 		self.mrGbML.autoShiftTime    = g_currentMission.time
 		self.mrGbML.lastGearSpeed    = Utils.getNoNil( self.mrGbMS.CurrentGearSpeed, 0 )				
-		self:mrGbMSetState( "CurrentGearSpeed", gearMaxSpeed )
+		self:mrGbMSetState( "CurrentGearSpeed", gearMaxSpeed, noEventSend )
 
-		gearboxMogli.setAutoMinMaxGearSpeed( self )
+		gearboxMogli.setAutoMinMaxGearSpeed( self, noEventSend )
 		
 		if self.mrGbML.motor ~= nil then	
 			self.mrGbML.motor.deltaRpm = 0
