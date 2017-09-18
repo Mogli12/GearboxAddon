@@ -400,18 +400,19 @@ function gearboxMogliRegisterSendConfigs:new()
   return self
 end
 function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
-  numStoreItems = streamReadInt32(streamId)
+  local numStoreItems = streamReadInt32(streamId)
 	print(string.format("gearboxMogli: received configurations for %d vehicles", numStoreItems))
   
 	local evData = {}
 	
 	for i=1,numStoreItems do
-		local evItem = {}
-	
-		evItem.xmlFilename = streamReadString(streamId)
+		local evItem = {}	
 		evItem.configItems = {}
-		local m = streamReadInt32(streamId)
-		for j=1,m do
+
+		local numConfigItems = streamReadInt32(streamId)
+		evItem.xmlFilename   = streamReadString(streamId)
+		
+		for j=1,numConfigItems do
 			local n = streamReadString(streamId)
 			local t = streamReadString(streamId)
 			table.insert( evItem.configItems, {name=n, title=t})
@@ -443,38 +444,55 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 		print("gearboxMogli: Sending nil configuration items to the client")
 		streamWriteInt32(streamId, 0)
 	else
-		local i = 0
+		local numStoreItems, sumConfigItems = 0, 0
 		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
-			i = i + 1
+			numStoreItems = numStoreItems + 1
 		end
 		
-		print(string.format("gearboxMogli: Sending %d configuration items to the client",i))
-		streamWriteInt32(streamId, i)
+		streamWriteInt32(streamId, numStoreItems)
 		
 		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
-			streamWriteString(streamId, xmlFileLower )
+			local numConfigItems = 0
+			if type( item.configurations ) == "table" then
+				for j,c in pairs( item.configurations ) do
+					numConfigItems = numConfigItems + 1
+					sumConfigItems = sumConfigItems + 1
+				end
+			end
 			
-			if type( item.configurations ) ~= "table" then
-				streamWriteInt32(streamId, 0)
-			else
-				streamWriteInt32(streamId, table.getn( item.configurations ))
+			if numConfigItems > 0 then
+				streamWriteInt32(streamId, numConfigItems)
+				streamWriteString(streamId, Utils.getNoNil( xmlFileLower, "!!!error!!!" ) )
 				
 				for j,c in pairs( item.configurations ) do
-					streamWriteString(streamId, Utils.getNoNil( c.name, "" ) )
-					streamWriteString(streamId, Utils.getNoNil( c.title,"" ) )
+					streamWriteString(streamId, Utils.getNoNil( c.name, "!!!empty!!!" ) )
+					streamWriteString(streamId, Utils.getNoNil( c.title,"!!!empty!!!" ) )
 				end
 			end
 		end
+		
+		print(string.format("gearboxMogli: Sending %d (%d) configuration items to the client",numStoreItems,sumConfigItems))
 	end
 end
 function gearboxMogliRegisterSendConfigs:run(connection)
 	if type( gearboxMogliRegister.modifiedStoreItems ) ~= "table" then
 		print("gearboxMogli: Sending nil configuration items to the client (local)")
 	else
-		local i = 0
+		local numStoreItems, sumConfigItems = 0, 0
 		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
-			i = i + 1
+			numStoreItems = numStoreItems + 1
 		end
-		print(string.format("gearboxMogli: Sending %d configuration items to the client (local)",i))
+		
+		for xmlFileLower,item in pairs( gearboxMogliRegister.modifiedStoreItems ) do
+			local numConfigItems = 0
+			if type( item.configurations ) == "table" then
+				for j,c in pairs( item.configurations ) do
+					numConfigItems = numConfigItems + 1
+					sumConfigItems = sumConfigItems + 1
+				end
+			end
+		end
+		
+		print(string.format("gearboxMogli: Sending %d (%d) configuration items to the client",numStoreItems,sumConfigItems))
 	end
 end

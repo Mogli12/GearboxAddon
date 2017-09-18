@@ -3663,10 +3663,10 @@ function gearboxMogli:update(dt)
 		end
 		
 		if self.mrGbMS.GrindingSoundVolume > 0 then
-			if gearboxMogli.mbIsSoundActive( self ) and self.mrGbMS.GrindingGearsVol > 0 then
-				local v = self.mrGbMS.GrindingGearsVol
-				self.mrGbMS.GrindingGearsVol = 0
-
+			local v = self.mrGbMS.GrindingGearsVol
+			self.mrGbMS.GrindingGearsVol = 0
+			
+			if self.isEntered and gearboxMogli.mbIsSoundActive( self ) and v > 0 then
 				local sample = nil
 				
 				if self.mrGbMS.GrindingSoundFile == nil then
