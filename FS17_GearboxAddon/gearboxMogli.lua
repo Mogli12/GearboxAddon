@@ -99,7 +99,7 @@ gearboxMogli.simplifiedAtClient   = false
 
 gearboxMogliGlobals                       = {}
 gearboxMogliGlobals.debugPrint            = false
-gearboxMogliGlobals.debugInfo             = false 
+gearboxMogliGlobals.debugInfo             = true 
 gearboxMogliGlobals.transmissionEfficiency= 0.96
 -- Giants is cheating: 0.86 * 0.88 = 0.7568 > 0.72 => torqueFactor = 0.86 * 0.88 / ( 0.72 * 0.94 )
 gearboxMogliGlobals.torqueFactor          = 0.86 * 0.88 / ( 0.72 * gearboxMogliGlobals.transmissionEfficiency )  
@@ -135,8 +135,8 @@ gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
 gearboxMogliGlobals.combineDefaultSpeed   = 10   -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
 gearboxMogliGlobals.combineDynamicChopper = 0.8
-gearboxMogliGlobals.dtDeltaTargetFast     = 0.0005 -- 2 second 
-gearboxMogliGlobals.dtDeltaTargetSlow     = 0.0002 -- 5 seconds
+gearboxMogliGlobals.dtDeltaTargetFast     = 0.0003  -- 3 1/3 second 
+gearboxMogliGlobals.dtDeltaTargetSlow     = 0.00014 -- 7 seconds
 gearboxMogliGlobals.ddsDirectory          = "dds/"
 gearboxMogliGlobals.initMotorOnLoad       = true
 gearboxMogliGlobals.ptoSpeedLimit         = true
@@ -575,9 +575,26 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.IdleRpm	                = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleRpm"),  self.motor.minRpm ), self.motor.minRpm )
 	self.mrGbMS.OrigMinRpm              = self.motor.minRpm
 	self.mrGbMS.OrigMaxRpm              = self.motor.maxRpm	
-	self.mrGbMS.CurMinRpm               = math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, 0 )
-	self.mrGbMS.CurMaxRpm               = self.mrGbMS.OrigMaxRpm + gearboxMogli.rpmPlus
-	self.mrGbMS.OrigRatedRpm            = math.min( math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ), self.motor.maxRpm )
+	
+	self.mrGbMS.OrigRatedRpm            = self.mrGbMS.IdleRpm
+	do
+		local maxPower = 0
+		for _,k in pairs(self.motor.torqueCurve.keyframes) do
+			p = k.time * k.v
+			if maxPower < p then
+				maxPower = p
+			end			
+			if k.v > 0 and p >= 0.9 * maxPower then
+				self.mrGbMS.OrigRatedRpm = k.time
+			end
+		end
+	end
+	
+--self.mrGbMS.OrigRatedRpm            = math.min( math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ), self.motor.maxRpm )
+
+	self.mrGbMS.CurMinRpm               = math.max( self.mrGbMS.IdleRpm - gearboxMogli.rpmMinus, 0 )
+	self.mrGbMS.CurMaxRpm               = math.max( self.mrGbMS.OrigRatedRpm + gearboxMogli.rpmPlus, self.mrGbMS.OrigMaxRpm )
+
 	self.mrGbMS.RatedRpm                = math.min( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#ratedRpm"), self.mrGbMS.OrigRatedRpm ), self.motor.maxRpm )
 	self.mrGbMS.AccelerateToLimit       = self.mrGbMG.accelerateToLimit
 	self.mrGbMS.MinTargetRpm            = getXMLFloat(xmlFile, xmlString .. "#minTargetRpm")
@@ -2023,14 +2040,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.HydrostaticPtoDiff = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#ptoRpmDelta"), dft )
 		end
 		
-		dft = Utils.getNoNil( hit, 3000 )
+		dft = Utils.getNoNil( hit, 1000 )
 		if dft < 100 then
 			-- do not smooth 
 			self.mrGbMS.HydrostaticIncFactor = 1
 		else
 			self.mrGbMS.HydrostaticIncFactor = 1 / dft
 		end
-		dft = Utils.getNoNil( hdt, 3000 )
+		dft = Utils.getNoNil( hdt, 1000 )
 		if hdt == nil and hit ~= nil then
 			-- compatibility
 			self.mrGbMS.HydrostaticDecFactor = self.mrGbMS.HydrostaticIncFactor
@@ -4594,12 +4611,14 @@ function gearboxMogli:draw()
 			end
 			renderText(ovRight, drawY, 0.5*deltaY, text )  		          
 		elseif self.mrGbMS.HudMode == 2 then
-			setTextAlignment(RenderText.ALIGN_LEFT) 
+		--setTextAlignment(RenderText.ALIGN_LEFT) 
+			setTextAlignment(RenderText.ALIGN_RIGHT) 
 			setTextBold(false)
 			
 			local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
 			local h = w * g_screenAspectRatio
-			local x = g_currentMission.speedMeterIconOverlay.x
+		--local x = g_currentMission.speedMeterIconOverlay.x
+			local x = 1
 			local y = g_currentMission.speedMeterIconOverlay.y
 	
 			local text = self.mrGbMS.DrawText2 .." "..gearText

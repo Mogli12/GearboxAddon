@@ -328,7 +328,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIHQuadtrac620.xml"/>
 		
 		<!-- http://www.caseiheurope.com/Media/490856a6-ee37-422f-bff2-0e5e02dd34f0/CaseIH_FlipViewer/de_de/Steiger_Quadtrac_620/flipviewerxpress.html -->
-		<gearboxMogli  >
+		<gearboxMogli ptoRpm="1800" ptoRpmEco="1800">
 			<differentials profile="permanent"/>
 		
 			<gears shiftTimeMs="0" shiftEffect="true" clutchRatio="1" defaultGear="13" automatic="true" reverseReset="true">	
@@ -357,7 +357,7 @@
 	<vehicle>newHollandT9
 		<configFile xmlName="data/vehicles/steerable/newHolland/newHollandT9.xml"/>
 		
-		<gearboxMogli>
+		<gearboxMogli ptoRpm="1800" ptoRpmEco="1800">
 			<blowOffVentilSound volume="0"/>
 			
 			<differentials profile="permanent"/>
