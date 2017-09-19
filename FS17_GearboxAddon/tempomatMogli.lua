@@ -100,7 +100,35 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		self.tempomatMogliOnLeave = nil
 		
 	-- inputs	
-		if self:getIsActiveForInput(false) then		
+		if     not self.isClient then
+		-- dedi server
+		elseif self.isHired then
+		-- hired worker
+			tempomatMogli.mbSetState( self, "KeepSpeed", false )	
+			if     not self.isEntered
+					or g_gui:getIsGuiVisible() 
+					or g_currentMission.isPlayerFrozen
+					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
+					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_3" )
+					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_4" ) then
+				-- ignore
+			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSETSPEED" ) then -- speed limiter
+				self:tempomatMogliSetSpeedLimit()
+			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSWAPSPEED" ) then -- speed limiter
+				self:tempomatMogliSwapSpeedLimit()
+			elseif tempomatMogli.mbHasInputEvent( "gearboxMogliSWAPSPEEDR" ) then -- speed limiter
+				self:tempomatMogliSwapSpeedLimit( true )
+			end
+		elseif not self.isControlled then
+		-- not controlled by anybody
+			tempomatMogli.mbSetState( self, "KeepSpeed", self.tempomatMogliV22.KeepSpeedToggle )
+		elseif not self.isEntered then
+		-- not controlled by current player
+		elseif g_gui:getIsGuiVisible() or g_currentMission.isPlayerFrozen then
+		-- GUI visible
+			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
+		else
+		-- input handling
 			if     tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_2" )
 					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_3" )
 					or tempomatMogli.mbHasInputEvent( "gearboxMogliCONFLICT_4" ) then
@@ -127,13 +155,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 				k = false
 			end
 			tempomatMogli.mbSetState( self, "KeepSpeed", k )
-		elseif self.steeringEnabled  then
-			tempomatMogli.mbSetState( self, "KeepSpeed", self.tempomatMogliV22.KeepSpeedToggle )		
-		else
-			tempomatMogli.mbSetState( self, "KeepSpeed", false )		
 		end
 		
-		if self.isServer and self.cruiseControl ~= nil then
+		if self.isServer then
 			if self.movingDirection <= 0 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) then
 				self.tempomatMogliV22.keepSpeedLimit = nil		
 			elseif self.tempomatMogliV22.KeepSpeed
@@ -157,12 +181,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			else
 				tempomatMogli.mbSetState( self, "SpeedLimit", -1 )		
 			end
-		else
-			self.tempomatMogliV22.keepSpeedLimit = nil		
-			tempomatMogli.mbSetState( self, "SpeedLimit", -1 )		
 		end
 		
-		if self.tempomatMogliV22.SpeedLimit >= 0 then
+		if self.cruiseControl ~= nil and self.tempomatMogliV22.SpeedLimit >= 0 then
 			if self.tempomatMogliV22.cruiseControlState == nil then
 				self.tempomatMogliV22.cruiseControlState = self.cruiseControl.state
 			end			

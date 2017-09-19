@@ -766,6 +766,17 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3600
 	end
 	
+	self.mrGbMS.ConfigId  = self.configurations.GearboxAddon
+	self.mrGbMS.BoughtIds = {}
+	
+	if self.boughtConfigurations ~= nil and type( self.boughtConfigurations.GearboxAddon ) == "table" then
+		for id,b in pairs(self.boughtConfigurations.GearboxAddon) do
+			if b then
+				table.insert( self.mrGbMS.BoughtIds, id )
+			end
+		end
+	end
+	
 	do
 		local configuration = self.mrGbMLStoreItem.configurations[self.configurations.GearboxAddon]
 	
@@ -3012,7 +3023,23 @@ function gearboxMogli:update(dt)
 	
 		return 
 	end 	
-		
+	
+	if      self.mrGbMS.ConfigId ~= nil 
+			and ( self.configurations == nil or self.configurations.GearboxAddon == nil ) then
+		print("GearboxAddon: setting current configuration at client")
+		if self.boughtConfigurations == nil then
+			self.boughtConfigurations = {}
+		end
+		for _,id in pairs(self.mrGbMS.BoughtIds) do
+			self.boughtConfigurations.GearboxAddon[id] = true
+		end	
+		if self.configurations == nil then
+			self.configurations = {}
+		end
+		self.configurations.GearboxAddon = self.mrGbMS.ConfigId
+		self:addBoughtConfiguration("GearboxAddon", self.configurations.GearboxAddon)
+	end
+	
 	if self.mrGbMS.CurMinRpm == nil or self.mrGbMS.CurMaxRpm == nil then
 		print("FS17_GearboxAddon: Error! Initialization of motor failed")
 	end
@@ -3192,8 +3219,10 @@ function gearboxMogli:update(dt)
 -- inputs	
 --**********************************************************************************************************			
 	if gearboxMogli.mbIsActiveForInput( self, false ) then	
-		if     self.mrGbMS.AllAuto and not ( self:mrGbMGetHasAllAuto() ) then
-			self:mrGbMSetState( "AllAuto", false )		
+		if     not ( self:mrGbMGetHasAllAuto() ) then
+			if self.mrGbMS.AllAuto then
+				self:mrGbMSetState( "AllAuto", false )		
+			end
 		elseif  self.isEntered 
 				and self.steeringEnabled 
 				and self.mrGbMS.AllAuto ~= gearboxMogli.simplifiedAtClient then
