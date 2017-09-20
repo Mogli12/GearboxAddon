@@ -589,8 +589,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end
 		end
 	end
-	
---self.mrGbMS.OrigRatedRpm            = math.min( math.max( self.motor.maxRpm - gearboxMogli.rpmRatedMinus, 2 * self.mrGbMS.IdleRpm ), self.motor.maxRpm )
 
 	self.mrGbMS.CurMinRpm               = math.max( self.mrGbMS.IdleRpm - gearboxMogli.rpmMinus, 0 )
 	self.mrGbMS.CurMaxRpm               = math.max( self.mrGbMS.OrigRatedRpm + gearboxMogli.rpmPlus, self.mrGbMS.OrigMaxRpm )
@@ -2039,7 +2037,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	
 		local dft
 		if self.mrGbMS.HydrostaticMaxRpm == nil then
-			dft = self.mrGbMS.MaxTargetRpm
+			dft = self.mrGbMS.RatedRpm
 			self.mrGbMS.HydrostaticMaxRpm = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm"), dft )
 		end
 		if self.mrGbMS.HydrostaticStart == nil then

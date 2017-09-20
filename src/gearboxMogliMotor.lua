@@ -1658,7 +1658,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 		end
 		self.ptoMotorRpm  = Utils.clamp( self.original.ptoMotorRpmRatio * self.ptoToolRpm, self.vehicle.mrGbMS.MinTargetRpm, self.vehicle.mrGbMS.MaxTargetRpm )
 	end
-			
+	
 	if self.vehicle.mrGbMS.IsCombine then
 		if self.vehicle:getIsTurnedOn() then
 			self.ptoOn          = true
@@ -1712,6 +1712,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	end
 
 	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
+	
+	if type( self.vehicle.mrGetNeededPtoRpmWhenControlled ) == "function" then
+		targetRequiredRpm = math.max( targetRequiredRpm, self.vehicle:mrGetNeededPtoRpmWhenControlled() * self.original.ptoMotorRpmRatio )
+	end	
 	
 	local minRpmReduced = Utils.clamp( targetRequiredRpm * gearboxMogli.rpmReduction, 
 																		 self.vehicle.mrGbMS.CurMinRpm, 
@@ -1828,7 +1832,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	if self.ptoOn then
 		if self.vehicle.mrGbMS.Hydrostatic then
 			-- PTO or hand throttle 
-			minTarget = self.minRequiredRpm
+			minTarget = Utils.clamp( self.maxPowerRpm, minRpmReduced, self.minRequiredRpm )
+			if minTarget < targetRpm and self.motorLoadP > 0.8 then
+				if self.motorLoadP >= 1 then
+					targetRpm = minTarget 
+				else
+					targetRpm = targetRpm + 5 * ( self.motorLoadP-0.8 ) * ( minTarget - targetRpm )
+				end
+			end
 		else
 		-- reduce target RPM to accelerate and increase to brake 
 			targetRpm = Utils.clamp( self.minRequiredRpm - accelerationPedal * gearboxMogli.ptoRpmThrottleDiff, minRpmReduced, self.vehicle.mrGbMS.MaxTargetRpm )
@@ -1872,7 +1883,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 			end
 		end
 	end
-	
+		
 	-- smooth
 	if self.targetRpm1 == nil then
 		self.targetRpm1 = targetRpm 
@@ -2562,13 +2573,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 							f = self.usedTransTorque / ( self.maxMotorTorque * self.vehicle.mrGbMS.HydrostaticLossFxTorqueRatio )
 						end
 						
-					--local r = math.min( ( 1 + f * self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio ) * t, math.max( t, self.maxMaxPowerRpm ) )
-					--hFx = math.max( 0, self.hydrostaticFactorT - w / Utils.clamp( r, n1, m1 ) )
-						hFx = 1 / ( 1 + f * self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio )
-						
-						if self.hydrostaticFactorT * hFx * self.vehicle.mrGbMS.RatedRpm < w then
-							hFx = math.min( w / ( self.hydrostaticFactorT * self.vehicle.mrGbMS.RatedRpm ), 1 )
-						end
+					--hFx = 1 / ( 1 + f * self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio )						
+					--if self.hydrostaticFactorT * hFx * self.vehicle.mrGbMS.MaxTargetRpm < w then
+					--	hFx = math.min( w / ( self.hydrostaticFactorT * self.vehicle.mrGbMS.MaxTargetRpm ), 1 )
+					--end
+					
+						hFx = 1 + f * self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio 
 						
 						if self.vehicle.mrGbMG.debugInfo then
 							self.vehicle.mrGbML.hydroTorqueFxInfo = string.format( "%5.3f, %4d => %4.2f", f, t, hFx )
@@ -2576,7 +2586,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 					end
 					
 					self.hydrostaticFactor = Utils.clamp( self.hydrostaticFactorT * hFx, hMin2, hMax2 )
-				--self.hydrostaticFactor = Utils.clamp( self.hydrostaticFactorT, hMin2, hMax2 )
 					
 					if gearboxMogli.debugGearShift then
 						if self.hydrostaticFactor > gearboxMogli.eps then
