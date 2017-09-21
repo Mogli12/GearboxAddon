@@ -1660,8 +1660,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	end
 	
 	self.ptoMotorRpm    = self.vehicle.mrGbMS.IdleRpm
-	self.ptoToolRpm     = PowerConsumer.getMaxPtoRpm( self.vehicle )
-	self.ptoToolTorque  = PowerConsumer.getTotalConsumedPtoTorque( self.vehicle ) 
+	self.ptoToolRpm     = Utils.getNoNil( PowerConsumer.getMaxPtoRpm( self.vehicle ), 0 )
+	self.ptoToolTorque  = Utils.getNoNil( PowerConsumer.getTotalConsumedPtoTorque( self.vehicle ), 0 )
 
 	local ptoToolOn = false
 	if self.ptoToolTorque > gearboxMogli.eps then

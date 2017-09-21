@@ -2691,11 +2691,18 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 	return true
 end
 	
+function gearboxMogli:writeStream(streamId, connection)
+end
+function gearboxMogli:readStream(streamId, connection)
+end
 
 --**********************************************************************************************************	
 -- gearboxMogli:update
 --**********************************************************************************************************	
 function gearboxMogli:update(dt)
+
+	gearboxMogli.sync(self)
+	if not gearboxMogli.isSynced(self) then return end
 
 	if self.mrGbMS == nil then
 		return
@@ -3060,7 +3067,7 @@ function gearboxMogli:update(dt)
 	if self.isServer and not ( self.mrGbML.firstTimeRun ) then
 		self.mrGbML.firstTimeRun = true
 		self:mrGbMSetLanuchGear( noEventSend )
-		self:mrGbMDoGearShift() 
+		self:mrGbMDoGearShift( noEventSend ) 
 	end	
 
 	if self.mrGbMG.debugPrint and not ( gearboxMogli.consoleCommand1 ) then
@@ -4001,6 +4008,8 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:updateTick(dt)
 
+	if not gearboxMogli.isSynced(self) then return end
+
 	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbMD == nil then
 		return
 	end	
@@ -4293,6 +4302,8 @@ end
 -- gearboxMogli:draw
 --**********************************************************************************************************	
 function gearboxMogli:draw() 	
+
+	if not gearboxMogli.isSynced(self) then return end
 	
 --if self.mrGbML.motor == nil then return end
 	
@@ -4909,7 +4920,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
 
 		gearboxMogli.setLaunchGearSpeed( self, true )
-		gearboxMogli.mrGbMDoGearShift( self )
+		gearboxMogli.mrGbMDoGearShift( self, true )
 	end
 	
 	return BaseMission.VEHICLE_LOAD_OK
@@ -7008,7 +7019,7 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 		end
 		
 		self:mrGbMSetLanuchGear( noEventSend )
-		self:mrGbMDoGearShift() 
+		self:mrGbMDoGearShift( noEventSend ) 
 		
 		self.cruiseControl.maxSpeed   = self.mrGbMS.MaxGearSpeed * self.mrGbMS.MaxTargetRpmRatio * 3.6
 		if self.mrGbMS.Hydrostatic then
