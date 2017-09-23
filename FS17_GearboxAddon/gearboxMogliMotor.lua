@@ -1726,8 +1726,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 
 	self.vehicle:mrGbMSetState( "ConstantRpm", self.ptoOn )
 	
-	if type( self.vehicle.mrGetNeededPtoRpmWhenControlled ) == "function" then
-		targetRequiredRpm = math.max( targetRequiredRpm, self.vehicle:mrGetNeededPtoRpmWhenControlled() * self.original.ptoMotorRpmRatio )
+	if self.vehicle.mrIsMrVehicle and type( self.vehicle.mrGetNeededPtoRpmWhenControlled ) == "function" then
+		local r = self.vehicle:mrGetNeededPtoRpmWhenControlled()
+		if r ~= nil and r > 0 then
+			targetRequiredRpm = math.max( targetRequiredRpm, r * self.original.ptoMotorRpmRatio )
+		end
 	end	
 	
 	local minRpmReduced = Utils.clamp( targetRequiredRpm * gearboxMogli.rpmReduction, 
