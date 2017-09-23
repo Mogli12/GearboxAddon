@@ -22,11 +22,12 @@
 -- 3.16 show call stack if self.object is invalid
 -- 3.17 log output in globalsLoad 
 -- 3.18 sync events instead of readStream / writeStream  
+-- 3.19 missing syncs in SP and MP
 
 -- Usage:  source(Utils.getFilename("mogliBase.lua", g_currentModDirectory));
 --         _G[g_currentModDirectory.."mogliBase"].newClass( "AutoCombine", "acParameters" )
 
-local mogliBaseVersion   = 3.18
+local mogliBaseVersion   = 3.19
 local mogliBaseClass     = g_currentModName..".mogliBase"
 local mogliEventClass    = g_currentModName..".mogliEvent"
 local mogliSyncRequest   = g_currentModName..".mogliSyncRequest"
@@ -262,6 +263,7 @@ else
 			if savegame ~= nil and type( _newClass_.loadFromAttributesAndNodes ) == "function" then
 				_newClass_.loadFromAttributesAndNodes( self, savegame.xmlFile, savegame.key, savegame.resetVehicles )
 			end
+			_newClass_.sync( self )
 		end
 
 	--********************************
@@ -393,12 +395,10 @@ else
 			if self[_globalClassName_.."StateHandler"] == nil then
 				self[_globalClassName_.."StateHandler"] = {}
 			end
-			if self.isServer then
-				self.mbClientInitDone30 = true
-			end
 			if _level0_ ~= nil and _level0_ ~= "" and self[_level0_] == nil then
 				self[_level0_] = {}
 			end
+			_newClass_.sync( self )
 		end
 		
 	--********************************
@@ -463,8 +463,7 @@ else
 	-- mbSetState
 	--********************************
 		function _newClass_:mbSetState(level1, value, noEventSend)
-			if not _newClass_.isSynced( self ) then return end
-			
+		--if not _newClass_.isSynced( self ) then return end
 			_newClass_.initStateHandling( self )
 			
 			if self[_globalClassName_.."StateHandler"][level1] == nil then
@@ -606,6 +605,14 @@ else
 		end	
 		
 		function _newClass_:sync()
+			if self == nil then
+				print("Error: moglieBase.sync called with self == nil")
+				mogliBase30.printCallStack()
+				return 
+			end
+			if g_server ~= nil then
+				self[_globalClassName_.."SyncReceived"]  = true
+			end
 			if      self[_globalClassName_.."ConfigHandler"] == nil
 					and self[_globalClassName_.."StateHandler"]  == nil then
 				return
@@ -619,15 +626,21 @@ else
 			end
 			if not ( self[_globalClassName_.."SyncRequested"] ) then
 				self[_globalClassName_.."SyncRequested"] = true
-				if g_server ~= nil then
-					self[_globalClassName_.."SyncReceived"]  = true
-				else
+				if g_server == nil then
 					g_client:getServerConnection():sendEvent(mogliBase30Request:new( _globalClassName_, self ),true)
 				end
 			end
 		end
 		
 		function _newClass_:isSynced()
+			if g_server ~= nil then
+				return true
+			end
+			if self == nil then
+				print("Error: moglieBase.isSynced called with self == nil")
+				mogliBase30.printCallStack()
+				return 
+			end
 			if self[_globalClassName_.."SyncReceived"] then
 				return true
 			end

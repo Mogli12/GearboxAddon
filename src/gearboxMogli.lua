@@ -56,6 +56,7 @@ gearboxMogli.smoothSlow           = 0.01
 gearboxMogli.hydroEffDiff         = 500
 gearboxMogli.hydroEffDiffInc      = 0 --150
 gearboxMogli.hydroEffMin          = 0.5
+gearboxMogli.ptoRpmHydroDiff      = 150
 gearboxMogli.ptoRpmThrottleDiff   = 50
 gearboxMogli.lastMotorRpmDiffReal = 50
 gearboxMogli.powerFactor0         = 0.1424083769633507853403141361257
@@ -510,7 +511,6 @@ function gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, fixEntry )
 	newEntry.maxRange       = getXMLFloat(xmlFile, baseName .. "#maxRange" )
 	newEntry.minRange2      = getXMLFloat(xmlFile, baseName .. "#minRange2" )
 	newEntry.maxRange2      = getXMLFloat(xmlFile, baseName .. "#maxRange2" )
-	newEntry.maxHydroRpm    = getXMLFloat(xmlFile, baseName .. "#maxHydrostaticRpm" )
 	return newEntry
 end
 
@@ -1769,7 +1769,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	local hit = 5000
 	local hdt = 5000
-	local h00 = 0.2
 	self.mrGbMS.HydrostaticDirect         = getXMLBool(xmlFile, xmlString .. ".hydrostatic#direct")
 	hydroCorrectGearSpeed = getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed")
 	
@@ -1805,20 +1804,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		if self.mrGbMS.HydrostaticProfile == nil then
 			-- nothing 
 		elseif self.mrGbMS.HydrostaticProfile == "Input" then
-			h00                        = 0.666666667
-			hit                        = 2000
-			hdt                        = 2000
-			self.mrGbMS.HydrostaticMin = 0
-			self.mrGbMS.HydrostaticMax = 1.333333333
+			self.mrGbMS.HydrostaticStart       = 0.666666667
+			hit                                = 2000
+			hdt                                = 2000
+			self.mrGbMS.HydrostaticMin         = 0
+			self.mrGbMS.HydrostaticMax         = 1.333333333
 			self.mrGbMS.TransmissionEfficiency = 0.98
 			self.mrGbMS.HydrostaticEfficiency  = {}
 			
 			mrfg = self.mrGbMG.hydroMaxTorqueInput
-			
-			if self.mrGbMS.DisableManual and self.mrGbMS.DefaultGear == 1 and self.mrGbMS.Gears[1].maxHydroRpm == nil then
-				self.mrGbMS.Gears[1].maxHydroRpm = 0.85 * self.mrGbMS.RatedRpm
-			end
-			
+						
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.00,v=gearboxMogli.hydroEffMin })
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.05,v=0.500})
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.22,v=0.680})
@@ -1975,7 +1970,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			or self.mrGbMS.HydrostaticCoupling    ~= nil then		
 			
 		self.mrGbMS.Hydrostatic = true
-		self.mrGbMS.TransmissionEfficiency = 0.98
 
 		if mrfg <= 0 then
 			if hydroMaxTorque ~= nil then
@@ -2049,18 +2043,22 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end	
 	
 		local dft
-		if self.mrGbMS.HydrostaticMaxRpm == nil then
-			dft = self.mrGbMS.RatedRpm
-			self.mrGbMS.HydrostaticMaxRpm = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxWheelRpm"), dft )
-		end
-		if self.mrGbMS.HydrostaticStart == nil then
-			dft = Utils.clamp( h00, self.mrGbMS.HydrostaticMin, self.mrGbMS.HydrostaticMax )
-			self.mrGbMS.HydrostaticStart  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), dft )
-		end
-		if self.mrGbMS.HydrostaticPtoDiff == nil then
-			dft = gearboxMogli.ptoRpmThrottleDiff
-			self.mrGbMS.HydrostaticPtoDiff = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#ptoRpmDelta"), dft )
-		end
+		dft = Utils.clamp( Utils.getNoNil( self.mrGbMS.HydrostaticStart, 0.2 ), self.mrGbMS.HydrostaticMin, self.mrGbMS.HydrostaticMax )
+		self.mrGbMS.HydrostaticStart  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), dft )
+		dft = Utils.getNoNil( self.mrGbMS.HydrostaticMaxRpm, self.mrGbMS.RatedRpm )
+		self.mrGbMS.HydrostaticMaxRpm = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRpm"), dft )
+		dft = Utils.getNoNil( self.mrGbMS.HydrostaticPtoDiff, gearboxMogli.ptoRpmHydroDiff )
+		self.mrGbMS.HydrostaticPtoDiff = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#ptoRpmDelta"), dft )
+		
+		dft = Utils.getNoNil( self.mrGbMS.HydrostaticMaxRpmLow, 0.8 * self.mrGbMS.HydrostaticMaxRpm )
+		self.mrGbMS.HydrostaticMaxRpmLow       = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRpmLow" ),      dft )
+		dft = Utils.getNoNil( self.mrGbMS.HydrostaticMaxRpmSpeedLow,  10 )
+		self.mrGbMS.HydrostaticMaxRpmSpeedLow  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRpmLowSpeed" ), dft )
+		dft = Utils.getNoNil( self.mrGbMS.HydrostaticMaxRpmSpeedHigh, 20 )
+		self.mrGbMS.HydrostaticMaxRpmSpeedHigh = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRpmSpeed"), dft )
+		
+		dft = Utils.getNoNil( self.mrGbMS.TransmissionEfficiency, 0.98 )
+		self.mrGbMS.TransmissionEfficiency = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#baseEfficiency"), dft )
 		
 		dft = getXMLFloat(xmlFile, xmlString .. ".hydrostatic#minMaxTimeMs")
 		if dft == nil then
@@ -2691,10 +2689,10 @@ local function gearboxMogliUpdateFuelUsage( self, dt )
 	return true
 end
 	
-function gearboxMogli:writeStream(streamId, connection)
-end
-function gearboxMogli:readStream(streamId, connection)
-end
+--function gearboxMogli:writeStream(streamId, connection)
+--end
+--function gearboxMogli:readStream(streamId, connection)
+--end
 
 --**********************************************************************************************************	
 -- gearboxMogli:update

@@ -2434,7 +2434,7 @@
       <!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="65" volumeMotor="233" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
       <gears>
-				<gear speed="40" atRpm="1750"/>
+				<gear speed="40" name="" atRpm="1750"/>
       </gears>
 
 			<engines>
@@ -3026,7 +3026,7 @@
 			<hydrostatic profile="Hydrostat" lossFxTorqueRatio="1" lossFxRpmRatio="0.1"/>	
 			<differentials profile="off"/>
 			<gears>	
-				<gear maxForwardSpeedRatio="1.1" />
+				<gear maxForwardSpeedRatio="1.1" name=""/>
 			</gears>
 		</gearboxMogli>	
 	</vehicle>

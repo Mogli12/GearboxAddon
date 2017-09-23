@@ -443,9 +443,9 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			if i ~= nil then
 				self.tempomatMogliV22.SpeedLimit3 = i
 			end
-			if getXMLBool(xmlFile, key .. "#mrGbMKeep" ) then
-				self.tempomatMogliV22.KeepSpeedToggle = true
-			end
+		--if getXMLBool(xmlFile, key .. "#mrGbMKeep" ) then
+		--	self.tempomatMogliV22.KeepSpeedToggle = true
+		--end
 		end
 		
 		if self.tempomatMogliV22.baseSpeed1 ~= nil then
