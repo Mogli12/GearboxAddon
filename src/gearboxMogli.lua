@@ -2699,8 +2699,8 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:update(dt)
 
-	gearboxMogli.sync(self)
-	if not gearboxMogli.isSynced(self) then return end
+	gearboxMogli.mbSync(self)
+	if not gearboxMogli.mbIsSynced(self) then return end
 
 	if self.mrGbMS == nil then
 		return
@@ -4006,7 +4006,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:updateTick(dt)
 
-	if not gearboxMogli.isSynced(self) then return end
+	if not gearboxMogli.mbIsSynced(self) then return end
 
 	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbMD == nil then
 		return
@@ -4301,7 +4301,7 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:draw() 	
 
-	if not gearboxMogli.isSynced(self) then return end
+	if not gearboxMogli.mbIsSynced(self) then return end
 	
 --if self.mrGbML.motor == nil then return end
 	

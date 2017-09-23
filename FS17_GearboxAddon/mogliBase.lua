@@ -263,7 +263,6 @@ else
 			if savegame ~= nil and type( _newClass_.loadFromAttributesAndNodes ) == "function" then
 				_newClass_.loadFromAttributesAndNodes( self, savegame.xmlFile, savegame.key, savegame.resetVehicles )
 			end
-			_newClass_.sync( self )
 		end
 
 	--********************************
@@ -398,7 +397,6 @@ else
 			if _level0_ ~= nil and _level0_ ~= "" and self[_level0_] == nil then
 				self[_level0_] = {}
 			end
-			_newClass_.sync( self )
 		end
 		
 	--********************************
@@ -463,7 +461,7 @@ else
 	-- mbSetState
 	--********************************
 		function _newClass_:mbSetState(level1, value, noEventSend)
-		--if not _newClass_.isSynced( self ) then return end
+		--if not _newClass_.mbIsSynced( self ) then return end
 			_newClass_.initStateHandling( self )
 			
 			if self[_globalClassName_.."StateHandler"][level1] == nil then
@@ -471,16 +469,7 @@ else
 			end
 			
 			local old = _newClass_.mbGetState( self, level1 )
-			if     old == nil or not ( mogliBase30.compare( old, value ) ) then
-				if noEventSend == nil or noEventSend == false then
-					local eventObject = mogliBase30Event:new(_globalClassName_, self, level1, value)
-					if g_server ~= nil then 
-						g_server:broadcastEvent( eventObject ) 
-					else
-						g_client:getServerConnection():sendEvent( eventObject ) 
-					end 
-				end 						
-			
+			if     old == nil or not ( mogliBase30.compare( old, value ) ) then			
 				if self[_globalClassName_.."StateHandler"][level1].handler ~= nil then
 					local noEventSend2 = true 
 					if self.isServer then
@@ -496,6 +485,16 @@ else
 				else
 					_newClass_.mbSetStateInternal(self, level1, value)
 				end 	
+				
+				if noEventSend == nil or noEventSend == false then
+					local eventObject = mogliBase30Event:new(_globalClassName_, self, level1, value)
+					if g_server ~= nil then 
+						g_server:broadcastEvent( eventObject ) 
+					else
+						_newClass_.mbSync( self )
+						g_client:getServerConnection():sendEvent( eventObject ) 
+					end 
+				end 										
 			end 	
 		end 
 
@@ -604,9 +603,9 @@ else
 			end
 		end	
 		
-		function _newClass_:sync()
+		function _newClass_:mbSync()
 			if self == nil then
-				print("Error: moglieBase.sync called with self == nil")
+				print("Error: moglieBase.mbSync called with self == nil")
 				mogliBase30.printCallStack()
 				return 
 			end
@@ -632,12 +631,12 @@ else
 			end
 		end
 		
-		function _newClass_:isSynced()
+		function _newClass_:mbIsSynced()
 			if g_server ~= nil then
 				return true
 			end
 			if self == nil then
-				print("Error: moglieBase.isSynced called with self == nil")
+				print("Error: moglieBase.mbIsSynced called with self == nil")
 				mogliBase30.printCallStack()
 				return 
 			end
