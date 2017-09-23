@@ -2700,7 +2700,10 @@ end
 function gearboxMogli:update(dt)
 
 	gearboxMogli.mbSync(self)
-	if not gearboxMogli.mbIsSynced(self) then return end
+	if not gearboxMogli.mbIsSynced(self) then
+		if self.isEntered then print("not synchronized") end
+		return
+	end
 
 	if self.mrGbMS == nil then
 		return
@@ -2808,7 +2811,6 @@ function gearboxMogli:update(dt)
 			and ( Vehicle.mrLoadFinished == nil or self.mrIsMrVehicle ~= nil ) then
 		if self.mrGbML.motor == nil then 
 	-- initialize as late as possible 			
-			if not ( self.mbClientInitDone30 ) then return end
 			if self.motor == nil then return end
 		
 			if self.mrGbML.motor == nil then
@@ -2828,8 +2830,7 @@ function gearboxMogli:update(dt)
 			return
 		end
 	end
-	
-	
+		
 --**********************************************************************************************************			
 -- differentials
 --**********************************************************************************************************			
