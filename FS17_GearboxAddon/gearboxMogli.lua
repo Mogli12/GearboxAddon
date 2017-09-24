@@ -43,7 +43,7 @@ gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minHydrostaticFactor = 5e-3
 gearboxMogli.maxGearRatio         = 37699.11184                     -- 0.01 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.minGearRatio         = 1.508                           -- 250  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
-gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 200 -- 2.0  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
+gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 500 -- 5.0  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.maxManualGearRatio   = gearboxMogli.maxGearRatio / 20  -- 0.2  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.maxRatioFactorR      = gearboxMogli.huge -- 2000                            -- 0.001km/h @1000 RPM if combined with maxHydroGearRatio
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
@@ -2840,7 +2840,7 @@ function gearboxMogli:update(dt)
 		self:mrGbMSetState( "ModifyDifferentials", false )
 	end
 	if self.mrGbMS.ModifyDifferentials and self.isServer then
-		if self.mrGbMS.IsOn and self.steeringEnabled then
+		if self.mrGbMS.IsOn and self.steeringEnabled and not self.mrGbMS.AllAuto then
       local getSpeedsOfDifferential;
       getSpeedsOfDifferential = function(self, diff)
 				local speed1, speed2;
