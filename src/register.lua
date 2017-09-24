@@ -226,13 +226,27 @@ function gearboxMogliRegister:addConfigurations()
 		if storeItem.xmlFilename ~= nil then
 			configFileName = string.lower( Utils.removeModDirectory( storeItem.xmlFilename ) )
 			
-			local vehXmlFile = loadXMLFile("TempConfig", storeItem.xmlFilename);
-			local typeName = getXMLString(vehXmlFile, "vehicle#type");
+			local vehXmlName = nil
+
+			local dummySelf = {}
+			dummySelf.configFileName = storeItem.xmlFilename
+			dummySelf.customEnvironment, dummySelf.baseDirectory = Utils.getModNameAndBaseDirectory(storeItem.xmlFilename)
+			dummySelf.xmlFile = loadXMLFile("TempConfig", storeItem.xmlFilename)
 			
-			local hasVehicleConfig = gearboxMogliRegister.testXML( vehXmlFile, "vehicle", ".gearboxMogli" )
-														or gearboxMogliRegister.testXML( vehXmlFile, "vehicle.motorConfigurations.motorConfiguration(0)", ".gearboxMogli" )					
+			if type( Vehicle.mrLoadFinished1 ) == "function" then
+				state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
+			--print("MR hack: "..tostring(state).." / "..tostring(dummySelf.mrIsMrVehicle).." / "..tostring(dummySelf.mrConfigFileName).." ("..tostring(result)..")")
+				if state and dummySelf.mrIsMrVehicle then
+					vehXmlName = dummySelf.mrConfigFileName
+				end
+			end
+						
+			local typeName = getXMLString(dummySelf.xmlFile, "vehicle#type");
 			
-			delete(vehXmlFile)
+			local hasVehicleConfig = gearboxMogliRegister.testXML( dummySelf.xmlFile, "vehicle", ".gearboxMogli" )
+														or gearboxMogliRegister.testXML( dummySelf.xmlFile, "vehicle.motorConfigurations.motorConfiguration(0)", ".gearboxMogli" )					
+		
+			delete(dummySelf.xmlFile)
 			
 			local addMogliGearbox = false
 			
