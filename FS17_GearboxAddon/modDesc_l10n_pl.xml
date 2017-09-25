@@ -120,5 +120,25 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="Przełączanie przyciskiem"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="Osobne przyciski"/>
 		
+		<!-- texts in the HUD => keep them short -->
+		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
+		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>
+		<text name="gearboxMogliDRAW_speed"              text="Speed"/>
+		<text name="gearboxMogliDRAW_currentRpm"         text="Current rpm"/>
+		<text name="gearboxMogliDRAW_TargetRpm"          text="Target rpm"/>
+		<text name="gearboxMogliDRAW_power"              text="Power"/>
+		<text name="gearboxMogliDRAW_load"               text="Load"/>
+		<text name="gearboxMogliDRAW_fuel"               text="Fuel used"/>
+		<text name="gearboxMogliDRAW_clutch"             text="Clutch"/>
+		<text name="gearboxMogliDRAW_autoClutch"         text="Auto clutch"/>
+		<text name="gearboxMogliDRAW_hand"               text="Hand throttle"/>
+		<text name="gearboxMogliDRAW_fixed"              text="Fixed ratio"/>
+		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
+		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
+		
+		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
+		<text name="gearboxMogliUNIT_HP"                 text="CV"/>		
+		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
 	</texts>
 </l10n>

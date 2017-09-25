@@ -241,6 +241,8 @@ gearboxMogli.stateWithSetGet = { "IsOnOff",
 																 "ReverseActive", 
 																 "SpeedLimiter",  
 																 "HandThrottle",
+																 "MaxTarget",
+																 "MinTarget",
 																 "FixedRatio",
 																 "AutoClutch", 
 																 "ManualClutch",
@@ -327,9 +329,12 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "AutoClutch",    true  )
 	gearboxMogli.registerState( self, "ManualClutch",  1,     gearboxMogli.mrGbMOnSetManualClutch )
 	gearboxMogli.registerState( self, "HandThrottle",  0 )
+	gearboxMogli.registerState( self, "MinTarget",     0 )
+	gearboxMogli.registerState( self, "MaxTarget",     0 )
 	gearboxMogli.registerState( self, "FixedRatio",    0 )
 	gearboxMogli.registerState( self, "SpeedLimiter",  false )
 	gearboxMogli.registerState( self, "AllAuto",       false )
+	gearboxMogli.registerState( self, "AllAuto2",      false )
 	gearboxMogli.registerState( self, "AllAutoMode",   7,     gearboxMogli.mrGbMOnSetAllAutoMode )
 	gearboxMogli.registerState( self, "EcoMode",       false )
 	gearboxMogli.registerState( self, "HudMode",       self.mrGbMG.defaultHudMode )
@@ -2760,16 +2765,17 @@ function gearboxMogli:update(dt)
 				if gearboxMogli.simplifiedAtClient and not self:mrGbMGetHasAllAuto() then
 					self:mrGbMSetState( "WarningText", "This gearbox does not have a simplified mode" )
 				end
-			elseif self:mrGbMGetHasAllAuto() then
-				self:mrGbMSetState( "AllAuto", not self.mrGbMS.AllAuto )
+			elseif self.mrGbMS.EnableAI  ~= gearboxMogli.AIAllAuto then
+				self:mrGbMSetState( "EnableAI", gearboxMogli.AIAllAuto )
+			elseif self.mrGbMS.EnableAI0 ~= gearboxMogli.AIAllAuto then
+				self:mrGbMSetState( "EnableAI", gearboxMogli.EnableAI0 )
+			else
+				self:mrGbMSetState( "EnableAI", gearboxMogli.AIGearboxOn )
 			end
 		end
 	end
 	
-	local enabledAtClient = gearboxMogli.enabledAtClient
-	if self.mrGbMS.NoDisable then
-		enabledAtClient = true
-	end
+	local enabledAtClient = gearboxMogli.enabledAtClient or self.mrGbMS.NoDisable
 	
 	if self.isEntered and self.steeringEnabled and self.mrGbMS.IsOnOff ~= enabledAtClient then
 		self:mrGbMSetIsOnOff( enabledAtClient ) 
@@ -3238,14 +3244,16 @@ function gearboxMogli:update(dt)
 -- inputs	
 --**********************************************************************************************************			
 	if gearboxMogli.mbIsActiveForInput( self, false ) then	
+		local simplifiedAtClient = gearboxMogli.simplifiedAtClient or self.mrGbMS.AllAuto2 
+	
 		if     not ( self:mrGbMGetHasAllAuto() ) then
 			if self.mrGbMS.AllAuto then
 				self:mrGbMSetState( "AllAuto", false )		
 			end
 		elseif  self.isEntered 
 				and self.steeringEnabled 
-				and self.mrGbMS.AllAuto ~= gearboxMogli.simplifiedAtClient then
-			self:mrGbMSetState( "AllAuto", gearboxMogli.simplifiedAtClient )
+				and self.mrGbMS.AllAuto ~= simplifiedAtClient then
+			self:mrGbMSetState( "AllAuto", simplifiedAtClient )
 		end
 
 		if self.mrGbMS.AllAuto then
@@ -4297,6 +4305,19 @@ function gearboxMogli:deleteMap()
 	end
 end
 
+function gearboxMogli.getSpeedMeasuringUnit()
+	if gearboxMogli.useMiles == nil then
+		gearboxMogli.useMiles = g_gameSettings:getValue("useMiles")
+		if gearboxMogli.useMiles == nil then
+			gearboxMogli.useMiles = false
+		end
+	end
+	if gearboxMogli.useMiles then
+		return gearboxMogli.getText("gearboxMogliUNIT_mph", "mph" )
+	end
+	return gearboxMogli.getText("gearboxMogliUNIT_kph", "km/h" )
+end
+
 --**********************************************************************************************************	
 -- gearboxMogli:draw
 --**********************************************************************************************************	
@@ -4477,7 +4498,7 @@ function gearboxMogli:draw()
 						end
 					elseif info == "difflock" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Diff.Lock") 	
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_difflock", "Diff.Lock"))	
 						else
 							t = ""
 							if self.mrGbMS.TorqueRatioMiddle < 0.01 or self.mrGbMS.TorqueRatioMiddle > 0.99 then
@@ -4487,19 +4508,19 @@ function gearboxMogli:draw()
 									t = "2wd "
 								end
 							elseif self:mrGbMGetDiffLockMiddle() then
-								t = t .. "M"
+								t = t .. "M "
 							else
-								t = t .. "_"
+								t = t .. "_ "
 							end
 							if self:mrGbMGetDiffLockFront()  then
-								t = t .. "F"
+								t = t .. "F "
 							else
-								t = t .. "_"
+								t = t .. "_ "
 							end
 							if self:mrGbMGetDiffLockBack()   then
-								t = t .. "B"
+								t = t .. "B "
 							else
-								t = t .. "_"
+								t = t .. "_ "
 							end
 							renderText(ovRight,drawY, deltaY, t) 	
 						end
@@ -4511,81 +4532,84 @@ function gearboxMogli:draw()
 						if col == 1 then
 							local t
 							if gearText == "" then
-								t = "Max. speed"
+								t = gearboxMogli.getText("gearboxMogliDRAW_maxSpeed", "Max. speed")
 							else
 								t = gearText
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", speed ))
+							renderText(ovRight,drawY, deltaY, string.format( "%3.1f %s", g_i18n:getSpeed(speed), gearboxMogli.getSpeedMeasuringUnit() ))
 						end
 					elseif info == "speed2" then
 						if col == 1 then
 							local t
 							if gearText == "" then
-								t = "Speed"
+								t = gearboxMogli.getText("gearboxMogliDRAW_speed", "Speed")
 							else
 								t = gearText
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f..%3.1f km/h", minSp, math.min( limit, maxSp ) ))
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f..%3.1f %s", g_i18n:getSpeed( minSp ), g_i18n:getSpeed(math.min( limit, maxSp )), gearboxMogli.getSpeedMeasuringUnit() ))
 						end
 					elseif info == "target2" then
 						if col == 1 then
 							local t
 							if gearText == "" or self.mrGbMS.DisableManual then
-								t = "Max. speed"
+								t = gearboxMogli.getText("gearboxMogliDRAW_maxSpeed", "Max. speed")
 							else
 								t = gearText
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
 							local sp = math.min( maxSp * handRpm / self.mrGbMS.RatedRpm, limit )
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", sp ))
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f %s", g_i18n:getSpeed(sp), gearboxMogli.getSpeedMeasuringUnit() ))
 						end
 					elseif info == "target1" then
 						if col == 1 then
 							local t
 							if gearText == "" then
-								t = "PTO speed"
+								t = "PTO"
 							else
 								t = "PTO "..gearText
 							end
 							renderText(ovLeft, drawY, deltaY, t) 	
 						else
 							local sp = math.min( rawSp * handRpm / self.mrGbMS.RatedRpm, limit )
-							renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", sp ))
+							renderText(ovRight,drawY, deltaY, string.format("%3.1f %s", g_i18n:getSpeed(sp), gearboxMogli.getSpeedMeasuringUnit() ))
 						end
 					elseif info == "target3" then
-						renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMD.Hydro * 0.5 + 0.5 ) ))  		
+						if col == 1 then
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMD.Hydro * 0.5 + 0.5 ) ))  		
+						end
 					elseif info == "rpm" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Current rpm")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_currentRpm", "Current rpm"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( self:mrGbMGetCurrentRPM() * 0.1 +0.5)*10)) 		
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f %s", math.floor( self:mrGbMGetCurrentRPM() * 0.1 +0.5)*10, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" )))		
 						end
 					elseif info == "target" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Target rpm")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_TargetRpm", "Target rpm"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( self:mrGbMGetTargetRPM() * 0.1 +0.5)*10)) 		
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f %s", math.floor( self:mrGbMGetTargetRPM() * 0.1 +0.5)*10, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ))) 		
 						end
 					elseif info == "power" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Power")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_power", "Power"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f HP", self:mrGbMGetUsedPower() ))
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f %s", self:mrGbMGetUsedPower(), gearboxMogli.getText("gearboxMogliUNIT_HP", "HP") ))
 						end
 					elseif info == "load" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Load")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_load", "Load"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( Utils.getNoNil( self:mrGbMGetMotorLoad(), 0 ) *10+0.5 )*10 )) 
 						end
 					elseif info == "fuel" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Fuel used")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_fuel", "Fuel used"))
 						elseif self.mrGbMS.FuelPerDistanceMinSpeed ~= nil and math.abs(self.lastSpeed)*3600 >= self.mrGbMS.FuelPerDistanceMinSpeed then
 							renderText(ovRight, drawY, deltaY, string.format("%3d l/100km", self:mrGbMGetFuelUsageRate() / math.abs(self.lastSpeed*36) ))
 						else
@@ -4593,36 +4617,36 @@ function gearboxMogli:draw()
 						end
 					elseif info == "clutch" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Clutch")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_clutch", "Clutch"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
 						end
 					elseif info == "clutch2" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Auto clutch")
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_autoClutch", "Auto clutch"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
 						end
 					elseif info == "hand" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Hand throttle")	
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_hand", "Hand throttle"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%4.0f rpm", math.floor( handRpm * 0.1 +0.5)*10)) 		
+							renderText(ovRight, drawY, deltaY, string.format("%4.0f %s", math.floor( handRpm * 0.1 +0.5)*10, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ))) 		
 						end
 					elseif info == "fixed" then					
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Fixed ratio")	
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_fixed", "Fixed ratio"))
 						else
 							local kmh = self.mrGbMS.FixedRatio * maxSp
 							if kmh <= limit then
-								renderText(ovRight,drawY, deltaY, string.format("%3.1f km/h", kmh ))
+								renderText(ovRight,drawY, deltaY, string.format("%3.1f %s", g_i18n:getSpeed(kmh), gearboxMogli.getSpeedMeasuringUnit() ))
 							else
 								renderText(ovRight,drawY, deltaY, string.format("%3.1f (%4d)", limit, self.mrGbMS.RatedRpm * limit / kmh ))
 							end
 						end
 					elseif info == "combine" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Combine")	
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_combine", "Combine"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3.0f t/h", self.mrGbMD.Rate ) )
 						end
@@ -4644,7 +4668,7 @@ function gearboxMogli:draw()
 						end
 					elseif info == "mrWheelSlip" then
 						if col == 1 then
-							renderText(ovLeft, drawY, deltaY, "Wheel slip")	
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_wheelSlip", "Wheel slip"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Slip ))	
 						end
@@ -4797,6 +4821,13 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 			attributes = attributes.." mrGbMResetRevRange2=\""  .. tostring(self.mrGbMS.ResetRevRange2 ) .. "\""
 		end
 
+		if self.mrGbMS.MinTarget > 0 then
+			attributes = attributes.." mrGbMMinTarget=\"" ..tostring(self.mrGbMS.MinTarget ) .. "\""
+		end
+		if self.mrGbMS.MaxTarget > 0 then
+			attributes = attributes.." mrGbMMaxTarget=\"" ..tostring(self.mrGbMS.MaxTarget ) .. "\""
+		end
+		
 		if self.mrGbMS.G27Mode > 0 then
 			attributes = attributes.." mrGbMG27Mode=\"" ..tostring(self.mrGbMS.G27Mode ) .. "\""
 		end
@@ -4805,6 +4836,9 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		end
 		if not ( self.mrGbMS.Automatic ) and ( self.mrGbMS.AutoShiftGears or self.mrGbMS.AutoShiftHl or self.mrGbMS.AutoShiftRange2 ) then
 			attributes = attributes.." mrGbMAutomatic=\"" .. tostring( self.mrGbMS.Automatic ) .. "\""  
+		end
+		if self.mrGbMS.AllAuto2 then
+			attributes = attributes.." mrGbMAllAuto=\"" .. tostring( self.mrGbMS.AllAuto2 ) .. "\""  
 		end
 		if self.mrGbMS.AllAutoMode < 7 then
 			attributes = attributes.." mrGbMAllAutoMode=\"" .. tostring( self.mrGbMS.AllAutoMode ) .. "\""  
@@ -4871,6 +4905,12 @@ function gearboxMogli:loadHelperStr( xmlFile, key, attr )
 		self.mrGbMS[attr] = s
 	end
 end
+function gearboxMogli:loadHelperFloat( xmlFile, key, attr )
+	local f = getXMLFloat( xmlFile, key )
+	if f ~= nil then
+		self.mrGbMS[attr] = f
+	end
+end
 
 function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 	local i, b
@@ -4908,6 +4948,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto"       , "AllAuto2"          )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMEcoMode"       , "EcoMode"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMSwapGearRange" , "SwapGearRangeKeys" )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDrawTargetRpm" , "DrawTargetRpm"     )
@@ -4917,6 +4958,9 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockBack"  , "DiffLockBack"      )
 
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
+		
+		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMinTarget"     , "MinTarget"         )
+		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMaxTarget"     , "MaxTarget"         )
 
 		gearboxMogli.setLaunchGearSpeed( self, true )
 		gearboxMogli.mrGbMDoGearShift( self, true )
@@ -7994,15 +8038,15 @@ function gearboxMogli:showSettingsUI()
 		for i=1,math.floor( self.mrGbMUI.FixedRatioSteps ) do
 			local kmh = maxSp * i / self.mrGbMUI.FixedRatioSteps
 			if kmh <= limit then
-				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", kmh, self.mrGbMS.RatedRpm ) )
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(kmh), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 			else
-				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", limit, self.mrGbMS.RatedRpm * limit / kmh ) )
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm * limit / kmh, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 			end
 		end
 		if maxSp <= limit then
-			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", maxSp, self.mrGbMS.RatedRpm ) )
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(maxSp), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 		else
-			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d km/h @ %4d", limit, self.mrGbMS.RatedRpm * limit / maxSp ) )
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm * limit / maxSp, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 		end
 	else
 		self.mrGbMUI.FixedRatio = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
@@ -8016,9 +8060,11 @@ function gearboxMogli:showSettingsUI()
 	end
 	for i=1,math.floor( self.mrGbMUI.HandThrottleSteps ) do
 		local handRpm = self.mrGbMS.IdleRpm + ( self.mrGbMS.MaxTargetRpm - self.mrGbMS.IdleRpm ) * i / self.mrGbMUI.HandThrottleSteps
-		table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f rpm", math.floor( handRpm * 0.1 +0.5)*10) )
+		table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f %s", math.floor( handRpm * 0.1 +0.5)*10, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" )))
 	end
-	table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f rpm", self.mrGbMS.MaxTargetRpm ) )
+	table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f %s", self.mrGbMS.MaxTargetRpm , gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" )))
+	self.mrGbMUI.MaxTarget = self.mrGbMUI.HandThrottle
+	self.mrGbMUI.MinTarget = self.mrGbMUI.HandThrottle
 	
 	g_gearboxMogliScreen:setVehicle( self )
 	g_gui:showGui( "gearboxMogliScreen" )
@@ -8071,14 +8117,14 @@ function gearboxMogli:mrGbMUISetAutomatic( value )
 	
 	if tab[value] ~= nil then
 		if     tab[value] == "S" then
-			self:mrGbMSetState( "AllAuto", true )
+			self:mrGbMSetState( "AllAuto2", true )
 		elseif tab[value] == "H" then
-			self:mrGbMSetState( "AllAuto", false )
+			self:mrGbMSetState( "AllAuto2", false )
 		elseif tab[value] == "M" then
-			self:mrGbMSetState( "AllAuto", false )
+			self:mrGbMSetState( "AllAuto2", false )
 			self:mrGbMSetState( "Automatic", false )
 		elseif tab[value] == "A" then
-			self:mrGbMSetState( "AllAuto", false )
+			self:mrGbMSetState( "AllAuto2", false )
 			self:mrGbMSetState( "Automatic", true )
 		end
 	end
@@ -8182,23 +8228,42 @@ function gearboxMogli:mrGbMUIGetFixedRatio( )
 	return 1
 end
 
-function gearboxMogli:mrGbMUISetHandThrottle( value )
+function gearboxMogli:mrGbMUISetXXThrottle( value, setter )
 	if     value <= 1 then
-		self:mrGbMSetHandThrottle( 0 )
+		setter( self, 0 )
 	elseif value - 1 >= self.mrGbMUI.HandThrottleSteps then
-		self:mrGbMSetHandThrottle( 1 )
+		setter( self, 1 )
 	else
-		self:mrGbMSetHandThrottle( ( value - 1 ) / self.mrGbMUI.HandThrottleSteps )
+		setter( self, ( value - 1 ) / self.mrGbMUI.HandThrottleSteps )
 	end
 end
-function gearboxMogli:mrGbMUIGetHandThrottle( )
-	if     self.mrGbMS.HandThrottle >  gearboxMogli.eps then
-	elseif self.mrGbMS.HandThrottle >= 1 then
+function gearboxMogli:mrGbMUIGetXXThrottle( attr )
+	if     self.mrGbMS[attr] <  gearboxMogli.eps then
+	elseif self.mrGbMS[attr] >= 1 then
 		return 1 + self.mrGbMUI.HandThrottleSteps
-	else
-		return 1 + math.floor( 0.5 + self.mrGbMS.HandThrottle * self.mrGbMUI.HandThrottleSteps )
 	end
-	return 1
+	return 1 + math.floor( 0.5 + self.mrGbMS[attr] * self.mrGbMUI.HandThrottleSteps )
+end
+
+function gearboxMogli:mrGbMUISetHandThrottle( value )
+	gearboxMogli.mrGbMUISetXXThrottle( self, value, gearboxMogli.mrGbMSetHandThrottle )
+end
+function gearboxMogli:mrGbMUIGetHandThrottle( )
+	return gearboxMogli.mrGbMUIGetXXThrottle( self, "HandThrottle" )
+end
+
+function gearboxMogli:mrGbMUISetMinTarget( value )
+	gearboxMogli.mrGbMUISetXXThrottle( self, value, gearboxMogli.mrGbMSetMinTarget )
+end
+function gearboxMogli:mrGbMUIGetMinTarget( )
+	return gearboxMogli.mrGbMUIGetXXThrottle( self, "MinTarget" )
+end
+
+function gearboxMogli:mrGbMUISetMaxTarget( value )
+	gearboxMogli.mrGbMUISetXXThrottle( self, value, gearboxMogli.mrGbMSetMaxTarget )
+end
+function gearboxMogli:mrGbMUIGetMaxTarget( )
+	return gearboxMogli.mrGbMUIGetXXThrottle( self, "MaxTarget" )
 end
 
 if _G[g_currentModName..".gearboxMogliMotor"] == nil then

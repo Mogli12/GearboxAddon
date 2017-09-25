@@ -86,9 +86,9 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="afficher les RPM"/>
 		<text name="gearboxMogliTEXT_DrawReqPower"       text="afficher la puissance"/>
 		<text name="gearboxMogliTEXT_EnableAI"           text="cacher ouvrier"/>
-		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="changer vitesses et gamme 1"/>	<- may need tweak
-		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>		<- may need tweak
-		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="changer vitesses et gamme 1"/>	... may need tweak
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>		... may need tweak
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>		... may need tweak
 		 
 		<text name="gearboxMogliTEXT_AllAutoMode"        text="Paramètres simplifiée"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="séquentielle"/>
@@ -102,19 +102,42 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		
 		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2RM"/>
 		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4RM"/>
-		<text name="gearboxMogliTEXT_DiffLock_open"      text="ouvert"/>			<- may need tweak
+		<text name="gearboxMogliTEXT_DiffLock_open"      text="ouvert"/>			... may need tweak
 		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="glissement limité"/>
 		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatique"/>
 		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="correction rapport"/>
 		<text name="gearboxMogliTEXT_DiffLock_locked"    text="verrouillé"/>
 		
-		<text name="gearboxMogliTEXT_GearShifter_both"   text="G27 et touches"/>		<- may need tweak
-		<text name="gearboxMogliTEXT_GearShifter_key"    text="touches"/>			<- may need tweak
+		<text name="gearboxMogliTEXT_GearShifter_both"   text="G27 et touches"/>		... may need tweak
+		<text name="gearboxMogliTEXT_GearShifter_key"    text="touches"/>			... may need tweak
 		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
 		
-		<text name="gearboxMogliTEXT_Shuttle_both"       text="échanger et séparer"/>		<- may need tweak
-		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="échanger bouton"/>		<- may need tweak
-		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="séparer boutons"/>		<- may need tweak
+		<text name="gearboxMogliTEXT_Shuttle_both"       text="échanger et séparer"/>		... may need tweak
+		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="échanger bouton"/>		... may need tweak
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="séparer boutons"/>		... may need tweak
 		
+		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min. RPM"/>
+		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max. RPM"/>
+		
+		<!-- texts in the HUD => keep them short -->
+		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
+		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>
+		<text name="gearboxMogliDRAW_speed"              text="Speed"/>
+		<text name="gearboxMogliDRAW_currentRpm"         text="Current rpm"/>
+		<text name="gearboxMogliDRAW_TargetRpm"          text="Target rpm"/>
+		<text name="gearboxMogliDRAW_power"              text="Power"/>
+		<text name="gearboxMogliDRAW_load"               text="Load"/>
+		<text name="gearboxMogliDRAW_fuel"               text="Fuel used"/>
+		<text name="gearboxMogliDRAW_clutch"             text="Clutch"/>
+		<text name="gearboxMogliDRAW_autoClutch"         text="Auto clutch"/>
+		<text name="gearboxMogliDRAW_hand"               text="Hand throttle"/>
+		<text name="gearboxMogliDRAW_fixed"              text="Fixed ratio"/>
+		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
+		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
+		
+		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
+		<text name="gearboxMogliUNIT_HP"                 text="CV"/>		
+		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
 	</texts>
 </l10n>

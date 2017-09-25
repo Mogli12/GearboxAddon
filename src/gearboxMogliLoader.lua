@@ -185,22 +185,23 @@ function gearboxMogliLoader.initXmlFiles()
 	gearboxMogliLoader.defaultConfigI = {} 
 	gearboxMogliLoader.defaultConfigE = {} 
 	
-	for f=1,3 do 	
+	for f=1,2 do 	
 		local file1
 		local logLevel
+		local successMsg = ""
 
 		if     f == 1 then
 			file1 = gearboxMogliLoader.baseDirectory.."gearboxAddonConfig.xml"
 			logLevel = 4
-		elseif f == 2 then
-			file1 = gearboxMogliLoader.modsDirectory.."gearboxAddonConfig.xml"
-			logLevel = 2
-		elseif gearboxMogliLoader.xmlFileExt ~= nil then
-			logWrite( 2,'ignoring gearboxAddonConfig.zip')
-			break
-		else
+			successMsg = "FS17_GearboxAddon/gearboxAddonConfig.xml"
+		elseif g_modIsLoaded["gearboxAddonConfig"] then		
 			file1 = gearboxMogliLoader.modsDirectory.."/gearboxAddonConfig/gearboxAddonConfig.xml"
 			logLevel = 1
+			successMsg = "Found external config in separate mod gearboxAddonConfig.zip"
+		else
+			file1 = gearboxMogliLoader.modsDirectory.."gearboxAddonConfig.xml"
+			logLevel = 2
+			successMsg = "Found external config in gearboxAddonConfig.xml"
 		end
 		
 		logWrite( logLevel, file1)
@@ -210,13 +211,8 @@ function gearboxMogliLoader.initXmlFiles()
 			if f == 1 then
 				gearboxMogliLoader.xmlFileInt = xmlFile
 			else
-				gearboxMogliLoader.xmlFileExt = xmlFile
-				
-				if f == 2 then
-					logWrite( 1,'Found gearboxAddonConfig.xml in mods folder.')
-				else
-					logWrite( 1,'Found gearboxAddonConfig.xml in extra mod gearboxAddonConfig.')
-				end
+				gearboxMogliLoader.xmlFileExt = xmlFile				
+				logWrite( 1,successMsg)
 			end
 			
 			local i = 0

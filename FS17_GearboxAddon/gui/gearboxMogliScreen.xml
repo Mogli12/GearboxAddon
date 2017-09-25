@@ -141,11 +141,29 @@
 				</GuiElement>
 				
 				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ShuttleShifterMode" toolTip="$l10n_gearboxMogliTEXT_ShuttleShifterMode"  onCreate="onCreateSubElement" onCreateArgs="list0"
-										focusId="33" focusChangeTop="32" focusChangeBottom="102">
+										focusId="33" focusChangeTop="32" focusChangeBottom="34">
 					<GuiElement type="button" profile="multiTextOptionLeft" />
 					<GuiElement type="button" profile="multiTextOptionRight"/>
 					<GuiElement type="text" profile="multiTextOptionText" />
 					<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_ShuttleShifterMode"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+				
+				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MinTarget" toolTip="$l10n_gearboxMogliTEXT_MinTargetRpm" onCreate="onCreateSubElement" onCreateArgs="list"
+										focusId="34" focusChangeTop="33" focusChangeBottom="35">
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text"   profile="multiTextOptionText" />
+					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_MinTargetRpm"/>
+					<GuiElement type="bitmap" profile="multiTextOptionBg" />
+				</GuiElement>
+				
+				<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MaxTarget" toolTip="$l10n_gearboxMogliTEXT_MaxTargetRpm" onCreate="onCreateSubElement" onCreateArgs="list"
+										focusId="35" focusChangeTop="34" focusChangeBottom="102">
+					<GuiElement type="button" profile="multiTextOptionLeft" />
+					<GuiElement type="button" profile="multiTextOptionRight"/>
+					<GuiElement type="text"   profile="multiTextOptionText" />
+					<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_MaxTargetRpm"/>
 					<GuiElement type="bitmap" profile="multiTextOptionBg" />
 				</GuiElement>
 			</GuiElement>

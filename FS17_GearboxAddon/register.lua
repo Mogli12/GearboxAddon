@@ -234,7 +234,7 @@ function gearboxMogliRegister:addConfigurations()
 			dummySelf.xmlFile = loadXMLFile("TempConfig", storeItem.xmlFilename)
 			
 			if type( Vehicle.mrLoadFinished1 ) == "function" then
-				state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
+				local state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
 			--print("MR hack: "..tostring(state).." / "..tostring(dummySelf.mrIsMrVehicle).." / "..tostring(dummySelf.mrConfigFileName).." ("..tostring(result)..")")
 				if state and dummySelf.mrIsMrVehicle then
 					vehXmlName = dummySelf.mrConfigFileName
