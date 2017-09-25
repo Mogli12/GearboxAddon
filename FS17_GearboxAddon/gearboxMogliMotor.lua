@@ -791,12 +791,13 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and not self.noTorque
 		--and self.vehicle.cruiseControl.state == 0
 			and self.vehicle.steeringEnabled then
-		if     acc <= gearboxMogli.eps then
+		local accL = math.max( acc, self.accS )
+		if     accL <= gearboxMogli.eps then
 			limitA = self.vehicle.mrGbMS.IdleRpm
-		elseif acc < self.vehicle.mrGbMS.MaxRpmThrottle
+		elseif accL < self.vehicle.mrGbMS.MaxRpmThrottle
 				and ( self.vehicle.mrGbMG.maxRpmThrottleAuto
 					 or self.vehicle.mrGbMS.CurrentGearSpeed >= self.vehicle.mrGbMS.AutoMaxGearSpeed - gearboxMogli.eps ) then
-			limitA = math.min( limitA, self:getThrottleMaxRpm( acc / self.vehicle.mrGbMS.MaxRpmThrottle ) )
+			limitA = math.min( limitA, self:getThrottleMaxRpm( accL / self.vehicle.mrGbMS.MaxRpmThrottle ) )
 		end
 		limitA = math.max( limitA, self.minRequiredRpm )
 	end
@@ -818,16 +819,16 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		torque                 = torque * acc
 	else
 		local applyLimit = true
-		if self.vehicle.mrGbMS.Hydrostatic then
-			applyLimit = false
-			if self.vehicle.mrGbMS.HydrostaticMin < 0 and self.vehicle.mrGbMS.ReverseActive then
-				if self.hydrostaticFactor > -self.vehicle.mrGbMS.HydrostaticMin * 0.98 then
-					applyLimit = true
-				end
-			elseif self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticMax * 0.98 then
-				applyLimit = true
-			end
-		end
+	--if self.vehicle.mrGbMS.Hydrostatic then
+	--	applyLimit = false
+	--	if self.vehicle.mrGbMS.HydrostaticMin < 0 and self.vehicle.mrGbMS.ReverseActive then
+	--		if self.hydrostaticFactor > -self.vehicle.mrGbMS.HydrostaticMin * 0.98 then
+	--			applyLimit = true
+	--		end
+	--	elseif self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticMax * 0.98 then
+	--		applyLimit = true
+	--	end
+	--end
 		
 		if applyLimit then
 			if not self.limitMaxRpm and self.nonClampedMotorRpm > limitC then
@@ -892,6 +893,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
 			end
 		end		
+		
+		torque = torque * acc		
 	end
 	
 	if     self.noTransmission 
@@ -2740,15 +2743,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 														hMax )
 													
 					-- no increas of hydrostatic factor if not accelerating (deltaRpm>0)
-					hIF = self.vehicle.mrGbMS.HydrostaticIncFactor
-					
-					if     a > 0.95 then
-					elseif self.accP     < self.accS then
+					hIF = self.vehicle.mrGbMS.HydrostaticIncFactor	
+					if a < 0.95 and self.accP < self.accS then
 						hIF = 0
-					elseif self.deltaRpm < gearboxMogli.eps then
-						hIF = 0.1 * hIF
-					elseif self.deltaRpm < gearboxMogli.autoShiftMaxDeltaRpm then
-						hIF = hIF * ( 0.1 + 0.9 * self.deltaRpm / gearboxMogli.autoShiftMaxDeltaRpm )
 					end
 														
 					hMax1 = math.max( math.min( hMax, self.hydrostaticFactor + self.tickDt * hIF, wMax * r / minRpmReduced ), 
