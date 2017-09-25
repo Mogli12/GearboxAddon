@@ -1606,6 +1606,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	end
 	
 	local acceleration = math.max( accelerationPedal, 0 )
+	
+	self.accP = acceleration
+	if self.accS == nil then
+		self.accS = 0
+	end
+	self.accS = self.accS + Utils.clamp( self.accP - self.accS, -0.000333 * self.tickDt, 0.000333 * self.tickDt )
 
 	if self == nil or self.vehicle == nil then
 		local i = 1
@@ -2735,10 +2741,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 													
 					-- no increas of hydrostatic factor if not accelerating (deltaRpm>0)
 					hIF = self.vehicle.mrGbMS.HydrostaticIncFactor
-					if     self.deltaRpm < gearboxMogli.eps then
+					
+					if     a > 0.95 then
+					elseif self.accP     < self.accS then
 						hIF = 0
+					elseif self.deltaRpm < gearboxMogli.eps then
+						hIF = 0.1 * hIF
 					elseif self.deltaRpm < gearboxMogli.autoShiftMaxDeltaRpm then
-						hIF = hIF * self.deltaRpm / gearboxMogli.autoShiftMaxDeltaRpm
+						hIF = hIF * ( 0.1 + 0.9 * self.deltaRpm / gearboxMogli.autoShiftMaxDeltaRpm )
 					end
 														
 					hMax1 = math.max( math.min( hMax, self.hydrostaticFactor + self.tickDt * hIF, wMax * r / minRpmReduced ), 
@@ -3262,6 +3272,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 								and p.gearSpeed   < self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps then
 							isValidEntry = false
 							dumpIt = dumpIt .. string.format("\n%d is not valid (e)",i)
+						elseif  self.accP     < self.accS
+								and p.gearSpeed   > self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
+							isValidEntry = false
+							dumpIt = dumpIt .. string.format("\n%d is not valid (d)",i)
 						end
 					end
 					
