@@ -4121,23 +4121,23 @@ function gearboxMogli:updateTick(dt)
 					end
 				end
 				
-				local s = 0
-				local t = math.abs( self.lastSpeedReal*1000 )
-				for _,wheel in ipairs(self.wheels) do
-					w = math.abs( getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius )
-					local r = 0
-					if w > 0.1 and w > t then
-						r = 1 - t / w
-					end
-					if wheel.gearboxMogliLongSlip == nil then
-						wheel.gearboxMogliLongSlip = r
-					else
-						wheel.gearboxMogliLongSlip = wheel.gearboxMogliLongSlip + self.mrGbML.smoothFast * ( r - wheel.gearboxMogliLongSlip )
-					end
-						
-					s = math.max( s, wheel.gearboxMogliLongSlip )
-				end
-				self.mrGbMD.Slip = math.floor( 100 * Utils.clamp( s, 0, 1 ) + 0.5 )
+			--local s = 0
+			--local t = math.abs( self.lastSpeedReal*1000 )
+			--for _,wheel in ipairs(self.wheels) do
+			--	w = math.abs( getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius )
+			--	local r = 0
+			--	if w > 0.1 and w > t then
+			--		r = 1 - t / w
+			--	end
+			--	if wheel.gearboxMogliLongSlip == nil then
+			--		wheel.gearboxMogliLongSlip = r
+			--	else
+			--		wheel.gearboxMogliLongSlip = wheel.gearboxMogliLongSlip + self.mrGbML.smoothFast * ( r - wheel.gearboxMogliLongSlip )
+			--	end
+			--		
+			--	s = math.max( s, wheel.gearboxMogliLongSlip )
+			--end
+				self.mrGbMD.Slip     = math.floor( 100 * Utils.clamp( 1-self.motor.wheelSlipFactor, 0, 1 ) + 0.5 )
 
 				self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
 				

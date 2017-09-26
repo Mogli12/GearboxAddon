@@ -230,6 +230,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.maxTargetRpm            = self.vehicle.mrGbMS.MaxTargetRpm
 	self.minTargetRpm            = self.vehicle.mrGbMS.MinTargetRpm
 	self.requiredWheelTorque     = 0
+	self.wheelSlipFactor         = 1
 
 	self.maxForwardSpeed         = motor.maxForwardSpeed 
 	self.maxBackwardSpeed        = motor.maxBackwardSpeed 
@@ -582,7 +583,7 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 
 		if speedLimit < gearboxMogli.huge then
 			speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
-			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG, 1, curMaxRpm )
+			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
 		end
 		
 		if self.rpmLimit ~= nil and self.rpmLimit < curMaxRpm then
@@ -597,7 +598,7 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 		if speedLimit < gearboxMogli.huge then
 			speedLimit = speedLimit * gearboxMogli.kmhTOms
 			speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
-			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG, 1, curMaxRpm )
+			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
 		end
 	end
 	
@@ -1405,6 +1406,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.clutchRpm           = self.clutchRpm          * gearboxMogli.factor30pi
 	self.requiredWheelTorque = self.maxMotorTorque*math.abs(self.gearRatio)	
 	self.wheelSpeedRpm       = self.vehicle.lastSpeedReal * 1000 * gearboxMogli.factor30pi * self.vehicle.movingDirection	
+	self.wheelSpeedRpmReal   = self.wheelSpeedRpm
 	self.rawTransTorque      = self.usedTransTorque
 	
 	if     not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps and self.vehicle.mrGbMS.HydrostaticLaunch  then
@@ -1580,6 +1582,25 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 		self.usedMotorTorque   = math.min( self.usedTransTorque / self.transmissionEfficiency + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 		self.fuelMotorTorque   = math.min( utt / self.transmissionEfficiency + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	end
+	
+	local f = 1
+	if not self.noTransmission then
+		local w = self.wheelSpeedRpm
+		local s = self.wheelSpeedRpmReal
+		
+		if self.gearRatio < 0 then
+			w = -w
+			s = -s
+		end
+		
+		if     s <= 0 then
+			f = gearboxMogli.eps
+		elseif w > gearboxMogli.eps and w > s then
+			f = math.max( s / w, gearboxMogli.eps )
+		end
+	end
+		
+	self.wheelSlipFactor = self.wheelSlipFactor + self.vehicle.mrGbML.smoothFast * ( f - self.wheelSlipFactor )
 end
 
 --**********************************************************************************************************	
@@ -1689,6 +1710,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	self.minTargetRpm = self.vehicle.mrGbMS.MinTargetRpm
 	if self.vehicle.mrGbMS.MinTarget > 0 then
 		self.minTargetRpm   = math.min( self:getThrottleMaxRpm( self.vehicle.mrGbMS.MinTarget, true ), self.maxTargetRpm )
+		targetRequiredRpm   = self.minTargetRpm
 	end
 
 	local handThrottle = -1
@@ -1822,15 +1844,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 		end
 	end	
 	
-	if      self.vehicle.mrGbMS.Hydrostatic 
-			and targetRequiredRpm < self.minTargetRpm
-			and not lastNoTransmission
-			and currentAbsSpeed > gearboxMogli.eps then
-		if currentAbsSpeed < 2 then
-			targetRequiredRpm = targetRequiredRpm + ( self.minTargetRpm - targetRequiredRpm ) * currentAbsSpeed * 0.5 
-		else
-			targetRequiredRpm = self.minTargetRpm
-		end
+	if targetRequiredRpm > self.maxTargetRpm then
+		targetRequiredRpm = self.maxTargetRpm
 	end
 	
 	local minRpmReduced = Utils.clamp( targetRequiredRpm * gearboxMogli.rpmReduction, 
