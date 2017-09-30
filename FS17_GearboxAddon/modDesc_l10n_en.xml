@@ -118,7 +118,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min target RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max target RPM"/>
-
+		
+		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
+		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
+		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
 		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>

@@ -1161,42 +1161,25 @@
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="42" maxAIGear="3" ptoRpm="1900" ptoRpmEco="1600">
 			<blowOffVentilSound volume="0.5"/>
 			
-			<gears defaultGear="3" automatic="true">	
-				<gear speed="4.2" name="1">
-					<extraName range1="1" name="1"/>
-					<extraName range1="2" name="2"/>
-					<extraName range1="3" name="3"/>
-					<extraName range1="4" name="4"/>
-				</gear>
-				<gear speed="9.9" name="2">
-					<extraName range1="1" name="5"/>
-					<extraName range1="2" name="6"/>
-					<extraName range1="3" name="7"/>
-					<extraName range1="4" name="8"/>
-				</gear>
-				<gear speed="16.5" name="3">
-					<extraName range1="1" name="9"/>
-					<extraName range1="2" name="10"/>
-					<extraName range1="3" name="11"/>
-					<extraName range1="4" name="12"/>
-				</gear>
-				<gear speed="40.7" name="4">
-					<extraName range1="1" name="13"/>
-					<extraName range1="2" name="14"/>
-					<extraName range1="3" name="15"/>
-					<extraName range1="4" name="16"/>
-				</gear>
-				<gear speed="48.9" name="5" minRange="4" forwardOnly="true">
-					<extraName range1="4" name="17"/>
-				</gear>
+			<gears defaultGear="10" automatic="true" shiftTimeMs="0">	
+				<gear speed="2.2"   name="1"/>
+				<gear speed="2.7"   name="2"/>
+				<gear speed="3.3"   name="3"/>
+				<gear speed="4.2"   name="4"   upShiftTimeMs="800"/>
+				<gear speed="5.2"   name="5" downShiftTimeMs="800"/>
+				<gear speed="6.3"   name="6"/>
+				<gear speed="7.7"   name="7"/>
+				<gear speed="9.9"   name="8"   upShiftTimeMs="800"/>
+				<gear speed="8.6"   name="9" downShiftTimeMs="800"/>
+				<gear speed="10.5"  name="10"/>
+				<gear speed="12.9"  name="11"/>
+				<gear speed="16.5"  name="12"   upShiftTimeMs="800"/>
+				<gear speed="21.2"  name="13" downShiftTimeMs="800"/>
+				<gear speed="26.0"  name="14"/>
+				<gear speed="31.7"  name="15"/>
+				<gear speed="40.7"  name="16"   upShiftTimeMs="800"/>
+				<gear speed="48.9"  name="17" downShiftTimeMs="800"/>
 			</gears>
-			
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
-				<range name="A" maxGear="4" ratio="0.5209" />
-				<range name="B" maxGear="4" ratio="0.6388"/>
-				<range name="C" maxGear="4" ratio="0.7789"/>
-				<range name="D" ratio="1"/>
-			</ranges>
 			
 			<engines>
 				<engine name="T6.140" idleRpm="900" ratedRpm="2200">
@@ -1905,7 +1888,7 @@
 		<configFile xmlName="data/vehicles/steerable/lamborghini/Mach230VRT.xml"/>
 		<gearboxMogli maxForwardSpeed="62" maxBackwardSpeed="32">
       <!-- 0.05..60 @1890 / 800..2100 / 2 -->
-      <!--hydrostatic coupling="InputA" minRatio="0" maxRatio="1.333" pressure="300" volumePump="110" volumeMotor="110" correctGearSpeed="false"/-->
+      <!--hydrostatic coupling="InputA" minRatio="0" maxRatio="1.333" pressure="550" volumePump="110" volumeMotor="110" correctGearSpeed="false"/-->
       <hydrostatic profile="Input"/>
       <gears automatic="true">
         <gear speed="6.25"/> <!-- 0.05 1.59 4 8-->
@@ -2372,7 +2355,7 @@
 
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
 		<gearboxMogli maxForwardSpeed="42" maxBackwardSpeed="24" disableManual="false">
-      <!--hydrostatic coupling="InputB" minRatio="0" maxRatio="2" pressure="300" volumePump="110" volumeMotor="110" correctGearSpeed="true"/-->
+      <!--hydrostatic coupling="InputB" minRatio="0" maxRatio="2" pressure="550" volumePump="110" volumeMotor="110" correctGearSpeed="true"/-->
       <hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
 			<gears  shiftTimeMs="0" automatic="false" reverseReset="true" onlyStopped="true">		
 				<gear name="heavy duty" speed="22"/>
@@ -2431,7 +2414,7 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt300.xml"/>
 
 		<gearboxMogli maxBackwardSpeed="26">
-      <!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="65" volumeMotor="233" correctGearSpeed="true"/-->
+      <!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="550" volumePump="65" volumeMotor="233" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
       <gears>
 				<gear speed="40" name="" atRpm="1750"/>
@@ -2495,7 +2478,7 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt700.xml"/>
 	
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
-			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="120" volumeMotor="233" correctGearSpeed="true"/-->
+			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="550" volumePump="120" volumeMotor="233" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="28" />
@@ -2742,7 +2725,7 @@
 		<configFile xmlName="data/vehicles/steerable/fendt/fendt900.xml"/>
 	
 		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="62" maxBackwardSpeed="33" maxAIGear="1">
-			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="300" volumePump="233" volumeMotor="466" correctGearSpeed="true"/-->
+			<!--hydrostatic coupling="Output" minRatio="-0.707" maxRatio="1.0" pressure="550" volumePump="233" volumeMotor="466" correctGearSpeed="true"/-->
 			<hydrostatic profile="Output" correctGearSpeed="true"/>		
 			<gears defaultGear="2" clutchRatio="1">	
 				<gear name="heavy duty" speed="35" />
@@ -4581,43 +4564,26 @@
 		</mod>
 			
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="42" maxAIGear="3" ptoRpm="1900" ptoRpmEco="1600">
-			<gears defaultGear="3" automatic="true">	
-				<gear speed="4.2" name="1">
-					<extraName range1="1" name="1"/>
-					<extraName range1="2" name="2"/>
-					<extraName range1="3" name="3"/>
-					<extraName range1="4" name="4"/>
-				</gear>
-				<gear speed="9.9" name="2">
-					<extraName range1="1" name="5"/>
-					<extraName range1="2" name="6"/>
-					<extraName range1="3" name="7"/>
-					<extraName range1="4" name="8"/>
-				</gear>
-				<gear speed="16.5" name="3">
-					<extraName range1="1" name="9"/>
-					<extraName range1="2" name="10"/>
-					<extraName range1="3" name="11"/>
-					<extraName range1="4" name="12"/>
-				</gear>
-				<gear speed="40.7" name="4">
-					<extraName range1="1" name="13"/>
-					<extraName range1="2" name="14"/>
-					<extraName range1="3" name="15"/>
-					<extraName range1="4" name="16"/>
-				</gear>
-				<gear speed="48.9" name="5" minRange="4" forwardOnly="true">
-					<extraName range1="4" name="17"/>
-				</gear>
+			<gears defaultGear="10" automatic="true" shiftTimeMs="0">	
+				<gear speed="2.2"   name="1"/>
+				<gear speed="2.7"   name="2"/>
+				<gear speed="3.3"   name="3"/>
+				<gear speed="4.2"   name="4"   upShiftTimeMs="800"/>
+				<gear speed="5.2"   name="5" downShiftTimeMs="800"/>
+				<gear speed="6.3"   name="6"/>
+				<gear speed="7.7"   name="7"/>
+				<gear speed="9.9"   name="8"   upShiftTimeMs="800"/>
+				<gear speed="8.6"   name="9" downShiftTimeMs="800"/>
+				<gear speed="10.5"  name="10"/>
+				<gear speed="12.9"  name="11"/>
+				<gear speed="16.5"  name="12"   upShiftTimeMs="800"/>
+				<gear speed="21.2"  name="13" downShiftTimeMs="800"/>
+				<gear speed="26.0"  name="14"/>
+				<gear speed="31.7"  name="15"/>
+				<gear speed="40.7"  name="16"   upShiftTimeMs="800"/>
+				<gear speed="48.9"  name="17" downShiftTimeMs="800"/>
 			</gears>
 			
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
-				<range name="A" maxGear="4" ratio="0.5209" />
-				<range name="B" maxGear="4" ratio="0.6388"/>
-				<range name="C" maxGear="4" ratio="0.7789"/>
-				<range name="D" ratio="1"/>
-			</ranges>
-
 			<engines>
 				<engine name="4115" idleRpm="800" ratedRpm="2200">
 					<!-- 1900: 145(125) | 2200: 131(116) | 1500..1500: 590(528) | 90 | 0 | 149 | 2.2 | 2300 | 1360: 205 -->
@@ -5403,8 +5369,6 @@
 	
 	<vehicle>
 		<configFile modName="FS17_IHC_644" xmlName="IHC_644.xml"/>
-		<configFile modName="IHC_644"  xmlName="IHC_644.xml"/>
-		<configFile modName="IHC_644A" xmlName="IHC_644A.xml"/>
 
 		<gearboxMogli autoStartStop="false" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
@@ -5453,8 +5417,7 @@
 	</vehicle>
 	
 	<vehicle>
-		<configFile modName="IHC_744"  xmlName="IHC_744.xml"/>
-		<configFile modName="IHC_744A" xmlName="IHC_744A.xml"/>
+		<configFile modName="FS17_IHC_744"  xmlName="IHC_744.xml"/>
 
 		<gearboxMogli autoStartStop="false" speedLimiter="false">
 			<blowOffVentilSound volume="0"/>
@@ -5511,42 +5474,25 @@
 		</mod>
 			
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="42" maxAIGear="3" ptoRpm="1900" ptoRpmEco="1600">
-			<gears defaultGear="3" automatic="true">	
-				<gear speed="4.2" name="1">
-					<extraName range1="1" name="1"/>
-					<extraName range1="2" name="2"/>
-					<extraName range1="3" name="3"/>
-					<extraName range1="4" name="4"/>
-				</gear>
-				<gear speed="9.9" name="2">
-					<extraName range1="1" name="5"/>
-					<extraName range1="2" name="6"/>
-					<extraName range1="3" name="7"/>
-					<extraName range1="4" name="8"/>
-				</gear>
-				<gear speed="16.5" name="3">
-					<extraName range1="1" name="9"/>
-					<extraName range1="2" name="10"/>
-					<extraName range1="3" name="11"/>
-					<extraName range1="4" name="12"/>
-				</gear>
-				<gear speed="40.7" name="4">
-					<extraName range1="1" name="13"/>
-					<extraName range1="2" name="14"/>
-					<extraName range1="3" name="15"/>
-					<extraName range1="4" name="16"/>
-				</gear>
-				<gear speed="48.9" name="5" minRange="4" forwardOnly="true">
-					<extraName range1="4" name="17"/>
-				</gear>
+			<gears defaultGear="10" automatic="true" shiftTimeMs="0">	
+				<gear speed="2.2"   name="1"/>
+				<gear speed="2.7"   name="2"/>
+				<gear speed="3.3"   name="3"/>
+				<gear speed="4.2"   name="4"   upShiftTimeMs="800"/>
+				<gear speed="5.2"   name="5" downShiftTimeMs="800"/>
+				<gear speed="6.3"   name="6"/>
+				<gear speed="7.7"   name="7"/>
+				<gear speed="9.9"   name="8"   upShiftTimeMs="800"/>
+				<gear speed="8.6"   name="9" downShiftTimeMs="800"/>
+				<gear speed="10.5"  name="10"/>
+				<gear speed="12.9"  name="11"/>
+				<gear speed="16.5"  name="12"   upShiftTimeMs="800"/>
+				<gear speed="21.2"  name="13" downShiftTimeMs="800"/>
+				<gear speed="26.0"  name="14"/>
+				<gear speed="31.7"  name="15"/>
+				<gear speed="40.7"  name="16"   upShiftTimeMs="800"/>
+				<gear speed="48.9"  name="17" downShiftTimeMs="800"/>
 			</gears>
-			
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
-				<range name="A" maxGear="4" ratio="0.5209" />
-				<range name="B" maxGear="4" ratio="0.6388"/>
-				<range name="C" maxGear="4" ratio="0.7789"/>
-				<range name="D" ratio="1"/>
-			</ranges>
 			
 			<engines>
 				<engine name="T6.120" idleRpm="800" ratedRpm="2200">
@@ -5685,42 +5631,25 @@
 		</mod>
 			
 		<gearboxMogli maxForwardSpeed="52" maxBackwardSpeed="42" maxAIGear="3" ptoRpm="1900" ptoRpmEco="1600">
-			<gears defaultGear="3" automatic="true">	
-				<gear speed="4.2" name="1">
-					<extraName range1="1" name="1"/>
-					<extraName range1="2" name="2"/>
-					<extraName range1="3" name="3"/>
-					<extraName range1="4" name="4"/>
-				</gear>
-				<gear speed="9.9" name="2">
-					<extraName range1="1" name="5"/>
-					<extraName range1="2" name="6"/>
-					<extraName range1="3" name="7"/>
-					<extraName range1="4" name="8"/>
-				</gear>
-				<gear speed="16.5" name="3">
-					<extraName range1="1" name="9"/>
-					<extraName range1="2" name="10"/>
-					<extraName range1="3" name="11"/>
-					<extraName range1="4" name="12"/>
-				</gear>
-				<gear speed="40.7" name="4">
-					<extraName range1="1" name="13"/>
-					<extraName range1="2" name="14"/>
-					<extraName range1="3" name="15"/>
-					<extraName range1="4" name="16"/>
-				</gear>
-				<gear speed="48.9" name="5" minRange="4" forwardOnly="true">
-					<extraName range1="4" name="17"/>
-				</gear>
+			<gears defaultGear="10" automatic="true" shiftTimeMs="0">	
+				<gear speed="2.2"   name="1"/>
+				<gear speed="2.7"   name="2"/>
+				<gear speed="3.3"   name="3"/>
+				<gear speed="4.2"   name="4"   upShiftTimeMs="800"/>
+				<gear speed="5.2"   name="5" downShiftTimeMs="800"/>
+				<gear speed="6.3"   name="6"/>
+				<gear speed="7.7"   name="7"/>
+				<gear speed="9.9"   name="8"   upShiftTimeMs="800"/>
+				<gear speed="8.6"   name="9" downShiftTimeMs="800"/>
+				<gear speed="10.5"  name="10"/>
+				<gear speed="12.9"  name="11"/>
+				<gear speed="16.5"  name="12"   upShiftTimeMs="800"/>
+				<gear speed="21.2"  name="13" downShiftTimeMs="800"/>
+				<gear speed="26.0"  name="14"/>
+				<gear speed="31.7"  name="15"/>
+				<gear speed="40.7"  name="16"   upShiftTimeMs="800"/>
+				<gear speed="48.9"  name="17" downShiftTimeMs="800"/>
 			</gears>
-			
-			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
-				<range name="A" maxGear="4" ratio="0.5209" />
-				<range name="B" maxGear="4" ratio="0.6388"/>
-				<range name="C" maxGear="4" ratio="0.7789"/>
-				<range name="D" ratio="1"/>
-			</ranges>
 			
 			<engines>
 				<engine name="T6.155" idleRpm="800" ratedRpm="2200">

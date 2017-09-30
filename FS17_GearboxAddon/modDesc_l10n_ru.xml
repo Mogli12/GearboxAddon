@@ -101,6 +101,9 @@ gearboxMogli. Добавляет сконфигурированные специ
 		<text name="gearboxMogliTEXT_Shuttle_both"       text="toggle and separate"/>
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
+				
+		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
+		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>

@@ -31,6 +31,8 @@ else
 
 		_newClass_.baseDirectory = g_currentModDirectory
 		_newClass_.modsDirectory = g_modsDirectory.."/"
+		_newClass_.buttonBackFocusId = "101"
+		_newClass_.buttonLeftFocusId = "1"
 		
 		local mogliScreen_mt = Class(_newClass_, ScreenElement)
 
@@ -45,9 +47,29 @@ else
 			self.returnScreenName = "";
 			self.vehicle = nil
 			self.mogliScreenElements = {}
+			if type(_newClass_.mogliScreenNew)=="function" then
+				_newClass_.mogliScreenNew(self) 
+			end			
 			return self
 		end
-
+		
+	--********************************
+	-- onCreate
+	--********************************
+		function _newClass_:onCreate(element, parameter)
+			if self.pageStateElement ~= nil then
+				self.pageStateElement:unlinkElement()
+			end
+			self.buttonBack = FocusManager:getElementById(_newClass_.buttonBackFocusId);
+			self.buttonLeft = FocusManager:getElementById(_newClass_.buttonLeftFocusId);
+			if self.pagingElement ~= nil then
+				self.pagingElement:setPage(1, true);
+			end
+			if type(_newClass_.mogliScreenOnCreate)=="function" then
+				_newClass_.mogliScreenOnCreate(self,element) 
+			end
+		end
+		
 	--********************************
 	-- setVehicle
 	--********************************
@@ -64,8 +86,8 @@ else
 					end
 				end
 			end
-			if type( _newClass_.postSetVehicle ) == "function" then
-				_newClass_.postSetVehicle( self, vehicle )
+			if type( _newClass_.mogliScreenSetVehicle ) == "function" then
+				_newClass_.mogliScreenSetVehicle( self, vehicle )
 			end
 		end
 
@@ -74,10 +96,15 @@ else
 	--********************************
 		function _newClass_:update(dt)
 			_newClass_:superClass().update(self, dt)
-		
-			if type( _newClass_.preUpdate ) == "function" then
-				_newClass_.postUpdate( self, dt )
+			
+			if type( _newClass_.mogliScreenPreUpdate ) == "function" then
+				_newClass_.mogliScreenPreUpdate( self, dt )
 			end
+			
+			if self.pageSelector ~= nil then
+				self.pageSelector:setCanChangeState(true)
+			end
+		
 			if self.vehicle ~= nil then
 				for name,s in pairs( self.mogliScreenElements ) do
 					if s.parameter == "callback" then
@@ -87,8 +114,8 @@ else
 					end
 				end
 			end
-			if type( _newClass_.postUpdate ) == "function" then
-				_newClass_.postUpdate( self, dt )
+			if type( _newClass_.mogliScreenPostUpdate ) == "function" then
+				_newClass_.mogliScreenPostUpdate( self, dt )
 			end
 		end
 
@@ -147,6 +174,11 @@ else
 					end
 				end
 			end
+				
+			if self.pageStateBox ~= nil then
+				self:setPageStates()
+				self:updatePageState()
+			end	
 			
 			_newClass_:superClass().onOpen(self)
 		end
@@ -205,6 +237,9 @@ else
 	-- onClose
 	--********************************
 		function _newClass_:onClose()
+			if type( _newClass_.mogliScreenOnClose ) == "function" then
+				_newClass_.mogliScreenOnClose( self )
+			end
 			g_currentMission.isPlayerFrozen = false
 			self.vehicle = nil
 			_newClass_:superClass().onClose(self);
@@ -269,6 +304,103 @@ else
 			else	
 				print("Error inserting UI element with ID: "..tostring(element.id))
 			end
+		end
+		
+	--********************************
+	-- onCreatePaging(element)
+	--********************************
+		function _newClass_:onCreatePaging(element)
+			local texts = {}
+			for _, page in pairs(element.pages) do
+				table.insert(texts, self:mogliScreenGetPageTitle(page))
+			end
+			self.pageSelector:setTexts(texts)
+			self.pageSelector:setState(1)
+		end
+
+	--********************************
+	-- onClickPageSelection(state)
+	--********************************
+		function _newClass_:onClickPageSelection(state)
+			self.pagingElement:setPage(state)
+		end
+
+	--********************************
+	-- onCreatePageState(element)
+	--********************************
+		function _newClass_:onCreatePageState(element)
+			if self.pageStateElement == nil then
+				self.pageStateElement = element
+			end
+		end
+
+	--********************************
+	-- updatePageState()
+	--********************************
+		function _newClass_:updatePageState()
+			for index, state in pairs(self.pageStateBox.elements) do
+				state.state = GuiOverlay.STATE_NORMAL
+				if index == self.pageSelector:getState() then
+					state.state = GuiOverlay.STATE_FOCUSED
+				end
+			end
+		end
+
+	--********************************
+	-- onPageChange(pageId, pageMappingIndex)
+	--********************************
+		function _newClass_:onPageChange(pageId, pageMappingIndex)
+			self:updatePageState()
+
+			local bottomTarget = nil;
+			local topTarget    = nil;
+			
+			if type( _newClass_.mogliScreenGetPageFocus ) == "function" and self.pages ~= nil then
+				for _,page in pairs(self.pages) do
+					if page.id == pageId then
+						topTarget, bottomTarget = _newClass_.mogliScreenGetPageFocus( self, element )
+					end
+				end
+			end
+			
+			self.buttonBack.focusChangeData[FocusManager.TOP] = bottomTarget
+			self.buttonLeft.focusChangeData[FocusManager.BOTTOM] = topTarget
+		end
+
+	--********************************
+	-- setPageStates()
+	--********************************
+		function _newClass_:setPageStates()
+			for i=#self.pageStateBox.elements, 1, -1 do
+				self.pageStateBox.elements[i]:delete();
+			end
+
+			local texts = {}
+			self.statePageMapping = {}
+			for _, page in pairs(self.pagingElement.pages) do
+				page.disabled = false
+				if      type( _newClass_.mogliScreenIsPageDisabled ) == "function"
+						and _newClass_.mogliScreenIsPageDisabled( self, page.element ) then
+					page.disabled = true
+				end
+				if not page.disabled then
+					table.insert(texts, self:mogliScreenGetPageTitle(page))
+					self.pageStateElement:clone(self.pageStateBox)
+					table.insert(self.statePageMapping, page)
+				end
+			end
+
+			self.pageSelector:setTexts(texts)
+		end
+	
+	--********************************
+	-- mogliScreenGetPageTitle()
+	--********************************
+		function _newClass_:mogliScreenGetPageTitle(page)
+			if page.element.toolTip ~= nil then
+				return page.element.toolTip
+			end
+			return page.element.name
 		end
 
 	--********************************

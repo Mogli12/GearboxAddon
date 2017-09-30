@@ -16,5 +16,19 @@ if gearboxMogliScreen == nil or gearboxMogliScreen.version == nil or gearboxMogl
 	end
 	_G[g_currentModName..".mogliScreen"].newClass( "gearboxMogliScreen", "gearboxMogli", "mrGbM", "mrGbMUI" )
 	--***************************************************************
+	
+	function gearboxMogliScreen:mogliScreenIsPageDisabled(element)
+		if element.name == "HELP1" then
+			return true
+		end
+		return false
+	end
+	
+	function gearboxMogliScreen:mogliScreenGetPageFocus(element)
+		if element.name == "ALL" then
+			return "11", "35"
+		end
+		return gearboxMogliScreen.buttonBackFocusId, gearboxMogliScreen.buttonLeftFocusId
+	end
 end
 

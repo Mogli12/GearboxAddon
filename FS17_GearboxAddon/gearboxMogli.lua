@@ -30,7 +30,7 @@ gearboxMogli.minRpmInSpeedHudDelta=  500
 gearboxMogli.maxRpmInSpeedHudDelta= 2500
 gearboxMogli.ptoRpmFactor         = 0.900 -- 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
 gearboxMogli.ptoRpmFactorEco      = 2/3   -- 0.5  -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
-gearboxMogli.autoShiftRpmDiff     = 200
+gearboxMogli.autoShiftRpmDiff     = gearboxMogli.huge -- 200
 gearboxMogli.autoShiftPowerRatio  = 1.03
 gearboxMogli.autoShiftMaxDeltaRpm = 1E-3
 gearboxMogli.minClutchPercent     = 0.01
@@ -49,6 +49,7 @@ gearboxMogli.maxRatioFactorR      = gearboxMogli.huge -- 2000                   
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 gearboxMogli.rpmReduction         = 0.925 -- 7.5% --0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
+gearboxMogli.maxMaxPowerRatio     = 0.8  -- RPM where shift to maxMaxPowerRpm starts
 gearboxMogli.smoothLittle         = 0.2
 gearboxMogli.smoothFast           = 0.12
 gearboxMogli.smoothMedium         = 0.04
@@ -510,12 +511,14 @@ function gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, fixEntry )
 	local newEntry = fixEntry
 	newEntry.reverseOnly    = getXMLBool( xmlFile, baseName .. "#reverseOnly" )		
 	newEntry.forwardOnly    = getXMLBool( xmlFile, baseName .. "#forwardOnly" )
-	newEntry.minGear        = getXMLFloat(xmlFile, baseName .. "#minGear" )
-	newEntry.maxGear        = getXMLFloat(xmlFile, baseName .. "#maxGear" )
-	newEntry.minRange       = getXMLFloat(xmlFile, baseName .. "#minRange" )
-	newEntry.maxRange       = getXMLFloat(xmlFile, baseName .. "#maxRange" )
-	newEntry.minRange2      = getXMLFloat(xmlFile, baseName .. "#minRange2" )
-	newEntry.maxRange2      = getXMLFloat(xmlFile, baseName .. "#maxRange2" )
+	newEntry.minGear        = getXMLInt(xmlFile, baseName .. "#minGear" )
+	newEntry.maxGear        = getXMLInt(xmlFile, baseName .. "#maxGear" )
+	newEntry.minRange       = getXMLInt(xmlFile, baseName .. "#minRange" )
+	newEntry.maxRange       = getXMLInt(xmlFile, baseName .. "#maxRange" )
+	newEntry.minRange2      = getXMLInt(xmlFile, baseName .. "#minRange2" )
+	newEntry.maxRange2      = getXMLInt(xmlFile, baseName .. "#maxRange2" )
+	newEntry.upShiftMs      = getXMLFloat(xmlFile, baseName .. "#upShiftTimeMs" )
+	newEntry.downShiftMs    = getXMLFloat(xmlFile, baseName .. "#downShiftTimeMs" )
 	return newEntry
 end
 
@@ -1035,9 +1038,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	elseif hasHydrostat then
 		self.mrGbMS.TorqueConverterOrHydro = true
 	end
-
-	self.mrGbMS.TorqueConverterEfficiency = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#torqueConverterEfficiency"), self.mrGbMS.TransmissionEfficiency )
-
 	
 --if self.mrGbMS.TorqueConverter then 
 --	default = gearboxMogli.huge --self.mrGbMS.CurMaxRpm
@@ -1076,8 +1076,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	end
 	
+	local dft = self.mrGbMS.TransmissionEfficiency
 	if self.mrGbMS.TorqueConverter then
-		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),3)
+		dft = 0.7 * self.mrGbMS.TransmissionEfficiency
+	end
+	self.mrGbMS.ClutchEfficiency    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiency"), dft )
+	self.mrGbMS.ClutchEfficiencyInc = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiencyInc"), 
+																		math.max( 0, 0.95 * self.mrGbMS.TransmissionEfficiency - self.mrGbMS.ClutchEfficiency ) )
+
+	if self.mrGbMS.TorqueConverter then
+		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),3) * self.mrGbMS.TransmissionEfficiency / self.mrGbMS.ClutchEfficiency
 	
 		self.mrGbMS.TorqueConverterLockupMs = getXMLFloat(xmlFile, xmlString .. "#torqueConverterLockupMs")
 		if      self.mrGbMS.TorqueConverter 
@@ -1109,7 +1117,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if self.mrGbMS.MinClutchPercent < 2 * gearboxMogli.minClutchPercent then 
 		self.mrGbMS.MinClutchPercent      = 2 * gearboxMogli.minClutchPercent 
 	end	
-		
+	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
@@ -2004,7 +2012,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 				self.mrGbMS.HydrostaticMax      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRatio"), 1.41421356 )
 			end
 			if self.mrGbMS.HydrostaticPressure == nil then
-				self.mrGbMS.HydrostaticPressure = 300
+				self.mrGbMS.HydrostaticPressure = 550
 			end
 	
 			self.mrGbMS.HydrostaticPressDelta = self.mrGbMS.HydrostaticPressure / math.max( 1, Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#pressureChangeMs"), 300 ) )
@@ -4838,7 +4846,7 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 			attributes = attributes.." mrGbMAutomatic=\"" .. tostring( self.mrGbMS.Automatic ) .. "\""  
 		end
 		if self.mrGbMS.AllAuto2 then
-			attributes = attributes.." mrGbMAllAuto=\"" .. tostring( self.mrGbMS.AllAuto2 ) .. "\""  
+			attributes = attributes.." mrGbMAllAuto2=\"" .. tostring( self.mrGbMS.AllAuto2 ) .. "\""  
 		end
 		if self.mrGbMS.AllAutoMode < 7 then
 			attributes = attributes.." mrGbMAllAutoMode=\"" .. tostring( self.mrGbMS.AllAutoMode ) .. "\""  
@@ -4948,7 +4956,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
-		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto"       , "AllAuto2"          )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAllAuto2"      , "AllAuto2"          )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMEcoMode"       , "EcoMode"           )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMSwapGearRange" , "SwapGearRangeKeys" )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDrawTargetRpm" , "DrawTargetRpm"     )
@@ -6245,8 +6253,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 				self.mrGbML.debugTimer = g_currentMission.time + 1000
 			end				
 			-- reset some values...
-			self.motor.requestedPower1 = nil
-			self.motor.targetRpm1      = nil
+			self.motor.timeShiftTab = nil
 		end
 		self.mrGbML.autoShiftTime = g_currentMission.time + timeToShift
 		
@@ -6562,6 +6569,21 @@ end
 -- gearboxMogli:setLaunchGearSpeed
 --**********************************************************************************************************	
 function gearboxMogli:setLaunchGearSpeed( noEventSend )
+	if     self.mrGbMS                                    == nil
+			or self.mrGbMS.GlobalRatioFactor                  == nil
+			or self.mrGbMS.CurrentGear                        == nil
+			or self.mrGbMS.Gears                              == nil
+			or self.mrGbMS.Gears[self.mrGbMS.CurrentGear]     == nil
+			or self.mrGbMS.CurrentRange                       == nil
+			or self.mrGbMS.Ranges                             == nil
+			or self.mrGbMS.Ranges[self.mrGbMS.CurrentRange]   == nil
+			or self.mrGbMS.CurrentRange2                      == nil
+			or self.mrGbMS.Ranges2                            == nil
+			or self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2] == nil
+			then
+		return 
+	end
+
 	maxSpeed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed
 					 * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio
 					 * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
@@ -6872,6 +6894,14 @@ function gearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
 	
 	--timer to shift the "range"
 	if self.isServer then
+		if old ~= nil and self.mrGbMS.Ranges[old] ~= nil then
+			if old < new and self.mrGbMS.Ranges[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges[old].upShiftMs then
+				timeToShift = self.mrGbMS.Ranges[old].upShiftMs
+			end
+			if old > new and self.mrGbMS.Ranges[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges[old].downShiftMs then
+				timeToShift = self.mrGbMS.Ranges[old].downShiftMs
+			end
+		end
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftHl, self.mrGbMS.Range1DoubleClutch, self.mrGbMS.GearShiftEffectHl, self.mrGbMS.ShiftNoThrottleHl ) 
 	end 
 end 
@@ -6901,6 +6931,14 @@ function gearboxMogli:mrGbMOnSetRange2( old, new, noEventSend )
 	
 	--timer to shift the "range 2"
 	if self.isServer then	
+		if old ~= nil and self.mrGbMS.Ranges2[old] ~= nil then
+			if old < new and self.mrGbMS.Ranges2[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges2[old].upShiftMs then
+				timeToShift = self.mrGbMS.Ranges2[old].upShiftMs
+			end
+			if old > new and self.mrGbMS.Ranges2[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges2[old].downShiftMs then
+				timeToShift = self.mrGbMS.Ranges2[old].downShiftMs
+			end
+		end
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftRanges2, self.mrGbMS.Range2DoubleClutch, self.mrGbMS.GearShiftEffectRanges2, self.mrGbMS.ShiftNoThrottleRanges2 ) 		
 	end 
 end 
@@ -6928,8 +6966,16 @@ function gearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
 		self.mrGbMS.CurrentRange2 = gearboxMogli.adjustRange2ToEntry( self, n )
 	end
 	
+	--timer to set the gear
 	if self.isServer then			
-		--timer to set the gear
+		if old ~= nil and self.mrGbMS.Gears[old] ~= nil then
+			if old < new and self.mrGbMS.Gears[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Gears[old].upShiftMs then
+				timeToShift = self.mrGbMS.Gears[old].upShiftMs
+			end
+			if old > new and self.mrGbMS.Gears[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Gears[old].downShiftMs then
+				timeToShift = self.mrGbMS.Gears[old].downShiftMs
+			end
+		end
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftGear, self.mrGbMS.GearsDoubleClutch, self.mrGbMS.GearShiftEffectGear, self.mrGbMS.ShiftNoThrottleGear ) 	 	
 	end
 end
@@ -7416,12 +7462,13 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 				
 		if self.isEntered and Vehicle.debugRendering then
 			debugInfo = {}
-			table.insert( debugInfo, { component1="motor", component2="idleThrottle",                        format="%3d%%", factor=100 } )
+		--table.insert( debugInfo, { component1="motor", component2="idleThrottle",                        format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="lastThrottle",                        format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="autoClutchPercent",                   format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="clutchPercent",                       format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { name="torque",                   value=torque,                        format="%3dNm", factor=1000 } )
 			table.insert( debugInfo, { component1="motor", component2="lastBrakeForce",                      format="%3dNm", factor=1000 } )
+			table.insert( debugInfo, { component1="motor", component2="lastMotorTorque",                     format="%3dNm", factor=1000 } )
 			table.insert( debugInfo, { component1="motor", component2="usedTransTorque",                     format="%3dNm", factor=1000 } )
 			table.insert( debugInfo, { component1="motor", component2="ptoMotorTorque",                      format="%3dNm", factor=1000 } )
 			table.insert( debugInfo, { component1="motor", component2="lastMissingTorque",                   format="%3dNm", factor=1000 } )

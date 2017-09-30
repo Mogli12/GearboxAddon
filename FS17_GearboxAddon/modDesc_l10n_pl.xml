@@ -120,6 +120,9 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="Przełączanie przyciskiem"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="Osobne przyciski"/>
 		
+		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
+		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
+		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
 		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>
