@@ -2299,7 +2299,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 				mt = 0
 			end	
 			
-			mt = 0.5 * mt
+			if handThrottle < 0 then
+				mt = 0.5 * mt
+			end
 			
 			self.minThrottle = Utils.clamp( self.minThrottle + Utils.clamp( mt - self.minThrottle, -maxDeltaThrottle, maxDeltaThrottle ), 0, 1 )
 		end
