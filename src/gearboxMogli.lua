@@ -154,7 +154,7 @@ gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
 gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms
-gearboxMogliGlobals.DefaultRevUpMs1       = 3000  -- ms
+gearboxMogliGlobals.DefaultRevUpMs1       = 4000  -- ms
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
@@ -936,10 +936,22 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	
 		if self.mrGbMG.debugPrint then
 			print(string.format("combine settings: du0: %8.3f dp0: %8.3f dpi: %8.3f dc0: %8.3f dci: %8.3f rp0: %8.3f rc0: %8.3f (%8.3f)", du0, dp0, dpi, dc0, dci, dp0/maxTorque, dc0/maxTorque, maxTorque ))
-		end			
+		end		
+
+		self.mrGbMS.ThreshingMinRpm              = getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")
+		self.mrGbMS.ThreshingMaxRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm"), self.mrGbMS.MaxTargetRpm )
+		
+		if self.mrGbMS.ThreshingMinRpm == nil then
+			if      self.sampleThreshing ~= nil
+					and self.sampleThreshing.pitchOffset ~= nil 
+					and self.sampleThreshing.cuttingPitchOffset ~= nil 
+					and self.sampleThreshing.cuttingPitchOffset < self.sampleThreshing.pitchOffset then
+				self.mrGbMS.ThreshingMinRpm = self.mrGbMS.ThreshingMaxRpm * self.sampleThreshing.cuttingPitchOffset / self.sampleThreshing.pitchOffset
+			else
+				self.mrGbMS.ThreshingMinRpm = math.max( self.mrGbMS.MinTargetRpm, 0.2 * self.mrGbMS.IdleRpm + 0.8 * self.mrGbMS.RatedRpm )
+			end
+		end
 			
-		self.mrGbMS.ThreshingMinRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")                      , math.max( self.mrGbMS.MinTargetRpm, 0.2 * self.mrGbMS.IdleRpm + 0.8 * self.mrGbMS.RatedRpm ))
-		self.mrGbMS.ThreshingMaxRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm")                      , self.mrGbMS.MaxTargetRpm )
 		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 ) * f
 		
 		self.mrGbMS.ThreshingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumption")   , dp0 ) * f
@@ -4761,21 +4773,23 @@ function gearboxMogli:draw()
 		a = gearboxMogli.simplifiedAtClient
 	end
 	
-	if InputBinding.gearboxMogliON_OFF ~= nil then
-		if e then
-			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
-		else
-			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliOFF", "Gearbox [off]"), InputBinding.gearboxMogliON_OFF)		
-		end
-	end
+--if InputBinding.gearboxMogliON_OFF ~= nil then
+--	if e then
+--		g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliON", "Gearbox [on]"),  InputBinding.gearboxMogliON_OFF)		
+--	else
+--		g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliOFF", "Gearbox [off]"), InputBinding.gearboxMogliON_OFF)		
+--	end
+--end
+--
+--if InputBinding.gearboxMogliAllAuto ~= nil and ( a or self.steeringEnabled or self:mrGbMGetHasAllAuto() ) then
+--	if a then
+--		g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
+--	else
+--		g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),InputBinding.gearboxMogliAllAuto)		
+--	end
+--end
 
-	if InputBinding.gearboxMogliAllAuto ~= nil and ( a or self.steeringEnabled or self:mrGbMGetHasAllAuto() ) then
-		if a then
-			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoON", "All auto [on]"),  InputBinding.gearboxMogliAllAuto)	
-		else
-			g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliAllAutoOFF", "All auto [off]"),InputBinding.gearboxMogliAllAuto)		
-		end
-	end
+	g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliSETTINGS", "Settings"),InputBinding.gearboxMogliSETTINGS)		
 	
 end 
 
@@ -6370,7 +6384,9 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 		--if self.mrGbMS.Hydrostatic then
 		--	self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
 		--end
-			self.motor.ratioFactorR = nil
+			self.motor.ratioFactorR       = nil
+			self.motor.torqueRpmReference = nil
+			self.motor.torqueRpmReduction = nil
 		else
 			self.mrGbML.afterShiftClutch  = nil
 			self.mrGbML.beforeShiftRpm    = nil

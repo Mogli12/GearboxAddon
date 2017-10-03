@@ -177,7 +177,54 @@
 					</GuiElement>
 				</GuiElement>
 				
+                <GuiElement type="empty" profile="page" name="INPUTS" toolTip="$l10n_ui_settingsControls">
+                    <GuiElement type="flowLayout" profile="settingsControlHeaderBox" id="settingsControlsHeaderBox">
+                        <GuiElement type="bitmap" profile="settingsControlsActionHeaderBg">
+                            <GuiElement type="text" profile="settingsControlsListHeaderText"  text="$l10n_ui_action" />
+                        </GuiElement>
+                        <GuiElement type="bitmap" profile="settingsControlsHeaderBg">
+                            <GuiElement type="text" profile="settingsControlsListHeaderText"  text="$l10n_ui_key1" />
+                        </GuiElement>
+                        <GuiElement type="bitmap" profile="settingsControlsHeaderBg">
+                            <GuiElement type="text" profile="settingsControlsListHeaderText"  text="$l10n_ui_key2" />
+                        </GuiElement>
+                        <GuiElement type="bitmap" profile="settingsControlsHeaderBg2">
+                            <GuiElement type="text" profile="settingsControlsListHeaderText"  text="$l10n_ui_mouse" />
+                        </GuiElement>
+                        <GuiElement type="bitmap" profile="settingsControlsHeaderBg2">
+                            <GuiElement type="text" profile="settingsControlsListHeaderText"  text="$l10n_ui_gamepad" />
+                        </GuiElement>
+                    </GuiElement>
+
+                    <GuiElement type="slider" profile="settingsSlider" id="controlsListSlider">
+                        <GuiElement type="button" profile="sliderButtonUp"   focusId="sliderUp" />
+                        <GuiElement type="button" profile="sliderButtonDown" focusId="sliderDown" />
+
+                        <GuiElement type="list" profile="controlsList" id="controlsList">
+                            <GuiElement type="flowLayout" profile="controlsListItemBox" id="controlsListTemplate">
+                                <GuiElement type="listItem" profile="controlsListItemAction" onCreate="onCreateListItem">
+                                    <GuiElement type="text" profile="controlsTextAction" onCreate="onCreateItem" onCreateArgs="action"/>
+                                </GuiElement>
+                                <GuiElement type="listItem" profile="controlsListItem"   onCreate="onCreateListItem">
+                                    <GuiElement type="text" profile="controlsText"       onCreate="onCreateItem" onCreateArgs="key1"/>
+                                </GuiElement>
+                                <GuiElement type="listItem" profile="controlsListItem"   onCreate="onCreateListItem">
+                                    <GuiElement type="text" profile="controlsText"       onCreate="onCreateItem" onCreateArgs="key2"/>
+                                </GuiElement>
+                                <GuiElement type="listItem" profile="controlsListItem2"  onCreate="onCreateListItem2">
+                                    <GuiElement type="text" profile="controlsText2"      onCreate="onCreateItem" onCreateArgs="mouse"/>
+                                </GuiElement>
+                                <GuiElement type="listItem" profile="controlsListItem2"  onCreate="onCreateListItem2">
+                                    <GuiElement type="text" profile="controlsText2"      onCreate="onCreateItem" onCreateArgs="gamepad"/>
+                                </GuiElement>
+                            </GuiElement>
+                        </GuiElement>
+                    </GuiElement>
+                </GuiElement>				
+				
 				<GuiElement type="empty" profile="page" name="HELP1" toolTip="$l10n_gearboxMogliTEXT_Help_1">
+					<GuiElement type="text" profile="textDefault" screenAlign="topLeft" positionOrigin="topLeft" textAlignment="left" 
+											position="32px -16px" textWrapWidth="936px" text="$l10n_gearboxMogliHelp_1" />				
 				</GuiElement>
 			</GuiElement>
 

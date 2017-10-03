@@ -175,6 +175,10 @@ else
 				end
 			end
 				
+			if type(_newClass_.mogliScreenOnOpen)=="function" then
+				_newClass_.mogliScreenOnOpen(self) 
+			end
+			
 			if self.pageStateBox ~= nil then
 				self:setPageStates()
 				self:updatePageState()

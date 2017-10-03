@@ -2,7 +2,7 @@ local load_gearboxMogliScreen = true
 
 gearboxMogliRegister = {}
 gearboxMogliRegister.isLoaded = true
-gearboxMogliRegister.modName  = "FS17_GearboxAddon"
+gearboxMogliRegister.modName  =  g_currentModName
 gearboxMogliRegister.g_currentModDirectory = g_currentModDirectory
 gearboxMogliRegister.requestConfigurations = false
 
@@ -211,6 +211,37 @@ function gearboxMogliRegister:add()
 		end
 	end
 	
+	
+	local l10nFilenamePrefixFull = Utils.getFilename("modDesc_l10n", gearboxMogliRegister.g_currentModDirectory);
+	local l10nXmlFile;
+	local l10nFilename
+	local langs = {g_languageShort, "en", "de"};
+	for _, lang in ipairs(langs) do
+		l10nFilename = l10nFilenamePrefixFull.."_"..lang..".xml";
+		if fileExists(l10nFilename) then
+			l10nXmlFile = loadXMLFile("TempConfig", l10nFilename);
+			break;
+		end
+	end
+	if l10nXmlFile ~= nil then
+		local textI = 0;
+		while true do
+			local key = string.format("l10n.longTexts.longText(%d)", textI);
+			if not hasXMLProperty(l10nXmlFile, key) then
+				break;
+			end;
+			local name = getXMLString(l10nXmlFile, key.."#name");
+			local text = getXMLString(l10nXmlFile, key);
+			if name ~= nil and text ~= nil then
+				g_i18n.globalI18N.texts[name] = text:gsub("\r\n", "\n")
+			end;
+			textI = textI+1;
+		end;
+		delete(l10nXmlFile);
+	else
+		print("Warning (longTexts): No l10n file found for '"..l10nFilenamePrefix.."' in mod '"..gearboxMogliRegister.modName.."'");
+	end
+	
 end
 
 function gearboxMogliRegister.testXML( xmlFile, baseName, transName )
@@ -265,7 +296,7 @@ function gearboxMogliRegister:addConfigurations()
 			
 			if addMogliGearbox then
 				local modifiedItem = {}
-				modifiedItem.xmlFilename    = storeItem.xmlFilename				
+				modifiedItem.xmlFilename	= storeItem.xmlFilename				
 				modifiedItem.configFileName = configFileName				
 				modifiedItem.configurations = {}
 			

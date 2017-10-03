@@ -122,6 +122,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_Settings"           text="Einstellungen"/>
 		<text name="gearboxMogliTEXT_Help_1"             text="Anleitung 1"/>
+		<text name="gearboxMogliTEXT_Inputs"             text="Anleitung 1"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Sperren"/>
@@ -143,5 +144,17 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliUNIT_HP"                 text="PS"/>		
 		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		
 	</texts>
+	
+	<longTexts>
+		<longText name="gearboxMogliHelp_1"><![CDATA[
+Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das FS17 Standardgetriebe. Dieser Mod fügt auf Basis der Konfigurationsdatei gearboxAddonConfig.xml den dort konfigurierten Traktoren nachträglich eine Gangschaltung hinzu. Dabei können ganz unterschiedliche Getriebe simuliert werden. Es gibt klassische Getriebe mit Gängen, ein oder zwei Gruppen und den Rückwärtsgängen als Gang, in der ersten oder zweiten Gruppe oder als Wendeschaltung. Wenn man die Schaltzeit auf (knapp über) null verkürzt, dann wird daraus leicht ein Lastschaltgetriebe. In modernen Traktoren werden die Lastschaltstufen dann oft auch automatisch geschaltet.
+
+Neben normalen Stufengetrieben werden auch stufenlose Getriebe unterstützt. Es gibt Modelle mit ein oder zwei Gängen wie bei Fendt Vario. Andere Modelle kombinieren vier automatisch geschaltete mechanische Gänge mit einem stufenlosen hydrostatischen Antrieb. Alle diese stufenlosen Getriebe haben gemeinsam, dass sich der Wirkungsgrad ja nach Übersetzung recht stark ändert.
+
+Zusätzlich gibt es die Modi AllAuto und ECO. Im ECO-Modus steht zwar das maximale Drehmoment, aber nur 90% der Leistung zur Verfügung. Im ECO-Modus ist die Drehzahl bei eingeschalteter Zapfwelle niedriger (50% anstatt 75%) und es wird etwas schneller hoch geschaltet. Im AllAuto-Modus werden Gänge, Gruppen (nur erstes Gruppengetriebe) und Kupplung automatisch gesteuert. In diesem Modus fährt auch der Helfer mit dem Getriebe des GearboxAddons. Schließlich gibt es in Version 1.3 eine andere Steuerung für die manuelle Kupplung mit nur noch einer Taste. Diese teilautomatische Kupplung richtet sich vor allem an Lenkradfahrer, da ein echtes Kupplungspedal in LS15 nicht richtig unterstütz wird.
+]]></longText>
+	</longTexts>
+	
 </l10n>
