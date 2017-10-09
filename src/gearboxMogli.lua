@@ -57,7 +57,7 @@ gearboxMogli.smoothSlow           = 0.01
 gearboxMogli.hydroEffDiff         = 500
 gearboxMogli.hydroEffDiffInc      = 0 --150
 gearboxMogli.hydroEffMin          = 0.5
-gearboxMogli.ptoRpmHydroDiff      = 150
+gearboxMogli.ptoRpmHydroDiff      = 25
 gearboxMogli.ptoRpmThrottleDiff   = 50
 gearboxMogli.lastMotorRpmDiffReal = 50
 gearboxMogli.powerFactor0         = 0.1424083769633507853403141361257
@@ -938,8 +938,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			print(string.format("combine settings: du0: %8.3f dp0: %8.3f dpi: %8.3f dc0: %8.3f dci: %8.3f rp0: %8.3f rc0: %8.3f (%8.3f)", du0, dp0, dpi, dc0, dci, dp0/maxTorque, dc0/maxTorque, maxTorque ))
 		end		
 
-		self.mrGbMS.ThreshingMinRpm              = getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")
-		self.mrGbMS.ThreshingMaxRpm              = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm"), self.mrGbMS.MaxTargetRpm )
+		self.mrGbMS.ThreshingMinRpm  = getXMLFloat(xmlFile, xmlString .. ".combine#minRpm")
+		self.mrGbMS.ThreshingFullRpm = getXMLFloat(xmlFile, xmlString .. ".combine#fullPowerRpm")
+		self.mrGbMS.ThreshingMaxRpm  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#maxRpm"), self.mrGbMS.MaxTargetRpm )
 		
 		if self.mrGbMS.ThreshingMinRpm == nil then
 			if      self.sampleThreshing ~= nil
@@ -951,7 +952,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 				self.mrGbMS.ThreshingMinRpm = math.max( self.mrGbMS.MinTargetRpm, 0.2 * self.mrGbMS.IdleRpm + 0.8 * self.mrGbMS.RatedRpm )
 			end
 		end
-			
+		
 		self.mrGbMS.UnloadingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#unloadingPowerConsumption")   , du0 ) * f
 		
 		self.mrGbMS.ThreshingPowerConsumption    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#threshingPowerConsumption")   , dp0 ) * f
@@ -974,6 +975,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			
 			self.mrGbMS.ThreshingSoundPitchMin     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#soundPitchMin"), pf ) 
 			self.mrGbMS.ThreshingSoundPitchMax     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".combine#soundPitchMax"), pt ) 
+		end
+		
+		if      self.mrGbMS.ThreshingSoundPitchMod 
+			--and not self.mrGbMS.OnlyHandThrottle 
+				and self.mrGbMS.ThreshingFullRpm == nil then
+			self.mrGbMS.ThreshingFullRpm = self.mrGbMS.ThreshingMinRpm
 		end
 		
 		self.addCutterArea = Utils.appendedFunction(self.addCutterArea, gearboxMogli.addCutterArea)
@@ -1792,8 +1799,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if hydroMaxTorque ~= nil then
 		hydroMaxTorque = hydroMaxTorque * 0.001
 	end
-	local hit = 5000
-	local hdt = 5000
+	local hit = 1000
+	local hdt = 1000
 	self.mrGbMS.HydrostaticDirect         = getXMLBool(xmlFile, xmlString .. ".hydrostatic#direct")
 	hydroCorrectGearSpeed = getXMLBool(xmlFile, xmlString .. ".hydrostatic#correctGearSpeed")
 	
@@ -1858,6 +1865,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
 		elseif self.mrGbMS.HydrostaticProfile == "Output" then
+			hit = 5000
+			hdt = 5000
 			self.mrGbMS.HydrostaticMin = -0.7
 			self.mrGbMS.HydrostaticMax = 1
 			self.mrGbMS.TransmissionEfficiency = 0.98
@@ -1874,6 +1883,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
 		elseif self.mrGbMS.HydrostaticProfile == "Direct" then
+			hit = 500
+		  hdt = 500
 			self.mrGbMS.HydrostaticMin = -1
 			self.mrGbMS.HydrostaticMax = 1
 			self.mrGbMS.TransmissionEfficiency = 0.98
@@ -3108,20 +3119,22 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- area per second calculation for combines 
 --**********************************************************************************************************			
-	if self.mrGbML.strawDisableTime ~= nil and self.mrGbML.strawDisableTime > g_currentMission.time then 
-		local timeUntilDisable = self.mrGbML.strawDisableTime - g_currentMission.time
-		local numToDrop
-		
-		numToDrop = math.min((dt*self.mrGbML.currentCuttersArea)/timeUntilDisable, self.mrGbML.currentCuttersArea)
-		self.mrGbML.currentCuttersArea  = self.mrGbML.currentCuttersArea - numToDrop
-		self.mrGbML.cutterAreaPerSecond = numToDrop * 1000 / dt
+	if self.isServer then
+		if self.mrGbML.strawDisableTime ~= nil and self.mrGbML.strawDisableTime > g_currentMission.time then 
+			local timeUntilDisable = self.mrGbML.strawDisableTime - g_currentMission.time
+			local numToDrop
+			
+			numToDrop = math.min((dt*self.mrGbML.currentCuttersArea)/timeUntilDisable, self.mrGbML.currentCuttersArea)
+			self.mrGbML.currentCuttersArea  = self.mrGbML.currentCuttersArea - numToDrop
+			self.mrGbML.cutterAreaPerSecond = numToDrop * 1000 / dt
 
-		numToDrop = math.min((dt*self.mrGbML.currentRealArea)/timeUntilDisable, self.mrGbML.currentRealArea)
-		self.mrGbML.currentRealArea  = self.mrGbML.currentRealArea - numToDrop		
-    self.mrGbML.realAreaPerSecond   = numToDrop * 1000 / dt
-	else
-		self.mrGbML.cutterAreaPerSecond = 0
-    self.mrGbML.realAreaPerSecond   = 0
+			numToDrop = math.min((dt*self.mrGbML.currentRealArea)/timeUntilDisable, self.mrGbML.currentRealArea)
+			self.mrGbML.currentRealArea  = self.mrGbML.currentRealArea - numToDrop		
+			self.mrGbML.realAreaPerSecond   = numToDrop * 1000 / dt
+		else
+			self.mrGbML.cutterAreaPerSecond = 0
+			self.mrGbML.realAreaPerSecond   = 0
+		end
 	end
 	
 --**********************************************************************************************************			
@@ -3846,28 +3859,10 @@ function gearboxMogli:update(dt)
 -- threshing sound pitch 
 --**********************************************************************************************************			
 	if self.mrGbMS.ThreshingSoundPitchMod then		
-		local p
 		local d = self.mrGbMS.ThreshingSoundPitchMax - self.mrGbMS.ThreshingSoundPitchMin
-		if not ( self.mrGbMS.ConstantRpm ) then
-			p = self.sampleThreshing.pitchOffset
-		elseif Utils.getNoNil( gearboxMogli.mrGbMGetThroughPutS( self ), -1 ) <= 0 then
-			p = self.sampleThreshing.pitchOffset
-		elseif d <= 0 then
-			p = self.mrGbMB.CombineCuttingPitchOffset
-		else
-			local r = self.motor:getEqualizedMotorRpm()
-			local f = ( r - self.mrGbMS.ThreshingMinRpm ) / ( self.mrGbMS.ThreshingMaxRpm - self.mrGbMS.ThreshingMinRpm )
-			p = self.mrGbMS.ThreshingSoundPitchMin + f * d
-			if not self.mrGbMS.OnlyHandThrottle then
-				local g = self:mrGbMGetMotorLoad()
-				if g < 0.5 then
-					g = 0
-				else
-					g = 2 * g - 1
-				end
-				p = 0.5 * ( p + self.sampleThreshing.pitchOffset + g * ( self.sampleThreshing.cuttingPitchOffset - self.sampleThreshing.pitchOffset ) )
-			end
-		end
+		local r = self.motor:getEqualizedMotorRpm()
+		local f = ( r - self.mrGbMS.ThreshingMinRpm ) / ( self.mrGbMS.ThreshingMaxRpm - self.mrGbMS.ThreshingMinRpm )
+		local p = math.max( 0, self.mrGbMS.ThreshingSoundPitchMin + f * d )
 		
 		if self.mrGbML.threshingPitchOffset == nil then
 			self.mrGbML.threshingPitchOffset = self.sampleThreshing.pitchOffset
