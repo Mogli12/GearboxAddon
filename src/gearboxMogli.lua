@@ -8136,11 +8136,27 @@ function gearboxMogli:mrGbMUISetAllAutoMode( value )
 end
 function gearboxMogli:mrGbMUIGetAllAutoMode()
 	if self.mrGbMUI ~= nil and self.mrGbMUI.AllAutoModeID ~= nil then
-		if table.getn( self.mrGbMUI.AllAutoModeID ) == 1 then
+		if     table.getn( self.mrGbMUI.AllAutoModeID ) == 1 then
 			return 1 
+		elseif self.mrGbMS.AllAutoMode <= 0 then
+			return 1
+		elseif self.mrGbMS.AllAutoMode >= 7 then
+			return table.getn( self.mrGbMUI.AllAutoModeID )
 		end
+		
+		local m = 0
+		if self.mrGbMS.CountGearsF  > 1 and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 1 ) > 0 then
+			m = m + 1
+		end
+		if self.mrGbMS.CountRange1F > 1 and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 2 ) > 0 then
+			m = m + 2
+		end
+		if self.mrGbMS.CountRange2F > 1 and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 3 ) > 0 then
+			m = m + 4
+		end
+		
 		for j,a in pairs( self.mrGbMUI.AllAutoModeID ) do
-			if self.mrGbMS.AllAutoMode <= a then
+			if m <= a then
 				return j
 			end
 		end
