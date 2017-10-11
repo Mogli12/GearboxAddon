@@ -6103,6 +6103,7 @@ function gearboxMogli:mrGbMGetAutoShiftGears()
 			and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 1 ) > 0 then
 		return true
 	elseif  self.mrGbMS.Automatic 
+			and not self.mrGbMS.AllAuto 
 			and self.mrGbMS.AutoShiftGears then
 		return true
 	elseif not ( self.steeringEnabled ) then
@@ -6149,6 +6150,7 @@ function gearboxMogli:mrGbMGetAutoShiftRange()
 			and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 2 ) > 0 then
 		return true
 	elseif  self.mrGbMS.Automatic 
+			and not self.mrGbMS.AllAuto 
 			and self.mrGbMS.AutoShiftHl then
 		return true
 	elseif not ( self.steeringEnabled ) then
@@ -6192,6 +6194,7 @@ function gearboxMogli:mrGbMGetAutoShiftRange2()
 			and gearboxMogli.getBit3( self.mrGbMS.AllAutoMode, 3 ) > 0 then
 		return true
 	elseif  self.mrGbMS.Automatic 
+			and not self.mrGbMS.AllAuto 
 			and self.mrGbMS.AutoShiftRange2 then
 		return true
 	elseif not ( self.steeringEnabled ) then
