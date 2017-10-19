@@ -3295,12 +3295,13 @@ function gearboxMogli:update(dt)
 		
 		if self.mrGbMS.Handbrake then
 			self:mrGbMSetNeutralActive( true ) 
-			self:mrGbMSetState( "AutoHold", true )		
+			self:mrGbMSetState( "AutoHold", true )	
 		else
 			-- auto start/stop
 			if      self.mrGbMS.NeutralActive
 					and self.isMotorStarted
 					and self:mrGbMGetAutoStartStop()
+					and self.mrGbMS.G27Mode <= 0 
 					and g_currentMission.time > self.motorStartTime
 					and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
 				self:mrGbMSetNeutralActive( false ) 
@@ -3471,6 +3472,10 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
 			if self.mrGbMS.Handbrake then
 				self:mrGbMSetState( "Handbrake", false )		
+				if self.mrGbMS.G27Mode >= 2 then
+					self:mrGbMSetNeutralActive( false ) 
+					self:mrGbMSetState( "AutoHold", false )		
+				end
 			else
 				self:mrGbMSetState( "Handbrake", true )		
 				self:mrGbMSetNeutralActive( true ) 
@@ -3630,16 +3635,19 @@ function gearboxMogli:update(dt)
 		--self.mrGbML.G27Gear = self.mrGbML.G27Gear ..", "..tostring(noAutomatic)..", "..tostring(self.mrGbMS.G27Mode)
 			
 			if noAutomatic and ( self.mrGbMS.G27Mode > 0 or gear ~= 0 or self.mrGbMS.GearShifterMode == 2 ) then		
+				-- G27Mode == 1 => no gear selected => go to neutral
+				-- G27Mode == 2 => a gear is selected => do not disable neutral if handbrake is engaged
+			
 				if self.mrGbMS.G27Mode <= 0 then
-					if self.mrGbMS.NeutralActive or gear == 0 then
+					if self.mrGbMS.NeutralActive then
 						self:mrGbMSetState( "G27Mode", 1 ) 
 					else
 						self:mrGbMSetState( "G27Mode", 2 ) 
 					end
 				end
-			
+				
 				local curGear = 0
-				if self.mrGbMS.G27Mode >= 2  then
+				if self.mrGbMS.G27Mode >= 2 then
 					if self.mrGbMS.SwapGearRangeKeys then
 						curGear   = self.mrGbMS.CurrentRange
 					else
@@ -3651,32 +3659,31 @@ function gearboxMogli:update(dt)
 					if self.mrGbMS.G27Gears[7] >= 0 then
 						curGear = math.abs( curGear )
 					end											
-				end											
+				end
 
-			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => "..tostring(curGear)..", "..tostring(gear)
-				
+				-- always shift 
 				if curGear ~= gear then					
 					local manClutch   = self.mrGbMS.ManualClutchGear
 					local onlyStopped = self.mrGbMS.GearsOnlyStopped 
-					if self:mrGbMGetAutoClutch() then
-						manClutch   = false
-						onlyStopped = false
-					elseif ( curGear>0 and gear<0 ) or ( curGear<0 and gear>0 ) then
-						manClutch   = self.mrGbMS.ManualClutchReverse
-						onlyStopped = self.mrGbMS.ReverseOnlyStopped
-					elseif self.mrGbMS.SwapGearRangeKeys then
+					if self.mrGbMS.SwapGearRangeKeys then
 						manClutch   = self.mrGbMS.ManualClutchHl
 						onlyStopped = self.mrGbMS.Range1OnlyStopped
 					end
-	
-				--self.mrGbML.G27Gear = self.mrGbML.G27Gear ..", "..tostring(manClutch)
-	
-					if     gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, onlyStopped, noEventSend )
-							or gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
-					-- do nothing 
+					if ( curGear>0 and gear<0 ) or ( curGear<0 and gear>0 ) then
+						manClutch   = manClutch   or self.mrGbMS.ManualClutchReverse
+						onlyStopped = onlyStopped or self.mrGbMS.ReverseOnlyStopped
+					end
+					if self:mrGbMGetAutoClutch() then
+						manClutch = false
+					end
+		
+					if     gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, onlyStopped, noEventSend ) then
+					-- do not shift because not stopped 
 					elseif gear == 0 then
-						self:mrGbMSetNeutralActive( true, false, true )	
-						self:mrGbMSetState( "G27Mode", 1 ) 
+					-- neutral
+						curGear = 0 
+					elseif gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
+					-- do not shift because of double clutch 
 					else
 						if self.mrGbMS.G27Gears[7] < 0 then
 							self:mrGbMSetReverseActive( (gear < 0) )
@@ -3693,21 +3700,21 @@ function gearboxMogli:update(dt)
 						if self.mrGbMS.ReverseActive then
 							curGear = -curGear 
 						end			
-
-						self:mrGbMSetState( "G27Mode", 2 ) 
-					--if not self:mrGbMGetAutoStartStop() then
-						self:mrGbMSetNeutralActive( false, false, true )
-						self:mrGbMSetState( "AutoHold", false )											
-					--end
 					end
 				end
 				
-			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => "..tostring(self.mrGbMS.G27Mode)
-				
+				if curGear == 0 then
+					self:mrGbMSetNeutralActive( true, false, true )	
+					self:mrGbMSetState( "G27Mode", 1 ) 
+				else
+					self:mrGbMSetState( "G27Mode", 2 ) 
+					if not self.mrGbMS.Handbrake then
+						self:mrGbMSetNeutralActive( false, false, true )
+						self:mrGbMSetState( "AutoHold", false )											
+					end
+				end				
 			elseif self.mrGbMS.G27Mode > 0 then
 				self:mrGbMSetState( "G27Mode", 0 ) 
-
-			--self.mrGbML.G27Gear = self.mrGbML.G27Gear .." => off"				
 			end
 		end
 --**********************************************************************************************************					
