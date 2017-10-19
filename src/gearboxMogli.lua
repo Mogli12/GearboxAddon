@@ -101,7 +101,7 @@ gearboxMogli.simplifiedAtClient   = false
 
 gearboxMogliGlobals                       = {}
 gearboxMogliGlobals.debugPrint            = false
-gearboxMogliGlobals.debugInfo             = true 
+gearboxMogliGlobals.debugInfo             = false 
 gearboxMogliGlobals.transmissionEfficiency= 0.96
 -- Giants is cheating: 0.86 * 0.88 = 0.7568 > 0.72 => torqueFactor = 0.86 * 0.88 / ( 0.72 * 0.94 )
 gearboxMogliGlobals.torqueFactor          = 0.86 * 0.88 / ( 0.72 * gearboxMogliGlobals.transmissionEfficiency )  
@@ -3293,10 +3293,7 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetState( "Handbrake", false )		
 		end
 		
-		if self.mrGbMS.Handbrake then
-			self:mrGbMSetNeutralActive( true ) 
-			self:mrGbMSetState( "AutoHold", true )	
-		else
+		if not self.mrGbMS.Handbrake then
 			-- auto start/stop
 			if      self.mrGbMS.NeutralActive
 					and self.isMotorStarted
@@ -3472,14 +3469,8 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
 			if self.mrGbMS.Handbrake then
 				self:mrGbMSetState( "Handbrake", false )		
-				if self.mrGbMS.G27Mode >= 2 then
-					self:mrGbMSetNeutralActive( false ) 
-					self:mrGbMSetState( "AutoHold", false )		
-				end
 			else
 				self:mrGbMSetState( "Handbrake", true )		
-				self:mrGbMSetNeutralActive( true ) 
-				self:mrGbMSetState( "AutoHold", true )		
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHUD" ) then
 			-- HUD mode	
@@ -3708,10 +3699,8 @@ function gearboxMogli:update(dt)
 					self:mrGbMSetState( "G27Mode", 1 ) 
 				else
 					self:mrGbMSetState( "G27Mode", 2 ) 
-					if not self.mrGbMS.Handbrake then
-						self:mrGbMSetNeutralActive( false, false, true )
-						self:mrGbMSetState( "AutoHold", false )											
-					end
+					self:mrGbMSetNeutralActive( false, false, true )
+					self:mrGbMSetState( "AutoHold", false )											
 				end				
 			elseif self.mrGbMS.G27Mode > 0 then
 				self:mrGbMSetState( "G27Mode", 0 ) 
@@ -4747,7 +4736,6 @@ function gearboxMogli:draw()
 			else
 				gearboxMogli.ovHandBrakeUp:render()
 			end
-	--elseif self:mrGbMGetAutoStartStop() or not ( self.mrGbMS.AutoHold ) then
 		else
 			if revShow then
 				gearboxMogli.ovArrowDownGray:render()
@@ -6710,11 +6698,7 @@ end
 -- gearboxMogli:mrGbMOnSetNeutral
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )	
-	if self.mrGbMS.Handbrake then
-		self.mrGbMS.NeutralActive = true
-	else
-		self.mrGbMS.NeutralActive = new 
-	end
+	self.mrGbMS.NeutralActive = new 
 
 	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0  then
 		self:mrGbMSetLanuchGear( noEventSend )
@@ -7218,8 +7202,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 --end
 	
 	-- self.doHandbrake is set to false if a dialog is shown
-	if self.isMotorStarted and self.steeringEnabled and self.isControlled then
-		doHandbrake = self.mrGbMS.Handbrake
+	if self.mrGbMS.Handbrake and self.steeringEnabled and self.isControlled then
+		doHandbrake = true
 	end
 	
 	local acceleration        = acc
@@ -7448,7 +7432,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		acceleration = ref + Utils.clamp( acceleration - ref, -diff, diff )
 	end
 	
-	gearboxMogliMotor.mrGbMUpdateGear( self.motor, acceleration )	
+	gearboxMogliMotor.mrGbMUpdateGear( self.motor, acceleration, doHandbrake )	
 	
 	local absAccelerationPedal = math.abs(accelerationPedal)
 	local wheelDriveTorque = 0

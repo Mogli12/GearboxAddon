@@ -1612,7 +1612,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:mrGbMUpdateGear
 --**********************************************************************************************************	
-function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
+function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 
 	local accelerationPedal = accelerationPedalRaw
 	if     accelerationPedalRaw > 1 then
@@ -2264,7 +2264,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	local brakeNeutral   = false
 	local autoOpenClutch = ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
 											or ( ( self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter )
-											 and accelerationPedal < -0.001 )
+											 and ( accelerationPedal < -0.001 or doHandbrake ) )
 	
 	if      self.vehicle.mrGbMS.Hydrostatic
 			and self.vehicle.mrGbMS.ConstantRpm 
@@ -2297,6 +2297,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 			and autoOpenClutch
 			and currentAbsSpeed < -1.8 then
 	-- reverser and did not stop yet
+		brakeNeutral = true
+	elseif  doHandbrake
+			and autoOpenClutch then
+	-- hand brake but not in neutral
 		brakeNeutral = true
 	elseif  self.vehicle.mrGbMS.Hydrostatic
 			and self.vehicle.mrGbMS.HydrostaticMin < gearboxMogli.eps
@@ -2335,7 +2339,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw )
 	
 	if self.vehicle.mrGbMG.debugInfo then
 		self.vehicle.mrGbML.brakeNeutralInfo = 
-			string.format("%1.3f %4d %s %2.1f %4d %4d", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(brakeNeutral), currentAbsSpeed, self.lastMotorRpm, self.minRequiredRpm)
+			string.format("%1.3f %4d %s %s %s %2.1f %4d %4d", accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(autoOpenClutch), tostring(doHandbrake), tostring(brakeNeutral), currentAbsSpeed, self.lastMotorRpm, self.minRequiredRpm)
 	end
 		
 	if brakeNeutral then
