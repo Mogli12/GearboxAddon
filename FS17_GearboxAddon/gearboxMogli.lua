@@ -1180,12 +1180,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ClutchAfterShiftGear    = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".gears#clutchRatio"),     default, 1, self.mrGbMS.GearShiftEffectGear ) 
 	self.mrGbMS.ClutchAfterShiftHl      = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".ranges(0)#clutchRatio"), default, 1, self.mrGbMS.GearShiftEffectHl ) 
 	self.mrGbMS.ClutchAfterShiftRanges2 = gearboxMogli.getNoNil2(getXMLFloat(xmlFile, xmlString .. ".ranges(1)#clutchRatio"), default, 1, self.mrGbMS.GearShiftEffectRanges2 ) 
-	self.mrGbMS.ClutchAfterShiftReverse = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#clutchRatio"), default )
 
 	self.mrGbMS.ManualClutchGear      	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".gears#manualClutch"),     self.mrGbMS.ClutchAfterShiftGear + 0.1 <= self.mrGbMS.MaxClutchPercent )
 	self.mrGbMS.ManualClutchHl        	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(0)#manualClutch"), self.mrGbMS.ClutchAfterShiftHl + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
 	self.mrGbMS.ManualClutchRanges2   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(1)#manualClutch"), self.mrGbMS.ClutchAfterShiftRanges2 + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
-	self.mrGbMS.ManualClutchReverse   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch"),   self.mrGbMS.ClutchAfterShiftReverse + 0.1 <= self.mrGbMS.MaxClutchPercent )
+	self.mrGbMS.ManualClutchReverse   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch"),   not self.mrGbMS.AutoStartStop or self.mrGbMS.ReverseOnlyStopped )
+	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
 		
 	self.mrGbMS.ShiftNoThrottleGear   	= getXMLBool( xmlFile, xmlString .. ".gears#shiftNoThrottle")
 	self.mrGbMS.ShiftNoThrottleHl     	= getXMLBool( xmlFile, xmlString .. ".ranges(0)#shiftNoThrottle")
@@ -3371,11 +3371,8 @@ function gearboxMogli:update(dt)
 													 self.mrGbMS.ManualClutch - dt / self.mrGbMS.ClutchTimeDec )
 			local ma = math.min( 1, 
 													 self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeInc )
-			if self.motor.targetRpm == nil then
-				self:mrGbMSetManualClutch( mi )
-			else
-				self:mrGbMSetManualClutch( self.motor:getClutchPercent( self.motor.targetRpm, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, self.mrGbMS.ManualClutch, ma ) )
-			end
+			local tr = self:mrGbMGetTargetRPM()
+			self:mrGbMSetManualClutch( self.motor:getClutchPercent( tr, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, self.mrGbMS.ManualClutch, ma ) )
 		end
 		
 		if InputBinding.gearboxMogliMINRPM ~= nil then
@@ -4624,9 +4621,9 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_fuel", "Fuel used"))
 						elseif self.mrGbMS.FuelPerDistanceMinSpeed ~= nil and math.abs(self.lastSpeed)*3600 >= self.mrGbMS.FuelPerDistanceMinSpeed then
-							renderText(ovRight, drawY, deltaY, string.format("%3d l/100km", self:mrGbMGetFuelUsageRate() / math.abs(self.lastSpeed*36) ))
+							renderText(ovRight, drawY, deltaY, string.format("%3d %s", self:mrGbMGetFuelUsageRate() / math.abs(self.lastSpeed*36), gearboxMogli.getText("gearboxMogliUNIT_lp100km", "l/100km" )))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%3d l/h", self:mrGbMGetFuelUsageRate() ))
+							renderText(ovRight, drawY, deltaY, string.format("%3d %s", self:mrGbMGetFuelUsageRate(), gearboxMogli.getText("gearboxMogliUNIT_lph", "l/h" )))
 						end
 					elseif info == "clutch" then
 						if col == 1 then
@@ -5096,7 +5093,9 @@ end
 function gearboxMogli:mrGbMCheckGrindingGears( checkIt, noEventSend )
 	if self.steeringEnabled and checkIt and not ( self:mrGbMGetAutoClutch() ) and not ( self:mrGbMGetAutomatic() ) then
 		if self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1 then
-			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear clutch > %3.0f%%", 100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ), noEventSend )
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format("%s > %3.0f%%", 
+																															gearboxMogli.getText( "gearboxMogliTEXT_GrindingClutch", "Cannot shift gear; clutch" ),
+																															100*Utils.clamp( self.mrGbMS.MinClutchPercent + 0.1, 0, 1 ) ), noEventSend )
 			return true
 		end		
 	end		
@@ -5110,7 +5109,9 @@ function gearboxMogli:mrGbMCheckShiftOnlyIfStopped( onlyStopped, noEventSend )
 	if self.steeringEnabled and onlyStopped and not self.mrGbMS.AllAuto then
 		local s = math.abs( self.lastSpeedReal*3600 )
 		if s > 1 then
-			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "Cannot shift gear speed > %3.0fkm/h", s ), noEventSend )
+			gearboxMogli.mrGbMSetGrindingGears( self, string.format( "%s > %3.0f %s", 
+																															gearboxMogli.getText( "gearboxMogliTEXT_GrindingSpeed", "Cannot shift gear; speed" ),
+																															g_i18n:getSpeed(1), gearboxMogli.getSpeedMeasuringUnit() ), noEventSend )
 			return true
 		end		
 	end		
@@ -5507,7 +5508,7 @@ function gearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 	if      not ( value )
 			and self.mrGbMS.NeutralActive
 			and not ( noCheck )
-			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchReverse, noEventSend ) then
+			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchNeutral, noEventSend ) then
 		return false
 	end
 
@@ -6666,7 +6667,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 
 	if self.isServer then
 		self.mrGbML.lastReverse = Utils.getNoNil( old, false )
-		gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, self.mrGbMS.ClutchAfterShiftReverse, self.mrGbMS.ReverseDoubleClutch, false ) 
+		gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, 0, self.mrGbMS.ReverseDoubleClutch, false ) 
 		if self.mrGbML.motor ~= nil and ( ( not ( new ) and old ) or ( new and not ( old ) ) ) then
 			if self.mrGbMS.Hydrostatic then
 				self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
@@ -7415,16 +7416,6 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		brakePedal = math.max( b, brakePedal )
 	end
 	
-	if      self:mrGbMGetAutoHold()
-			and g_currentMission.time > self.mrGbML.DirectionChangeTime + 2000
-			and math.abs( currentSpeed ) < 5.5555555556e-5
-			and not self.motor.noTransmission
-			and ( ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch ) or self.mrGbMS.ManualClutch > 0.9 )
-			and acceleration < 0.1 then
-		-- auto hold
-		brakePedal  = 1
-	end
-		
 	self.setBrakeLightsVisibility(self, brakeLights)
 	if not ( self.isReverseDriving ) then
 		self.setReverseLightsVisibility(self, self.mrGbMS.ReverseActive)

@@ -121,6 +121,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
 		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
+		<text name="gearboxMogliTEXT_Inputs"             text="inputs"/>
+		
+		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
@@ -142,8 +146,9 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliUNIT_HP"                 text="HP"/>		
 		<text name="gearboxMogliUNIT_kph"                text="kph"/>		
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
+		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
 	</texts>
-
 	
 	<longTexts>
 		<longText name="gearboxMogliHelp_1"><![CDATA[

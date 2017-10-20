@@ -122,7 +122,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_Settings"           text="Einstellungen"/>
 		<text name="gearboxMogliTEXT_Help_1"             text="Anleitung 1"/>
-		<text name="gearboxMogliTEXT_Inputs"             text="Anleitung 1"/>
+		<text name="gearboxMogliTEXT_Inputs"             text="Tastenbelegung"/>
+		
+		<text name="gearboxMogliTEXT_GrindingClutch"     text="Schalten nicht möglich; Kupplung"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Schalten nicht möglich; Geschwindigkeit"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Sperren"/>
@@ -144,6 +147,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliUNIT_HP"                 text="PS"/>		
 		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
+		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
 		
 	</texts>
 	
