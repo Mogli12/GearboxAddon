@@ -124,6 +124,8 @@ gearboxMogli. Добавляет сконфигурированные специ
 		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
 		<text name="gearboxMogliUNIT_HP"                 text="CV"/>		
 		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
-		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>
+		<text name="gearboxMogliUNIT_lph"                text="л/ч"/>		
+		<text name="gearboxMogliUNIT_lp100km"            text="л/100"/>	
 	</texts>
 </l10n>
