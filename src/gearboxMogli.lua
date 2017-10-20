@@ -41,6 +41,7 @@ gearboxMogli.maxClutchPercentTC   = 0.96
 gearboxMogli.clutchLoopTimes      = 10
 gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minHydrostaticFactor = 5e-3
+gearboxMogli.fixedRatioDeltaRatio = 0.01 -- allow 1% deviation for hydrostatic and fixed ratio 
 gearboxMogli.maxGearRatio         = 37699.11184                     -- 0.01 km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.minGearRatio         = 1.508                           -- 250  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
 gearboxMogli.maxHydroGearRatio    = gearboxMogli.maxGearRatio / 500 -- 5.0  km/h @1000 RPM / gear ratio might be bigger, but no clutch in this case
@@ -4427,7 +4428,8 @@ function gearboxMogli:draw()
 			elseif self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "hand"
 			end
-			if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) and self.mrGbMS.FixedRatio > 0 then
+		--if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) and self.mrGbMS.FixedRatio > 0 then
+			if self.mrGbMS.Hydrostatic and self.mrGbMS.FixedRatio > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "fixed"
 			end
 			if self.mrGbMS.DrawReqPower  then
@@ -4648,11 +4650,16 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_fixed", "Fixed ratio"))
 						else
-							local kmh = self.mrGbMS.FixedRatio * maxSp
+							local refRpm = self.mrGbMS.RatedRpm
+							local kmh    = self.mrGbMS.FixedRatio * maxSp
+							if self.mrGbMS.ConstantRpm then
+								refRpm = self:mrGbMGetTargetRPM()
+								kmh    = kmh * refRpm / self.mrGbMS.RatedRpm
+							end
 							if kmh <= limit then
 								renderText(ovRight,drawY, deltaY, string.format("%3.1f %s", g_i18n:getSpeed(kmh), gearboxMogli.getSpeedMeasuringUnit() ))
 							else
-								renderText(ovRight,drawY, deltaY, string.format("%3.1f (%4d)", limit, self.mrGbMS.RatedRpm * limit / kmh ))
+								renderText(ovRight,drawY, deltaY, string.format("%3.1f (%4d)", limit, refRpm * limit / kmh ))
 							end
 						end
 					elseif info == "combine" then
@@ -8066,10 +8073,17 @@ function gearboxMogli:showSettingsUI()
 	end	
 	
 	self.mrGbMUI.FixedRatioSteps = 1
-	if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) then
+--if self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) then
+	if self.mrGbMS.Hydrostatic then
 		local _,_,maxSp = self:mrGbMGetGearSpeed()
-		local limit = gearboxMogli.huge
-			
+		local refRpm = self.mrGbMS.RatedRpm
+		local limit  = gearboxMogli.huge
+		
+		if self.mrGbMS.ConstantRpm then
+			refRpm = self:mrGbMGetTargetRPM()
+			maxSp  = maxSp * refRpm / self.mrGbMS.RatedRpm
+		end
+		
 		if self.mrGbMS.MaxSpeedLimiter then
 			if self.mrGbMS.ReverseActive then
 				if self.motor.maxBackwardSpeed ~= nil then
@@ -8090,15 +8104,15 @@ function gearboxMogli:showSettingsUI()
 		for i=1,math.floor( self.mrGbMUI.FixedRatioSteps ) do
 			local kmh = maxSp * i / self.mrGbMUI.FixedRatioSteps
 			if kmh <= limit then
-				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(kmh), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(kmh), gearboxMogli.getSpeedMeasuringUnit(), refRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 			else
-				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm * limit / kmh, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
+				table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), refRpm * limit / kmh, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 			end
 		end
 		if maxSp <= limit then
-			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(maxSp), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(maxSp), gearboxMogli.getSpeedMeasuringUnit(), refRpm, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 		else
-			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), self.mrGbMS.RatedRpm * limit / maxSp, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
+			table.insert( self.mrGbMUI.FixedRatio, string.format( "%3d %s @ %4d %s", g_i18n:getSpeed(limit), gearboxMogli.getSpeedMeasuringUnit(), refRpm * limit / maxSp, gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" ) ) )
 		end
 	else
 		self.mrGbMUI.FixedRatio = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
@@ -8290,7 +8304,7 @@ function gearboxMogli:mrGbMUIGetFixedRatio( )
 		return 1
 	elseif self.mrGbMS.FixedRatio >= 1 then
 		return 1 + self.mrGbMUI.FixedRatioSteps
-	elseif self.mrGbMS.Hydrostatic and not ( self.mrGbMS.ConstantRpm ) then
+	elseif self.mrGbMS.Hydrostatic then
 		return 1 + math.floor( 0.5 + self.mrGbMS.FixedRatio * self.mrGbMUI.FixedRatioSteps )
 	end
 	return 1

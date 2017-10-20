@@ -136,7 +136,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliDRAW_clutch"             text="Kupplung"/>
 		<text name="gearboxMogliDRAW_autoClutch"         text="Autom. Kupplung"/>
 		<text name="gearboxMogliDRAW_hand"               text="Handgas"/>
-		<text name="gearboxMogliDRAW_fixed"              text="Feste Übersetzung"/>
+		<text name="gearboxMogliDRAW_fixed"              text="Feste Übers."/>
 		<text name="gearboxMogliDRAW_combine"            text="Durchsatz"/>
 		<text name="gearboxMogliDRAW_wheelSlip"          text="Schlupf"/>
 		
