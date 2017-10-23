@@ -126,6 +126,12 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Schalten nicht möglich; Kupplung"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Schalten nicht möglich; Geschwindigkeit"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"       text="Schalten nicht möglich; Drehzahl"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="Drehzahl ist zu niedrig"/>
+		<text name="gearboxMogliTEXT_Stall2"             text="Motor abgewürgt, da Drehzahl zu niedrig war"/>
+		<text name="gearboxMogliTEXT_Stall3"             text="Gerät benötigt zu viel Kraft"/>
+		<text name="gearboxMogliTEXT_Stall4"             text="Motor abgewürgt, da Gerät zu viel Kraft benötigte"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"  text="Kupplung überhitzt"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Sperren"/>

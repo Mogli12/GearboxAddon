@@ -306,6 +306,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "ConstantRpm",   false )
 	gearboxMogli.registerState( self, "NoUpdateStream",false, gearboxMogli.mrGbMOnSetNoUpdateStream )
 	gearboxMogli.registerState( self, "NUSMessage",    {},    gearboxMogli.mrGbMOnSetNUSMessage )
+	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
 	
 --**********************************************************************************************************	
 -- state variables with setter methods	
@@ -3367,12 +3368,10 @@ function gearboxMogli:update(dt)
 				self:mrGbMSetManualClutch( 1 )
 			end
 		elseif g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
-			local mi = math.max( ( g_currentMission.time - self.mrGbML.oneButtonClutchTimer ) / self.mrGbMS.ClutchTimeManual,
-													 self.mrGbMS.ManualClutch - dt / self.mrGbMS.ClutchTimeDec )
-			local ma = math.min( 1, 
-													 self.mrGbMS.ManualClutch + dt / self.mrGbMS.ClutchTimeInc )
-			local tr = self:mrGbMGetTargetRPM()
-			self:mrGbMSetManualClutch( self.motor:getClutchPercent( tr, self.mrGbMS.OpenRpm, self.mrGbMS.CloseRpm, mi, self.mrGbMS.ManualClutch, ma ) )
+			if self.mrGbMS.ManualClutch < 1 then
+				self:mrGbMSetManualClutch( 1 )
+				self:mrGbMSetState( "AutoCloseTimer", g_currentMission.time - 1 )
+			end
 		end
 		
 		if InputBinding.gearboxMogliMINRPM ~= nil then
@@ -4629,7 +4628,8 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_clutch", "Clutch"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
+						--renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
 						end
 					elseif info == "clutch2" then
 						if col == 1 then
@@ -5595,17 +5595,10 @@ function gearboxMogli:mrGbMGetAutoClutchPercent()
 	if self.mrGbML.motor == nil or not ( self.isServer ) then
 		return 0
 	end
-	
-	if     self.mrGbMS.NeutralActive then
-		return 0
-	elseif self.mrGbMS.ManualClutch < 1
-	    or not self:mrGbMGetAutoClutch() then
+	if self.mrGbMS.TorqueConverterOrHydro then
 		return self.mrGbMS.ManualClutch
-	elseif self.mrGbMS.TorqueConverterOrHydro then
-		return 1
-	else
-		return self.motor.clutchPercent
 	end
+	return self.motor.clutchPercent
 end
 
 --**********************************************************************************************************	
@@ -5615,13 +5608,10 @@ function gearboxMogli:mrGbMGetClutchPercent()
 	if self.mrGbML.motor == nil then
 		return -1
 	end
-	if self:mrGbMGetAutoClutch() then 
-		if self.isServer then
-			return gearboxMogli.mrGbMGetAutoClutchPercent( self )
-		end
-		return self.mrGbMD.Clutch*0.005
-	end	
-	return self.mrGbMS.ManualClutch
+	if self.isServer then
+		return gearboxMogli.mrGbMGetAutoClutchPercent( self )
+	end
+	return self.mrGbMD.Clutch*0.005
 end
 
 --**********************************************************************************************************	
@@ -7054,13 +7044,18 @@ function gearboxMogli:checkGearShiftDC( new, what, noEventSend )
 			
 		if     v > 1 then
 			self:mrGbMSetNeutralActive( true, noEventSend )
-			self:mrGbMSetState( "WarningText", string.format( "Cannot shift gear: rpm in: %4.0f / out: %4.0f", self.motor.transmissionInputRpm, w ))
+			self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+																												self.motor.transmissionInputRpm, w ))
 			self.mrGbMS.GrindingGearsVol = 0
 			self:mrGbMSetState( "GrindingGearsVol", 1 )
 			return false
 		elseif v > 0 and v > self.mrGbMS.GrindingGearsVol then
-			self:mrGbMSetState( "InfoText", string.format( "Cannot shift gear: rpm in: %4.0f / out: %4.0f", self.motor.transmissionInputRpm, w ))
+			self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+																												self.motor.transmissionInputRpm, w ))
 			self:mrGbMSetState( "GrindingGearsVol", v )
+			return true
 		elseif self.mrGbMS.GrindingGearsVol > 0 then
 			self:mrGbMSetState( "GrindingGearsVol", 0 )
 		end

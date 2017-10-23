@@ -125,6 +125,12 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"       text="cannot shift gear; RPM"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="RPM is too low"/>
+		<text name="gearboxMogliTEXT_Stall2"             text="motor stopped because RPM was too low"/>
+		<text name="gearboxMogliTEXT_Stall3"             text="too much PTO power requested"/>
+		<text name="gearboxMogliTEXT_Stall4"             text="motor stopped because too much PTO power was requested"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"  text="clutch is overheating"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>

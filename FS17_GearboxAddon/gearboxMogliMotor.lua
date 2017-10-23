@@ -725,13 +725,14 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 				if self.ptoWarningTimer == nil then
 					self.ptoWarningTimer = g_currentMission.time
 				end
+				local w1 = gearboxMogli.getText( "gearboxMogliTEXT_Stall3", "too much PTO power requested" )
+				local w2 = gearboxMogli.getText( "gearboxMogliTEXT_Stall4", "motor stopped because too much PTO power was requested" )
 				if      g_currentMission.time > self.ptoWarningTimer + 10000 then
 					self.ptoWarningTimer = nil
-					
-					gearboxMogliMotor.motorStall( self, string.format("Motor stopped due to missing power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ), 
-																								string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ) )
+					gearboxMogliMotor.motorStall( self, string.format("%s (%4.0f Nm < %4.0f Nm)", w2, mt*1000, pt*1000 ), 
+																							string.format("%s (%4.0f Nm < %4.0f Nm)", w1, mt*1000, pt*1000 ) )
 				elseif  g_currentMission.time > self.ptoWarningTimer + 2000 then
-					self.vehicle:mrGbMSetState( "WarningText", string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ))
+					self.vehicle:mrGbMSetState( "WarningText", string.format("%s (%4.0f Nm < %4.0f Nm)", w1, mt*1000, pt*1000 ))
 				end			
 			elseif self.ptoWarningTimer ~= nil then
 				self.ptoWarningTimer = nil
@@ -2259,19 +2260,25 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	local maxDeltaThrottle = self.vehicle.mrGbMG.maxDeltaAccPerMs * self.tickDt 
 
 --**********************************************************************************************************		
-	local reverserClutch = false
+	local autoCloseClutch = false
+	local autoClutchTimer = self.vehicle.mrGbMS.AutoCloseTimer
+	
+	if not self.vehicle.mrGbMS.ManualClutchReverse and self.vehicle.mrGbML.DirectionChangeTime > autoClutchTimer then
+		autoClutchTimer = self.vehicle.mrGbML.DirectionChangeTime
+	end
+
 	if      self.vehicle.mrGbMS.ClutchTimeManual > 10
 			and not ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
-			and g_currentMission.time < self.vehicle.mrGbML.DirectionChangeTime + self.vehicle.mrGbMS.ClutchTimeManual
-			and not self.vehicle.mrGbMS.ManualClutchReverse then
-		reverserClutch = true
+			and g_currentMission.time >= autoClutchTimer
+			and g_currentMission.time <  autoClutchTimer + self.vehicle.mrGbMS.ClutchTimeManual then
+		autoCloseClutch = true
 	end
 		
 --**********************************************************************************************************		
 -- no transmission / neutral 
 --**********************************************************************************************************		
 	local brakeNeutral   = false
-	local autoOpenClutch = reverserClutch
+	local autoOpenClutch = self.vehicle.mrGbML.ReverserNeutral
 											or ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
 											or ( ( self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter )
 											 and ( accelerationPedal < -0.001 or doHandbrake ) )
@@ -3885,9 +3892,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			self.vehicle.mrGbML.debugTimer = math.max( g_currentMission.time + 200, self.vehicle.mrGbML.debugTimer )
 		end
 	else
-		if reverserClutch then
+		if autoCloseClutch then
 		-- shuttle and manual clutch 
-			local c = ( self.vehicle.mrGbML.DirectionChangeTime - g_currentMission.time ) / self.vehicle.mrGbMS.ClutchTimeManual
+			local c = ( autoClutchTimer - g_currentMission.time ) / self.vehicle.mrGbMS.ClutchTimeManual
 			self.clutchPercent = math.min( math.max( c, self.autoClutchPercent ), self.vehicle.mrGbMS.ManualClutch )		
 		else
 			self.clutchPercent = self.vehicle.mrGbMS.ManualClutch
@@ -3899,12 +3906,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				self.stallWarningTimer = g_currentMission.time
 			else
 				self.stallWarningTimer = lastStallWarningTimer
+				local w1 = gearboxMogli.getText( "gearboxMogliTEXT_Stall1", "RPM is too low" )
+				local w2 = gearboxMogli.getText( "gearboxMogliTEXT_Stall2", "motor stopped because RPM was too low" )
 				if     g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallMotorOffTime then
 					self.stallWarningTimer = nil
-					self:motorStall( string.format("Motor stopped because RPM too low: %4.0f < %4.0f", self.nonClampedMotorRpm, minRpm ),
-													 string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, minRpm ) )
+					self:motorStall( string.format("%s (%4.0f < %4.0f)", w2, self.nonClampedMotorRpm, minRpm ),
+													 string.format("%s (%4.0f < %4.0f)", w1, self.nonClampedMotorRpm, minRpm ) )
 				elseif g_currentMission.time > self.stallWarningTimer + self.vehicle.mrGbMG.stallWarningTime then
-					self.vehicle:mrGbMSetState( "WarningText", string.format("RPM is too low: %4.0f < %4.0f", self.nonClampedMotorRpm, minRpm ))
+					self.vehicle:mrGbMSetState( "WarningText", string.format("%s (%4.0f < %4.0f)", w1, self.nonClampedMotorRpm, minRpm ))
 				end		
 			end		
 		end
@@ -3994,7 +4003,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			end
 			
 			if self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime then
-				local w = "Clutch is overheating"
+				local w = gearboxMogli.getText( "gearboxMogliTEXT_ClutchOverheating", "clutch is overheating" )
 				if      self.vehicle.mrGbMS.WarningText ~= nil
 						and self.vehicle.mrGbMS.WarningText ~= "" 
 						and self.vehicle.mrGbMS.WarningText ~= w 
@@ -4232,10 +4241,8 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 	end
 	
 	local target        = math.min( targetRpm, self.vehicle.mrGbMS.ClutchMaxTargetRpm )
-	
 	local eps           = maxPercent - minPercent
-	local delta         = ( throttle - math.max( self.clutchRpm, 0 ) ) * eps
-	
+	local delta         = ( throttle - math.max( self.clutchRpm, 0 ) ) * eps	
 	local times         = math.max( gearboxMogli.clutchLoopTimes, math.ceil( delta / gearboxMogli.clutchLoopDelta ) )
 	delta = delta / times 
 	eps   = eps   / times 
@@ -4252,19 +4259,7 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 			clutchPercent = maxPercent - i * eps
 		end
 	end
-	
-	if      self.vehicle.mrGbMG.debugInfo 
-			and self.autoClutchPercent < self.vehicle.mrGbMS.MaxClutchPercent
-			and fromPercent ~= nil
-			and toPercent   ~= nil then
-		self.vehicle.mrGbML.clutchInfo = 
-					string.format("Clutch: cur: %4.0f tar: %4.0f opn: %4.0f cls: %4.0f rg: %1.3f .. %1.3f => tar: %4.0f thr: %4.0f whl: %4.0f => mo %4.0f clu %4.0f diffi %4.0f => %1.3f (%4.4f %4.4f)",
-												self.lastRealMotorRpm, targetRpm, openRpm, closeRpm,
-												fromPercent, toPercent,
-												target, throttle, self.clutchRpm, self:getMotorRpm(),
-												clutchRpm, diff, clutchPercent, eps, delta )
-	end 
-	
+		
 	return clutchPercent 
 end
 
