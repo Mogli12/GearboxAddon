@@ -5538,19 +5538,15 @@ function gearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 		f = 1
 	end
 	
-	if self.mrGbMS.ReverseActive ~= value then
-		self.mrGbML.DirectionChangeTime = g_currentMission.time
-		self.mrGbML.ReverserNeutral     = true
-		
-		if gearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) then
-			if self.isServer then
-				if not gearboxMogli.checkGearShiftDC( self, value, "R", noEventSend ) then		
-					return true -- better false ???
-				end
-			else
-				self:mrGbMSetState( "NewReverse", value, noEventSend )
-				return true
+	if      self.mrGbMS.ReverseActive ~= value
+			and gearboxMogli.mrGbMCheckDoubleClutch( self, self.mrGbMS.ReverseDoubleClutch, noEventSend ) then
+		if self.isServer then
+			if not gearboxMogli.checkGearShiftDC( self, value, "R", noEventSend ) then		
+				return true -- better false ???
 			end
+		else
+			self:mrGbMSetState( "NewReverse", value, noEventSend )
+			return true
 		end
 	end
 
@@ -6657,6 +6653,8 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 
 	if self.isServer then
 		self.mrGbML.lastReverse = Utils.getNoNil( old, false )
+		self.mrGbML.DirectionChangeTime = g_currentMission.time
+		self.mrGbML.ReverserNeutral     = true		
 		gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, 0, self.mrGbMS.ReverseDoubleClutch, false ) 
 		if self.mrGbML.motor ~= nil and ( ( not ( new ) and old ) or ( new and not ( old ) ) ) then
 			if self.mrGbMS.Hydrostatic then
