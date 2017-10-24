@@ -145,6 +145,15 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>
 		
+		<text name="gearboxMogliTEXT_GrindingClutch"     text="Nie można zmienić biegu; Sprzęgło"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Nie można zmienić biegu; Prędkość"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"       text="Nie można zmienić biegu; RPM silnika"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="Zbyt niskie RPM silnika!"/>
+		<text name="gearboxMogliTEXT_Stall2"             text="Silnik zgasł z powodu zbyt niskich RPM silnika"/>
+		<text name="gearboxMogliTEXT_Stall3"             text="Zbyt duże zapotrzebowanie na mocy z WOM!"/>
+		<text name="gearboxMogliTEXT_Stall4"             text="Silnik zgasł z powodu zbyt dużego zapotrzebowania na moc z WOM"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"  text="Palisz sprzęgło!"/>
+		
 		<!-- still used?? -->
 		<text name="input_gearboxMogliCONFLICT_1"	   text="Gearbox: Konflikt 1"/>
 		<text name="input_gearboxMogliCONFLICT_2"	   text="Gearbox: Konflikt 2"/>
@@ -155,7 +164,9 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 	<longTexts>
 		<longText name="gearboxMogliHelp_1"><![CDATA[
 Nie każdy ciągnik posiada bezstopniową skrzynię biegów. Ale nawet bezstopniowa skrzynia biegów nie jest tak skonstruowana jak ta standardowa w FS17. Ten mod dodaje za pomocą pliku konfiguracyjnego 'gearboxAddonConfig.xml' różne skrzynie biegów do pojazdów w nim skonfigurowanych. Możesz symulować różnego rodzaju skrzynie biegów. Istnieją klasyczne skrzynie z biegami, z jednym lub dwoma zakresami i biegiem wstecznym jako bieg w pierwszym lub drugim zakresie lub jako rewers. Gdy czas przełożenia zostanie skrócony do 0, da to w rezultacie przekładnię PowerShift. W nowoczesnych ciągnikach, przekładnia ta działa zazwyczaj automatycznie.
+
 Oprócz klasycznych skrzyń biegów, wspierane są też bezstopniowe przekładnie. Są modele z jednym lub dwoma biegami jak np. Fendt Vario. Inne modele łączą cztery automatycznie przełączane biegi z bezstopniowym napędem hydrostatycznym. Wszystkie te bezstopniowe przekładnie mają jedną wspólną cechę, wydajność różni się w zależności od przełożenia.
+
 Ponadto istnieją tryby AllAuto i ECO. W trybie ECO uzyskiwany jest maksymalny moment obrotowy, ale dostępne jest tylko 90% mocy. W trybie ECO RPM silnika są niższe (50% zamiast 75%), gdy zostanie włączony WOM, będzie on też przekazywał trochę mniej mocy. W trybie AllAuto biegi, zakresy (tylko pierwszy zakres skrzyni) i sprzęgło są sterowane automatycznie. W tym trybie również pomocnik jest nastawiony na używanie skrzyni biegów z modu GearboxAddons.
 ]]></longText>
 	</longTexts>
