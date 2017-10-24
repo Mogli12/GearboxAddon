@@ -4129,32 +4129,15 @@ function gearboxMogli:updateTick(dt)
 					end
 				end
 				
-			--local s = 0
-			--local t = math.abs( self.lastSpeedReal*1000 )
-			--for _,wheel in ipairs(self.wheels) do
-			--	w = math.abs( getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius )
-			--	local r = 0
-			--	if w > 0.1 and w > t then
-			--		r = 1 - t / w
-			--	end
-			--	if wheel.gearboxMogliLongSlip == nil then
-			--		wheel.gearboxMogliLongSlip = r
-			--	else
-			--		wheel.gearboxMogliLongSlip = wheel.gearboxMogliLongSlip + self.mrGbML.smoothFast * ( r - wheel.gearboxMogliLongSlip )
-			--	end
-			--		
-			--	s = math.max( s, wheel.gearboxMogliLongSlip )
-			--end
 				self.mrGbMD.Slip     = math.floor( 100 * Utils.clamp( 1-self.motor.wheelSlipFactor, 0, 1 ) + 0.5 )
-
 				self.mrGbMD.Rate     = tonumber( Utils.clamp( math.floor( gearboxMogli.mrGbMGetThroughPutS( self ) + 0.5 ), 0, 255 ))						
 				
 				if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
+						or self.mrGbMD.lastSlip   ~= self.mrGbMD.Slip
 						or ( self.mrGbMS.sendHydro     and self.mrGbMD.lastHydro  ~= self.mrGbMD.Hydro )
 						or ( self.mrGbMS.sendTargetRpm and self.mrGbMD.lastTgt    ~= self.mrGbMD.Tgt   )
 						or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
 						or ( self.mrGbMS.IsCombine     and self.mrGbMD.lastRate   ~= self.mrGbMD.Rate  )
-						or ( self.mrIsMrVehicle        and self.mrGbMD.lastSlip   ~= self.mrGbMD.Slip  )
 						then
 					self.mrGbMD.lastTgt    = self.mrGbMD.Tgt
 					self.mrGbMD.lastClutch = self.mrGbMD.Clutch
@@ -4166,12 +4149,11 @@ function gearboxMogli:updateTick(dt)
 					if self.mrGbMS.NoUpdateStream then					
 						local message = {}
 						message.Clutch = self.mrGbMD.Clutch
-						
+						message.Slip   = self.mrGbMD.Slip						
 						if self.mrGbMS.sendHydro     then message.Hydro = self.mrGbMD.Hydro end		 
 						if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Tgt   end			
 						if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
 						if self.mrGbMS.IsCombine     then message.Rate  = self.mrGbMD.Rate  end		
-						if self.mrIsMrVehicle        then message.Slip  = self.mrGbMD.Slip  end
 						
 						self:mrGbMSetState( "NUSMessage", message )
 					else
@@ -4213,12 +4195,11 @@ function gearboxMogli:readUpdateStream(streamId, timestamp, connection)
 				self.mrGbMD = {}
 			end
 			self.mrGbMD.Clutch = streamReadUInt8( streamId ) 
-			
+			self.mrGbMD.Slip   = streamReadUInt8( streamId )			
 			if self.mrGbMS.sendHydro     then self.mrGbMD.Hydro  = streamReadUInt8( streamId  ) end		 
 			if self.mrGbMS.sendTargetRpm then self.mrGbMD.Tgt    = streamReadUInt8( streamId  ) end			
 			if self.mrGbMS.sendReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
 			if self.mrGbMS.IsCombine     then self.mrGbMD.Rate   = streamReadUInt8( streamId  ) end		
-			if self.mrIsMrVehicle        then self.mrGbMD.Slip   = streamReadUInt8( streamId  ) end
 
 		elseif checkId == nil or checkId ~= 142 then
 			print("FS17_GearboxAddon: Error! There is another specialization with incorrect readUpdateStream implementation ("..tostring(checkId)..")")
@@ -4237,12 +4218,12 @@ function gearboxMogli:writeUpdateStream(streamId, connection, dirtyMask)
 		if bitAND(dirtyMask, self.mrGbML.dirtyFlag) ~= 0 then			
 			streamWriteUInt8(streamId, 178 )
 			streamWriteUInt8(streamId, self.mrGbMD.Clutch ) 
+			streamWriteUInt8(streamId, self.mrGbMD.Slip )
 			
 			if self.mrGbMS.sendHydro     then streamWriteUInt8(streamId, self.mrGbMD.Hydro  ) end		 
 			if self.mrGbMS.sendTargetRpm then streamWriteUInt8(streamId, self.mrGbMD.Tgt    ) end			
 			if self.mrGbMS.sendReqPower  then streamWriteUInt16(streamId,self.mrGbMD.Power  ) end			
 			if self.mrGbMS.IsCombine     then streamWriteUInt8(streamId, self.mrGbMD.Rate   ) end
-			if self.mrIsMrVehicle        then streamWriteUInt8(streamId, self.mrGbMD.Slip  )  end
 		else
 			streamWriteUInt8(streamId, 142 )
 		end 
@@ -4628,14 +4609,13 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_clutch", "Clutch"))
 						else
-						--renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self.mrGbMS.ManualClutch * 100 + 0.5 ) ))
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self:mrGbMGetClutchPercent() * 100 + 0.5 ) ))
 						end
 					elseif info == "clutch2" then
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_autoClutch", "Auto clutch"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", self.mrGbMD.Clutch*0.5 ))
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %%", math.floor( self:mrGbMGetClutchPercent() * 100 + 0.5 ) ))
 						end
 					elseif info == "hand" then
 						if col == 1 then
@@ -5591,7 +5571,13 @@ function gearboxMogli:mrGbMGetAutoClutchPercent()
 	if self.mrGbML.motor == nil or not ( self.isServer ) then
 		return 0
 	end
+	if self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
+		return self.mrGbMS.ManualClutch
+	end
 	if self.mrGbMS.TorqueConverterOrHydro then
+		return self.mrGbMS.ManualClutch
+	end
+	if not self:mrGbMGetAutoClutch() and g_currentMission.time >= self.mrGbMS.AutoCloseTimer + self.mrGbMS.ClutchTimeManual then
 		return self.mrGbMS.ManualClutch
 	end
 	return self.motor.clutchPercent
@@ -5606,6 +5592,15 @@ function gearboxMogli:mrGbMGetClutchPercent()
 	end
 	if self.isServer then
 		return gearboxMogli.mrGbMGetAutoClutchPercent( self )
+	end
+	if self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
+		return self.mrGbMS.ManualClutch
+	end
+	if self.mrGbMS.TorqueConverterOrHydro then
+		return self.mrGbMS.ManualClutch
+	end
+	if not self:mrGbMGetAutoClutch() and g_currentMission.time >= self.mrGbMS.AutoCloseTimer + self.mrGbMS.ClutchTimeManual then
+		return self.mrGbMS.ManualClutch
 	end
 	return self.mrGbMD.Clutch*0.005
 end
@@ -6644,26 +6639,26 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 				self:mrGbMSetState( "ResetFwdRange2", self.mrGbMS.CurrentRange2, noEventSend )
 			end			
 		end
-	end
 	
-	-- restore last gear of new direction 
-	if self.steeringEnabled then
-		gearboxMogli.setLaunchGear( self, noEventSend, true )
-	end		
+		-- restore last gear of new direction 
+		if self.steeringEnabled then
+			gearboxMogli.setLaunchGear( self, noEventSend, true )
+		end		
 
-	if self.isServer then
-		self.mrGbML.lastReverse = Utils.getNoNil( old, false )
-		self.mrGbML.DirectionChangeTime = g_currentMission.time
-		self.mrGbML.ReverserNeutral     = true		
-		gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, 0, self.mrGbMS.ReverseDoubleClutch, false ) 
-		if self.mrGbML.motor ~= nil and ( ( not ( new ) and old ) or ( new and not ( old ) ) ) then
-			if self.mrGbMS.Hydrostatic then
-				self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
+		if self.isServer then
+			self.mrGbML.lastReverse = Utils.getNoNil( old, false )
+			self.mrGbML.DirectionChangeTime = g_currentMission.time
+			self.mrGbML.ReverserNeutral     = true		
+			gearboxMogli.mrGbMPrepareGearShift( self, self.mrGbMS.GearTimeToShiftReverse, 0, self.mrGbMS.ReverseDoubleClutch, false ) 
+			if self.mrGbML.motor ~= nil and ( ( not ( new ) and old ) or ( new and not ( old ) ) ) then
+				if self.mrGbMS.Hydrostatic then
+					self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
+				end
+				self.mrGbML.motor.speedLimitS       = 0
+				self.mrGbML.motor.motorLoadOverflow = 0
 			end
-			self.mrGbML.motor.speedLimitS       = 0
-			self.mrGbML.motor.motorLoadOverflow = 0
-		end
-	end	
+		end	
+	end
 end 
 
 --**********************************************************************************************************	
@@ -7399,6 +7394,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	
 	if      ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
+			and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1
 			and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
 				 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
 		-- wrong direction   

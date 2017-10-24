@@ -1578,13 +1578,8 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	
 	local f = 1
 	if not self.noTransmission then
-		local w = self.wheelSpeedRpm
-		local s = self.wheelSpeedRpmReal
-		
-		if self.gearRatio < 0 then
-			w = -w
-			s = -s
-		end
+		local w = self.clutchRpm
+		local s = self.wheelSpeedRpmReal * self.gearRatio
 		
 		if     s <= 0 then
 			f = gearboxMogli.eps
@@ -2278,10 +2273,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 -- no transmission / neutral 
 --**********************************************************************************************************		
 	local brakeNeutral   = false
-	local autoOpenClutch = self.vehicle.mrGbML.ReverserNeutral
-											or ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
+	local autoOpenClutch = ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
 											or ( ( self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter )
 											 and ( accelerationPedal < -0.001 or doHandbrake ) )
+											or ( not self.vehicle.mrGbMS.ManualClutchReverse
+											 and self.vehicle.mrGbML.DirectionChangeTime <= g_currentMission.time 
+											 and g_currentMission.time <  self.vehicle.mrGbML.DirectionChangeTime + self.vehicle.mrGbMS.ClutchTimeManual ) 
 	
 	if      self.vehicle.mrGbMS.Hydrostatic
 			and self.vehicle.mrGbMS.ConstantRpm 
