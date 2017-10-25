@@ -8,13 +8,14 @@
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
 			 <de>Getriebe v3.0 build 213 von Mogli</de>
-				<en>Gearbox v3.0 build 213 by mogli</en>
-				 <it>Cambio v3.0 build 213 by mogli</it>
-	 <fr>Transmission v3.0 build 213 by mogli</fr>
-				 <cz>Řazení v3.0 build 213 by mogli</cz>
-<pl>Skrzynia biegów v3.0 build 213 by mogli</pl>
+			 <en>Gearbox v3.0 build 213 by mogli</en>
+			 <it>Cambio v3.0 build 213 by mogli</it>
+			 <fr>Transmission v3.0 build 213 by mogli</fr>
+			 <cz>Řazení v3.0 build 213 by mogli</cz>
+			 <pl>Skrzynia biegów v3.0 build 213 by mogli</pl>
+			 <ru>Gearbox v3.0 build 213 by mogli</ru>
 		</text>                  
-  </l10n>
+	</l10n>
 
 	<title>
 		<en>Gearbox AddOn</en>
@@ -25,7 +26,9 @@
 		<ru>gearboxMogli</ru>
 		<cz>Řazení AddOn</cz>
 		<pl>Skrzynia biegów</pl>
+		<ru>Gearbox AddOn</ru>
 	</title>
+	
 	<description>
 		<en><![CDATA[
 Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in farming simulator. 
@@ -94,64 +97,84 @@ Changement 2.2:
 ]]></fr>
 		<es><![CDATA[Descripción:
 Cambio Manual/automático para FS17 por Mogli]]></es>
-<ru><![CDATA[Коробка передач:
-gearboxMogli. Добавляет сконфигурированные специализации всем транспортным средствам]]></ru>
-<cz><![CDATA[
+	<cz><![CDATA[
 Každý traktor nemá zjednodušené ovládání jako stroje ve Farming simulátoru. Tento mod přidává do každého stroje reálnější simulaci řazení převodových stupnů.
 Od manuálního řazení se spojkou a meziplynem, přes různe řady násobičů a redukcí, přes plně automatickou převodovku až po bezestupňové řazení (CVT).
 Vše se odvíjí od nastavení každého stroje zvlášť v  souboru gearboxAddonConfig.xml. Mód podporuje volanty se spojkou i řadící pákou, což stupňuje požitek ze hry.]]></cz>
-<pl><![CDATA[Skrzynia biegów:
+	<pl><![CDATA[Skrzynia biegów:
 Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]></pl>
+	
+	<ru><![CDATA[Не каждый трактор имеет бесступенчатую трансмиссию. И даже бесступенчатые трансмиссии не так просты по конструкции, как стандартная в FS17. Этот мод добавляет на основе файла gearboxAddonConfig.xml коробку передач ко всем сконфигурированным транспорным средствам. 
+Могут быть смоделированы многие виды коробок передач. Существуют классические коробки передач с шестернями, одной или двумя группами, а также реверсивные передачи или группы. 
+Когда передаточное число будет уменьшено до 0, это приведет к передаче PowerShift. В современных тракторах PowerShift трансмиссия часто сочетается с автоматическим переключением передач.
+
+Новое в версии 1.1: теперь поддерживается бесступенчатые коробки передач. 
+Есть модели с одной или двумя передачами, такими как Fendt Vario. 
+Другие модели объединяют четыре автоматически переключаемых механических механизма с бесступенчатым гидростатическим приводом. 
+Все эти бесступенчатые передачи имеют одну общую черту: эффективность сильно варьируется в зависимости от передаточного отношения.
+
+Подробное описание доступно здесь: https://github.com/Mogli12/GearboxAddon/wiki/DE
+
+Список изменений 2.2:
+- более легкий запуск транспортных средств с CVT
+- звук заднего хода
+- отсутствует перегрев сцепления при открытии GUI
+- передачу для старта можно установить, когда автомобиль находится в AutoHold (автоудержание)
+- устранение мерцания указателя расхода топлива (MP)
+- лучшее торможение двигателем
+- блокирование и разблокирование дифференциалов
+- новый диалог настроек
+]]></ru>
 	</description>
 
 	<inputBindings>
-		<input name="gearboxMogliSHIFTGEARUP" 	    key1="KEY_leftbracket"             button="BUTTON_3"  category="VEHICLE" />
+		<input name="gearboxMogliSHIFTGEARUP"       key1="KEY_leftbracket"             button="BUTTON_3"  category="VEHICLE" />
 		<input name="gearboxMogliSHIFTGEARDOWN"     key1="KEY_quote"                   button="BUTTON_4"  category="VEHICLE" />
 		<input name="gearboxMogliSHIFTGEARTOGGLE"   key1="KEY_rctrl KEY_quote"                            category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGEUP"      key1="KEY_rightbracket"                               category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGEDOWN"    key1="KEY_backslash"                                  category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGETOGGLE"  key1="KEY_rctrl KEY_backslash"                        category="VEHICLE" />
-		<input name="gearboxMogliNEUTRAL"      	    key1="KEY_semicolon"                                  category="VEHICLE" />
-		<input name="gearboxMogliAUTOMATIC"      	  key1="KEY_rctrl KEY_slash"                            category="VEHICLE" />
-		<input name="gearboxMogliAllAuto"      	    key1="KEY_rshift KEY_slash" 		                      category="VEHICLE" />
-		<input name="gearboxMogliHUD" 		     	    key1="KEY_slash" 					     			                  category="VEHICLE" />
-		<input name="gearboxMogliON_OFF"      	    key1="KEY_rshift KEY_semicolon"                       category="VEHICLE" />
-		<input name="gearboxMogliSETTINGS"         	key1="KEY_rctrl KEY_semicolon"                        category="VEHICLE" />
-		<input name="gearboxMogliREVERSE" 		      key1="KEY_space"                   button="BUTTON_2"  category="VEHICLE" />
-		<input name="gearboxMogliECO" 	    			  key1="KEY_rshift KEY_space"  			                    category="VEHICLE" />
-		<input name="gearboxMogliHANDBRAKE"  			  key1="KEY_rctrl KEY_space"  		                      category="VEHICLE" />
-		<input name="gearboxMogliKEEPSPEED" 	 		  key1="KEY_delete"                                     category="VEHICLE" />
+		<input name="gearboxMogliNEUTRAL"           key1="KEY_semicolon"                                  category="VEHICLE" />
+		<input name="gearboxMogliAUTOMATIC"         key1="KEY_rctrl KEY_slash"                            category="VEHICLE" />
+		<input name="gearboxMogliAllAuto"           key1="KEY_rshift KEY_slash"                           category="VEHICLE" />
+		<input name="gearboxMogliHUD"               key1="KEY_slash"                                      category="VEHICLE" />
+		<input name="gearboxMogliON_OFF"            key1="KEY_rshift KEY_semicolon"                       category="VEHICLE" />
+		<input name="gearboxMogliSETTINGS"          key1="KEY_rctrl KEY_semicolon"                        category="VEHICLE" />
+		<input name="gearboxMogliREVERSE"           key1="KEY_space"                   button="BUTTON_2"  category="VEHICLE" />
+		<input name="gearboxMogliECO"               key1="KEY_rshift KEY_space"                           category="VEHICLE" />
+		<input name="gearboxMogliHANDBRAKE"         key1="KEY_rctrl KEY_space"                            category="VEHICLE" />
+		<input name="gearboxMogliKEEPSPEED"         key1="KEY_delete"                                     category="VEHICLE" />
 		<input name="gearboxMogliKEEPSPEEDTOGGLE"   key1="KEY_rctrl KEY_delete"                           category="VEHICLE" />
-		<input name="gearboxMogliAUTOCLUTCH2"       key1="KEY_rshift KEY_period"  		                    category="VEHICLE" />
+		<input name="gearboxMogliAUTOCLUTCH2"       key1="KEY_rshift KEY_period"                          category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGE2UP"     key1="KEY_rshift KEY_rightbracket"                    category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGE2DOWN"   key1="KEY_rshift KEY_backslash"                       category="VEHICLE" />
 		<input name="gearboxMogliSHIFTRANGE2TOGGLE" key1="KEY_rctrl KEY_rightbracket"                     category="VEHICLE" />
-    <input name="gearboxMogliGEAR1"                                                button="BUTTON_9"  category="VEHICLE" />
-    <input name="gearboxMogliGEAR2"                                                button="BUTTON_10" category="VEHICLE" />
-    <input name="gearboxMogliGEAR3"                                                button="BUTTON_11" category="VEHICLE" />
-    <input name="gearboxMogliGEAR4"                                                button="BUTTON_12" category="VEHICLE" />
-    <input name="gearboxMogliGEAR5"                                                button="BUTTON_13" category="VEHICLE" />
-    <input name="gearboxMogliGEAR6"                                                button="BUTTON_14" category="VEHICLE" />
-    <input name="gearboxMogliGEARR"                                                button="BUTTON_15" category="VEHICLE" />
+		<input name="gearboxMogliGEAR1"                                                button="BUTTON_9"  category="VEHICLE" />
+		<input name="gearboxMogliGEAR2"                                                button="BUTTON_10" category="VEHICLE" />
+		<input name="gearboxMogliGEAR3"                                                button="BUTTON_11" category="VEHICLE" />
+		<input name="gearboxMogliGEAR4"                                                button="BUTTON_12" category="VEHICLE" />
+		<input name="gearboxMogliGEAR5"                                                button="BUTTON_13" category="VEHICLE" />
+		<input name="gearboxMogliGEAR6"                                                button="BUTTON_14" category="VEHICLE" />
+		<input name="gearboxMogliGEARR"                                                button="BUTTON_15" category="VEHICLE" />
 		<input name="gearboxMogliGEARFWD"                                                                 category="VEHICLE" />
 		<input name="gearboxMogliGEARBACK"                                                                category="VEHICLE" />
 		<input name="gearboxMogliSPEEDLIMIT"        key1="KEY_rshift KEY_3"                               category="VEHICLE" />
 		<input name="gearboxMogliSWAPSPEED"         key1="KEY_4"                                          category="VEHICLE" />
 		<input name="gearboxMogliSWAPSPEEDR"        key1="KEY_rctrl KEY_4"                                category="VEHICLE" />
 		<input name="gearboxMogliSETSPEED"          key1="KEY_rshift KEY_4"                               category="VEHICLE" />
-		<input name="gearboxMogliACCTOLIMIT" 	      key1="KEY_rshift KEY_leftbracket"                     category="VEHICLE" />
+		<input name="gearboxMogliACCTOLIMIT"        key1="KEY_rshift KEY_leftbracket"                     category="VEHICLE" />
 		<input name="gearboxMogliDECTOLIMIT"        key1="KEY_rshift KEY_quote"                           category="VEHICLE" />
 		<input name="gearboxMogliCONFLICT_2"        key1="KEY_lctrl KEY_4"	              visible="false" category="VEHICLE" />
 		<input name="gearboxMogliCONFLICT_3"        key1="KEY_lshift KEY_space"           visible="false" category="VEHICLE" />
 		<input name="gearboxMogliCONFLICT_4"        key1="KEY_lctrl KEY_space"	          visible="false" category="VEHICLE" />
-    <input name="gearboxMogliCLUTCH_3"				  key1="KEY_period"                                     category="VEHICLE" />
-		<input name="gearboxMogliDIFFLOCKMIDDLE"    key1="KEY_lshift KEY_4"  		                          category="VEHICLE" />
-		<input name="gearboxMogliDIFFLOCKFRONT"     key1="KEY_lshift KEY_5"  		                          category="VEHICLE" />
-		<input name="gearboxMogliDIFFLOCKBACK"      key1="KEY_lshift KEY_6"  		                          category="VEHICLE" />
+		<input name="gearboxMogliCLUTCH_3"          key1="KEY_period"                                     category="VEHICLE" />
+		<input name="gearboxMogliDIFFLOCKMIDDLE"    key1="KEY_lshift KEY_4"                               category="VEHICLE" />
+		<input name="gearboxMogliDIFFLOCKFRONT"     key1="KEY_lshift KEY_5"                               category="VEHICLE" />
+		<input name="gearboxMogliDIFFLOCKBACK"      key1="KEY_lshift KEY_6"                               category="VEHICLE" />
 		
-    <axis name="gearboxMogliCLUTCH"     key1=""                      key2=""                     axis="AXIS_6" invert="false" category="VEHICLE" />
-    <axis name="gearboxMogliMINRPM"     key1="KEY_equals"            key2="KEY_minus"            axis="AXIS_8" invert="false" category="VEHICLE" />
-    <axis name="gearboxMogliFIXEDRATIO" key1="KEY_rshift KEY_equals" key2="KEY_rshift KEY_minus" axis=""       invert="false" category="VEHICLE" />
+		<axis name="gearboxMogliCLUTCH"            key1=""                      key2=""                     axis="AXIS_6" invert="false" category="VEHICLE" />
+		<axis name="gearboxMogliMINRPM"            key1="KEY_equals"            key2="KEY_minus"            axis="AXIS_8" invert="false" category="VEHICLE" />
+		<axis name="gearboxMogliFIXEDRATIO"        key1="KEY_rshift KEY_equals" key2="KEY_rshift KEY_minus" axis=""       invert="false" category="VEHICLE" />
 	</inputBindings>
 
 	<extraSourceFiles>
