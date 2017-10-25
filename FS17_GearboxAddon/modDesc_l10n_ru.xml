@@ -2,130 +2,174 @@
 <l10n>
 	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
 	<description>
-<![CDATA[Коробка передач:
-gearboxMogli. Добавляет сконфигурированные специализации всем транспортным средствам]]>
+<![CDATA[Коробка передач. Добавляет специализацию gearboxMogli ко всем сконфигурированным транспортным средствам]]>
 </description>
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
-		<text name="gearboxMogliInputPrefix"           text="GB: "/>
+		<text name="gearboxMogliInputPrefix"               text="Gearbox: "/>
 		
-		<text name="input_gearboxMogliSHIFTGEARUP"     text="GB: Передача вверх"/>
-		<text name="input_gearboxMogliSHIFTGEARDOWN"   text="GB: Передача вниз"/>
-		<text name="input_gearboxMogliSHIFTRANGEUP"    text="GB: Группа вверх"/>
-		<text name="input_gearboxMogliSHIFTRANGE2UP"   text="GB: Группа 2 вверх"/>
-		<text name="input_gearboxMogliSHIFTRANGEDOWN"  text="GB: Группа вниз"/>
-		<text name="input_gearboxMogliSHIFTRANGE2DOWN" text="GB: Группа 2 вниз"/>
-		<text name="input_gearboxMogliNEUTRAL"         text="GB: Нейтраль"/>
-		<text name="input_gearboxMogliOFF"             text="МКПП [выкл]"/>
-		<text name="input_gearboxMogliON"              text="МКПП [вкл]"/>
-		<text name="input_gearboxMogliON_OFF"          text="GB: ВКЛ/ВЫКЛ"/>
-		<text name="input_gearboxMogliHUD"             text="GB: HUD вкл/выкл"/>
-		<text name="input_gearboxMogliAllAuto"         text="GB: реальное переключение"/>
-		<text name="input_gearboxMogliAllAutoON"       text="GB [упрощенная]"/>
-		<text name="input_gearboxMogliAllAutoOFF"      text="GB [реальная]"/>
-		<text name="input_gearboxMogliREVERSE"         text="GB: Задний ход"/>
-		<text name="input_gearboxMogliAUTOCLUTCH2"     text="GB: авто.сцепление"/>
-		<text name="input_gearboxMogliCLUTCH"          text="GB: сцепление"/>
-		<text name="input_gearboxMogliCLUTCH_1"        text="GB: сцепление открытое"/>
-		<text name="input_gearboxMogliCLUTCH_2"        text="GB: сцепление закрытое"/>
-		<text name="input_gearboxMogliCLUTCH_3"        text="GB: сцепление"/>
-		<text name="input_gearboxMogliMINRPM"          text="GB: ручной газ"/>
-		<text name="input_gearboxMogliMINRPM_1"        text="GB: ручной газ вниз"/>
-		<text name="input_gearboxMogliMINRPM_2"        text="GB: ручной газ вверх"/>
-		<text name="input_gearboxMogliGEAR1"           text="Gearbox: G27 1"/>
-		<text name="input_gearboxMogliGEAR2"           text="Gearbox: G27 2"/>
-		<text name="input_gearboxMogliGEAR3"           text="Gearbox: G27 3"/>
-		<text name="input_gearboxMogliGEAR4"           text="Gearbox: G27 4"/>
-		<text name="input_gearboxMogliGEAR5"           text="Gearbox: G27 5"/>
-		<text name="input_gearboxMogliGEAR6"           text="Gearbox: G27 6"/>
-		<text name="input_gearboxMogliGEARR"           text="Gearbox: G27 R"/>
-		<text name="input_gearboxMogliGEARFWD"         text="GB: вперед"/>
-		<text name="input_gearboxMogliGEARBACK"        text="GB: назад"/> 
-		<text name="input_gearboxMogliSPEEDLIMIT"      text="GB: ограничитель"/>
-		<text name="input_gearboxMogliSWAPSPEED"       text="GB: ограничитель 2"/>
-		<text name="input_gearboxMogliSETSPEED"        text="GB: установить ограничитель"/>
-		<text name="input_gearboxMogliACCTOLIMIT"      text="GB: ускорение"/>
-		<text name="input_gearboxMogliDECTOLIMIT"      text="GB: замедление"/>
-		<text name="input_gearboxMogliECO"             text="GB: ЭКО вкл/выкл"/>
-		<text name="input_gearboxMogliKEEPSPEED"       text="GB: держать скорость"/>
+		<text name="input_gearboxMogliSHIFTGEARUP"         text="Gearbox: Передача вверх"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"       text="Gearbox: Передача вниз"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE"     text="Gearbox: Переключение передач"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"        text="Gearbox: Диапазон вверх"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"       text="Gearbox: Диапазон 2 вверх"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"      text="Gearbox: Диапазон вниз"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN"     text="Gearbox: Диапазон 2 вниз"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"    text="Gearbox: Переключатель диапазона"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE"   text="Gearbox: Переключатель диапазона 2"/>
+		<text name="input_gearboxMogliNEUTRAL"             text="Gearbox: Нейтральная"/>
+		<text name="input_gearboxMogliAUTOMATIC"           text="Gearbox: Тип коробки передач"/>
+		<text name="input_gearboxMogliOFF"                 text="Ручная КПП [Выкл]"/>
+		<text name="input_gearboxMogliON"                  text="Ручная КПП [Вкл]"/>
+		<text name="input_gearboxMogliON_OFF"              text="Gearbox: ВКЛ/ВЫКЛ"/>
+		<text name="input_gearboxMogliSETTINGS"            text="Gearbox: Настройки"/>
+		<text name="input_gearboxMogliHUD"                 text="Gearbox: HUD Вкл/Выкл"/>
+		<text name="input_gearboxMogliAllAuto"             text="Gearbox: Реальное переключение"/>
+		<text name="input_gearboxMogliAllAutoON"           text="Gearbox [упрощенная]"/>
+		<text name="input_gearboxMogliAllAutoOFF"          text="Gearbox [реалистичная]"/>
+		<text name="input_gearboxMogliREVERSE"             text="Gearbox: Задний ход"/>
+		<text name="input_gearboxMogliHANDBRAKE"           text="Gearbox: Стояночный тормоз"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"         text="Gearbox: Автоматическое сцепление"/>
+		<text name="input_gearboxMogliCLUTCH"              text="Gearbox: Аналоговое цепление"/>
+		<text name="input_gearboxMogliCLUTCH_1"            text="Gearbox: Сцепление выжать"/>
+		<text name="input_gearboxMogliCLUTCH_2"            text="Gearbox: Сцепление отпустить"/>
+		<text name="input_gearboxMogliCLUTCH_3"            text="Gearbox: Цифровое сцепление"/>
+		<text name="input_gearboxMogliMINRPM"              text="Gearbox: Ручной газ"/>
+		<text name="input_gearboxMogliMINRPM_1"            text="Gearbox: Ручной газ вниз"/>
+		<text name="input_gearboxMogliMINRPM_2"            text="Gearbox: Ручной газ вверх"/>
+		<text name="input_gearboxMogliFIXEDRATIO"          text="Gearbox: Фиксированный коэффициент"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"        text="Gearbox: Фиксированный коэффициент -"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"        text="Gearbox: Фиксированный коэффициент +"/>
+		<text name="input_gearboxMogliGEAR1"               text="Gearbox: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"               text="Gearbox: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"               text="Gearbox: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"               text="Gearbox: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"               text="Gearbox: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"               text="Gearbox: G27 6"/>
+		<text name="input_gearboxMogliGEARR"               text="Gearbox: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"             text="Gearbox: Вперед"/>
+		<text name="input_gearboxMogliGEARBACK"            text="Gearbox: Назад"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"          text="Gearbox: Ограничитель скорости"/>
+		<text name="input_gearboxMogliSWAPSPEED"           text="Gearbox: Следующий ограничитель"/>
+		<text name="input_gearboxMogliSWAPSPEEDR"          text="Gearbox: Предыдущий ограничитель"/>
+		<text name="input_gearboxMogliSETSPEED"            text="Gearbox: Установить ограничитель"/>
+		<text name="input_gearboxMogliACCTOLIMIT"          text="Gearbox: Ускорение"/>
+		<text name="input_gearboxMogliDECTOLIMIT"          text="Gearbox: Замедление"/>
+		<text name="input_gearboxMogliECO"                 text="Gearbox: ЭКО вкл/выкл"/>
+		<text name="input_gearboxMogliKEEPSPEED"           text="Gearbox: Задать скорость удержания"/>
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"     text="Gearbox: Вкл. удержание скорости"/>
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"      text="Gearbox: Тип привода"/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"       text="Gearbox: Блокировка переднего диффер."/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"        text="Gearbox: Блокировка заднего диффер."/>
 		
-		<text name="gearboxMogliTEXT_OFF"        text="мотор Выкл."/>
-		<text name="gearboxMogliTEXT_AI"         text="Наймит"/>
-		<text name="gearboxMogliTEXT_CP"         text="CP"/>
-		<text name="gearboxMogliTEXT_BRAKE"      text="Ручник"/>
-		<text name="gearboxMogliTEXT_DC"         text="Двойное сцепление"/>
-		<text name="gearboxMogliTEXT_NEUTRAL"    text="нейтраль"/>
-		<text name="gearboxMogliTEXT_AUTO"       text="Автомат"/>
-		<text name="gearboxMogliTEXT_MANUAL"     text="Ручная"/>
-		<text name="gearboxMogliTEXT_NOGEAR"     text="нет передач"/>
-		<text name="gearboxMogliTEXT_VARIO"      text="Плавно"/>
-		<text name="gearboxMogliTEXT_ALLAUTO"    text="Упрощенная"/>
-		<text name="gearboxMogliTEXT_ECO"        text="ЭКО"/>
-		<text name="gearboxMogliTEXT_AUTO_HOLD"  text="Автоудержание"/>
+		<text name="gearboxMogliTEXT_OFF"                  text="STOP"/>
+		<text name="gearboxMogliTEXT_AI"                   text="Наймит"/>
+		<text name="gearboxMogliTEXT_CP"                   text="CP"/>
+		<text name="gearboxMogliTEXT_BRAKE"                text="Ручник"/>
+		<text name="gearboxMogliTEXT_DC"                   text="Двойное сцепление"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"              text="Нейтральная"/>
+		<text name="gearboxMogliTEXT_AUTO"                 text="Автомат"/>
+		<text name="gearboxMogliTEXT_MANUAL"               text="Ручная"/>
+		<text name="gearboxMogliTEXT_NOGEAR"               text="без передач"/>
+		<text name="gearboxMogliTEXT_VARIO"                text="CVT"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"              text="Упрощенная"/>
+		<text name="gearboxMogliTEXT_ECO"                  text="eco"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"            text="Автоудержание"/>
 
-		<text name="gearboxMogliTEXT_DISABLED"           text="off"/>
-		<text name="gearboxMogliTEXT_ENABLED"            text="on"/>
-		<text name="gearboxMogliTEXT_POWERSHIFT"         text="auto power shift"/>
-		<text name="gearboxMogliTEXT_N_A"                text="n/a"/>
+		<text name="gearboxMogliTEXT_DISABLED"             text="Выкл."/>
+		<text name="gearboxMogliTEXT_ENABLED"              text="Вкл."/>
+		<text name="gearboxMogliTEXT_POWERSHIFT"           text="автосмена мощности"/>
+		<text name="gearboxMogliTEXT_N_A"                  text="не доступно"/>
 		
-		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="show target RPM"/>
-		<text name="gearboxMogliTEXT_DrawReqPower"       text="show power"/>
-		<text name="gearboxMogliTEXT_EnableAI"           text="hired worker"/>
-		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="swap gears and range 1"/>
-		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 and gears"/>
-		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="for-/backwards buttons"/>
+		<text name="gearboxMogliTEXT_DrawTargetRpm"        text="Отображать заданные обороты"/>
+		<text name="gearboxMogliTEXT_DrawReqPower"         text="Отображать мощность"/>
+		<text name="gearboxMogliTEXT_EnableAI"             text="КПП для наёмного работника"/>
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"    text="Поменять клав.передач с диап.1"/>
+		<text name="gearboxMogliTEXT_GearShifterMode"      text="G27 и передачи"/>
+		<text name="gearboxMogliTEXT_ShuttleShifterMode"   text="Клавиши переключ. направления"/>
 		 
-		<text name="gearboxMogliTEXT_AllAutoMode"        text="settings simplified"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="sequential"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="gears"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="range 1"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_3"      text="gears and range 1"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_4"      text="range 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="gears and range 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="ranges 1 and 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="gears, ranges 1 and 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode"          text="Упрощенные настройки"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_0"        text="последовательная"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_1"        text="передачи"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_2"        text="диапазон 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_3"        text="передачи и диапазон 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_4"        text="диапазон 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_5"        text="передачи и диапазон 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_6"        text="диапазоны 1 и 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_7"        text="передачи, диапазоны 1,2"/>
 		
-		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2wd"/>
-		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4wd"/>
-		<text name="gearboxMogliTEXT_DiffLock_open"      text="open"/>
-		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="limited slip"/>
-		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatic"/>
-		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="fixed ratio"/>
-		<text name="gearboxMogliTEXT_DiffLock_locked"    text="locked"/>
+		<text name="gearboxMogliTEXT_DiffLock_2wd"         text="2wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_4wd"         text="4wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_open"        text="разблокирован"/>
+		<text name="gearboxMogliTEXT_DiffLock_lsd"         text="дифф.повыш.трения"/>
+		<text name="gearboxMogliTEXT_DiffLock_auto"        text="автоматически"/>
+		<text name="gearboxMogliTEXT_DiffLock_fixed"       text="Фиксированное значение"/>
+		<text name="gearboxMogliTEXT_DiffLock_locked"      text="заблокирован"/>
 		
-		<text name="gearboxMogliTEXT_GearShifter_both"   text="keys and G27"/>
-		<text name="gearboxMogliTEXT_GearShifter_key"    text="keys"/>
-		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
+		<text name="gearboxMogliTEXT_GearShifter_both"     text="клавиши и G27"/>
+		<text name="gearboxMogliTEXT_GearShifter_key"      text="клавиши"/>
+		<text name="gearboxMogliTEXT_GearShifter_G27"      text="G27"/>
 		
-		<text name="gearboxMogliTEXT_Shuttle_both"       text="toggle and separate"/>
-		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
-		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
+		<text name="gearboxMogliTEXT_Shuttle_both"         text="переключатель и раздельно"/>
+		<text name="gearboxMogliTEXT_Shuttle_toggle"       text="переключатель"/>
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"     text="раздельные клав."/>
+		
+		<text name="gearboxMogliTEXT_MinTargetRpm"         text="min заданные обороты"/>
+		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="max заданные обороты"/>
+		
+		
+		<text name="tooltip_gearboxMogliSPEEDLIMIT"         text="Это будет подказка"/>
 				
-		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
+		<text name="gearboxMogliTEXT_Settings"             text="Настройки GearBox"/>
+		<text name="gearboxMogliTEXT_Help_1"               text="Справка 1"/>
+		<text name="gearboxMogliTEXT_Inputs"               text="Сочетание клавиш"/>
+		
+		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"         text="Нельзя переключить передачу: обороты"/>
+		<text name="gearboxMogliTEXT_Stall1"               text="Обороты слишком низкие"/>
+		<text name="gearboxMogliTEXT_Stall2"               text="Мотор заглох, потому что обороты были очень низкими"/>
+		<text name="gearboxMogliTEXT_Stall3"               text="Слишком много мощности отбирается через ВОМ"/>
+		<text name="gearboxMogliTEXT_Stall4"               text="Мотор заглох, потому что слишком много мощности отбиралось через ВОМ"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"    text="Сцепление перегрелось"/>
 		
 		<!-- texts in the HUD => keep them short -->
-		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
-		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>
-		<text name="gearboxMogliDRAW_speed"              text="Speed"/>
-		<text name="gearboxMogliDRAW_currentRpm"         text="Current rpm"/>
-		<text name="gearboxMogliDRAW_TargetRpm"          text="Target rpm"/>
-		<text name="gearboxMogliDRAW_power"              text="Power"/>
-		<text name="gearboxMogliDRAW_load"               text="Load"/>
-		<text name="gearboxMogliDRAW_fuel"               text="Fuel used"/>
-		<text name="gearboxMogliDRAW_clutch"             text="Clutch"/>
-		<text name="gearboxMogliDRAW_autoClutch"         text="Auto clutch"/>
-		<text name="gearboxMogliDRAW_hand"               text="Hand throttle"/>
-		<text name="gearboxMogliDRAW_fixed"              text="Fixed ratio"/>
-		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
-		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
+		<text name="gearboxMogliDRAW_difflock"             text="Блок.дифф."/>
+		<text name="gearboxMogliDRAW_maxSpeed"             text="Max. скорость"/>
+		<text name="gearboxMogliDRAW_speed"                text="Скорость"/>
+		<text name="gearboxMogliDRAW_currentRpm"           text="Текущие об."/>
+		<text name="gearboxMogliDRAW_TargetRpm"            text="Установл. об."/>
+		<text name="gearboxMogliDRAW_power"                text="Мощность"/>
+		<text name="gearboxMogliDRAW_load"                 text="Нагрузка"/>
+		<text name="gearboxMogliDRAW_fuel"                 text="Расход"/>
+		<text name="gearboxMogliDRAW_clutch"               text="Сцепление"/>
+		<text name="gearboxMogliDRAW_autoClutch"           text="Автосцепление"/>
+		<text name="gearboxMogliDRAW_hand"                 text="Ручной газ"/>
+		<text name="gearboxMogliDRAW_fixed"                text="Фикс.коэфф."/>
+		<text name="gearboxMogliDRAW_combine"              text="Комбайн"/>
+		<text name="gearboxMogliDRAW_wheelSlip"            text="Скольжение колёс"/>
 		
-		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
-		<text name="gearboxMogliUNIT_HP"                 text="CV"/>		
-		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
-		<text name="gearboxMogliUNIT_mph"                text="mph"/>
-		<text name="gearboxMogliUNIT_lph"                text="л/ч"/>		
-		<text name="gearboxMogliUNIT_lp100km"            text="л/100"/>	
+		<text name="gearboxMogliUNIT_rpm"                  text="об."/>		
+		<text name="gearboxMogliUNIT_HP"                   text="л.с."/>		
+		<text name="gearboxMogliUNIT_kph"                  text="км/ч"/>		
+		<text name="gearboxMogliUNIT_mph"                  text="миль/ч"/>		
+		<text name="gearboxMogliUNIT_lph"                  text="л/ч"/>		
+		<text name="gearboxMogliUNIT_lp100km"              text="л/100км"/>		
 	</texts>
+	
+	
+		<longTexts>
+		<longText name="gearboxMogliHelp_1"><![CDATA[
+Не каждый трактор имеет бесступенчатую трансмиссию. И даже бесступенчатые трансмиссии не так просты по конструкции, как стандартная в FS17. Этот мод добавляет на основе файла gearboxAddonConfig.xml коробку передач ко всем сконфигурированным транспорным средствам. 
+Могут быть смоделированы многие виды коробок передач. Существуют классические коробки передач с шестернями, одной или двумя группами, а также реверсивные передачи или группы. 
+Когда передаточное число будет уменьшено до 0, это приведет к передаче PowerShift. В современных тракторах PowerShift трансмиссия часто сочетается с автоматическим переключением передач.
+
+Новое в версии 1.1: теперь поддерживается бесступенчатые коробки передач. 
+Есть модели с одной или двумя передачами, такими как Fendt Vario. 
+Другие модели объединяют четыре автоматически переключаемых механических механизма с бесступенчатым гидростатическим приводом. 
+Все эти бесступенчатые передачи имеют одну общую черту: эффективность сильно варьируется в зависимости от передаточного отношения.]]></longText>
+	</longTexts>
+	
+</l10n>
 </l10n>
