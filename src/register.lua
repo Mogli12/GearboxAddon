@@ -313,8 +313,7 @@ function gearboxMogliRegister:addConfigurations()
 				elseif storeItem.category == "cars"         then
 					defaultConfigName = "defaultCars"
 				elseif storeItem.category == "wheelLoaders" then
-				--defaultConfigName = "defaultTorqueConverter"
-					defaultConfigName = "defaultHydrostatic2"
+					defaultConfigName = "defaultTorqueConverter"
 				elseif storeItem.category == "teleLoaders"  then
 					defaultConfigName = "defaultHydrostatic2"
 				elseif storeItem.category == "skidSteers"   then

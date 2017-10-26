@@ -446,7 +446,7 @@
 		<gearboxMogli torqueConverter="true" clutchOpenRpm="1800" clutchCloseRpm="2100" clutchMaxTargetRpm="2600" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
+			<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true" reverseReset="true">
 				<gear speed="40"  forwardOnly="true" name="1"/>
 				<gear speed="50"  reverseOnly="true" name="R"/>			
 				<gear speed="60"  forwardOnly="true" name="2"/>
@@ -586,7 +586,7 @@
 		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
+			<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true" reverseReset="true">
 				<gear speed="30"  forwardOnly="true" name="1"/>
 				<gear speed="50"  reverseOnly="true" name="R"/>			
 				<gear speed="55"  forwardOnly="true" name="2"/>
@@ -773,7 +773,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 		
 		<transmissions>
-			<transmission name="Torque Converter" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterMaxFactor="1.25" torqueConverter="true" minClutchRatio="0.6">
+			<transmission name="Torque Converter" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterProfile="clutch" minClutchRatio="0.6">
 				<gears defaultGear="4" shiftTimeMs="800">	
 					<gear speed="3.9"  name="1" />
 					<gear speed="6.2"  name="2" />
@@ -2948,7 +2948,7 @@
 		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
 			<blowOffVentilSound volume="0"/>
 			
-			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" automatic="true" reverseReset="true">	
+			<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true" reverseReset="true">
 				<gear speed="30"  forwardOnly="true" name="1"/>
 				<gear speed="50"  reverseOnly="true" name="R"/>			
 				<gear speed="55"  forwardOnly="true" name="2"/>
@@ -2984,16 +2984,16 @@
 	<vehicle>
 		<configFile xmlName="defaultTorqueConverter"/>
 
-		<gearboxMogli torqueConverter="true" speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false">
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" defaultOn="false" torqueConverterProfile="wheelLoader">
 			<blowOffVentilSound volume="0"/>			
 			<differentials profile="off"/>			
-			<gears shiftTimeMs="0" shiftEffect="false" clutchRatio="0" speedMatching="false" defaultGear="3">
+			<gears defaultGear="2" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="false" speedMatching="false" reverseReset="false">
 				<gear name="1" maxForwardSpeedRatio="0.40" />
 				<gear name="2" maxForwardSpeedRatio="0.69" />
 				<gear name="3" maxForwardSpeedRatio="1.15" />
 			</gears>
 			
-			<ranges shiftTimeMs="300" shiftEffect="false" clutchRatio="-1" defaultRange="1" gearOffset="1">
+			<ranges defaultRange="1" gearOffset="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="false" speedMatching="false" reverseReset="false">
 				<range ratio="0.435" name="A"/>
 				<range ratio="1.000" name="S"/>
 			</ranges>

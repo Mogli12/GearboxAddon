@@ -1035,7 +1035,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 --**************************************************************************************************		
 	self.mrGbMS.TorqueConverter         = getXMLBool( xmlFile, xmlString .. "#torqueConverter" )	
 	self.mrGbMS.MaxClutchPercent        = getXMLFloat(xmlFile, xmlString .. "#maxClutchRatio")
-	
+	local torqueConverterProfile        = getXMLString( xmlFile, xmlString .. "#torqueConverterProfile" )	-- "wheelLoader" / "clutch" / "car"
+	if torqueConverterProfile ~= nil and torqueConverterProfile ~= "" and self.mrGbMS.TorqueConverter == nil then
+		self.mrGbMS.TorqueConverter    = true
+	end
 	if self.mrGbMS.TorqueConverter == nil and self.mrGbMS.MaxClutchPercent == nil then
 		self.mrGbMS.TorqueConverter    = false
 		self.mrGbMS.MaxClutchPercent   = 1
@@ -1047,6 +1050,13 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	elseif self.mrGbMS.TorqueConverter == nil then
 		self.mrGbMS.TorqueConverter    = ( self.mrGbMS.MaxClutchPercent < 0.99 )		
+	end
+	if torqueConverterProfile == nil then
+		if self.mrGbMS.TorqueConverter then
+			torqueConverterProfile = "clutch" 
+		else
+			torqueConverterProfile = ""
+		end
 	end
 	
 	if self.mrGbMS.MaxClutchPercent > 1 then 
@@ -1060,20 +1070,24 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.TorqueConverterOrHydro = true
 	end
 	
---if self.mrGbMS.TorqueConverter then 
---	default = gearboxMogli.huge --self.mrGbMS.CurMaxRpm
---else
+	if torqueConverterProfile == "wheelLoader" then 
+		default = gearboxMogli.huge
+	else
 		default = math.max( 0.62 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm )
 		if self.mrGbMS.Engine.maxTorque > 0 then
 			default = math.min( default, self.mrGbMS.Engine.maxTorqueRpm )
 		end
---end
+	end
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
 	
-	default = self.mrGbMS.CurMinRpm-1 -- no automatic opening of clutch by default!!!
-	if self.mrGbMS.TorqueConverter then 
+	if torqueConverterProfile == "wheelLoader" then 
+		default = gearboxMogli.huge
+	elseif self.mrGbMS.TorqueConverter then 
 		default = math.min( self.mrGbMS.CloseRpm, self.mrGbMS.RatedRpm )
+	else
+		default = self.mrGbMS.CurMinRpm-1 -- no automatic opening of clutch by default!!!
 	end
+		
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), default )
 	self.mrGbMS.ClutchRpmShift          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchRpmShift"), 0 )
 	
@@ -1098,24 +1112,32 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 	local dft = self.mrGbMS.TransmissionEfficiency
-	if self.mrGbMS.TorqueConverter then
-		dft = 0.7 * self.mrGbMS.TransmissionEfficiency
+	if     torqueConverterProfile == "wheelLoader" then
+		dft = 0.85 * self.mrGbMS.TransmissionEfficiency 
+	elseif self.mrGbMS.TorqueConverter then
+		dft = 0.7  * self.mrGbMS.TransmissionEfficiency
 	end
 	self.mrGbMS.ClutchEfficiency    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiency"), dft )
 	self.mrGbMS.ClutchEfficiencyInc = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiencyInc"), 
 																		math.max( 0, 0.95 * self.mrGbMS.TransmissionEfficiency - self.mrGbMS.ClutchEfficiency ) )
 
 	if self.mrGbMS.TorqueConverter then
-		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),3) * self.mrGbMS.TransmissionEfficiency / self.mrGbMS.ClutchEfficiency
+		default = 3.2 -- hanomag or car
+		if torqueConverterProfile == "clutch" then
+			default = 1.25 -- voith
+		end
+		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),default) * self.mrGbMS.TransmissionEfficiency / self.mrGbMS.ClutchEfficiency
 	
 		self.mrGbMS.TorqueConverterLockupMs = getXMLFloat(xmlFile, xmlString .. "#torqueConverterLockupMs")
-		if      self.mrGbMS.TorqueConverter 
-				and self.mrGbMS.CloseRpm < self.mrGbMS.RatedRpm 
-				and self.mrGbMS.TorqueConverterLockupMs == nil then
+		if self.mrGbMS.CloseRpm < self.mrGbMS.RatedRpm and self.mrGbMS.TorqueConverterLockupMs == nil then
 			self.mrGbMS.TorqueConverterLockupMs = 200
 		end		
 	
-		self.mrGbMS.TorqueConverterTime    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"),    2000 )
+		default = 2000
+		if torqueConverterProfile == "wheelLoader" then
+			default = 10000
+		end
+		self.mrGbMS.TorqueConverterTime    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"), default )
 		self.mrGbMS.TorqueConverterTimeInc = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTimeInc"), 0 )
 	end
 	
@@ -1132,8 +1154,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	end
 	if self.mrGbMS.TorqueConverter then
-		self.mrGbMS.MinClutchPercentTC = self.mrGbMS.MinClutchPercent
-		self.mrGbMS.MinClutchPercent   = 0
+		self.mrGbMS.MinClutchPercentTC    = self.mrGbMS.MinClutchPercent
+		self.mrGbMS.MinClutchPercent      = 0
 	end	
 	if self.mrGbMS.MinClutchPercent < 2 * gearboxMogli.minClutchPercent then 
 		self.mrGbMS.MinClutchPercent      = 2 * gearboxMogli.minClutchPercent 
@@ -1186,7 +1208,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ManualClutchHl        	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(0)#manualClutch"), self.mrGbMS.ClutchAfterShiftHl + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
 	self.mrGbMS.ManualClutchRanges2   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(1)#manualClutch"), self.mrGbMS.ClutchAfterShiftRanges2 + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
 	self.mrGbMS.ManualClutchReverse   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch"),   not self.mrGbMS.AutoStartStop or self.mrGbMS.ReverseOnlyStopped )
-	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
+	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
 		
 	self.mrGbMS.ShiftNoThrottleGear   	= getXMLBool( xmlFile, xmlString .. ".gears#shiftNoThrottle")
 	self.mrGbMS.ShiftNoThrottleHl     	= getXMLBool( xmlFile, xmlString .. ".ranges(0)#shiftNoThrottle")
