@@ -22,6 +22,8 @@
 				<range name="H" ratio="1"/>
 			</ranges>
 			
+			<reverse manualClutch="true"/>
+			
 			<realEngine idleRpm="800" ratedRpm="2100">
         <!-- 2100: 125(125) | 2100: 125(125) | 1400..1400: 537(537) | 85 | 0.5 | 149 | 2 | 2200 | 1320: 220 -->
         <torque rpm="350" motorTorque="303" fuelUsageRatio="254"/>
@@ -127,6 +129,8 @@
 				<range ratio="1"     name="V"/>
 			</ranges>
 			
+			<reverse manualClutch="true"/>
+			
 			<realEngine idleRpm="800" ratedRpm="2500">
         <!-- 2500: 88(88) | 2500: 88(88) | 1300..1300: 323(323) | 85 | 0.5 | 149 | 2 | 2600 | 1300: 220 -->
         <torque rpm="350" motorTorque="170" fuelUsageRatio="255.3"/>
@@ -184,7 +188,7 @@
 				<range ratio="1"      name="6" />
 			</ranges>
 
-			<reverse ratio="1" shiftTimeMs="500" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<reverse ratio="1" shiftTimeMs="500" manualClutch="false" resetRange="false" resetGear="false"/>
 
 			<engines>
 				<engine name="160" idleRpm="800" ratedRpm="2100" >
@@ -264,7 +268,7 @@
 				<range ratio="1"     name="S" />
 			</ranges>
 			
-			<reverse ratio="1" shiftTimeMs="500" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<reverse ratio="1" shiftTimeMs="500" manualClutch="false" resetRange="false" resetGear="false"/>
 			
 			<engines>
 				<engine name="Multi 4095" idleRpm="900" ratedRpm="2200" >
@@ -3592,7 +3596,7 @@
 				<range ratio="1.0000" name="Hi" />
 			</ranges>
 		
-			<reverse ratio="1.0000" shiftTimeMs="800" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<reverse ratio="1.0000" shiftTimeMs="800" manualClutch="false" resetRange="false" resetGear="false"/>
 		
 			<realEngine idleRpm="800" ratedRpm="2200">
 				<torque rpm="0" motorTorque="0"/>
@@ -3643,7 +3647,7 @@
 				<range ratio="1.0000" name="Hi" />
 			</ranges>
 		
-			<reverse ratio="1.0000" shiftTimeMs="800" clutchRatio="1" resetRange="false" resetGear="false"/>
+			<reverse ratio="1.0000" shiftTimeMs="800" manualClutch="false" resetRange="false" resetGear="false"/>
 			
 			<engines>
 				<engine name="130 HD" idleRpm="800" ratedRpm="2200">	
@@ -4066,6 +4070,8 @@
 				<range name="L" ratio="0.245"/>
 				<range name="H" ratio="1"/>
 			</ranges>
+			
+			<reverse manualClutch="true"/>
 		</gearboxMogli>				
 	</vehicle>
 
@@ -4491,7 +4497,7 @@
 					<range name="4" ratio="1.000"/>
 				</ranges>
 				
-				<reverse ratio="1.0434" shiftTimeMs="0" clutchRatio="1"/>
+				<reverse ratio="1.0434" shiftTimeMs="0" manualClutch="false"/>
 			</transmission>	
 			
 			<transmission name="AutoPowr" ptoRpm="1950" ptoRpmEco="1773" maxForwardSpeed="52" maxBackwardSpeed="52">

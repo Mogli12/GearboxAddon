@@ -1396,6 +1396,19 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.wheelSpeedRpmReal   = self.wheelSpeedRpm
 	self.rawTransTorque      = self.usedTransTorque
 	
+	local f = 1
+	if not self.noTransmission then
+		local w = self.clutchRpm
+		local s = self.wheelSpeedRpmReal * self.gearRatio
+		
+		if     s <= 0 then
+			f = gearboxMogli.eps
+		elseif w > gearboxMogli.eps and w > s then
+			f = math.max( s / w, gearboxMogli.eps )
+		end
+	end		
+	self.wheelSlipFactor = self.wheelSlipFactor + self.vehicle.mrGbML.smoothFast * ( f - self.wheelSlipFactor )
+	
 	if     not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps and self.vehicle.mrGbMS.HydrostaticLaunch  then
 		self.wheelSpeedRpm = self.clutchRpm / self.gearRatio
 	elseif not ( self.noTransmission ) and math.abs( self.gearRatio ) > gearboxMogli.eps and gearboxMogli.trustClutchRpmTimer <= dt then
@@ -1574,21 +1587,7 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	self.usedTransTorqueS = math.min( self.usedTransTorqueS + self.vehicle.mrGbML.smoothFast * ( self.usedTransTorque - self.usedTransTorqueS ), self.lastTransTorque )
 	self.usedMotorTorqueS = math.min( self.usedTransTorqueS + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
-	self.fuelMotorTorque  = math.min( utt + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )
-	
-	local f = 1
-	if not self.noTransmission then
-		local w = self.clutchRpm
-		local s = self.wheelSpeedRpmReal * self.gearRatio
-		
-		if     s <= 0 then
-			f = gearboxMogli.eps
-		elseif w > gearboxMogli.eps and w > s then
-			f = math.max( s / w, gearboxMogli.eps )
-		end
-	end
-		
-	self.wheelSlipFactor = self.wheelSlipFactor + self.vehicle.mrGbML.smoothFast * ( f - self.wheelSlipFactor )
+	self.fuelMotorTorque  = math.min( utt + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )	
 end
 
 --**********************************************************************************************************	
@@ -1973,10 +1972,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 
 	local mlf = Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 ) 
-	if     self.vehicle.mrGbML.gearShiftingNeeded == 2
-			or ( self.vehicle.mrGbML.gearShiftingNeeded > 0 and self.vehicle.mrGbML.doubleClutch )
-			or self.vehicle.mrGbML.gearShiftingNeeded  < 0 then
-		mlf = math.max( 0.5, mlf )
+	if     lastNoTorque then
+		mlf = 0
+	elseif self.vehicle.mrGbML.gearShiftingNeeded == 2 then
+		mlf = 1
+	elseif ( self.vehicle.mrGbML.gearShiftingNeeded > 0 and self.vehicle.mrGbML.doubleClutch )
+			or self.vehicle.mrGbML.gearShiftingNeeded   < 0 
+			or ( self.vehicle.mrGbML.NeutralActive and not self.vehicle:mrGbMGetAutoClutch() ) then
+		mlf = math.max( mlf, 0.5, accelerationPedal )
 	end
 	if  not lastNoTransmission
 			and self.nonClampedMotorRpm > self.prevNonClampedMotorRpm + self.maxRpmIncrease - gearboxMogli.eps then
@@ -2477,10 +2480,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	--**********************************************************************************************************		
 	-- during gear shift with automatic clutch
 			if self.vehicle.mrGbML.gearShiftingNeeded == 2 and g_currentMission.time < self.vehicle.mrGbML.gearShiftingTime then	
-				if self.lastRealMotorRpm > 0.97 * self.vehicle.mrGbMS.RatedRpm then
+				if      self.lastRealMotorRpm > 0.8 * self.vehicle.mrGbMS.MaxTargetRpm 
+						and g_currentMission.time + g_currentMission.time > self.vehicle.mrGbML.gearShiftingTime + self.vehicle.mrGbML.clutchShiftingTime then
 					self.vehicle.mrGbML.gearShiftingNeeded  = 3
 				end
-				accelerationPedal = 1
+				if self.lastRealMotorRpm < 0.9 * self.vehicle.mrGbMS.MaxTargetRpm then
+					accelerationPedal = 1
+				else
+					accelerationPedal = 0.8
+				end
 			else               
 				accelerationPedal = 0
 				self.noTorque     = true
@@ -3949,8 +3957,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 
 	if self.noTransmission then
-		if self.lastThrottle > 0 and self.lastThrottle > ( self.lastMotorRpm / self.maxRpm )  then
-			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + f * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactor, 
+		if self.lastThrottle > 0 and self.lastThrottle * self.vehicle.mrGbMS.MaxTargetRpm > self.lastMotorRpm then
+			self.lastMotorRpm  = Utils.clamp( self.lastMotorRpm + f * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral, 
 																			 self.minRequiredRpm, 
 																			 self:getThrottleMaxRpm( ) )
 		else
@@ -4031,7 +4039,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	if self.noTransmission then
 		self.maxPossibleRpm = gearboxMogli.huge
 		self.lastMaxRpmTab  = nil
-		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactor
+		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorNeutral
 	elseif self.torqueRpmReduction ~= nil then
 	  self.maxPossibleRpm = math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm )
 		self.lastMaxRpmTab  = nil
@@ -4116,6 +4124,19 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end	
 		
 	self.lastThrottle = math.max( self.minThrottle, accelerationPedal )
+	
+--**********************************************************************************************************	
+	if     self.vehicle.mrGbML.gearShiftingNeeded == gearboxMogli.gearShiftingNoThrottle then
+		self.vehicle:mrGbMSetState( "DoubleClutch", 3 )
+	elseif self.vehicle.mrGbML.gearShiftingNeeded == 2 then
+		self.vehicle:mrGbMSetState( "DoubleClutch", 1 )
+	elseif self.vehicle.mrGbML.gearShiftingNeeded  < 0 then
+		self.vehicle:mrGbMSetState( "DoubleClutch", 2 )
+	elseif self.vehicle.mrGbML.NeutralActive and not self.vehicle:mrGbMGetAutoClutch() and accelerationPedal > 0.1 then
+		self.vehicle:mrGbMSetState( "DoubleClutch", 2 )
+	else
+		self.vehicle:mrGbMSetState( "DoubleClutch", 0 )
+	end
 	
 --**********************************************************************************************************	
 -- VehicleMotor.updateGear II

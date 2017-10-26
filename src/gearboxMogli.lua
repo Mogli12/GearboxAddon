@@ -156,6 +156,7 @@ gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
 gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms
 gearboxMogliGlobals.DefaultRevUpMs1       = 4000  -- ms
+gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
@@ -307,6 +308,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "NoUpdateStream",false, gearboxMogli.mrGbMOnSetNoUpdateStream )
 	gearboxMogli.registerState( self, "NUSMessage",    {},    gearboxMogli.mrGbMOnSetNUSMessage )
 	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
+	gearboxMogli.registerState( self, "DoubleClutch",  0 )
 	
 --**********************************************************************************************************	
 -- state variables with setter methods	
@@ -1207,9 +1209,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ManualClutchGear      	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".gears#manualClutch"),     self.mrGbMS.ClutchAfterShiftGear + 0.1 <= self.mrGbMS.MaxClutchPercent )
 	self.mrGbMS.ManualClutchHl        	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(0)#manualClutch"), self.mrGbMS.ClutchAfterShiftHl + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
 	self.mrGbMS.ManualClutchRanges2   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".ranges(1)#manualClutch"), self.mrGbMS.ClutchAfterShiftRanges2 + 0.1 <= self.mrGbMS.MaxClutchPercent ) 
-	self.mrGbMS.ManualClutchReverse   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch"),   not self.mrGbMS.AutoStartStop or self.mrGbMS.ReverseOnlyStopped )
-	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
-		
+	
 	self.mrGbMS.ShiftNoThrottleGear   	= getXMLBool( xmlFile, xmlString .. ".gears#shiftNoThrottle")
 	self.mrGbMS.ShiftNoThrottleHl     	= getXMLBool( xmlFile, xmlString .. ".ranges(0)#shiftNoThrottle")
 	self.mrGbMS.ShiftNoThrottleRanges2	= getXMLBool( xmlFile, xmlString .. ".ranges(1)#shiftNoThrottle") 		
@@ -1218,10 +1218,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 
 	local revUpMs0                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  self.mrGbMG.DefaultRevUpMs0 ) 
 	local f                             = revUpMs0 /  math.max(1,self.mrGbMG.DefaultRevUpMs0)
-	local revUpMs1                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMsFullLoad"),  self.mrGbMG.DefaultRevUpMs1 * f ) 
+	local revUpMs1                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMsFullLoad"), self.mrGbMG.DefaultRevUpMs1 * f ) 
+	local revUpMs2                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMsNeutral"),  self.mrGbMG.DefaultRevUpMs2 * f ) 
 	local revDownMs                     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revDownMs"), self.mrGbMG.DefaultRevDownMs * f ) 
 	self.mrGbMS.RpmIncFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / math.max( 10, revUpMs0 )
 	self.mrGbMS.RpmIncFactorFull        = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / math.max( 10, revUpMs1 )
+	self.mrGbMS.RpmIncFactorNeutral     = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / math.max( 10, revUpMs2 )
 	self.mrGbMS.RpmDecFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / math.max( 10, revDownMs )
 	
 --**************************************************************************************************	
@@ -1590,7 +1592,43 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 
 	--**************************************************************************************************		
 	self.mrGbMS.ReverseRatio            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#ratio"), 1) 
-
+	self.mrGbMS.ManualClutchReverse   	= getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch")
+	if self.mrGbMS.ManualClutchReverse == nil then
+		-- unsupported parameter; but keep default handling for reverse#manualClutch
+		local f = getXMLFloat(xmlFile, xmlString .. ".reverse#clutchRatio")
+		if f ~= nil then
+			self.mrGbMS.ManualClutchReverse = f + 0.1 <= self.mrGbMS.MaxClutchPercent
+		elseif self.mrGbMS.ReverseOnlyStopped then
+			self.mrGbMS.ManualClutchReverse = true
+		elseif self.mrGbMS.AutoStartStop      then
+			self.mrGbMS.ManualClutchReverse = false 
+		elseif  self.mrGbMS.ManualClutchGear
+				and self.mrGbMS.ManualClutchHl 
+				and self.mrGbMS.ManualClutchRanges2 then
+			self.mrGbMS.ManualClutchReverse = true
+		else
+			self.mrGbMS.ManualClutchReverse = false
+			for _,attr in pairs({"Gears","Ranges","Ranges2"}) do
+				for _,g in pairs( self.mrGbMS[attr] ) do
+					if g.reverseOnly then
+						if     attr == "Gears"  then
+							self.mrGbMS.ManualClutchReverse = self.mrGbMS.ManualClutchGear 
+						elseif attr == "Ranges" then
+							self.mrGbMS.ManualClutchReverse = self.mrGbMS.ManualClutchHl 
+						else
+							self.mrGbMS.ManualClutchReverse = self.mrGbMS.ManualClutchRanges2 
+						end
+						break
+					end
+				end
+				if self.mrGbMS.ManualClutchReverse then
+					break
+				end
+			end
+		end
+	end
+	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
+	--**************************************************************************************************		
 	
 	local hasDefaultGear = true
 	self.mrGbMS.DefaultGear        = getXMLInt(xmlFile, xmlString .. ".gears#defaultGear")
@@ -3213,11 +3251,11 @@ function gearboxMogli:update(dt)
 			text = gearboxMogli.getText( "gearboxMogliTEXT_BRAKE", "handbrake" )
 		elseif self.mrGbMS.AutoHold and self:mrGbMGetAutoStartStop() then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_AUTO_HOLD", "auto hold" )
-		elseif self.mrGbML.gearShiftingNeeded == gearboxMogli.gearShiftingNoThrottle then
+		elseif self.mrGbMS.DoubleClutch == 3 then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_NT", "release throttle" )
 			text2 = text
-		elseif self.mrGbML.gearShiftingNeeded < 0 then
-			text = gearboxMogli.getText( "gearboxMogliTEXT_DC", "double clutch" ) .." "..tostring(-self.mrGbML.gearShiftingNeeded)
+		elseif self.mrGbMS.DoubleClutch >  0 then
+			text = gearboxMogli.getText( "gearboxMogliTEXT_DC", "double clutch" ) -- .." "..tostring(self.mrGbMS.DoubleClutch)
 			text2 = text
 		elseif self.mrGbMS.NeutralActive then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_NEUTRAL", "neutral" )
@@ -3900,7 +3938,15 @@ function gearboxMogli:update(dt)
 		self.motorSoundLoadMinimalVolumeFactor = math.max( self.mrGbMS.Sound.LoadMinimalVolumeFactor, ( self.motorSoundLoadFactor - 0.5 ) * self.sampleMotorLoad.volume )
 	else
 		self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
-	end			
+	end		
+
+	if     self.mrGbMS.DoubleClutch == 1 then
+		self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
+		self.motorSoundLoadFactor              = self.actualLoadPercentage
+	elseif self.mrGbMS.DoubleClutch == 2 and self.axisForward ~= nil then
+		self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, -self.axisForward * self.sampleMotorLoad.volume )
+		self.motorSoundLoadFactor              = self.actualLoadPercentage
+	end
 	
 	if      self.steeringEnabled 
 			and self.isServer 
