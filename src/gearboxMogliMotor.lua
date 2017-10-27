@@ -1795,10 +1795,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		getMaxPower = false
 	end
 	
-	if getMaxPower then
-		print("Missing torque")
-	end
-	
 	if      not ( getMaxPower or lastNoTransmission or lastNoTorque )
 			and self.currentSpeed < currentSpeedLimit - 1
 			and g_currentMission.time > self.lastClutchClosedTime + 1000 then

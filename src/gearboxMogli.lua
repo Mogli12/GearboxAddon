@@ -185,6 +185,8 @@ gearboxMogliGlobals.manual4wd             = true  -- diff lock
 gearboxMogliGlobals.maxDeltaAccPerMs      = 0.003 -- max delta for acceleration; it takes 333 ms from 0 to 1
 gearboxMogliGlobals.uiFixedRatioStep      = 2
 gearboxMogliGlobals.uiHandThrottleStep    = 50    -- 50 RPM step, little more to avoid runding problems
+gearboxMogliGlobals.clutchAxisOpen        = -0.9  -- clutch axis from value from -1 to -0.9 => clutch = 0
+gearboxMogliGlobals.clutchAxisClosed      =  0.9  -- clutch axis from value from 0.9 to 1   => clutch = 1
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -3406,10 +3408,27 @@ function gearboxMogli:update(dt)
 			if InputBinding.isAxisZero(targetClutchPercent) then
 				targetClutchPercent = InputBinding.getAnalogInputAxis(InputBinding.gearboxMogliCLUTCH)
 				if not InputBinding.isAxisZero(targetClutchPercent) then
-					targetClutchPercent = Utils.clamp( 0.55 * ( targetClutchPercent + 1 ), 0, 1 ) 
-					if math.abs( targetClutchPercent - self.mrGbMS.ManualClutch ) > 0.01 then
+					local c = 0
+					if self.mrGbMG.clutchAxisOpen < self.mrGbMG.clutchAxisClosed then
+						if     targetClutchPercent >= self.mrGbMG.clutchAxisClosed then
+							c = 1
+						elseif targetClutchPercent <= self.mrGbMG.clutchAxisOpen   then
+							c = 0
+						else
+							c = ( targetClutchPercent - self.mrGbMG.clutchAxisOpen ) / ( self.mrGbMG.clutchAxisClosed - self.mrGbMG.clutchAxisOpen )
+						end
+					else
+						if     targetClutchPercent <= self.mrGbMG.clutchAxisClosed then
+							c = 1
+						elseif targetClutchPercent >= self.mrGbMG.clutchAxisOpen   then
+							c = 0
+						else
+							c = ( targetClutchPercent - self.mrGbMG.clutchAxisOpen ) / ( self.mrGbMG.clutchAxisClosed - self.mrGbMG.clutchAxisOpen )
+						end
+					end
+					if math.abs( c - self.mrGbMS.ManualClutch ) > 0.01 then
 						self.mrGbML.oneButtonClutchTimer = math.huge
-						self:mrGbMSetManualClutch( targetClutchPercent ) 
+						self:mrGbMSetManualClutch( c ) 
 					end
 				end
 			elseif targetClutchPercent < 0 then

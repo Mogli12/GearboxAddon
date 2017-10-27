@@ -6344,6 +6344,132 @@
 		</gearboxMogli>			
 	</vehicle>
 	
+	<vehicle>FS17_FENDT_900_Favorit_Vario
+		<mod name="FS17_FENDT_900_Favorit_Vario">
+			<xmlFile name="fendt_900.xml"/>
+		</mod>
+	
+		<gearboxMogli ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="52" maxBackwardSpeed="38" maxAIGear="1">
+			<hydrostatic profile="Output" correctGearSpeed="true"/>		
+			<gears defaultGear="2" clutchRatio="1">	
+				<gear name="heavy duty" speed="32"/>
+				<gear name="transport"  speed="60"/>
+			</gears>
+
+			<differentials profile="torsen3"/>
+
+			<engines>
+				<engine name="916 Vario" idleRpm="850" ratedRpm="2200">
+					<!-- 2000: 198(198) | 2150: 180(180) | 1400..1400: 847(847) | 82 | 0 | 199 | 1.8 | 2200 | 1340: 194 -->
+					<torque rpm="350" motorTorque="433" fuelUsageRatio="223"/>
+					<torque rpm="700" motorTorque="645" fuelUsageRatio="206.1"/>
+					<torque rpm="900" motorTorque="741" fuelUsageRatio="199.7"/>
+					<torque rpm="1000" motorTorque="779" fuelUsageRatio="197.4"/>
+					<torque rpm="1100" motorTorque="809" fuelUsageRatio="195.7"/>
+					<torque rpm="1200" motorTorque="830" fuelUsageRatio="194.6"/>
+					<torque rpm="1300" motorTorque="843" fuelUsageRatio="194"/>
+					<torque rpm="1400" motorTorque="847" fuelUsageRatio="194.1"/>
+					<torque rpm="1500" motorTorque="843" fuelUsageRatio="194.8"/>
+					<torque rpm="1600" motorTorque="830" fuelUsageRatio="196.2"/>
+					<torque rpm="1700" motorTorque="809" fuelUsageRatio="198.3"/>
+					<torque rpm="1800" motorTorque="771" fuelUsageRatio="201"/>
+					<torque rpm="1850" motorTorque="750" fuelUsageRatio="202.5"/>
+					<torque rpm="1900" motorTorque="731" fuelUsageRatio="204.3"/>
+					<torque rpm="1950" motorTorque="713" fuelUsageRatio="206.2"/>
+					<torque rpm="2000" motorTorque="695" fuelUsageRatio="208.3"/>
+					<torque rpm="2050" motorTorque="671" fuelUsageRatio="210.6"/>
+					<torque rpm="2100" motorTorque="635" fuelUsageRatio="213"/>
+					<torque rpm="2150" motorTorque="588" fuelUsageRatio="215.6"/>
+					<torque rpm="2200" motorTorque="539" fuelUsageRatio="284.5"/>
+					<torque rpm="2250" motorTorque="418" fuelUsageRatio="375.6"/>
+					<torque rpm="2300" motorTorque="234" fuelUsageRatio="683.8"/>
+					<torque rpm="2350" motorTorque="0" fuelUsageRatio="0"/>
+				</engine>
+				
+				<engine name="920 Vario" idleRpm="850" ratedRpm="2200">
+					<!-- 2000: 220(220) | 2150: 210(210) | 1400..1400: 960(960) | 82 | 0.4 | 199 | 2 | 2200 | 1340: 194 -->
+					<torque rpm="350" motorTorque="491" fuelUsageRatio="223"/>
+					<torque rpm="700" motorTorque="731" fuelUsageRatio="206.1"/>
+					<torque rpm="900" motorTorque="840" fuelUsageRatio="199.7"/>
+					<torque rpm="1000" motorTorque="883" fuelUsageRatio="197.4"/>
+					<torque rpm="1100" motorTorque="917" fuelUsageRatio="195.7"/>
+					<torque rpm="1200" motorTorque="941" fuelUsageRatio="194.6"/>
+					<torque rpm="1300" motorTorque="955" fuelUsageRatio="194"/>
+					<torque rpm="1400" motorTorque="960" fuelUsageRatio="194.1"/>
+					<torque rpm="1500" motorTorque="944" fuelUsageRatio="194.8"/>
+					<torque rpm="1600" motorTorque="922" fuelUsageRatio="196.2"/>
+					<torque rpm="1700" motorTorque="894" fuelUsageRatio="198.3"/>
+					<torque rpm="1800" motorTorque="857" fuelUsageRatio="201"/>
+					<torque rpm="1850" motorTorque="834" fuelUsageRatio="202.5"/>
+					<torque rpm="1900" motorTorque="812" fuelUsageRatio="204.3"/>
+					<torque rpm="1950" motorTorque="792" fuelUsageRatio="206.2"/>
+					<torque rpm="2000" motorTorque="772" fuelUsageRatio="208.3"/>
+					<torque rpm="2050" motorTorque="750" fuelUsageRatio="210.6"/>
+					<torque rpm="2100" motorTorque="721" fuelUsageRatio="213"/>
+					<torque rpm="2150" motorTorque="686" fuelUsageRatio="215.6"/>
+					<torque rpm="2200" motorTorque="643" fuelUsageRatio="265.1"/>
+					<torque rpm="2250" motorTorque="513" fuelUsageRatio="339.9"/>
+					<torque rpm="2300" motorTorque="296" fuelUsageRatio="601.4"/>
+					<torque rpm="2350" motorTorque="0" fuelUsageRatio="0"/>
+				</engine>
+				
+				<engine name="924 Vario" idleRpm="850" ratedRpm="2200">
+					<!-- 2000: 253(253) | 2250: 240(240) | 1400..1400: 1045(1045) | 82 | 0 | 99 | 3 | 2300 | 1380: 194 -->
+					<torque rpm="350" motorTorque="535" fuelUsageRatio="221.2"/>
+					<torque rpm="700" motorTorque="796" fuelUsageRatio="205.9"/>
+					<torque rpm="900" motorTorque="914" fuelUsageRatio="199.9"/>
+					<torque rpm="1000" motorTorque="961" fuelUsageRatio="197.7"/>
+					<torque rpm="1100" motorTorque="998" fuelUsageRatio="196"/>
+					<torque rpm="1200" motorTorque="1024" fuelUsageRatio="194.8"/>
+					<torque rpm="1300" motorTorque="1040" fuelUsageRatio="194.2"/>
+					<torque rpm="1400" motorTorque="1045" fuelUsageRatio="194"/>
+					<torque rpm="1500" motorTorque="1041" fuelUsageRatio="194.4"/>
+					<torque rpm="1600" motorTorque="1028" fuelUsageRatio="195.4"/>
+					<torque rpm="1700" motorTorque="1006" fuelUsageRatio="196.9"/>
+					<torque rpm="1800" motorTorque="975" fuelUsageRatio="199"/>
+					<torque rpm="1850" motorTorque="957" fuelUsageRatio="200.3"/>
+					<torque rpm="1900" motorTorque="934" fuelUsageRatio="201.7"/>
+					<torque rpm="1950" motorTorque="911" fuelUsageRatio="203.3"/>
+					<torque rpm="2000" motorTorque="888" fuelUsageRatio="204.9"/>
+					<torque rpm="2050" motorTorque="865" fuelUsageRatio="206.8"/>
+					<torque rpm="2100" motorTorque="839" fuelUsageRatio="208.8"/>
+					<torque rpm="2150" motorTorque="811" fuelUsageRatio="210.9"/>
+					<torque rpm="2200" motorTorque="781" fuelUsageRatio="213.1"/>
+					<torque rpm="2250" motorTorque="749" fuelUsageRatio="215.6"/>
+					<torque rpm="2300" motorTorque="653" fuelUsageRatio="300"/>
+					<torque rpm="2350" motorTorque="0" fuelUsageRatio="0"/>
+				</engine>
+
+				<engine name="926 Vario" idleRpm="850" ratedRpm="2200">
+					<!-- 2000: 286(286) | 2250: 270(270) | 1400..1400: 1180(1180) | 82 | 0 | 99 | 3 | 2300 | 1380: 194 -->
+					<torque rpm="350" motorTorque="604" fuelUsageRatio="221.2"/>
+					<torque rpm="700" motorTorque="899" fuelUsageRatio="205.9"/>
+					<torque rpm="900" motorTorque="1033" fuelUsageRatio="199.9"/>
+					<torque rpm="1000" motorTorque="1086" fuelUsageRatio="197.7"/>
+					<torque rpm="1100" motorTorque="1127" fuelUsageRatio="196"/>
+					<torque rpm="1200" motorTorque="1156" fuelUsageRatio="194.8"/>
+					<torque rpm="1300" motorTorque="1174" fuelUsageRatio="194.2"/>
+					<torque rpm="1400" motorTorque="1180" fuelUsageRatio="194"/>
+					<torque rpm="1500" motorTorque="1175" fuelUsageRatio="194.4"/>
+					<torque rpm="1600" motorTorque="1160" fuelUsageRatio="195.4"/>
+					<torque rpm="1700" motorTorque="1136" fuelUsageRatio="196.9"/>
+					<torque rpm="1800" motorTorque="1102" fuelUsageRatio="199"/>
+					<torque rpm="1850" motorTorque="1081" fuelUsageRatio="200.3"/>
+					<torque rpm="1900" motorTorque="1056" fuelUsageRatio="201.7"/>
+					<torque rpm="1950" motorTorque="1029" fuelUsageRatio="203.3"/>
+					<torque rpm="2000" motorTorque="1004" fuelUsageRatio="204.9"/>
+					<torque rpm="2050" motorTorque="977" fuelUsageRatio="206.8"/>
+					<torque rpm="2100" motorTorque="948" fuelUsageRatio="208.8"/>
+					<torque rpm="2150" motorTorque="915" fuelUsageRatio="210.9"/>
+					<torque rpm="2200" motorTorque="880" fuelUsageRatio="213.1"/>
+					<torque rpm="2250" motorTorque="843" fuelUsageRatio="215.6"/>
+					<torque rpm="2300" motorTorque="734" fuelUsageRatio="301.4"/>
+					<torque rpm="2350" motorTorque="0" fuelUsageRatio="0"/>
+				</engine>
+			</engines>				
+		</gearboxMogli>			
+	</vehicle>
+	
 	<vehicle>FS17_jcbFastrac7000
 		<mod name="FS17_jcbFastrac7000">
 			<xmlFile name="jcbFastrac7000.xml"/>
