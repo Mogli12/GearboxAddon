@@ -447,7 +447,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
-		<gearboxMogli torqueConverter="true" clutchOpenRpm="1800" clutchCloseRpm="2100" clutchMaxTargetRpm="2600" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
+		<gearboxMogli torqueConverterProfile="oldCar" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true" reverseReset="true">
@@ -587,7 +587,7 @@
 	<vehicle>lizardPickupTT
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupTT.xml"/>
 		
-		<gearboxMogli clutchOpenRpm="1200" clutchCloseRpm="1600" torqueConverter="true" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
+		<gearboxMogli torqueConverterProfile="modernCar" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000" maxTargetRpm="5000">
 			<blowOffVentilSound volume="0"/>
 			
 			<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true" reverseReset="true">
@@ -600,6 +600,37 @@
 				<gear speed="250" forwardOnly="true" name="6"/>
 			</gears>
 			
+			<engines>
+				<engine idleRpm="800" ratedRpm="5000">
+					<!-- 5000: 200(200) | 5000: 200(200) | 2250..2500: 350(350) | 70 | 0.5 | 1499 | 1.7 | 5700 | 1200: 210 -->
+					<torque rpm="350" motorTorque="168" fuelUsageRatio="407.8"/>
+					<torque rpm="700" motorTorque="231" fuelUsageRatio="278.4"/>
+					<torque rpm="900" motorTorque="259" fuelUsageRatio="234.6"/>
+					<torque rpm="1100" motorTorque="284" fuelUsageRatio="212.7"/>
+					<torque rpm="1300" motorTorque="305" fuelUsageRatio="210"/>
+					<torque rpm="1500" motorTorque="322" fuelUsageRatio="210.4"/>
+					<torque rpm="1700" motorTorque="335" fuelUsageRatio="211"/>
+					<torque rpm="1850" motorTorque="342" fuelUsageRatio="211.8"/>
+					<torque rpm="2000" motorTorque="347" fuelUsageRatio="212.7"/>
+					<torque rpm="2250" motorTorque="350" fuelUsageRatio="214.6"/>
+					<torque rpm="2500" motorTorque="350" fuelUsageRatio="217"/>
+					<torque rpm="3000" motorTorque="342" fuelUsageRatio="223.5"/>
+					<torque rpm="3250" motorTorque="337" fuelUsageRatio="227.5"/>
+					<torque rpm="3500" motorTorque="331" fuelUsageRatio="232"/>
+					<torque rpm="3750" motorTorque="324" fuelUsageRatio="237"/>
+					<torque rpm="4000" motorTorque="317" fuelUsageRatio="242.6"/>
+					<torque rpm="4250" motorTorque="309" fuelUsageRatio="248.7"/>
+					<torque rpm="4500" motorTorque="300" fuelUsageRatio="255.2"/>
+					<torque rpm="4750" motorTorque="291" fuelUsageRatio="262.4"/>
+					<torque rpm="5000" motorTorque="281" fuelUsageRatio="270"/>
+					<torque rpm="5250" motorTorque="268" fuelUsageRatio="297.7"/>
+					<torque rpm="5500" motorTorque="237" fuelUsageRatio="351.3"/>
+					<torque rpm="5750" motorTorque="194" fuelUsageRatio="448.8"/>
+					<torque rpm="6000" motorTorque="140" fuelUsageRatio="651.3"/>
+					<torque rpm="6250" motorTorque="75" fuelUsageRatio="1270.3"/>
+					<torque rpm="6500" motorTorque="0" fuelUsageRatio="0"/>
+				</engine>
+			</engines>
 		</gearboxMogli>
 	</vehicle>
 	

@@ -94,7 +94,7 @@ gearboxMogli.motorBrakeTime       = 250
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.powerCurveFactor     = 0.95
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
-gearboxMogli.trustClutchRpmTimer  = 0
+gearboxMogli.trustClutchRpmTimer  = 50
 gearboxMogli.brakeForceLimitRpm   = 25
 
 gearboxMogli.enabledAtClient      = true
@@ -154,8 +154,8 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms
-gearboxMogliGlobals.DefaultRevUpMs1       = 4000  -- ms
+gearboxMogliGlobals.DefaultRevUpMs0       = 3000  -- ms
+gearboxMogliGlobals.DefaultRevUpMs1       = 4500  -- ms
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
@@ -774,7 +774,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end
 		end
 		
-		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3600
+		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3.6
 	end
 	
 	self.mrGbMS.ConfigId  = self.configurations.GearboxAddon
@@ -4488,7 +4488,7 @@ function gearboxMogli:draw()
 			end
 			if not self:mrGbMGetAutoClutch() then
 				ovRows = ovRows + 1 infos[ovRows] = "clutch"
-			elseif self.mrGbMD.Clutch < 200  then
+			elseif self.isMotorStarted and not self.mrGbMS.NeutralActive and self.mrGbMD.Clutch < 200 then
 				ovRows = ovRows + 1 infos[ovRows] = "clutch2"
 			end
 			if self.mrGbMG.debugPrint and self.isServer and self.mrGbMS.IsCombine and not ( self.mrIsMrVehicle ) then
@@ -7504,16 +7504,20 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		local c           = 0
 		
 		brakePedal = math.max( brakePedal, brakeForce )
-						
-		if     self.motor.clutchPercent < gearboxMogli.minClutchPercent then
-			c = 0
+			
+		if self.mrGbMS.TorqueConverter and self.mrGbMS.ManualClutch > 0.9 then
+			c = gearboxMogli.huge
 		else
 			local cp = self.motor.clutchPercent
 			if self.mrGbMS.TorqueConverter then
 				cp = self.mrGbMS.ManualClutch
 			end
 
-			c = self.mrGbMG.clutchFactor * self.motor.maxMotorTorque * ( ( 0.5 * ( 1 - math.cos( math.pi * cp )) ) ^ self.mrGbMG.clutchExp )
+			if cp < gearboxMogli.minClutchPercent then
+				c = 0
+			else
+				c = self.mrGbMG.clutchFactor * self.motor.maxMotorTorque * ( ( 0.5 * ( 1 - math.cos( math.pi * cp )) ) ^ self.mrGbMG.clutchExp )
+			end
 		end
 		
 		if self.mrGbMG.debugInfo then
