@@ -36,7 +36,7 @@ gearboxMogli.autoShiftMaxDeltaRpm = 1E-3
 gearboxMogli.minClutchPercent     = 0.01
 gearboxMogli.minClutchPercentStd  = 0.4
 gearboxMogli.minClutchPercentTC   = 0.2
-gearboxMogli.minClutchPercentTCL  = 0.2
+gearboxMogli.minClutchPercentTCL  = 0.3
 gearboxMogli.maxClutchPercentTC   = 0.96
 gearboxMogli.clutchLoopTimes      = 10
 gearboxMogli.clutchLoopDelta      = 10
@@ -154,8 +154,8 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 3000  -- ms
-gearboxMogliGlobals.DefaultRevUpMs1       = 4500  -- ms
+gearboxMogliGlobals.DefaultRevUpMs0       = 1500  -- ms
+gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
@@ -1076,6 +1076,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	
 	if torqueConverterProfile == "wheelLoader" then 
 		default = gearboxMogli.huge
+	elseif torqueConverterProfile == "oldCar" then 
+		default = 0.7 * self.mrGbMS.RatedRpm + 0.3 * self.mrGbMS.IdleRpm
+	elseif torqueConverterProfile == "modernCar" then 
+		default = 0.5 * self.mrGbMS.RatedRpm + 0.5 * self.mrGbMS.IdleRpm
 	else
 		default = math.max( 0.62 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm )
 		if self.mrGbMS.Engine.maxTorque > 0 then
@@ -1106,6 +1110,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if clutchEngagingTimeMs == nil then
 		if     hasHydrostat then
 			clutchEngagingTimeMs = 100
+		elseif torqueConverterProfile == "wheelLoader" then 
+			clutchEngagingTimeMs = 1000
+		elseif torqueConverterProfile == "oldCar" then 
+			clutchEngagingTimeMs = 2000
+		elseif torqueConverterProfile == "modernCar" then 
+			clutchEngagingTimeMs = 400
 		elseif self.mrGbMS.TorqueConverter then
 			clutchEngagingTimeMs = 400
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
@@ -1116,10 +1126,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 	local dft = self.mrGbMS.TransmissionEfficiency
-	if     torqueConverterProfile == "wheelLoader" then
-		dft = 0.85 * self.mrGbMS.TransmissionEfficiency 
-	elseif self.mrGbMS.TorqueConverter then
-		dft = 0.7  * self.mrGbMS.TransmissionEfficiency
+	if self.mrGbMS.TorqueConverter then
+		dft = math.min( 0.85, self.mrGbMS.TransmissionEfficiency )
 	end
 	self.mrGbMS.ClutchEfficiency    = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiency"), dft )
 	self.mrGbMS.ClutchEfficiencyInc = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#clutchEfficiencyInc"), 
@@ -1137,9 +1145,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueConverterLockupMs = 200
 		end		
 	
-		default = 2000
+		default = 5000
 		if torqueConverterProfile == "wheelLoader" then
-			default = 10000
+			default = 20000
 		end
 		self.mrGbMS.TorqueConverterTime    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"), default )
 		self.mrGbMS.TorqueConverterTimeInc = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTimeInc"), 0 )
@@ -7544,6 +7552,11 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end
 				
 		if self.isEntered and Vehicle.debugRendering then
+			local t
+			if self.motor.torqueMultiplication ~= nil and self.motor.torqueMultiplication > gearboxMogli.eps and self.motor.ratioFactorG ~= nil then
+				t = self.motor.ratioFactorG / self.motor.torqueMultiplication
+			end
+		
 			debugInfo = {}
 		--table.insert( debugInfo, { component1="motor", component2="idleThrottle",                        format="%3d%%", factor=100 } )
 			table.insert( debugInfo, { component1="motor", component2="lastThrottle",                        format="%3d%%", factor=100 } )
@@ -7558,11 +7571,11 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			table.insert( debugInfo, { component1="motor", component2="nonClampedMotorRpm",                  format="%4d" } )
 		--table.insert( debugInfo, { component1="motor", component2="lastRealMotorRpm",                    format="%4d" } )
 			table.insert( debugInfo, { component1="motor", component2="transmissionEfficiency",              format="%3d%%", factor=100 } )
+			table.insert( debugInfo, { component1="torque multiplication", value=t,                          format="%7.3f" } )
 			table.insert( debugInfo, { name="maxRpm",                   value=maxRpm,                        format="%6d" } )
 			table.insert( debugInfo, { name="motor:getCurMaxRpm(true)", value=self.motor:getCurMaxRpm(true), format="%6d" } )
 			table.insert( debugInfo, { component1="motor", component2="wheelSpeedRpm",                       format="%7.3f" } )
 			table.insert( debugInfo, { component1="motor", component2="gearRatio",                           format="%7.3f" } )
-			table.insert( debugInfo, { component1="motor", component2="ratioFactorG",                        format="%7.3f" } )
 			table.insert( debugInfo, { component1="motor", component2="ratioFactorR",                        format="%7.3f" } )
 			table.insert( debugInfo, { component1="motor", component2="hydrostaticFactor",                   format="%7.3f" } )
 			table.insert( debugInfo, { component1="mrGbML", component2="fuelUsageRaw",                       format="%7.3f" } )
