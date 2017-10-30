@@ -155,6 +155,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
 		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
 		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
+		<text name="gearboxMogliUNIT_tph"                text="t/h"/>tons per hour
 		
 	</texts>
 	

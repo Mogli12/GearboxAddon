@@ -4738,7 +4738,7 @@ function gearboxMogli:draw()
 						if col == 1 then
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_combine", "Combine"))
 						else
-							renderText(ovRight, drawY, deltaY, string.format("%3.0f t/h", self.mrGbMD.Rate ) )
+							renderText(ovRight, drawY, deltaY, string.format("%3.0f %s", self.mrGbMD.Rate, gearboxMogli.getText("gearboxMogliUNIT_tph", "t/h" )))
 						end
 					elseif info == "pto" then
 						if col == 1 then
@@ -5231,7 +5231,7 @@ function gearboxMogli:mrGbMGetRangeForNewGear( newGear )
 
 	newRange = gearboxMogli.adjustRangeToEntry( self, self.mrGbMS.Gears[newGear] )
 	
-	if      not self.mrGbMS.NeutralActive
+	if      not gearboxMogli.isReallyInNeutral( self )
 			and ( self:mrGbMGetAutoShiftRange()
 				 or ( self.mrGbMS.MatchRanges ~= nil
 					and self.mrGbMS.MatchRanges ~= "false"
@@ -5270,6 +5270,26 @@ function gearboxMogli:mrGbMGetRangeForNewGear( newGear )
 	
 	newRange = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges, self.mrGbMS.CurrentRange, newRange, "range" )
 	return newRange
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMSetCurrentGear
+--**********************************************************************************************************	
+function gearboxMogli:isReallyInNeutral()
+	
+	if     math.abs( self.lastSpeedReal ) > 0.0005 then
+		return false
+	elseif self.mrGbMS.G27Mode > 0 then
+		if self.mrGbMS.AutoHold then
+			return true
+		end
+	else
+		if self.mrGbMS.NeutralActive then
+			return true
+		end
+	end
+	
+	return false 
 end
 
 --**********************************************************************************************************	
@@ -5320,7 +5340,7 @@ function gearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 		
 		if      self.isServer 
 				and manual 
-				and self.mrGbMS.NeutralActive
+				and gearboxMogli.isReallyInNeutral( self )
 				then
 			if self.mrGbMS.ReverseActive then
 				self:mrGbMSetState( "ResetRevGear",   self.mrGbMS.CurrentGear,   noEventSend ) 
@@ -5353,7 +5373,7 @@ function gearboxMogli:mrGbMGetGearForNewRange( newRange )
 	
 	newGear = gearboxMogli.adjustGearToEntry( self, self.mrGbMS.Ranges[newRange] )
 	
-	if      not self.mrGbMS.NeutralActive
+	if      not gearboxMogli.isReallyInNeutral( self )
 			and ( self:mrGbMGetAutoShiftGears()
 				 or ( self.mrGbMS.MatchGears ~= nil
 					and self.mrGbMS.MatchGears ~= "false"
@@ -5442,7 +5462,7 @@ function gearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 
 		if      self.isServer 
 				and manual 
-				and self.mrGbMS.NeutralActive
+				and gearboxMogli.isReallyInNeutral( self )
 				then
 			if self.mrGbMS.ReverseActive then
 				self:mrGbMSetState( "ResetRevGear",   self.mrGbMS.CurrentGear,   noEventSend ) 
@@ -5492,7 +5512,7 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 		local newRange = self.mrGbMS.CurrentRange
 		local newGear  = self.mrGbMS.CurrentGear
 		
-	--if not self.mrGbMS.NeutralActive then
+	--if not gearboxMogli.isReallyInNeutral( self ) then
 	--	local speed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
 	--	local delta = nil
 	--	local fr    = gearboxMogliMotor.combineGear( self.motor, self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange )
@@ -5544,7 +5564,7 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 
 		if      self.isServer 
 				and manual 
-				and self.mrGbMS.NeutralActive
+				and gearboxMogli.isReallyInNeutral( self )
 				then
 			if self.mrGbMS.ReverseActive then
 				self:mrGbMSetState( "ResetRevGear",   self.mrGbMS.CurrentGear,   noEventSend ) 

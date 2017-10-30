@@ -148,12 +148,13 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
 		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
 		
-		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
-		<text name="gearboxMogliUNIT_HP"                 text="HP"/>		
-		<text name="gearboxMogliUNIT_kph"                text="kph"/>		
-		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
-		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
-		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
+		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>rounds per minute		
+		<text name="gearboxMogliUNIT_HP"                 text="HP"/> horse power
+		<text name="gearboxMogliUNIT_kph"                text="kph"/>kilometers per hour		
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>miles per hour
+		<text name="gearboxMogliUNIT_lph"                text="l/h"/>litres per hour
+		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>litres per 100 km
+		<text name="gearboxMogliUNIT_tph"                text="t/h"/>tons per hour
 	</texts>
 	
 	<longTexts>
