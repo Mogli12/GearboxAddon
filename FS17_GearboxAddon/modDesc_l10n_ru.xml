@@ -23,7 +23,7 @@
 		<text name="input_gearboxMogliOFF"                 text="Ручная КПП [Выкл]"/>
 		<text name="input_gearboxMogliON"                  text="Ручная КПП [Вкл]"/>
 		<text name="input_gearboxMogliON_OFF"              text="Gearbox: ВКЛ/ВЫКЛ"/>
-		<text name="input_gearboxMogliSETTINGS"            text="Gearbox: Настройки"/>
+		<text name="input_gearboxMogliSETTINGS"            text="Gearbox: Настройки Gearbox"/>
 		<text name="input_gearboxMogliHUD"                 text="Gearbox: HUD Вкл/Выкл"/>
 		<text name="input_gearboxMogliAllAuto"             text="Gearbox: Реальное переключение"/>
 		<text name="input_gearboxMogliAllAutoON"           text="Gearbox [упрощенная]"/>
@@ -60,8 +60,8 @@
 		<text name="input_gearboxMogliKEEPSPEED"           text="Gearbox: Задать скорость удержания"/>
 		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"     text="Gearbox: Вкл. удержание скорости"/>
 		<text name="input_gearboxMogliDIFFLOCKMIDDLE"      text="Gearbox: Тип привода"/>
-		<text name="input_gearboxMogliDIFFLOCKFRONT"       text="Gearbox: Блокировка переднего диффер."/>
-		<text name="input_gearboxMogliDIFFLOCKBACK"        text="Gearbox: Блокировка заднего диффер."/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"       text="Gearbox: Блокировать передний диффер."/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"        text="Gearbox: Блокировать задний дифферен."/>
 		
 		<text name="gearboxMogliTEXT_OFF"                  text="STOP"/>
 		<text name="gearboxMogliTEXT_AI"                   text="Наймит"/>
@@ -121,14 +121,14 @@
 		
 		<text name="tooltip_gearboxMogliSPEEDLIMIT"         text="Это будет подказка"/>
 				
-		<text name="gearboxMogliTEXT_Settings"             text="Настройки GearBox"/>
+		<text name="gearboxMogliTEXT_Settings"             text="Настройки"/>
 		<text name="gearboxMogliTEXT_Help_1"               text="Справка 1"/>
 		<text name="gearboxMogliTEXT_Inputs"               text="Сочетание клавиш"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"         text="Нельзя переключить передачу: обороты"/>
-		<text name="gearboxMogliTEXT_Stall1"               text="Обороты слишком низкие"/>
+		<text name="gearboxMogliTEXT_Stall1"               text="Слишком низкие обороты"/>
 		<text name="gearboxMogliTEXT_Stall2"               text="Мотор заглох, потому что обороты были очень низкими"/>
 		<text name="gearboxMogliTEXT_Stall3"               text="Слишком много мощности отбирается через ВОМ"/>
 		<text name="gearboxMogliTEXT_Stall4"               text="Мотор заглох, потому что слишком много мощности отбиралось через ВОМ"/>
@@ -147,15 +147,16 @@
 		<text name="gearboxMogliDRAW_autoClutch"           text="Автосцепление"/>
 		<text name="gearboxMogliDRAW_hand"                 text="Ручной газ"/>
 		<text name="gearboxMogliDRAW_fixed"                text="Фикс.коэфф."/>
-		<text name="gearboxMogliDRAW_combine"              text="Комбайн"/>
+		<text name="gearboxMogliDRAW_combine"              text="Производительн."/>
 		<text name="gearboxMogliDRAW_wheelSlip"            text="Скольжение колёс"/>
 		
-		<text name="gearboxMogliUNIT_rpm"                  text="об."/>		
-		<text name="gearboxMogliUNIT_HP"                   text="л.с."/>		
-		<text name="gearboxMogliUNIT_kph"                  text="км/ч"/>		
-		<text name="gearboxMogliUNIT_mph"                  text="миль/ч"/>		
-		<text name="gearboxMogliUNIT_lph"                  text="л/ч"/>		
-		<text name="gearboxMogliUNIT_lp100km"              text="л/100км"/>		
+		<text name="gearboxMogliUNIT_rpm"                  text="об."/>
+		<text name="gearboxMogliUNIT_HP"                   text="л.с."/>
+		<text name="gearboxMogliUNIT_kph"                  text="км/ч"/>
+		<text name="gearboxMogliUNIT_mph"                  text="миль/ч"/>
+		<text name="gearboxMogliUNIT_lph"                  text="л/ч"/>
+		<text name="gearboxMogliUNIT_lp100km"              text="л/100км"/>
+		<text name="gearboxMogliUNIT_tph"                  text="т/ч"/>
 	</texts>
 	
 	
@@ -171,5 +172,4 @@
 Все эти бесступенчатые передачи имеют одну общую черту: эффективность сильно варьируется в зависимости от передаточного отношения.]]></longText>
 	</longTexts>
 	
-</l10n>
 </l10n>
