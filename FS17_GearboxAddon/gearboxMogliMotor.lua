@@ -801,7 +801,12 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 					 or self.vehicle.mrGbMS.CurrentGearSpeed >= self.vehicle.mrGbMS.AutoMaxGearSpeed - gearboxMogli.eps ) then
 			limitA = math.min( limitA, self:getThrottleMaxRpm( accL / self.vehicle.mrGbMS.MaxRpmThrottle ) )
 		end
-		limitA = math.max( limitA, self.minRequiredRpm )
+		if self.vehicle.mrGbMS.EcoMode and limitA > self.vehicle.mrGbMS.MaxTargetRpm then
+			limitA = self.vehicle.mrGbMS.MaxTargetRpm 
+		end
+		if limitA < self.minRequiredRpm then
+			limitA = self.minRequiredRpm
+		end
 	end
 	
 	if not ( self.vehicle.mrGbMS.Hydrostatic ) then
@@ -866,7 +871,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			local p1 = rpm * ( self.lastMotorTorque - self.ptoMotorTorque )
 			local p0 = 0
 			if self.vehicle.mrGbMS.EcoMode then
-				p0 = self.currentMaxPower
+				p0 = math.min( self.currentMaxPower, 0.9 * self.maxPower )
 			else
 				p0 = self.maxPower
 			end
@@ -886,6 +891,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			if self.vehicle.mrGbMG.debugInfo then
 				self.vehicle.mrGbML.accDebugInfo = string.format( "%3.0f%%, %7.3f %7.3f => %3.0f%%", old*100, p0, p1, acc*100 )
 			end
+		elseif self.vehicle.mrGbMS.EcoMode then
+			acc = acc * 0.9
 		end		
 		
 		torque = torque * acc		
@@ -1993,7 +2000,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	self.minRequiredRpm = self.minRequiredRpm + Utils.clamp( targetRequiredRpm - self.minRequiredRpm, 
 																													-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, 
-																													 self.tickDt * self.vehicle.mrGbMS.RpmIncFactorFull )
+																													 self.tickDt * self.vehicle.mrGbMS.RpmIncFactor )
 	minRpmReduced       = math.min( minRpmReduced, self.minRequiredRpm )
 	
 	if ptoToolOn then
