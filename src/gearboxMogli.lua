@@ -154,10 +154,11 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 1500  -- ms
-gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms
-gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms
-gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms
+gearboxMogliGlobals.DefaultRevUpMs0       = 1500  -- ms time between idle and rated RPM w/o load
+gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms time between idle and rated RPM with full load
+gearboxMogliGlobals.DefaultRevUpMsH       = 3000  -- ms time between idle and rated RPM with full load (hydrostat)
+gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms time between idle and rated RPM in neutral 
+gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms time between rated and idle RPM
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
 gearboxMogliGlobals.hydroMaxTorqueInput   = 0 -- 2
@@ -1228,7 +1229,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 
 	local revUpMs0                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMs"),  self.mrGbMG.DefaultRevUpMs0 ) 
 	local f                             = revUpMs0 /  math.max(1,self.mrGbMG.DefaultRevUpMs0)
-	local revUpMs1                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMsFullLoad"), self.mrGbMG.DefaultRevUpMs1 * f ) 
+	local revUpMs1 = gearboxMogli.getNoNil2( getXMLFloat(xmlFile, xmlString .. "#revUpMsFullLoad"), self.mrGbMG.DefaultRevUpMs1 * f, self.mrGbMG.DefaultRevUpMsH * f, hasHydrostat )
 	local revUpMs2                      = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revUpMsNeutral"),  self.mrGbMG.DefaultRevUpMs2 * f ) 
 	local revDownMs                     = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#revDownMs"), self.mrGbMG.DefaultRevDownMs * f ) 
 	self.mrGbMS.RpmIncFactor            = ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) / math.max( 10, revUpMs0 )
@@ -3234,9 +3235,7 @@ function gearboxMogli:update(dt)
 			isRev = true
 		end
 		
-		if not ( self.isMotorStarted ) then
-			text = gearboxMogli.getText( "gearboxMogliTEXT_OFF", "off" )
-		elseif self.cp ~= nil and self.cp.isDriving then
+		if      self.cp ~= nil and self.cp.isDriving then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_CP", "courseplay" )
 			text2 = text
 			if not self:mrGbMGetAutomatic() and not ( self.mrGbMS.Hydrostatic ) then
@@ -3248,11 +3247,18 @@ function gearboxMogli:update(dt)
 			if not self:mrGbMGetAutomatic() and not ( self.mrGbMS.Hydrostatic ) then
 				text = text .." (M)"
 			end
-		elseif self.mrGbMS.AllAuto then
+		elseif self.isMotorStarted and self.mrGbMS.AllAuto then
 			text = gearboxMogli.getText( "gearboxMogliTEXT_ALLAUTO", "all auto" )
 			if     isRev then
 			-- see below
 			elseif self.mrGbMS.Handbrake then
+				text = text.." (P)"
+			elseif self.mrGbMS.NeutralActive then
+				text = text.." (N)"
+			end
+		elseif not ( self.isMotorStarted ) then
+			text = gearboxMogli.getText( "gearboxMogliTEXT_OFF", "off" )
+			if self.mrGbMS.Handbrake then
 				text = text.." (P)"
 			elseif self.mrGbMS.NeutralActive then
 				text = text.." (N)"
@@ -3362,7 +3368,7 @@ function gearboxMogli:update(dt)
 		end
 
 		if self.mrGbMS.AllAuto then
-			self:mrGbMSetState( "Handbrake", false )		
+			self:mrGbMSetState( "Handbrake", self.isMotorStarted )		
 		end
 		
 		if not self.mrGbMS.Handbrake then
@@ -3552,7 +3558,7 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetState( "EcoMode", not self.mrGbMS.EcoMode )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
 			if self.mrGbMS.Handbrake then
-				self:mrGbMSetState( "Handbrake", false )		
+				self:mrGbMSetState( "Handbrake", false )
 			else
 				self:mrGbMSetState( "Handbrake", true )		
 			end
@@ -3802,7 +3808,7 @@ function gearboxMogli:update(dt)
 				and g_gui:getIsGuiVisible() 
 				and g_gui.currentGuiName ~= "ChatDialog" 
 				and self:mrGbMGetCurrentRPM() <= 1.1 * self.mrGbMS.IdleRpm then
-			if self:mrGbMGetAutoStartStop() then
+			if self:mrGbMGetAutoHold() then
 				self:mrGbMSetNeutralActive( true, false, true ) 
 				self:mrGbMSetState( "AutoHold", true )
 			elseif not ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch ) then
@@ -3977,78 +3983,78 @@ function gearboxMogli:update(dt)
 	
 	if      self.steeringEnabled 
 			and self.isServer 
-			and self.isMotorStarted
 			and not ( self.isEntered or self.isControlled ) then
-	
+		if self.isMotorStarted then
+
 --**********************************************************************************************************			
 -- drive control parallel mode
 --**********************************************************************************************************			
-		if      self.dCcheckModule                  ~= nil
-				and self.driveControl                   ~= nil
-				and self:dCcheckModule("cruiseControl")  
-				and self.driveControl.cruiseControl     ~= nil
-			--and g_currentMission.controlledVehicle  ~= self 
-				and self.cruiseControl.state             > 0 then
-				
-			local rootVehicle = self:getRootAttacherVehicle()
-				
-			if self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_FULL then
-				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
-				if trailerFillLevel~= nil and trailerCapacity~= nil then
-					if trailerFillLevel >= trailerCapacity then
+			if      self.dCcheckModule                  ~= nil
+					and self.driveControl                   ~= nil
+					and self:dCcheckModule("cruiseControl")  
+					and self.driveControl.cruiseControl     ~= nil
+				--and g_currentMission.controlledVehicle  ~= self 
+					and self.cruiseControl.state             > 0 then
+					
+				local rootVehicle = self:getRootAttacherVehicle()
+					
+				if self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_FULL then
+					local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
+					if trailerFillLevel~= nil and trailerCapacity~= nil then
+						if trailerFillLevel >= trailerCapacity then
+							self:setCruiseControlState(0)
+						end
+					end
+					self.driveControl.cruiseControl.refVehicle = nil
+				elseif self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_EMPTY then
+					local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
+					if trailerFillLevel~= nil and trailerCapacity~= nil then
+						if trailerFillLevel <= 0 then
+							self:setCruiseControlState(0)
+						end
+					end
+					self.driveControl.cruiseControl.refVehicle = nil
+				elseif  self.driveControl.cruiseControl.mode                == self.driveControl.cruiseControl.MODE_PARALLEL
+						and self.driveControl.cruiseControl.refVehicle          ~= nil
+						and self.driveControl.cruiseControl.refVehicle.rootNode ~= nil then
+					local dx, _, dz = localDirectionToWorld(rootVehicle.rootNode, 0, 0, 1)
+					local sdx, _, sdz = localDirectionToWorld(self.driveControl.cruiseControl.refVehicle.rootNode, 0, 0, 1)
+												
+					local diffAngle = (dx*sdx + dz*sdz)/(math.sqrt(dx^2+dz^2)*math.sqrt(sdx^2+sdz^2))
+					diffAngle = math.acos(diffAngle)
+					
+					if diffAngle > math.rad(20) then
 						self:setCruiseControlState(0)
-					end
-				end
-				self.driveControl.cruiseControl.refVehicle = nil
-			elseif self.driveControl.cruiseControl.mode == self.driveControl.cruiseControl.MODE_STOP_EMPTY then
-				local trailerFillLevel, trailerCapacity = rootVehicle:getAttachedTrailersFillLevelAndCapacity()
-				if trailerFillLevel~= nil and trailerCapacity~= nil then
-					if trailerFillLevel <= 0 then
-						self:setCruiseControlState(0)
-					end
-				end
-				self.driveControl.cruiseControl.refVehicle = nil
-			elseif  self.driveControl.cruiseControl.mode                == self.driveControl.cruiseControl.MODE_PARALLEL
-					and self.driveControl.cruiseControl.refVehicle          ~= nil
-					and self.driveControl.cruiseControl.refVehicle.rootNode ~= nil then
-				local dx, _, dz = localDirectionToWorld(rootVehicle.rootNode, 0, 0, 1)
-				local sdx, _, sdz = localDirectionToWorld(self.driveControl.cruiseControl.refVehicle.rootNode, 0, 0, 1)
-											
-				local diffAngle = (dx*sdx + dz*sdz)/(math.sqrt(dx^2+dz^2)*math.sqrt(sdx^2+sdz^2))
-				diffAngle = math.acos(diffAngle)
-				
-				if diffAngle > math.rad(20) then
-					self:setCruiseControlState(0)
-				else				
-					self:setCruiseControlMaxSpeed(self.driveControl.cruiseControl.refVehicle.lastSpeed*3600/math.cos(diffAngle))
-					self.cruiseControl.wasSpeedChanged = true
-					self.cruiseControl.changeCurrentDelay = 0
+					else				
+						self:setCruiseControlMaxSpeed(self.driveControl.cruiseControl.refVehicle.lastSpeed*3600/math.cos(diffAngle))
+						self.cruiseControl.wasSpeedChanged = true
+						self.cruiseControl.changeCurrentDelay = 0
 
-					if g_server ~= nil then
-						g_server:broadcastEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed), nil, nil, self)
-					else
-						g_client:getServerConnection():sendEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed))
-					end
+						if g_server ~= nil then
+							g_server:broadcastEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed), nil, nil, self)
+						else
+							g_client:getServerConnection():sendEvent(SetCruiseControlSpeedEvent:new(self, self.cruiseControl.speed))
+						end
 
-					self.cruiseControl.speedSent = self.cruiseControl.speed
+						self.cruiseControl.speedSent = self.cruiseControl.speed
+					end
 				end
 			end
-		end
 
 --**********************************************************************************************************			
 -- keep on going if not entered 
 --**********************************************************************************************************		
-		if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE then
-			Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
-		elseif  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm then
-			if self.mrGbMS.AutoHold then
-				Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
-			else
+			if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE then
 				Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
+			elseif  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm then
+				if self.mrGbMS.AutoHold then
+					Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
+				else
+					Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
+				end
 			end
 		end
-	end		
-
+	end
 end 
 
 --**********************************************************************************************************	
@@ -4099,7 +4105,7 @@ function gearboxMogli:onLeave()
 
 	if      self.steeringEnabled 
 			and self.mrGbMS.IsOn 
-			and self.isMotorStarted
+		--and self.isMotorStarted
 			and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE
 			and not self.isHired then
 		if self:mrGbMGetAutoStartStop() then 
@@ -6782,6 +6788,8 @@ end
 function gearboxMogli:mrGbMGetAutoHold( )
 	if not ( self.steeringEnabled ) then
 		return false
+	elseif self.forceIsActive then
+		return false
 	elseif self:mrGbMGetAutoStartStop() then
 		return true
 	end
@@ -7218,7 +7226,7 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 			gearboxMogliMotor.copyRuntimeValues( self.mrGbMB.motor, self.mrGbML.motor )
 			self.motor = self.mrGbML.motor
 		end
-		if self:mrGbMGetAutoStartStop() then
+		if self:mrGbMGetAutoHold() then
 			self:mrGbMSetNeutralActive( true, noEventSend, true ) 
 			self:mrGbMSetState( "AutoHold", true, noEventSend ) 
 		end
@@ -7308,12 +7316,14 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
 	end
 	
---if self.steeringEnabled and self.isReverseDriving  then
---	acc = -acc
---end
-	
-	-- self.doHandbrake is set to false if a dialog is shown
-	if self.mrGbMS.Handbrake and self.steeringEnabled and self.isControlled then
+	if     self.isHired then
+	elseif self.forceIsActive then
+		doHandbrake = false
+	elseif self.mrGbMS.Handbrake then
+		doHandbrake = true
+	elseif self.mrGbMS.AutoHold
+			or not ( self.isMotorStarted ) 
+		  or g_currentMission.time < self.motorStartTime then
 		doHandbrake = true
 	end
 	
@@ -7484,7 +7494,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	local lastRotatedTime = self.mrGbML.lastRotatedTime
 	self.mrGbML.lastRotatedTime = nil
 	
-	if     doHandbrake or self.mrGbMS.AutoHold or not ( self.isMotorStarted ) or g_currentMission.time < self.motorStartTime then
+	if     doHandbrake then
 		-- hand brake
 		if self.articulatedAxis ~= nil then
 			if lastRotatedTime == nil then
@@ -7499,6 +7509,9 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	elseif acceleration < 0 then
 		-- braking 
 		brakePedal   = -acceleration
+	elseif not ( self.isMotorStarted ) 
+			or g_currentMission.time < self.motorStartTime then
+		accelerationPedal = 0
 	elseif self.mrGbMS.ReverseActive then
 		-- reverse 
 		accelerationPedal = -acceleration
@@ -7508,7 +7521,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end
 	
 	
-	if      ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
+	if      self.isMotorStarted
+			and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
 			and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1
 			and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
 				 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
@@ -7541,6 +7555,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	 
 	self.mrGbML.lastAcceleration  = acceleration
 	self.mrGbML.lastBrakePedal    = brakePedal 
+	self.mrGbML.lastDoHandbrake   = doHandbrake 
 
 	
 	if next(self.differentials) ~= nil and self.motorizedNode ~= nil then

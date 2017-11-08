@@ -1797,18 +1797,17 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	self.lastThrottle = math.max( 0, accelerationPedal )
 	
 	-- acceleration pedal and speed limit
-	local currentSpeedLimit = self.currentSpeedLimit
+	local currentSpeedLimit = self.currentSpeedLimit + gearboxMogli.extraSpeedLimitMs
 	if self.vehicle.mrGbML.hydroTargetSpeed ~= nil and currentSpeedLimit > self.vehicle.mrGbML.hydroTargetSpeed then
 		currentSpeedLimit = self.vehicle.mrGbML.hydroTargetSpeed
-	end
-	if not self.vehicle.mrGbMS.Hydrostatic then
-		currentSpeedLimit = currentSpeedLimit + gearboxMogli.extraSpeedLimitMs
 	end
 	
 	if self.ptoSpeedLimit ~= nil and currentSpeedLimit > self.ptoSpeedLimit then
 		currentSpeedLimit = self.ptoSpeedLimit
 	end
-		
+	currentSpeedLimitR  = math.min( self.currentSpeedLimit, math.max( currentSpeedLimit - gearboxMogli.kmhTOms, currentSpeedLimit * 0.95 ) )
+	currentSpeedLimitD1 = 1 / ( currentSpeedLimit - currentSpeedLimitR )
+	
 	local prevWheelSpeedRpm = self.absWheelSpeedRpm
 	self.absWheelSpeedRpm = self.wheelSpeedRpm
 	if self.vehicle.mrGbMS.ReverseActive then 
@@ -1827,7 +1826,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 	
 	if      not ( getMaxPower or lastNoTransmission or lastNoTorque )
-			and self.currentSpeed < currentSpeedLimit - 1
+			and self.currentSpeed     < currentSpeedLimitR
 			and g_currentMission.time > self.lastClutchClosedTime + 1000 then
 		if      self.deltaRpm       < gearboxMogli.autoShiftMaxDeltaRpm 
 				and accelerationPedal   > 0.9 
@@ -2011,10 +2010,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	local rp = ( self.ptoMotorTorque + self.lastMissingTorque ) * math.max( self.prevNonClampedMotorRpm, self.vehicle.mrGbMS.IdleRpm )
 	
-	if self.currentSpeed < currentSpeedLimit - 1 then
+	if self.currentSpeed < currentSpeedLimitR then
 		rp = math.max( rp, self.lastThrottle * self.currentMaxPower )
 	elseif self.currentSpeed < currentSpeedLimit then
-		rp = math.max( rp, math.min( currentSpeedLimit - self.currentSpeed, self.lastThrottle ) * self.currentMaxPower )
+		rp = math.max( rp, math.min( currentSpeedLimitD1 * ( currentSpeedLimit - self.currentSpeed ), self.lastThrottle ) * self.currentMaxPower )
 	end
 	
 	if     getMaxPower then
@@ -2121,7 +2120,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		elseif accelerationPedal < -gearboxMogli.accDeadZone then
 		-- motor brake
 			targetRpm = self.vehicle.mrGbMS.IdleRpm - 2 * ( accelerationPedal + gearboxMogli.accDeadZone ) * ( self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm )
-		elseif getMaxPower or requestedPower > self.currentMaxPower * 0.99 then
+		elseif getMaxPower or requestedPower > 0.99 * currentPower then -- self.currentMaxPower * 0.99 then
 			targetRpm = self.maxMaxPowerRpm
 		else
 			local r = self.currentPowerCurve:get( requestedPower )
