@@ -161,12 +161,17 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			if self.movingDirection <= 0 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) then
 				self.tempomatMogliV22.keepSpeedLimit = nil		
 			elseif self.tempomatMogliV22.KeepSpeed
-					and ( math.abs( self.lastSpeedReal*3600 ) > 2 
+					and ( ( self.axisForward <= 0.2 and self.tempomatMogliV22.keepSpeedLimit ~= nil and self.tempomatMogliV22.keepSpeedLimit > 1 )
+						 or math.abs( self.lastSpeedReal*3600 ) > 4
 						 or self.axisForward <= -0.2
 					   or not self.tempomatMogliV22.KeepSpeedToggle ) then
-				if      self.tempomatMogliV22.keepSpeedLimit == nil then
+				if self.tempomatMogliV22.keepSpeedLimit == nil then
 					self.tempomatMogliV22.lastAxisFoward = 0
-					self.tempomatMogliV22.keepSpeedLimit = math.max( self.lastSpeedReal*3600, tempomatMogli.getMinSpeed( self, true ) )
+					if self.cruiseControl ~= nil and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE then
+						self.tempomatMogliV22.keepSpeedLimit = math.max( self.cruiseControl.speed, tempomatMogli.getMinSpeed( self, true ) )
+					else
+						self.tempomatMogliV22.keepSpeedLimit = math.max( self.lastSpeedReal*3600, tempomatMogli.getMinSpeed( self, true ) )
+					end
 				end
 			elseif self.tempomatMogliV22.keepSpeedLimit ~= nil then
 				self.tempomatMogliV22.keepSpeedLimit = nil		

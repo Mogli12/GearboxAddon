@@ -55,8 +55,8 @@ gearboxMogli.smoothLittle         = 0.2
 gearboxMogli.smoothFast           = 0.12
 gearboxMogli.smoothMedium         = 0.04
 gearboxMogli.smoothSlow           = 0.01
-gearboxMogli.hydroEffDiff         = 500
-gearboxMogli.hydroEffDiffInc      = 0 --150
+gearboxMogli.hydroEffDiff         = 0
+gearboxMogli.hydroEffDiffInc      = 50
 gearboxMogli.hydroEffMin          = 0.5
 gearboxMogli.ptoRpmHydroDiff      = 25
 gearboxMogli.ptoRpmThrottleDiff   = 50
@@ -92,7 +92,6 @@ gearboxMogli.speedLimitMode       = "B" -- "T"orque limit only / "M"ax RPM only 
 gearboxMogli.speedLimitRpmDiff    = 10
 gearboxMogli.motorBrakeTime       = 250     
 gearboxMogli.motorLoadExp         = 1.5
-gearboxMogli.powerCurveFactor     = 0.95
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
 gearboxMogli.brakeForceLimitRpm   = 25
@@ -156,7 +155,7 @@ gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
 gearboxMogliGlobals.DefaultRevUpMs0       = 1500  -- ms time between idle and rated RPM w/o load
 gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms time between idle and rated RPM with full load
-gearboxMogliGlobals.DefaultRevUpMsH       = 3000  -- ms time between idle and rated RPM with full load (hydrostat)
+gearboxMogliGlobals.DefaultRevUpMsH       = 30000 -- ms time between idle and rated RPM with full load (hydrostat)
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms time between idle and rated RPM in neutral 
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms time between rated and idle RPM
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
@@ -634,6 +633,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	local torqueF = nil
 	local torqueP = 0
 	local realEngineBaseKey = nil
+	local minTgtDft = 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm -- ~1330 RPM if rated = 2100
 	
 	if xmlMotor ~= nil then
 		for i=1,3 do
@@ -767,7 +767,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#minRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 			self.mrGbMS.CurMaxRpm = self.mrGbMS.Engine.maxRpm + gearboxMogli.rpmPlus
 			if self.mrGbMS.MinTargetRpm == nil then
-				self.mrGbMS.MinTargetRpm = self.mrGbMS.Engine.maxTorqueRpm * gearboxMogli.rpmReduction
+				self.mrGbMS.MinTargetRpm = math.max( self.mrGbMS.Engine.maxTorqueRpm * gearboxMogli.rpmReduction, minTgtDft )
 			end
 			local m = getXMLFloat(xmlFile, realEngineBaseKey.."#maxRpm")
 			if m ~= nil then
@@ -804,7 +804,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 	if self.mrGbMS.MinTargetRpm == nil then
-		self.mrGbMS.MinTargetRpm = 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm 
+		self.mrGbMS.MinTargetRpm = minTgtDft
 	end
 	if self.mrGbMS.MaxTargetRpm == nil then
 		self.mrGbMS.MaxTargetRpm = 0.5 * ( self.mrGbMS.RatedRpm + math.max( self.mrGbMS.RatedRpm, self.mrGbMS.CurMaxRpm - gearboxMogli.rpmPlus ) )
@@ -3368,7 +3368,7 @@ function gearboxMogli:update(dt)
 		end
 
 		if self.mrGbMS.AllAuto then
-			self:mrGbMSetState( "Handbrake", self.isMotorStarted )		
+			self:mrGbMSetState( "Handbrake", not self.isMotorStarted )		
 		end
 		
 		if not self.mrGbMS.Handbrake then
@@ -3557,11 +3557,7 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliECO" ) then
 			self:mrGbMSetState( "EcoMode", not self.mrGbMS.EcoMode )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
-			if self.mrGbMS.Handbrake then
-				self:mrGbMSetState( "Handbrake", false )
-			else
-				self:mrGbMSetState( "Handbrake", true )		
-			end
+			self:mrGbMSetState( "Handbrake", not self.mrGbMS.Handbrake )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHUD" ) then
 			-- HUD mode	
 		--local m = self.mrGbMS.HudMode + 1
@@ -6488,8 +6484,7 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 		--	self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
 		--end
 			self.motor.ratioFactorR       = nil
-			self.motor.torqueRpmReference = nil
-			self.motor.torqueRpmReduction = nil
+			self.motor.torqueRpmReduxMode = nil
 		else
 			self.mrGbML.afterShiftClutch  = nil
 			self.mrGbML.beforeShiftRpm    = nil
@@ -7317,10 +7312,10 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end
 	
 	if     self.isHired then
-	elseif self.forceIsActive then
-		doHandbrake = false
 	elseif self.mrGbMS.Handbrake then
 		doHandbrake = true
+	elseif self.forceIsActive then
+		doHandbrake = false
 	elseif self.mrGbMS.AutoHold
 			or not ( self.isMotorStarted ) 
 		  or g_currentMission.time < self.motorStartTime then
