@@ -50,7 +50,7 @@ gearboxMogli.maxRatioFactorR      = gearboxMogli.huge -- 2000                   
 gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 gearboxMogli.rpmReduction         = 0.925 -- 7.5% --0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
-gearboxMogli.maxMaxPowerRatio     = 0.8  -- RPM where shift to maxMaxPowerRpm starts
+gearboxMogli.maxMaxPowerRatio     = 1.0  -- RPM where shift to maxMaxPowerRpm starts
 gearboxMogli.smoothLittle         = 0.2
 gearboxMogli.smoothFast           = 0.12
 gearboxMogli.smoothMedium         = 0.04
