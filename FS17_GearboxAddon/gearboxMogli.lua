@@ -6440,7 +6440,11 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 				or self.mrGbMS.Ranges        == nil
 				or self.mrGbMS.CurrentRange  == nil
 				or self.mrGbMS.Ranges2       == nil 
-				or self.mrGbMS.CurrentRange2 == nil then
+				or self.mrGbMS.CurrentRange2 == nil
+				or self.mrGbMS.Gears[self.mrGbMS.CurrentGear] == nil
+				or self.mrGbMS.Ranges[self.mrGbMS.CurrentRange] == nil
+				or self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2] == nil
+				then
 			self:mrGbMSetState( "CurrentGearSpeed", 0, noEventSend )
 			self:mrGbMSetState( "AutoMinGearSpeed", 0, noEventSend )
 			self:mrGbMSetState( "AutoMaxGearSpeed", 0, noEventSend )

@@ -102,8 +102,10 @@ Cambio Manual/automático para FS17 por Mogli]]>
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
 		
-		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="settings"/>
+		<text name="gearboxMogliTIP_Help_1"              text="help 1"/>
+		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>

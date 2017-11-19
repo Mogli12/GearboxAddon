@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="37">
+<modDesc descVersion="38">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.2.2.4</version>
+	<version>2.2.2.5</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v3.0 build 224 von Mogli</de>
-			  <en>Gearbox v3.0 build 224 by mogli</en>
-				 <it>Cambio v3.0 build 224 by mogli</it>
-	 <fr>Transmission v3.0 build 224 by mogli</fr>
-				 <cz>Řazení v3.0 build 224 by mogli</cz>
-<pl>Skrzynia biegów v3.0 build 224 by mogli</pl>
-				<ru>Gearbox v3.0 build 224 by mogli</ru>
-				<ro>Gearbox v3.0 build 224 by mogli</ro>
+			 <de>Getriebe v3.0 build 225 von Mogli</de>
+			  <en>Gearbox v3.0 build 225 by mogli</en>
+				 <it>Cambio v3.0 build 225 by mogli</it>
+	 <fr>Transmission v3.0 build 225 by mogli</fr>
+				 <cz>Řazení v3.0 build 225 by mogli</cz>
+<pl>Skrzynia biegów v3.0 build 225 by mogli</pl>
+				<ru>Gearbox v3.0 build 225 by mogli</ru>
+				<ro>Gearbox v3.0 build 225 by mogli</ro>
 		</text>                  
 	</l10n>
 
@@ -40,7 +40,7 @@ There are models with one or two gears like the Fendt Vario. Other models combin
 
 For details please look into: https://github.com/Mogli12/GearboxAddon/wiki/EN
 
-Changelog 2.2:
+Changelog 3.0:
 - easier launch of vehicle with CVT
 - reverse driving sound
 - avoid overheating of clutch if a GUI is open
@@ -56,7 +56,7 @@ Dieses Script fügt vielen Fahrzeugen nachträglich eine Gangschaltung hinzu. Da
 
 Eine detailierte Beschreibung befindet sich hier: https://github.com/Mogli12/GearboxAddon/wiki/DE
 
-Changelog 2.2:
+Changelog 3.0:
 - 
 - leichterer Start von Fahrzeugen mit CVT
 - Rückfahrtsound
@@ -88,7 +88,7 @@ Ce script ajoute sur la base du fichier gearboxAddonConfig.xml une boîte de vit
 
 Une description détaillée est disponible ici: https://github.com/Mogli12/GearboxAddon/wiki/EN
 
-Changement 2.2:
+Changement 3.0:
 - Lancement plus facile du véhicule avec CVT
 - sens inverse
 - éviter la surchauffe de l'embrayage si une GUI est ouverte
@@ -116,7 +116,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 
 Подробное описание доступно здесь: https://github.com/Mogli12/GearboxAddon/wiki/DE
 
-Список изменений 2.2:
+Список изменений 3.0:
 - более легкий запуск транспортных средств с CVT
 - звук заднего хода
 - отсутствует перегрев сцепления при открытии GUI

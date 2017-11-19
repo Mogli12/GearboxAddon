@@ -119,9 +119,10 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min. RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max. RPM"/>
 		
-		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
-		<text name="gearboxMogliTEXT_Inputs"             text="inputs"/>
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="settings"/>
+		<text name="gearboxMogliTIP_Help_1"              text="help 1"/>
+		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>

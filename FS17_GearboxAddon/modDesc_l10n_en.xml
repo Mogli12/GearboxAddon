@@ -119,9 +119,29 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min target RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max target RPM"/>
 		
-		<text name="gearboxMogliTEXT_Settings"           text="settings"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="help 1"/>
-		<text name="gearboxMogliTEXT_Inputs"             text="inputs"/>
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="settings"/>
+		<text name="gearboxMogliTIP_Help_1"              text="help 1"/>
+		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
+		
+		<!-- tool tips -->
+		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Limits the maximum speed according to the current cruise control speed"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="For wheel drive or locking of the middle differential"/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Locking of the front axle differential; requires 4wd"/>
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Locking of the back axle differential"/>
+		<text name="gearboxMogliTIP_MINRPM"              text="Manual throttle"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Fixed gear ratio for continous variable transmissions"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatic clutch"/>
+		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatic shifting like the vehicle has in real life"/>
+		<text name="gearboxMogliTIP_AllAutoMode"         text="Setting for simplified mode; you can choose what should be shifted automatically"/>
+		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Shows the target RPM in the HUD"/>
+		<text name="gearboxMogliTIP_DrawReqPower"        text="Shows the current power in the HUD"/>
+		<text name="gearboxMogliTIP_EnableAI"            text="Setting for the hired worker"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Swaps gears and group one"/>
+		<text name="gearboxMogliTIP_GearShifterMode"     text="Setting for sterring wheels with shifter"/>
+		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Setting for sterring wheels with shifter"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"        text="Minimum target RPM"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Maximum target RPM"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>

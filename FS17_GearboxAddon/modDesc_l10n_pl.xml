@@ -120,9 +120,10 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="Min. docelowe RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="Max. docelowe RPM"/>
 		
-		<text name="gearboxMogliTEXT_Settings"           text="Ustawienia"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="Pomoc 1"/>
-		<text name="gearboxMogliTEXT_Inputs"             text="Klawisze"/>
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="Ustawienia"/>
+		<text name="gearboxMogliTIP_Help_1"              text="Pomoc 1"/>
+		<text name="gearboxMogliTIP_Inputs"              text="Klawisze"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Nie można zmienić biegu; Sprzęgło"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Nie można zmienić biegu; Prędkość"/>

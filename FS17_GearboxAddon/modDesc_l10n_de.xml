@@ -120,10 +120,30 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min. Solldrehzahl"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max. Solldrehzahl"/>
 		
-		<text name="gearboxMogliTEXT_Settings"           text="Einstellungen"/>
-		<text name="gearboxMogliTEXT_Help_1"             text="Anleitung 1"/>
-		<text name="gearboxMogliTEXT_Inputs"             text="Tastenbelegung"/>
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="Einstellungen"/>
+		<text name="gearboxMogliTIP_Help_1"              text="Anleitung 1"/>
+		<text name="gearboxMogliTIP_Inputs"              text="Tastenbelegung"/>
 		
+		<!-- tool tips -->
+		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Begrenzung der maximalen Geschwindigkeit auf den aktuellen Wert des Tempomaten"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="Allrad bzw. Sperre des Mitteldifferentials "/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Sperre des Vorderachsdifferentials; dazu muss Allrad eingeschaltet sein"/>
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Sperre des Hinterachsdifferentials"/>
+		<text name="gearboxMogliTIP_MINRPM"              text="Handgas"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Feste Übersetzung; nur möglich bei stufenlosen Getrieben"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatische Kupplung"/>
+		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatische Schaltung wie im originalen Fahrzeug"/>
+		<text name="gearboxMogliTIP_AllAutoMode"         text="Hier kann man einstellen, ob Gänge oder Gruppen im vereinfachten Modus automatisch geschaltet werden sollen"/>
+		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Zeigt die Solldrehzahl im HUD an"/>
+		<text name="gearboxMogliTIP_DrawReqPower"        text="Zeigt die aktuell abgerufene Leistung im HUD an"/>
+		<text name="gearboxMogliTIP_EnableAI"            text="Hier kann man einstellen, wie sich das Getriebe im Helferbetrieb verhalten soll"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Gänge und 1. Gruppe vertauschen"/>
+		<text name="gearboxMogliTIP_GearShifterMode"     text="Diese Einstellung ist nur sinnvoll mit einem Lenkrad mit Schalthebel"/>
+		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Diese Einstellung ist nur sinnvoll mit einem Lenkrad mit Schalthebel"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"        text="Untere Solldrehzahl manuell einstellen"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Obere Solldrehzahl manuell einstellen"/>
+		                                                
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Schalten nicht möglich; Kupplung"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Schalten nicht möglich; Geschwindigkeit"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"       text="Schalten nicht möglich; Drehzahl"/>

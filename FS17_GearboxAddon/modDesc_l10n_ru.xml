@@ -119,11 +119,12 @@
 		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="max заданные обороты"/>
 		
 		
-		<text name="tooltip_gearboxMogliSPEEDLIMIT"         text="Это будет подказка"/>
-				
-		<text name="gearboxMogliTEXT_Settings"             text="Настройки"/>
-		<text name="gearboxMogliTEXT_Help_1"               text="Справка 1"/>
-		<text name="gearboxMogliTEXT_Inputs"               text="Сочетание клавиш"/>
+		<text name="tooltip_gearboxMogliSPEEDLIMIT"        text="Это будет подказка"/>
+
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"              text="Настройки"/>
+		<text name="gearboxMogliTIP_Help_1"                text="Справка 1"/>
+		<text name="gearboxMogliTIP_Inputs"                text="Сочетание клавиш"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
