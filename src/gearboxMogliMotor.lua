@@ -2315,7 +2315,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 --**********************************************************************************************************		
 -- smooth
 	local delayedDown = self.motorLoadS * 5000
-	if ptoToolOn or getMaxPower or self.torqueRpmReduxMode ~= nil or self.currentSpeed > currentSpeedLimitR then
+	if     ptoToolOn
+			or getMaxPower
+			or self.torqueRpmReduxMode ~= nil
+			or self.currentSpeed > currentSpeedLimitR
+			or self.currentSpeed < 0.278 then
 		delayedDown = 0
 	end
 

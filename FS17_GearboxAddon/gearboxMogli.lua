@@ -2466,6 +2466,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
+		if self.sampleMotorLoad ~= nil and self.sampleMotorLoad.volume ~= nil then
+			self.mrGbMS.Sound.MotorLoadVolume       = self.sampleMotorLoad.volume / 0.8
+		end
 	end
 	
 --**********************************************************************************************************		
@@ -3109,10 +3112,14 @@ function gearboxMogli:update(dt)
 		self.updateFuelUsage = gearboxMogliUpdateFuelUsage
 		
 		if self.mrGbMB.Sound == nil then
+			local vol = nil
+			if self.mrGbMS.Sound.MotorLoadVolume ~= nil then
+				vol = self.sampleMotorLoad.volume
+			end
 			self.mrGbMB.Sound = { self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 														self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax, 
 														self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
-														self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D }
+														self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D, vol }
 			if self.mrGbMS.ThreshingSoundPitchMod then
 				self.mrGbMB.CombineCuttingPitchOffset = self.sampleThreshing.cuttingPitchOffset
 			end
@@ -3124,6 +3131,11 @@ function gearboxMogli:update(dt)
 		self.motorSoundRunPitchMax      = self.mrGbMS.Sound.RunPitchMax
 		self.motorSoundLoadPitchScale   = self.mrGbMS.Sound.LoadPitchScale 
 		self.motorSoundLoadPitchMax     = self.mrGbMS.Sound.LoadPitchMax
+		
+		if self.mrGbMS.Sound.MotorLoadVolume ~= nil then
+			self.sampleMotorLoad.volume   = self.mrGbMS.Sound.MotorLoadVolume
+		end
+		
 		self.sampleReverseDrive.sample  = nil
 		self.sampleReverseDrive.sound3D = nil
 		
@@ -3138,7 +3150,10 @@ function gearboxMogli:update(dt)
 			self.motorSoundPitchScale,     self.motorSoundPitchMax, 
 			self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,
 			self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax,
-			self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D = unpack( self.mrGbMB.Sound )
+			self.sampleReverseDrive.sample,self.sampleReverseDrive.sound3D,	vol = unpack( self.mrGbMB.Sound )
+			if self.mrGbMS.Sound.MotorLoadVolume ~= nil then
+				self.sampleMotorLoad.volume = vol
+			end
 			self.mrGbMB.Sound = nil
 			if self.mrGbMB.CombineCuttingPitchOffset ~= nil then
 				self.sampleThreshing.cuttingPitchOffset = self.mrGbMB.CombineCuttingPitchOffset
