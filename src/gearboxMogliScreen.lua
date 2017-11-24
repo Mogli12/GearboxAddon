@@ -29,16 +29,6 @@ if gearboxMogliScreen == nil or gearboxMogliScreen.version == nil or gearboxMogl
 		for _, actionData in pairs(self.controlsActions) do
 			SettingsScreen.updateInputStrings(self, actionData);
 		end
-		
-	--if self.lastMouseCursorState then
-	--	local mr = FS17_moreRealistic
-	--	if moreRealistic ~= nil then
-	--		mr = moreRealistic
-	--	end
-	--	if mr ~= nil and mr.RealisticGui ~= nil and mr.RealisticGui.stopMouse then
-	--		self.lastMouseCursorState = false
-	--	end
-	--end
 	end
 	
 	function gearboxMogliScreen:mogliScreenIsPageDisabled(element)

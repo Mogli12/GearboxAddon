@@ -25,7 +25,7 @@ function gearboxMogliRegister:loadMap(name)
     gearboxMogliRegister.isLoaded = true
 		ConfigurationUtil.registerConfigurationType("GearboxAddon", "Transmission")
 		
-		if g_server ~= nil then
+		if g_server ~= nil or g_modIsLoaded["gearboxAddonConfig"] then
 			gearboxMogliRegister.addConfigurations(self)
 		else
 			gearboxMogliRegister.requestConfigurations = true
@@ -264,6 +264,8 @@ function gearboxMogliRegister:addConfigurations()
 			dummySelf.customEnvironment, dummySelf.baseDirectory = Utils.getModNameAndBaseDirectory(storeItem.xmlFilename)
 			dummySelf.xmlFile = loadXMLFile("TempConfig", storeItem.xmlFilename)
 			
+			print(storeItem.xmlFilename)
+			
 			if type( Vehicle.mrLoadFinished1 ) == "function" then
 				local state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
 			--print("MR hack: "..tostring(state).." / "..tostring(dummySelf.mrIsMrVehicle).." / "..tostring(dummySelf.mrConfigFileName).." ("..tostring(result)..")")
@@ -300,34 +302,8 @@ function gearboxMogliRegister:addConfigurations()
 				modifiedItem.configFileName = configFileName				
 				modifiedItem.configurations = {}
 			
-				local entry, configTab, defaultConfigName
-				
-				if     storeItem.category == "harvesters"   then
-					defaultConfigName = "defaultCombine"
-				elseif storeItem.category == "forageHarvesters" then
-					defaultConfigName = "defaultCombine"
-				elseif storeItem.category == "tractors"     then
-					defaultConfigName = "defaultTractors"
-				elseif storeItem.category == "trucks"       then
-					defaultConfigName = "defaultTrucks"
-				elseif storeItem.category == "cars"         then
-					defaultConfigName = "defaultCars"
-				elseif storeItem.category == "wheelLoaders" then
-					defaultConfigName = "defaultTorqueConverter"
-				elseif storeItem.category == "teleLoaders"  then
-					defaultConfigName = "defaultHydrostatic2"
-				elseif storeItem.category == "skidSteers"   then
-					defaultConfigName = "defaultHydrostatic1"
-				elseif storeItem.category == "wood"         then
-					defaultConfigName = "defaultHydrostatic1"
-				elseif storeItem.category == "animals"      then
-					defaultConfigName = "defaultHydrostatic1"
-				elseif storeItem.category == "sprayers"     then
-					defaultConfigName = "defaultHydrostatic2"
-				else
-					defaultConfigName = "default"
-				end
-				
+				local entry, configTab
+								
 				local isDefault = true
 				if hasVehicleConfig then
 					table.insert( modifiedItem.configurations, { name = "Gearbox (vehicle)", title = "Gearbox (vehicle)", source = 0, isDefault = isDefault } )
@@ -374,6 +350,32 @@ function gearboxMogliRegister:addConfigurations()
 					table.insert( modifiedItem.configurations, { name = "default manual", title = "Default Transmission", source = 3, def = "defaultTractors", isDefault = isDefault } )
 					table.insert( modifiedItem.configurations, { name = "default vario", title = "Default Transmission", source = 3, def = "default", isDefault = false } )
 				else
+					local defaultConfigName
+					
+					if     storeItem.category == "harvesters"   then
+						defaultConfigName = "defaultCombine"
+					elseif storeItem.category == "forageHarvesters" then
+						defaultConfigName = "defaultCombine"
+					elseif storeItem.category == "trucks"       then
+						defaultConfigName = "defaultTrucks"
+					elseif storeItem.category == "cars"         then
+						defaultConfigName = "defaultCars"
+					elseif storeItem.category == "wheelLoaders" then
+						defaultConfigName = "defaultTorqueConverter"
+					elseif storeItem.category == "teleLoaders"  then
+						defaultConfigName = "defaultHydrostatic2"
+					elseif storeItem.category == "skidSteers"   then
+						defaultConfigName = "defaultHydrostatic1"
+					elseif storeItem.category == "wood"         then
+						defaultConfigName = "defaultHydrostatic1"
+					elseif storeItem.category == "animals"      then
+						defaultConfigName = "defaultHydrostatic1"
+					elseif storeItem.category == "sprayers"     then
+						defaultConfigName = "defaultHydrostatic2"
+					else
+						defaultConfigName = "default"
+					end				
+				
 					table.insert( modifiedItem.configurations, { name = "default", title = "Default Transmission", source = 3, def = defaultConfigName, isDefault = isDefault } )
 				end
 				
