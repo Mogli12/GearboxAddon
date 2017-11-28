@@ -2346,7 +2346,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		
 			for _,tvs in pairs(tab) do
 				deltaT = g_currentMission.time - tvs.t
-				if deltaT < 4000 then
+				if deltaT < delayedDown then
 					table.insert( self.timeShiftTab, tvs )
 					if r < tvs.r then
 						r = tvs.r
@@ -2360,8 +2360,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			self.timeShiftTab = {}
 		end
 		
-		self.targetRpm      = self.targetRpm      + self.vehicle.mrGbML.smoothMedium * ( r - self.targetRpm      )
-		self.requestedPower = self.requestedPower + self.vehicle.mrGbML.smoothMedium * ( p - self.requestedPower )
+		local s
+		if r < self.targetRpm then s = self.vehicle.mrGbML.smoothSlow else s = self.vehicle.mrGbML.smoothMedium end
+		self.targetRpm      = self.targetRpm      + s * ( r - self.targetRpm      )
+		if p < self.requestedPower then s = self.vehicle.mrGbML.smoothSlow else s = self.vehicle.mrGbML.smoothMedium end
+		self.requestedPower = self.requestedPower + s * ( p - self.requestedPower )
 		
 		if self.vehicle.mrGbMG.debugInfo then
 			self.vehicle.mrGbML.targetRpmTInfo = string.format("filled: %4d %s, %3d, %4d, %4d, %4d",delayedDown,tostring(getMaxPower),table.getn(self.timeShiftTab),self.targetRpm,r,targetRpm)
