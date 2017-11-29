@@ -185,7 +185,7 @@ Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Get
 
 Neben normalen Stufengetrieben werden auch stufenlose Getriebe unterstützt. Es gibt Modelle mit ein oder zwei Gängen wie bei Fendt Vario. Andere Modelle kombinieren vier automatisch geschaltete mechanische Gänge mit einem stufenlosen hydrostatischen Antrieb. Alle diese stufenlosen Getriebe haben gemeinsam, dass sich der Wirkungsgrad ja nach Übersetzung recht stark ändert.
 
-Zusätzlich gibt es die Modi AllAuto und ECO. Im ECO-Modus steht zwar das maximale Drehmoment, aber nur 90% der Leistung zur Verfügung. Im ECO-Modus ist die Drehzahl bei eingeschalteter Zapfwelle niedriger (50% anstatt 75%) und es wird etwas schneller hoch geschaltet. Im AllAuto-Modus werden Gänge, Gruppen (nur erstes Gruppengetriebe) und Kupplung automatisch gesteuert. In diesem Modus fährt auch der Helfer mit dem Getriebe des GearboxAddons. Schließlich gibt es in Version 1.3 eine andere Steuerung für die manuelle Kupplung mit nur noch einer Taste. Diese teilautomatische Kupplung richtet sich vor allem an Lenkradfahrer, da ein echtes Kupplungspedal in LS15 nicht richtig unterstütz wird.
+Zusätzlich gibt es die Modi AllAuto und ECO. Im ECO-Modus steht zwar das maximale Drehmoment, aber nur 90% der Leistung zur Verfügung. Im ECO-Modus ist die Drehzahl bei eingeschalteter Zapfwelle niedriger (50% anstatt 75%) und es wird etwas schneller hoch geschaltet. Im AllAuto-Modus werden Gänge, Gruppen (nur erstes Gruppengetriebe) und Kupplung automatisch gesteuert. In diesem Modus fährt auch der Helfer mit dem Getriebe des GearboxAddons. 
 ]]></longText>
 	</longTexts>
 	

@@ -2348,8 +2348,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				deltaT = g_currentMission.time - tvs.t
 				if deltaT < delayedDown then
 					table.insert( self.timeShiftTab, tvs )
-					if r < tvs.r then
-						r = tvs.r
+					local tr = math.min( self.maxPowerRpm, tvs.r )
+					if r < tr then
+						r = tr
 					end
 					if p < tvs.p then
 						p = tvs.p

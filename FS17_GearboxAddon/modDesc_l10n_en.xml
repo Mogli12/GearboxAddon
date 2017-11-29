@@ -179,8 +179,11 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 	
 	<longTexts>
 		<longText name="gearboxMogliHelp_1"><![CDATA[
-Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in FS15. This mod adds on the basis of the file gearboxAddonConfig.xml  a gearbox to all configured tractors. Many various transmission kinds can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. In modern tractors power shift transmissions are often combined with automatic gear shifting.
-New in version 1.1 is now also the support of continuously variable transmissions. There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio. 
+Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in FS15. This mod adds on the basis of the file gearboxAddonConfig.xml  a gearbox to all configured tractors. Many various transmission types can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. In modern tractors power shift transmissions are often combined with automatic gear shifting.
+
+Additionally, continuously variable transmissions are supported. There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio. 
+
+There are additional modes like AllAuto and ECO. In ECO mode the vehicle still has maximum torque but only 90% power to safe fuel. In AllAuto the gearbox will shift automatically.
 ]]></longText>
 	</longTexts>
 	
