@@ -117,7 +117,7 @@ gearboxMogliGlobals.minTimeToShiftReverse = 500  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 4000 -- ms
 gearboxMogliGlobals.autoShiftTimeoutShort = 750  -- ms -- let it go up to ratedRPM !!!
-gearboxMogliGlobals.autoShiftTimeoutHydroL= 100  -- ms 
+gearboxMogliGlobals.autoShiftTimeoutHydroL= 1000 -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 0    -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
 gearboxMogliGlobals.shiftTimeMsFactor     = 1
@@ -2152,7 +2152,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end	
 	
 		local dft
-		dft = Utils.clamp( Utils.getNoNil( self.mrGbMS.HydrostaticStart, 0.2 ), self.mrGbMS.HydrostaticMin, self.mrGbMS.HydrostaticMax )
+		dft = Utils.clamp( Utils.getNoNil( self.mrGbMS.HydrostaticStart, 0.3 ), self.mrGbMS.HydrostaticMin, self.mrGbMS.HydrostaticMax )
 		self.mrGbMS.HydrostaticStart  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#startFactor"), dft )
 		dft = Utils.getNoNil( self.mrGbMS.HydrostaticMaxRpm, self.mrGbMS.RatedRpm )
 		self.mrGbMS.HydrostaticMaxRpm = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. ".hydrostatic#maxRpm"), dft )
@@ -2422,8 +2422,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 -- sound 
 --**********************************************************************************************************		
 
-	self.mrGbMS.EqualizedRpmFactor = ( self.mrGbMS.Sound.MaxRpm - self.mrGbMS.OrigMinRpm ) / ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) 
-	self.mrGbMS.EqualizedMaxRpm    = self:mrGbMGetEqualizedRpm( self.mrGbMS.CurMaxRpm )
+	self.mrGbMS.EqualizedRpmFactor   = ( self.mrGbMS.OrigRatedRpm - self.mrGbMS.OrigMinRpm ) / ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) 
+	if self.mrGbMS.Sound.MaxRpm ~= self.mrGbMS.OrigRatedRpm and self.mrGbMS.Sound.MaxRpm > gearboxMogli.eps then
+		self.mrGbMS.EqualizedRpmFactor = self.mrGbMS.EqualizedRpmFactor * self.mrGbMS.OrigRatedRpm / self.mrGbMS.Sound.MaxRpm
+	end
+	self.mrGbMS.EqualizedMaxRpm      = self:mrGbMGetEqualizedRpm( self.mrGbMS.CurMaxRpm )
 	do
 		-- original RPM range
 		local rpmRange  = self.mrGbMS.OrigMaxRpm - self.mrGbMS.OrigMinRpm		
