@@ -84,12 +84,11 @@ gearboxMogli.AIGearboxOff         = "N"
 gearboxMogli.AIAllAuto            = "A"
 gearboxMogli.AIGearboxOn          = "Y"
 gearboxMogli.kmhTOms              = 5 / 18
-gearboxMogli.extraSpeedLimit      = 0.25
-gearboxMogli.extraSpeedLimitMs    = 5 / 72
+gearboxMogli.extraSpeedLimit      = 0.15
+gearboxMogli.extraSpeedLimitMs    = gearboxMogli.extraSpeedLimit / 3.6
 gearboxMogli.deltaLimitTimeMs     = 333
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
-gearboxMogli.speedLimitMode       = "B" -- "T"orque limit only / "M"ax RPM only / "B"oth
-gearboxMogli.speedLimitRpmDiff    = 10
+gearboxMogli.speedLimitRpmDiff    = 5
 gearboxMogli.motorBrakeTime       = 250     
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
@@ -2837,7 +2836,7 @@ function gearboxMogli:update(dt)
 	if self.actualLoadPercentage == nil or not ( self.isMotorStarted ) then
 		self.mrGbML.MotorLoad = 0
 	else
-		self.mrGbML.MotorLoad = self.mrGbML.MotorLoad + self.mrGbML.smoothMedium * ( self.actualLoadPercentage - self.mrGbML.MotorLoad )
+		self.mrGbML.MotorLoad = self.mrGbML.MotorLoad + self.mrGbML.smoothMedium * ( math.min( self.actualLoadPercentage * 1.11, 1 ) - self.mrGbML.MotorLoad )
 	end
 	
 	local processInput = true
@@ -6515,6 +6514,7 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 		--end
 			self.motor.ratioFactorR       = nil
 			self.motor.torqueRpmReduxMode = nil
+			self.motor.maxAccSpeedLimit   = nil
 		else
 			self.mrGbML.afterShiftClutch  = nil
 			self.mrGbML.beforeShiftRpm    = nil
@@ -7476,44 +7476,55 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	-- cruise control 
 	--*******************
 	self.motor:updateMotorRpm( dt )
+	local speedLimit = self.motor:updateSpeedLimit( dt, acceleration ) * 3.6
+	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or ( self.cruiseControl.state > 0 )
+	local ccBrake    = self.mrGbMS.CruiseControlBrake or self.mrGbMS.AllAuto
+	if self.tempomatMogliV22 ~= nil and self.tempomatMogliV22.keepSpeedLimit ~= nil then
+		ccOn    = true
+		ccBrake = true
+	end
 	
-	if     not ( self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 ) 
-			or not self.steeringEnabled
-			or self.mrGbMS.CruiseControlBrake
-			or self.mrGbMS.AllAuto
-			or gearboxMogli.speedLimitMode == "M" then
+	if     not self.steeringEnabled then
+	-- hired worker => limit max RPM
 		self.motor.limitMaxRpm = true
-	elseif gearboxMogli.speedLimitMode == "T" then
+	elseif not ccOn then
+	-- speed limit off => no limit
 		self.motor.limitMaxRpm = false
-	elseif math.abs( currentSpeed ) * 3600 <= self.cruiseControl.speed then
+	elseif math.abs( currentSpeed ) * 3600 <= speedLimit then
+	-- below speed limit => limit max RPM
 		self.motor.limitMaxRpm = true
 	elseif self.motor.usedTransTorque < gearboxMogli.eps then
+	-- no torque used => no limit => we can go faster downhill
 		self.motor.limitMaxRpm = false
 	end
-
-	if not self.motor.limitMaxRpm and self.cruiseControl.state > 0 then
-		if currentSpeed * 3600 >= self.cruiseControl.speed + gearboxMogli.extraSpeedLimit then
-			acceleration = 0
-		end
-	end
-	
+		
 	do
 		local cs = currentSpeed * 3600
-		local sl = self:getSpeedLimit(true) + gearboxMogli.extraSpeedLimit
-		if cs >= sl + 1 then
-			brakePedal  = 1
-			brakeLights = true
-		elseif cs > sl then
-			brakePedal  = math.max( brakePedal, cs - sl )
+		local sl = self:getSpeedLimit(true)
+		if      not self.motor.limitMaxRpm 
+		    and ccOn
+				and ccBrake
+				and sl > speedLimit then
+			sl = speedLimit
 		end
-	end
-	
-	self.motor:updateSpeedLimit( dt )
-	
-	if      self.tempomatMogliV22 ~= nil 
-			and self.tempomatMogliV22.keepSpeedLimit ~= nil 
-			and math.abs( currentSpeed ) * 3600 > self.tempomatMogliV22.keepSpeedLimit + 1 then
-		brakeLights = true
+		sl = sl + gearboxMogli.extraSpeedLimit + gearboxMogli.extraSpeedLimit
+		local bp = 0
+		if cs >= sl + 1 then
+			bp = 1
+		elseif cs > sl then
+			bp = cs - sl
+		end
+		if bp > gearboxMogli.eps then
+			acceleration = 0
+			if bp > 0.8 then
+				brakeLights  = true
+			end
+			bp = bp * 0.8
+			if bp > brakePedal then
+				brakePedal = bp
+			end	
+			print(string.format("%4.1f km/h / %4.1f km/h => %3.0f",cs,sl,bp*100))
+		end
 	end
 	
 	local lastRotatedTime = self.mrGbML.lastRotatedTime

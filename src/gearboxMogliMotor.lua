@@ -412,6 +412,7 @@ function gearboxMogliMotor.copyRuntimeValues( motorFrom, motorTo )
 	motorTo.usedTransTorqueS        = 0
 	motorTo.currentSpeed            = 0
 	motorTo.currentSpeedVector      = nil
+	motorTo.accS                    = 0
 end
 
 --**********************************************************************************************************	
@@ -508,7 +509,7 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:updateSpeedLimit
 --**********************************************************************************************************	
-function gearboxMogliMotor:updateSpeedLimit( dt )
+function gearboxMogliMotor:updateSpeedLimit( dt, acceleration )
 	self.currentSpeedLimit = math.huge
 	
 	local speedLimit = self.vehicle:getSpeedLimit(true)
@@ -566,6 +567,24 @@ function gearboxMogliMotor:updateSpeedLimit( dt )
 			maxSpeed = self.maxBackwardSpeed
 		end		
 		
+		local _,_,gMax = self.vehicle:mrGbMGetGearSpeed()
+				
+		if maxSpeed < gMax and 0.01 < acceleration and acceleration < self.vehicle.mrGbMS.MaxRpmThrottle then			
+			-- no further acceleration 
+			local sMax = self.currentSpeed
+			if self.maxAccSpeedLimit ~= nil and self.maxAccSpeedLimit < sMax then
+				sMax = self.maxAccSpeedLimit
+			end
+			self.maxAccSpeedLimit = math.max( 0.278,
+																				sMax - 0.0001 * dt,
+																				math.min( maxSpeed, gMax / 3.6 ) * acceleration / self.vehicle.mrGbMS.MaxRpmThrottle )
+			if maxSpeed > self.maxAccSpeedLimit then
+				maxSpeed = self.maxAccSpeedLimit
+			end
+		else
+			self.maxAccSpeedLimit = nil
+		end
+						
 		if speedLimit > maxSpeed then
 			speedLimit = maxSpeed
 		end
@@ -573,7 +592,7 @@ function gearboxMogliMotor:updateSpeedLimit( dt )
 						
 	self.currentSpeedLimit = speedLimit 
 	
-	return speedLimit + gearboxMogli.extraSpeedLimitMs
+	return speedLimit
 end
 
 --**********************************************************************************************************	
@@ -583,14 +602,12 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 
 	curMaxRpm = gearboxMogli.huge
 						
-	if self.ratioFactorR ~= nil and self.ratioFactorR > 1e-6 then 		
-		curMaxRpm = self.maxPossibleRpm
-		
-	--if forGetTorque and self.vehicle.mrGbMS.MaxTarget > gearboxMogli.eps then
-	--	curMaxRpm = math.min( curMaxRpm, self.maxTargetRpm )
-	--end
-		
-		curMaxRpm = ( curMaxRpm + gearboxMogli.speedLimitRpmDiff ) / self.ratioFactorR
+	if self.ratioFactorR ~= nil and self.ratioFactorR > 1e-6 then 	
+		if     not ( forGetTorque ) then
+			curMaxRpm = ( self.maxPossibleRpm + gearboxMogli.speedLimitRpmDiff ) / self.ratioFactorR
+		elseif not ( self.vehicle.mrGbMS.Hydrostatic ) then
+			curMaxRpm = self.maxPossibleRpm / self.ratioFactorR
+		end
 	
 		local speedLimit   = gearboxMogli.huge
 		
@@ -818,9 +835,9 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
-	if not ( self.vehicle.mrGbMS.Hydrostatic ) then
+--if not ( self.vehicle.mrGbMS.Hydrostatic ) then
 		limitC = math.min( self:getCurMaxRpm( true ), limitA )
-	end
+--end
 		
 	self.vehicle.mrGbML.rpmLimitInfo = ""
 	
@@ -1684,9 +1701,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	local acceleration = math.max( accelerationPedal, 0 )
 	
 	self.accP = acceleration
-	if self.accS == nil then
-		self.accS = 0
-	end
 	self.accS = self.accS + Utils.clamp( self.accP - self.accS, -0.000333 * self.tickDt, 0.000333 * self.tickDt )
 
 	if self == nil or self.vehicle == nil then
@@ -4308,7 +4322,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				self.vehicle.mrGbML.afterShiftRpm = nil
 			end
 		end
-		
 	end
 	
 	if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect and not self.noTransmission then 
