@@ -7523,7 +7523,6 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			if bp > brakePedal then
 				brakePedal = bp
 			end	
-			print(string.format("%4.1f km/h / %4.1f km/h => %3.0f",cs,sl,bp*100))
 		end
 	end
 	
