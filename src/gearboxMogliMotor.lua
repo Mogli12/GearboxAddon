@@ -566,27 +566,34 @@ function gearboxMogliMotor:updateSpeedLimit( dt, acceleration )
 		if self.vehicle.mrGbMS.ReverseActive then
 			maxSpeed = self.maxBackwardSpeed
 		end		
-		
+		if speedLimit > maxSpeed then
+			speedLimit = maxSpeed
+		end
+	end
+	
+	local lastAccSpeedLimit = self.maxAccSpeedLimit
+	self.maxAccSpeedLimit   = nil
+	if 0.01 < acceleration and acceleration < self.vehicle.mrGbMS.MaxRpmThrottle then
 		local _,_,gMax = self.vehicle:mrGbMGetGearSpeed()
-				
-		if maxSpeed < gMax and 0.01 < acceleration and acceleration < self.vehicle.mrGbMS.MaxRpmThrottle then			
+		gMax = gMax / 3.6
+		local gMin
+		if self.vehicle.mrGbMS.Hydrostatic then
+			gMin = 0
+		else
+			gMin = gMax * self.vehicle.mrGbMS.IdleRpm / self.vehicle.mrGbMS.RatedRpm
+		end
+		if gMin < speedLimit then 			
 			-- no further acceleration 
 			local sMax = self.currentSpeed
-			if self.maxAccSpeedLimit ~= nil and self.maxAccSpeedLimit < sMax then
-				sMax = self.maxAccSpeedLimit
+			if lastAccSpeedLimit ~= nil and lastAccSpeedLimit < sMax then
+				sMax = lastAccSpeedLimit
 			end
 			self.maxAccSpeedLimit = math.max( 0.278,
 																				sMax - 0.0001 * dt,
-																				math.min( maxSpeed, gMax / 3.6 ) * acceleration / self.vehicle.mrGbMS.MaxRpmThrottle )
-			if maxSpeed > self.maxAccSpeedLimit then
-				maxSpeed = self.maxAccSpeedLimit
+																				gMin + ( math.min( speedLimit, gMax ) - gMin ) * acceleration / self.vehicle.mrGbMS.MaxRpmThrottle )
+			if speedLimit > self.maxAccSpeedLimit then
+				speedLimit = self.maxAccSpeedLimit
 			end
-		else
-			self.maxAccSpeedLimit = nil
-		end
-						
-		if speedLimit > maxSpeed then
-			speedLimit = maxSpeed
 		end
 	end
 						
@@ -747,10 +754,15 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	self.lastMotorTorque	= torque
 	
 	if pt > 0 then
-		if not ( self.noTransmission 
-					or self.noTorque 
-					or self.vehicle.mrGbMS.Hydrostatic
-					or ( self.vehicle.mrGbMS.TorqueConverter and self.vehicle.mrGbMS.OpenRpm > self.maxPowerRpm - 1 ) ) then
+		if     self.noTransmission 
+				or self.noTorque 
+				or self.minRequiredRpm < self.ptoMotorRpmRatio * self.ptoToolRpm - 50
+			--or self.vehicle.mrGbMS.Hydrostatic
+			--or ( self.vehicle.mrGbMS.TorqueConverter and self.vehicle.mrGbMS.OpenRpm > self.maxPowerRpm - 1 )
+				then
+		--print(string.format("%4d < %4d (%3.0f * %4d)",self.minRequiredRpm, self.ptoMotorRpmRatio * self.ptoToolRpm, self.ptoMotorRpmRatio, self.ptoToolRpm ))
+			self.ptoWarningTimer = nil
+		else
 			local mt = self.currentTorqueCurve:get( Utils.clamp( self.lastRealMotorRpm, self.vehicle.mrGbMS.IdleRpm, self.vehicle.mrGbMS.RatedRpm ) ) 
 			if mt < pt then
 			--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastRealMotorRpm))
@@ -769,8 +781,6 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			elseif self.ptoWarningTimer ~= nil then
 				self.ptoWarningTimer = nil
 			end
-		else
-			self.ptoWarningTimer = nil
 		end
 		
 		local maxPtoTorqueRatio = math.min( 1, self.vehicle.mrGbMS.MaxPtoTorqueRatio + math.abs( self.currentSpeed*3.6 ) * self.vehicle.mrGbMS.MaxPtoTorqueRatioInc )
@@ -817,16 +827,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		limitA = self.targetRpm * ( 1 + self.vehicle.mrGbMS.HydrostaticLossFxRpmRatio ) + gearboxMogli.ptoRpmThrottleDiff 
 	elseif  not self.noTransmission 
 			and not self.noTorque
-		--and self.vehicle.cruiseControl.state == 0
 			and self.vehicle.steeringEnabled then
-		local accL = math.max( acc, self.accS )
-		if     accL <= gearboxMogli.eps then
-			limitA = self.vehicle.mrGbMS.IdleRpm
-		elseif accL < self.vehicle.mrGbMS.MaxRpmThrottle
-				and ( self.vehicle.mrGbMG.maxRpmThrottleAuto
-					 or self.vehicle.mrGbMS.CurrentGearSpeed >= self.vehicle.mrGbMS.AutoMaxGearSpeed - gearboxMogli.eps ) then
-			limitA = math.min( limitA, self:getThrottleMaxRpm( accL / self.vehicle.mrGbMS.MaxRpmThrottle ) )
-		end
 		if self.vehicle.mrGbMS.EcoMode and limitA > self.vehicle.mrGbMS.MaxTargetRpm then
 			limitA = self.vehicle.mrGbMS.MaxTargetRpm 
 		end
@@ -835,10 +836,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
---if not ( self.vehicle.mrGbMS.Hydrostatic ) then
-		limitC = math.min( self:getCurMaxRpm( true ), limitA )
---end
-		
+	limitC = math.min( self:getCurMaxRpm( true ), limitA )
+	
 	self.vehicle.mrGbML.rpmLimitInfo = ""
 	
 	if torque < 0 then
@@ -1776,7 +1775,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			targetRequiredRpm = self.minTargetRpm
 		end
 	end
-
+	
 	local handThrottle = -1
 	
 	if     self.vehicle:mrGbMGetOnlyHandThrottle()
@@ -1996,6 +1995,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			targetRequiredRpm = math.max( targetRequiredRpm, result * self.original.ptoMotorRpmRatio )
 		end
 	end	
+	if self.vehicle.mrGbMS.ToolIsDirty then
+		targetRequiredRpm = math.max( targetRequiredRpm, self.vehicle.mrGbMS.HydraulicRpm )
+	end
 	
 	if targetRequiredRpm > self.maxTargetRpm then
 		targetRequiredRpm = self.maxTargetRpm
@@ -2011,7 +2013,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	minRpmReduced       = math.min( minRpmReduced, self.minRequiredRpm )
 	
 	if ptoToolOn then
-		self.ptoMotorRpmRatio = self.minRequiredRpm / self.ptoToolRpm
+		self.ptoMotorRpmRatio = targetRequiredRpm / self.ptoToolRpm
 	else
 		self.ptoMotorRpmRatio = self.original.ptoMotorRpmRatio
 	end
@@ -3862,6 +3864,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 							if p.rpmLo < p.rpmHi then
 								p.score = math.max( p.score, Utils.clamp( 0.001 * self.fuelCurve:get( p.rpmLo ), 0, 0.4 ) )
 							end
+							if p.isCurrent then
+								p.score = p.score * 0.99
+							end
 						end
 					end
 					
@@ -4067,6 +4072,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					self.lastTorqueConverterRatio = math.min( 1, lastTCR + d * ( self.motorLoadP - 0.3 ) / 0.7 )
 				elseif self.motorLoadP < 0.3 then
 					self.lastTorqueConverterRatio = math.max( 0, lastTCR - d * ( 0.3 - self.motorLoadP ) / 0.3 )
+				else
+					self.lastTorqueConverterRatio = lastTCR
 				end
 				
 				if openRpm > minRpmReduced then

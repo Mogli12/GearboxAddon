@@ -310,6 +310,8 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "NUSMessage",    {},    gearboxMogli.mrGbMOnSetNUSMessage )
 	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
 	gearboxMogli.registerState( self, "DoubleClutch",  0 )
+	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
+	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
 -- state variables with setter methods	
@@ -838,6 +840,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if self.mrGbMS.Sound.MaxRpm == nil then
 		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.OrigRatedRpm
 	end
+	
+	self.mrGbMS.HydraulicRpm = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#hydraulicRpm"), self.mrGbMS.MinTargetRpm)
 
 --**************************************************************************************************	
 -- PTO RPM
@@ -4150,6 +4154,13 @@ function gearboxMogli:updateTick(dt)
 	if self.mrGbMS == nil or self.mrGbML == nil or self.mrGbMD == nil then
 		return
 	end	
+	
+	if self.mrGbMS.ToolIsDirty2 then
+		self.mrGbMS.ToolIsDirty  = true
+		self.mrGbMS.ToolIsDirty2 = false 
+	else
+		self.mrGbMS.ToolIsDirty  = false 
+	end
 	
 	if self.isActive then
 		if self.isServer then
@@ -7978,12 +7989,31 @@ end
 function gearboxMogli:setLastRpm(lastRpm)
 end
 
+function gearboxMogli:afterCylinderedSetDirty( part )
+	if not ( part.playSound ) then return end
+	if type( self.getRootAttacherVehicle ) ~= "function" then return end
+	local rootVehicle = self:getRootAttacherVehicle()
+	if rootVehicle.mrGbMS ~= nil and rootVehicle.mrGbMGetIsOn ~= nil and rootVehicle:mrGbMGetIsOn() then
+		rootVehicle:mrGbMSetState( "ToolIsDirty2", true )
+	end
+end
+
+function gearboxMogli:afterUpdateAttacherJointRotation(superFunc, jointDesc, object)
+	if type( self.getRootAttacherVehicle ) ~= "function" then return end
+	local rootVehicle = self:getRootAttacherVehicle()
+	if rootVehicle.mrGbMS ~= nil and rootVehicle.mrGbMGetIsOn ~= nil and rootVehicle:mrGbMGetIsOn() then
+		rootVehicle:mrGbMSetState( "ToolIsDirty2", true )
+	end
+end
+
 --**********************************************************************************************************	
 WheelsUtil.updateWheelsPhysics = Utils.overwrittenFunction( WheelsUtil.updateWheelsPhysics,gearboxMogli.newUpdateWheelsPhysics )
 VehicleHudUtils.setHudValue = Utils.overwrittenFunction( VehicleHudUtils.setHudValue, gearboxMogli.newSetHudValue )
 Motorized.loadMotor = Utils.appendedFunction( Motorized.loadMotor, gearboxMogli.afterLoadMotor )
 Motorized.readUpdateStream = Utils.overwrittenFunction( Motorized.readUpdateStream, gearboxMogli.newReadUpdateStream )
 Motorized.writeUpdateStream = Utils.overwrittenFunction( Motorized.writeUpdateStream, gearboxMogli.newWriteUpdateStream )
+Cylindered.setDirty = Utils.appendedFunction( Cylindered.setDirty, gearboxMogli.afterCylinderedSetDirty )
+AttacherJoints.updateAttacherJointRotation = Utils.appendedFunction( AttacherJoints.updateAttacherJointRotation, gearboxMogli.afterUpdateAttacherJointRotation )
 --**********************************************************************************************************	
 
 --local oldClamp = Utils.clamp
