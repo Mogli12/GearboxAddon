@@ -4841,17 +4841,17 @@ function gearboxMogli:draw()
 			revShow = not revShow
 		end
 			
-		if not ( self:mrGbMGetNeutralActive() ) then
-			if revShow then
-				gearboxMogli.ovArrowDownWhite:render()
-			else
-				gearboxMogli.ovArrowUpWhite:render()
-			end
-		elseif self.mrGbMS.Handbrake then
+		if self.mrGbMS.Handbrake then
 			if revShow then
 				gearboxMogli.ovHandBrakeDown:render()
 			else
 				gearboxMogli.ovHandBrakeUp:render()
+			end
+		elseif not ( self:mrGbMGetNeutralActive() ) then
+			if revShow then
+				gearboxMogli.ovArrowDownWhite:render()
+			else
+				gearboxMogli.ovArrowUpWhite:render()
 			end
 		else
 			if revShow then
