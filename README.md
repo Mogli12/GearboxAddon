@@ -1,5 +1,8 @@
 # GearboxAddOn for Farming Simulator 2017
 
+## Taking a Break
+I have noticed that I do not play Farming Simulator anymore. I just check from time to time if the gearbox addon is working the way I wanted it to be. But overall I am a little bit tired and I will pause this project for now.
+
 ## Current Status
 I managed to switch the gearbox via buyable configuration. Please be careful with this version. It might be that the bought transmission is lost when opening a savegame. This is work in progress.
 
