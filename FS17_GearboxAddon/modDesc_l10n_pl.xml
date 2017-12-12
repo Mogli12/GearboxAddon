@@ -122,8 +122,27 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="Ustawienia"/>
-		<text name="gearboxMogliTIP_Help_1"              text="Pomoc 1"/>
+		<text name="gearboxMogliTIP_Help_1"              text="Wstęp"/>
 		<text name="gearboxMogliTIP_Inputs"              text="Klawisze"/>
+		
+		<!-- tool tips -->
+		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Ograniczenie maksymalnej prędkości jazdy do aktualnej wartości ustawionej na tempomacie"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="Załączanie napędu na wszystkie koła"/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Blokowanie tylnego mechanizmu różnicowego (napęd na wszystkie koła musi być włączony!!)"/>
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Blokowanie tylnego mechanizmu różnicowego"/>
+		<text name="gearboxMogliTIP_MINRPM"              text="Gaz ręczny"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Poprawiny współczynnik dla skrzyni CVT"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatyczne sprzęgło"/>
+		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatyczna zmiana biegów jak w realnym pojeździe"/>
+		<text name="gearboxMogliTIP_AllAutoMode"         text="Ustawienia skrzyni uproszczonej (czy zakresy i biegi mają przełączane automatycznie)"/>
+		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Wyświetla docelowe obroty silnika na HUDzie"/>
+		<text name="gearboxMogliTIP_DrawReqPower"        text="Wyświetla obecną moc na HUDzie"/>
+		<text name="gearboxMogliTIP_EnableAI"            text="Ustawiania dla pomocnika"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Zamiana biegów z 1 zakresem"/>
+		<text name="gearboxMogliTIP_GearShifterMode"     text="Zmiana biegów drążkiem (wymagana kierownica z shifterem)"/>
+		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Zmiana kierunku jazdy (wymagana kierownica z shifterem)"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"        text="Najniższe docelowe obroty silnika"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Najwyższe docelowe obroty silnika"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Nie można zmienić biegu; Sprzęgło"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Nie można zmienić biegu; Prędkość"/>
