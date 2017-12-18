@@ -119,6 +119,11 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min. Solldrehzahl"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max. Solldrehzahl"/>
+		<text name="gearboxMogliTEXT_MatchGears"         text="Gang beim Gruppenwechsel"/>
+		<text name="gearboxMogliTEXT_MatchRanges"        text="Gruppe beim Gangwechsel"/>
+		<text name="gearboxMogliTEXT_MATCH_1"            text="nicht anpassen"/>
+		<text name="gearboxMogliTEXT_MATCH_2"            text="nur am Anfang und Ende"/>
+		<text name="gearboxMogliTEXT_MATCH_3"            text="automatisch anpassen"/>
 		
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="Einstellungen"/>
@@ -143,6 +148,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Diese Einstellung ist nur sinnvoll mit einem Lenkrad mit Schalthebel"/>
 		<text name="gearboxMogliTIP_MinTargetRpm"        text="Untere Solldrehzahl manuell einstellen"/>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Obere Solldrehzahl manuell einstellen"/>
+		<text name="gearboxMogliTIP_MatchGears"          text="Gang beim Gruppenwechsel automatisch anpassen"/>
+		<text name="gearboxMogliTIP_MatchRanges"         text="Gruppe beim Gangwechsel automatisch anpassen"/>
 		                                                
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Schalten nicht möglich; Kupplung"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Schalten nicht möglich; Geschwindigkeit"/>

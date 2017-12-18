@@ -118,6 +118,11 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min target RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max target RPM"/>
+		<text name="gearboxMogliTEXT_MatchGears"         text="speed matching (gears)"/>
+		<text name="gearboxMogliTEXT_MatchRanges"        text="speed matching (range)"/>
+		<text name="gearboxMogliTEXT_MATCH_1"            text="do not match"/>
+		<text name="gearboxMogliTEXT_MATCH_2"            text="only at first or last"/>
+		<text name="gearboxMogliTEXT_MATCH_3"            text="match automatically"/>
 		
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="settings"/>

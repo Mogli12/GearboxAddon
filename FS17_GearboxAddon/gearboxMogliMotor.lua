@@ -622,7 +622,14 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 			speedLimit = self.ptoSpeedLimit
 		end
 		
-		if forGetTorque or self.limitMaxRpm then
+		local limitRpmNow = false
+		if forGetTorque then
+			limitRpmNow = not ( self.limitMaxRpm )
+		else
+			limitRpmNow = self.limitMaxRpm
+		end
+		
+		if limitRpmNow then
 			speedLimit = math.min( speedLimit, self:getSpeedLimit() )
 		elseif self.vehicle.mrGbMS.ConstantRpm then
 			speedLimit = math.min( speedLimit, self:getSpeedLimit() + gearboxMogli.speedLimitBrake )
@@ -644,11 +651,13 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 			curMaxRpm  = self.vehicle.mrGbMS.CurMinRpm 
 		end
 		
-		speedLimit = self.vehicle:getSpeedLimit(true)
-		if speedLimit < gearboxMogli.huge then
-			speedLimit = speedLimit * gearboxMogli.kmhTOms
-			speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
-			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
+		if limitRpmNow then
+			speedLimit = self.vehicle:getSpeedLimit(true)
+			if speedLimit < gearboxMogli.huge then
+				speedLimit = speedLimit * gearboxMogli.kmhTOms
+				speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
+				curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
+			end
 		end
 	end
 	

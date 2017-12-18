@@ -195,6 +195,7 @@ function gearboxMogliRegister:add()
 	local prelen = 0
 	if prefix ~= nil and prefix ~= "" then
 		prelen = string.len( prefix )
+		g_i18n.globalI18N.texts.gearboxMogliInputPrefix = prefix
 	end
 	for m,t in pairs( g_i18n.texts ) do
 		local n = nil

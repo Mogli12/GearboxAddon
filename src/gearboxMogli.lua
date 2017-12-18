@@ -103,7 +103,7 @@ gearboxMogliGlobals.debugPrint            = false
 gearboxMogliGlobals.debugInfo             = false 
 gearboxMogliGlobals.transmissionEfficiency= 0.96
 -- Giants is cheating: 0.86 * 0.88 = 0.7568 > 0.72 => torqueFactor = 0.86 * 0.88 / ( 0.72 * 0.94 )
-gearboxMogliGlobals.torqueFactor          = 0.86 * 0.88 / ( 0.72 * gearboxMogliGlobals.transmissionEfficiency )  
+gearboxMogliGlobals.torqueFactor          = 1 --0.86 * 0.88 / ( 0.72 * gearboxMogliGlobals.transmissionEfficiency )  
 gearboxMogliGlobals.blowOffVentilVol      = 0.14
 gearboxMogliGlobals.drawTargetRpm         = false 
 gearboxMogliGlobals.drawReqPower          = false
@@ -629,9 +629,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.Engine.maxTorqueRpm = 0
 	self.mrGbMS.Engine.minRpm = gearboxMogli.huge
 	self.mrGbMS.Engine.maxRpm = 0
+	self.mrGbMS.TorqueFactor  = 1
 
 	local torqueI = 0
-	local torqueF = nil
 	local torqueP = 0
 	local realEngineBaseKey = nil
 	local minTgtDft = 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm -- ~1330 RPM if rated = 2100
@@ -711,10 +711,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 				if self.mrIsMrVehicle then
 					tf = 1
 				end
-				torqueF = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#torqueFactor"), tf) / 1000
+				self.mrGbMS.TorqueFactor = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#torqueFactor"), tf) / 1000
 			end
 			
-			torque = torque * torqueF 
+			torque = torque * self.mrGbMS.TorqueFactor 
 		
 			self.mrGbMS.Engine.torqueValues[torqueI+1] = {v=torque, time = rpm}
 					
@@ -734,7 +734,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end		
 			if      ecoTorque ~= nil
 					and ( ecoTorque > 0 or self.mrGbMS.Engine.ecoTorqueValues ~= nil ) then
-				ecoTorque = ecoTorque * torqueF 
+				ecoTorque = ecoTorque * self.mrGbMS.TorqueFactor 
 				
 				if self.mrGbMS.Engine.ecoTorqueValues == nil then
 					self.mrGbMS.Engine.ecoTorqueValues = {}
@@ -1821,6 +1821,18 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.StartInSmallestRange = false
 	end
 	
+	if       self.mrGbMS.MatchGears  ~= "end"
+			and  self.mrGbMS.MatchGears  ~= "true" then
+		self.mrGbMS.MatchGears           = "false"
+	end
+	if       self.mrGbMS.MatchRanges ~= "end"
+			and  self.mrGbMS.MatchRanges ~= "true" then
+		self.mrGbMS.MatchRanges          = "false"
+	end
+	
+	self.mrGbMS.MatchRanges0 = self.mrGbMS.MatchRanges 
+	self.mrGbMS.MatchGears0  = self.mrGbMS.MatchGears  
+	
 --**************************************************************************************************	
 	
 	local function countFR( array )
@@ -2523,7 +2535,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueSenseFront  = 1
 			self.mrGbMS.SpeedRatioFront   = 1
 			self.mrGbMS.TorqueRatioBack   = self.differentials[2].torqueRatio
-			self.mrGbMS.TorqueSenseBack   = 1
+			self.mrGbMS.TorqueSenseBack   = 0.75
 			self.mrGbMS.SpeedRatioBack    = 1
 			
 			-- profile == "manual" is default 
@@ -4896,7 +4908,7 @@ function gearboxMogli:draw()
 --	end
 --end
 
-	g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliSETTINGS", "Settings"),InputBinding.gearboxMogliSETTINGS)		
+	g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliInputPrefix","")..gearboxMogli.getText("gearboxMogliSETTINGS", "Settings"),InputBinding.gearboxMogliSETTINGS)		
 	
 end 
 
@@ -5008,6 +5020,12 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.DiffLockBack then
 			attributes = attributes.." mrGbMDiffLockBack=\"" .. tostring( self.mrGbMS.DiffLockBack ) .. "\""     
 		end
+		if self.mrGbMS.MatchGears ~= self.mrGbMS.MatchGears0 then
+			attributes = attributes.." mrGbMMatchGears=\"" .. tostring( self.mrGbMS.MatchGears ) .. "\""     
+		end
+		if self.mrGbMS.MatchRanges ~= self.mrGbMS.MatchRanges0 then
+			attributes = attributes.." mrGbMMatchRanges=\"" .. tostring( self.mrGbMS.MatchRanges ) .. "\""     
+		end
 	end 
 	
 	return attributes
@@ -5087,6 +5105,8 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockBack"  , "DiffLockBack"      )
 
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
+		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchGears"    , "MatchGears"        )
+		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchRanges"   , "MatchRanges"       )
 		
 		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMinTarget"     , "MinTarget"         )
 		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMaxTarget"     , "MaxTarget"         )
@@ -7495,22 +7515,24 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		ccBrake = true
 	end
 	
+	local currentSpeedKmh = currentSpeed * 3600
+	
 	if     not self.steeringEnabled then
 	-- hired worker => limit max RPM
 		self.motor.limitMaxRpm = true
 	elseif not ccOn then
 	-- speed limit off => no limit
 		self.motor.limitMaxRpm = false
-	elseif math.abs( currentSpeed ) * 3600 <= speedLimit then
+	elseif currentSpeedKmh <= speedLimit then
 	-- below speed limit => limit max RPM
 		self.motor.limitMaxRpm = true
 	elseif self.motor.usedTransTorque < gearboxMogli.eps then
 	-- no torque used => no limit => we can go faster downhill
 		self.motor.limitMaxRpm = false
+	-- else keep current value !!!
 	end
 		
 	do
-		local cs = currentSpeed * 3600
 		local sl = self:getSpeedLimit(true)
 		if      not self.motor.limitMaxRpm 
 		    and ccOn
@@ -7520,13 +7542,12 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end
 		sl = sl + gearboxMogli.extraSpeedLimit + gearboxMogli.extraSpeedLimit
 		local bp = 0
-		if cs >= sl + 1 then
+		if currentSpeedKmh >= sl + 1 then
 			bp = 1
-		elseif cs > sl then
-			bp = cs - sl
+		elseif currentSpeedKmh > sl then
+			bp = currentSpeedKmh - sl
 		end
 		if bp > gearboxMogli.eps then
-			acceleration = 0
 			if bp > 0.8 then
 				brakeLights  = true
 			end
@@ -7585,7 +7606,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		self.setReverseLightsVisibility(self, self.mrGbMS.ReverseActive)
 	end
 	
-	if acceleration > 0 then
+	if acceleration > 0 or brakePedal <= 0 then
 		local ref = 0
 		if self.mrGbML.lastAcceleration ~= nil and self.mrGbML.lastAcceleration > 0 then
 			ref = self.mrGbML.lastAcceleration
@@ -8212,7 +8233,7 @@ function gearboxMogli:showSettingsUI()
 		self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 	elseif  self.mrGbMS.ModifyDifferentials              then
 		local function getOpenText( torqueRatio, torqueSense, speedRatio )
-			if     torqueSense >= 1 then
+			if     torqueSense >  0.81 then
 				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_open", "open" )
 			elseif torqueSense >  gearboxMogli.eps then
 				return gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_lsd", "limited slip" )
@@ -8315,6 +8336,29 @@ function gearboxMogli:showSettingsUI()
 	table.insert( self.mrGbMUI.HandThrottle, string.format("%4.0f %s", self.mrGbMS.MaxTargetRpm , gearboxMogli.getText("gearboxMogliUNIT_rpm", "rpm" )))
 	self.mrGbMUI.MaxTarget = self.mrGbMUI.HandThrottle
 	self.mrGbMUI.MinTarget = self.mrGbMUI.HandThrottle
+	
+	if      self.mrGbMS.MatchGears == "false" 
+			and ( self.mrGbMS.DisableManual 
+				 or math.max( self.mrGbMS.CountGearsF,  self.mrGbMS.CountGearsR  ) < 2
+				 or math.max( self.mrGbMS.CountRange1F, self.mrGbMS.CountRange1R ) < 2
+				 or self.mrGbMS.AutoShiftGears ) then
+		self.mrGbMUI.MatchGears  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	else
+		self.mrGbMUI.MatchGears  = { gearboxMogli.getText( "gearboxMogliTEXT_MATCH_1", "off" ),
+																 gearboxMogli.getText( "gearboxMogliTEXT_MATCH_2", "end" ),
+																 gearboxMogli.getText( "gearboxMogliTEXT_MATCH_3", "on" ) }
+	end
+	if      self.mrGbMS.MatchRanges == "false" 
+			and ( self.mrGbMS.DisableManual 
+				 or math.max( self.mrGbMS.CountGearsF,  self.mrGbMS.CountGearsR  ) < 2
+				 or math.max( self.mrGbMS.CountRange1F, self.mrGbMS.CountRange1R ) < 2
+				 or self.mrGbMS.AutoShiftHl ) then
+		self.mrGbMUI.MatchRanges = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	else
+		self.mrGbMUI.MatchRanges = { gearboxMogli.getText( "gearboxMogliTEXT_MATCH_1", "off" ),
+																 gearboxMogli.getText( "gearboxMogliTEXT_MATCH_2", "end" ),
+																 gearboxMogli.getText( "gearboxMogliTEXT_MATCH_3", "on" ) }
+	end
 	
 	g_gearboxMogliScreen:setVehicle( self )
 	g_gui:showGui( "gearboxMogliScreen" )
@@ -8530,6 +8574,42 @@ function gearboxMogli:mrGbMUISetMaxTarget( value )
 end
 function gearboxMogli:mrGbMUIGetMaxTarget( )
 	return gearboxMogli.mrGbMUIGetXXThrottle( self, "MaxTarget" )
+end
+
+function gearboxMogli:mrGbMUISetMatchGears( value )
+	if     value == 2 then
+		self:mrGbMSetState( "MatchGears", "end" )
+	elseif value == 3 then
+		self:mrGbMSetState( "MatchGears", "true" )
+	else
+		self:mrGbMSetState( "MatchGears", "false" )
+	end
+end
+function gearboxMogli:mrGbMUIGetMatchGears( )
+	if     self.mrGbMS.MatchGears == "end"  then
+		return 2
+	elseif self.mrGbMS.MatchGears == "true" then
+		return 3
+	end
+	return 1
+end
+
+function gearboxMogli:mrGbMUISetMatchRanges( value )
+	if     value == 2 then
+		self:mrGbMSetState( "MatchRanges", "end" )
+	elseif value == 3 then
+		self:mrGbMSetState( "MatchRanges", "true" )
+	else
+		self:mrGbMSetState( "MatchRanges", "false" )
+	end
+end
+function gearboxMogli:mrGbMUIGetMatchRanges( )
+	if     self.mrGbMS.MatchRanges == "end"  then
+		return 2
+	elseif self.mrGbMS.MatchRanges == "true" then
+		return 3
+	end
+	return 1
 end
 
 if _G[g_currentModName..".gearboxMogliMotor"] == nil then
