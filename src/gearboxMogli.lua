@@ -1384,8 +1384,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		while true do
 			local baseName2 = baseName .. string.format(".extraName(%d)",r)
 			r = r + 1
-			local extraName = getXMLString(xmlFile, baseName2 .. "#name")
-			if extraName == nil then
+			local extraName  = getXMLString(xmlFile, baseName2 .. "#name")
+			local extraSpeed = getXMLFloat(xmlFile, baseName2 .. "#speed")
+			if extraName == nil and extraSpeed == nil then
 				break
 			end
 			local r1 = Utils.getNoNil( getXMLInt( xmlFile, baseName2 .. "#range1" ),  0 ) 
@@ -1396,7 +1397,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			if newEntry.extraNames[r1] == nil then
 				newEntry.extraNames[r1] = {}
 			end
-			newEntry.extraNames[r1][r2] = extraName
+			newEntry.extraNames[r1][r2].name  = extraName
+			newEntry.extraNames[r1][r2].speed = extraSpeed
 		end
 		
 		table.insert(self.mrGbMS.Gears, newEntry)  -- m/s
@@ -4003,19 +4005,23 @@ function gearboxMogli:update(dt)
 -- sound pitch and volume
 --**********************************************************************************************************			
 	
-	if self.motorSoundLoadFactor ~= nil and self.motorSoundLoadFactor > 0.5 then
-	-- at least half of the motor sound load volume even at low RPM
-		self.motorSoundLoadMinimalVolumeFactor = math.max( self.mrGbMS.Sound.LoadMinimalVolumeFactor, ( self.motorSoundLoadFactor - 0.5 ) * self.sampleMotorLoad.volume )
-	else
+	if self.sampleMotorLoad.volume == nil then
 		self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
-	end		
+	else
+		if self.motorSoundLoadFactor ~= nil and self.motorSoundLoadFactor > 0.5 then
+		-- at least half of the motor sound load volume even at low RPM
+			self.motorSoundLoadMinimalVolumeFactor = math.max( self.mrGbMS.Sound.LoadMinimalVolumeFactor, ( self.motorSoundLoadFactor - 0.5 ) * self.sampleMotorLoad.volume )
+		else
+			self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
+		end		
 
-	if     self.mrGbMS.DoubleClutch == 1 then
-		self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
-		self.motorSoundLoadFactor              = self.actualLoadPercentage
-	elseif self.mrGbMS.DoubleClutch == 2 and self.axisForward ~= nil then
-		self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, -self.axisForward * self.sampleMotorLoad.volume )
-		self.motorSoundLoadFactor              = self.actualLoadPercentage
+		if     self.mrGbMS.DoubleClutch == 1 then
+			self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
+			self.motorSoundLoadFactor              = self.actualLoadPercentage
+		elseif self.mrGbMS.DoubleClutch == 2 and self.axisForward ~= nil then
+			self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, -self.axisForward * self.sampleMotorLoad.volume )
+			self.motorSoundLoadFactor              = self.actualLoadPercentage
+		end
 	end
 	
 	if      self.steeringEnabled 
@@ -6051,8 +6057,9 @@ function gearboxMogli:mrGbMGetGearText()
 		
 		while true do		
 			if      self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1]     ~= nil 
-					and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1][r2] ~= nil then
-				gearText = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1][r2]
+					and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1][r2] ~= nil
+					and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1][r2].name ~= nil then
+				gearText = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[r1][r2].name
 				if r1 == 0 and self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].name ~= nil and self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].name ~= "" then
 					gearText = self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].name .." ".. gearText
 				end
@@ -6134,6 +6141,14 @@ function gearboxMogli:mrGbMGetGearSpeed()
 			s3 = s3 * self.mrGbMS.HydrostaticMax
 		end
 	end
+	
+	if      self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames ~= nil 
+			and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[self.mrGbMS.CurrentRange] ~= nil 
+			and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[self.mrGbMS.CurrentRange][self.mrGbMS.CurrentRange2] ~= nil 
+			and self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[self.mrGbMS.CurrentRange][self.mrGbMS.CurrentRange2].speed ~= nil then
+		s1 = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].extraNames[self.mrGbMS.CurrentRange][self.mrGbMS.CurrentRange2].speed
+	end
+	
 	return s1,s2,s3
 end
 
