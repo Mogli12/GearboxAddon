@@ -1397,8 +1397,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			if newEntry.extraNames[r1] == nil then
 				newEntry.extraNames[r1] = {}
 			end
-			newEntry.extraNames[r1][r2].name  = extraName
-			newEntry.extraNames[r1][r2].speed = extraSpeed
+			newEntry.extraNames[r1][r2] = { name = extraName, speed = extraSpeed }
 		end
 		
 		table.insert(self.mrGbMS.Gears, newEntry)  -- m/s
