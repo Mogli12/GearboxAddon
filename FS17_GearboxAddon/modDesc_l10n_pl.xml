@@ -119,6 +119,11 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="Min. docelowe RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="Max. docelowe RPM"/>
+		<text name="gearboxMogliTEXT_MatchGears"         text="Bieg przy zmienie zakresu"/>
+		<text name="gearboxMogliTEXT_MatchRanges"        text="Zakres przy zmienie biegu"/>
+		<text name="gearboxMogliTEXT_MATCH_1"            text="Nie dostosowuj"/>
+		<text name="gearboxMogliTEXT_MATCH_2"            text="Tylko dla 1 i ostatniego"/>
+		<text name="gearboxMogliTEXT_MATCH_3"            text="Dostosuj automatycznie"/>
 		
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="Ustawienia"/>
@@ -143,6 +148,8 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Zmiana kierunku jazdy (wymagana kierownica z shifterem)"/>
 		<text name="gearboxMogliTIP_MinTargetRpm"        text="Najniższe docelowe obroty silnika"/>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Najwyższe docelowe obroty silnika"/>
+		<text name="gearboxMogliTIP_MatchGears"          text="Automatycznie dostosowuje bieg podczas zmiany zakresów"/>
+		<text name="gearboxMogliTIP_MatchRanges"         text="Automatycznie dostosowuje zakres podczas zmiany biegów"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Nie można zmienić biegu; Sprzęgło"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Nie można zmienić biegu; Prędkość"/>
