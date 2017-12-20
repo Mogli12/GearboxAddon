@@ -31,7 +31,7 @@
 		<text name="input_gearboxMogliREVERSE"             text="Gearbox: Задний ход"/>
 		<text name="input_gearboxMogliHANDBRAKE"           text="Gearbox: Стояночный тормоз"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"         text="Gearbox: Автоматическое сцепление"/>
-		<text name="input_gearboxMogliCLUTCH"              text="Gearbox: Аналоговое цепление"/>
+		<text name="input_gearboxMogliCLUTCH"              text="Gearbox: Аналоговое сцепление"/> <!-- !!!!!!!!!!! -->
 		<text name="input_gearboxMogliCLUTCH_1"            text="Gearbox: Сцепление выжать"/>
 		<text name="input_gearboxMogliCLUTCH_2"            text="Gearbox: Сцепление отпустить"/>
 		<text name="input_gearboxMogliCLUTCH_3"            text="Gearbox: Цифровое сцепление"/>
@@ -117,22 +117,45 @@
 		
 		<text name="gearboxMogliTEXT_MinTargetRpm"         text="min заданные обороты"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="max заданные обороты"/>
+		<text name="gearboxMogliTEXT_MatchGears"           text="Согласование скорости (передачи)"/>
+		<text name="gearboxMogliTEXT_MatchRanges"          text="Согласование скорости (диапазоны)"/>
+		<text name="gearboxMogliTEXT_MATCH_1"              text="не согласовывать"/>
+		<text name="gearboxMogliTEXT_MATCH_2"              text="только с первой или последней"/>
+		<text name="gearboxMogliTEXT_MATCH_3"              text="автоматическое согласование"/>
 		
-		
-		<text name="tooltip_gearboxMogliSPEEDLIMIT"        text="Это будет подказка"/>
-
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"              text="Настройки"/>
 		<text name="gearboxMogliTIP_Help_1"                text="Справка 1"/>
 		<text name="gearboxMogliTIP_Inputs"                text="Сочетание клавиш"/>
 		
+		<!-- tool tips -->
+		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Ограничивает максимальную скорость для текущего диапазона круиз-контроля"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"        text="Привод на четыре колеса или блокировка промежуточного дифференциала"/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"         text="Блокировка переднего осевого дифференциала; необходим 4wd"/>
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"          text="Блокировка заднего осевого дифференциала"/>
+		<text name="gearboxMogliTIP_MINRPM"                text="Ручной газ"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"            text="Фиксированное передаточное отношение для бесступенчатых коробок передач"/> <!-- !!!!!!!!!!! -->
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"           text="Автоматическое сцепление"/>
+		<text name="gearboxMogliTIP_AUTOMATIC"             text="Автоматическое переключение, как у реального автомобиля"/>
+		<text name="gearboxMogliTIP_AllAutoMode"           text="Настройка для упрощенного режима; вы можете выбрать, что должно переключаться автоматически"/>
+		<text name="gearboxMogliTIP_DrawTargetRpm"         text="Отображать текущие обороты на HUD"/>
+		<text name="gearboxMogliTIP_DrawReqPower"          text="Отображать текущую мощность на HUD"/>
+		<text name="gearboxMogliTIP_EnableAI"              text="Настройка для наемного работника"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"     text="Поменять местами сочетание клавиш для переключения диапазонов с сочетанием клавиш для передач"/>
+		<text name="gearboxMogliTIP_GearShifterMode"       text="Этот параметр имеет смысл только с рулевым колесом с рычагом переключения передач"/>
+		<text name="gearboxMogliTIP_ShuttleShifterMode"    text="Этот параметр имеет смысл только с рулевым колесом с рычагом переключения передач"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"          text="Минимальные целевые обороты"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Максимальные целевые обороты"/>
+		<text name="gearboxMogliTIP_MatchGears"            text="Автоматическая настройка передач при переключении групп"/>
+		<text name="gearboxMogliTIP_MatchRanges"           text="Автоматическая настройка группы при переключении передач"/>
+		
 		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"         text="Нельзя переключить передачу: обороты"/>
 		<text name="gearboxMogliTEXT_Stall1"               text="Слишком низкие обороты"/>
-		<text name="gearboxMogliTEXT_Stall2"               text="Мотор заглох, потому что обороты были очень низкими"/>
+		<text name="gearboxMogliTEXT_Stall2"               text="Двигатель заглох, потому что обороты были очень низкими"/>
 		<text name="gearboxMogliTEXT_Stall3"               text="Слишком много мощности отбирается через ВОМ"/>
-		<text name="gearboxMogliTEXT_Stall4"               text="Мотор заглох, потому что слишком много мощности отбиралось через ВОМ"/>
+		<text name="gearboxMogliTEXT_Stall4"               text="Двигатель заглох, потому что слишком много мощности отбиралось через ВОМ"/>
 		<text name="gearboxMogliTEXT_ClutchOverheating"    text="Сцепление перегрелось"/>
 		
 		<!-- texts in the HUD => keep them short -->
@@ -149,7 +172,7 @@
 		<text name="gearboxMogliDRAW_hand"                 text="Ручной газ"/>
 		<text name="gearboxMogliDRAW_fixed"                text="Фикс.коэфф."/>
 		<text name="gearboxMogliDRAW_combine"              text="Производительн."/>
-		<text name="gearboxMogliDRAW_wheelSlip"            text="Скольжение колёс"/>
+		<text name="gearboxMogliDRAW_wheelSlip"            text="Пробуксовка колёс"/>
 		
 		<text name="gearboxMogliUNIT_rpm"                  text="об."/>
 		<text name="gearboxMogliUNIT_HP"                   text="л.с."/>
@@ -163,14 +186,19 @@
 	
 		<longTexts>
 		<longText name="gearboxMogliHelp_1"><![CDATA[
-Не каждый трактор имеет бесступенчатую трансмиссию. И даже бесступенчатые трансмиссии не так просты по конструкции, как стандартная в FS17. Этот мод добавляет на основе файла gearboxAddonConfig.xml коробку передач ко всем сконфигурированным транспорным средствам. 
+Не каждый трактор имеет бесступенчатую трансмиссию. И даже бесступенчатые трансмиссии не так просты по конструкции, как стандартная в FS17. Этот мод добавляет, на основе файла gearboxAddonConfig.xml, коробку передач ко всем сконфигурированным транспорным средствам. 
 Могут быть смоделированы многие виды коробок передач. Существуют классические коробки передач с шестернями, одной или двумя группами, а также реверсивные передачи или группы. 
 Когда передаточное число будет уменьшено до 0, это приведет к передаче PowerShift. В современных тракторах PowerShift трансмиссия часто сочетается с автоматическим переключением передач.
 
-Новое в версии 1.1: теперь поддерживается бесступенчатые коробки передач. 
+Теперь поддерживается бесступенчатые коробки передач. 
 Есть модели с одной или двумя передачами, такими как Fendt Vario. 
 Другие модели объединяют четыре автоматически переключаемых механических механизма с бесступенчатым гидростатическим приводом. 
-Все эти бесступенчатые передачи имеют одну общую черту: эффективность сильно варьируется в зависимости от передаточного отношения.]]></longText>
+Все эти бесступенчатые передачи имеют одну общую черту: эффективность сильно варьируется в зависимости от передаточного отношения.
+
+Существуют дополнительные режимы, такие как AllAuto и ECO. В режиме ECO автомобиль по-прежнему имеет максимальный крутящий момент, но только отдаётся тольк 90% мощности для экономии топлива. В AllAuto коробка передач переключится автоматически.
+
+Наконец, версия 1.3 имеет ручное управление сцеплением с помощью одной кнопки. Эта полуавтоматическая муфта в основном предназначена 
+для владельцев рулевого колеса, так как настоящая педаль сцепления в FS17 должным образом не поддерживается.]]></longText>
 	</longTexts>
 	
 </l10n>
