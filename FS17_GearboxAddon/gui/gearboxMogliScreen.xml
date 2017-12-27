@@ -64,11 +64,20 @@
 						</GuiElement>
 						
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="FixedRatio" toolTip="$l10n_gearboxMogliTIP_FIXEDRATIO" onCreate="onCreateSubElement" onCreateArgs="list"
-												focusId="16" focusChangeTop="15" focusChangeBottom="101">
+												focusId="16" focusChangeTop="15" focusChangeBottom="17">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
 							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliFIXEDRATIO"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="EnableAI" toolTip="$l10n_gearboxMogliTIP_EnableAI" onCreate="onCreateSubElement" onCreateArgs="list"
+												focusId="17" focusChangeTop="16" focusChangeBottom="101">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text"   profile="multiTextOptionText" />
+							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_EnableAI"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 					</GuiElement>
@@ -119,12 +128,21 @@
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 
-						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="EnableAI" toolTip="$l10n_gearboxMogliTIP_EnableAI" onCreate="onCreateSubElement" onCreateArgs="list"
-												focusId="26" focusChangeTop="25" focusChangeBottom="101">
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MinAutoGearSpeed" toolTip="MinAutoGearSpeed" onCreate="onCreateSubElement" onCreateArgs="list"
+												focusId="26" focusChangeTop="25" focusChangeBottom="27">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
-							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_EnableAI"/>
+							<GuiElement type="text"   profile="multiTextOptionTitle" text="MinAutoGearSpeed"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MaxAutoGearSpeed" toolTip="MaxAutoGearSpeed" onCreate="onCreateSubElement" onCreateArgs="list"
+												focusId="27" focusChangeTop="26" focusChangeBottom="101">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text"   profile="multiTextOptionText" />
+							<GuiElement type="text"   profile="multiTextOptionTitle" text="MaxAutoGearSpeed"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 					</GuiElement>

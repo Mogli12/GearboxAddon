@@ -423,6 +423,14 @@ function gearboxMogliLoader:loadgearboxMogli( savegame )
 	elseif configuration.source == 0 then
 		local key
 		local xmlFile = self.xmlFile 
+		
+		if configuration.config ~= nil then 
+			key = configuration.baseName ..string.format("vehicle.transmissions.transmission(%d)", configuration.config - 1 )
+			gearboxMogli.initFromXml( self, self.xmlFile, key, nil, "vehicle", false )
+			self.mrGbMLGearbox1 = true
+			return 
+		end
+		
 		if self.configurations ~= nil and self.configurations.motor ~= nil then
 			key = string.format("vehicle.motorConfigurations.motorConfiguration(%d).gearboxMogli", self.configurations.motor-1)
 			if gearboxMogliLoader.testXmlFile( self.xmlFile, key, ".gears.gear(0)#speed", ".gears.gear(0)#inverseRatio", ".hydrostatic.efficiency#ratio" ) then

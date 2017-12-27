@@ -278,8 +278,22 @@ function gearboxMogliRegister:addConfigurations()
 			local typeName = getXMLString(dummySelf.xmlFile, "vehicle#type");
 			
 			local hasVehicleConfig = gearboxMogliRegister.testXML( dummySelf.xmlFile, "vehicle", ".gearboxMogli" )
-														or gearboxMogliRegister.testXML( dummySelf.xmlFile, "vehicle.motorConfigurations.motorConfiguration(0)", ".gearboxMogli" )					
-		
+														or gearboxMogliRegister.testXML( dummySelf.xmlFile, "vehicle.motorConfigurations.motorConfiguration(0)", ".gearboxMogli" )
+														
+			local vehicleTransConf = nil
+			local j = 0
+			while true do
+				local s = getXMLString( dummySelf.xmlFile, string.format("vehicle.transmissions.transmission(%d)#name", j) )
+				if s == nil then
+					break
+				end
+				if vehicleTransConf == nil then
+					vehicleTransConf = {}
+				end
+				vehicleTransConf[j] = s
+				j = j + 1
+			end
+			
 			delete(dummySelf.xmlFile)
 			
 			local addMogliGearbox = false
@@ -306,7 +320,12 @@ function gearboxMogliRegister:addConfigurations()
 				local entry, configTab
 								
 				local isDefault = true
-				if hasVehicleConfig then
+				if vehicleTransConf ~= nil then
+					for j,s in pairs(vehicleTransConf) do						
+						table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = 0, config = j, isDefault = isDefault } )
+						isDefault = false
+					end
+				elseif hasVehicleConfig then
 					table.insert( modifiedItem.configurations, { name = "Gearbox (vehicle)", title = "Gearbox (vehicle)", source = 0, isDefault = isDefault } )
 				end
 					

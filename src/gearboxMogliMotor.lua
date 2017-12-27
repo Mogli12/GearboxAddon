@@ -3749,11 +3749,21 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 						end
 					end
 						
-					if p.gearSpeed < self.vehicle.mrGbMG.minAutoGearSpeed then
+					if p.gearSpeed * 3.6 < self.vehicle.mrGbMG.minAutoGearSpeed then
 					--p.priority = 10
 						isValidEntry = false
 						dumpIt = dumpIt .. string.format("\n%d is not valid (c)",i)
 					end
+					if      self.vehicle.mrGbMS.MinAutoGearSpeed > self.vehicle.mrGbMG.minAutoGearSpeed 
+							and p.gearSpeed * 3.6 < self.vehicle.mrGbMS.MinAutoGearSpeed then
+						isValidEntry = false
+						dumpIt = dumpIt .. string.format("\n%d is not valid (c)",i)
+					end
+					if      self.vehicle.mrGbMS.MaxAutoGearSpeed > self.vehicle.mrGbMG.minAutoGearSpeed 
+							and p.gearSpeed * 3.6 > self.vehicle.mrGbMS.MaxAutoGearSpeed then
+						isValidEntry = false
+						dumpIt = dumpIt .. string.format("\n%d is not valid (c)",i)
+					end					
 						
 					if p.gearSpeed > maxDcSpeed then
 						p.priority = 10
