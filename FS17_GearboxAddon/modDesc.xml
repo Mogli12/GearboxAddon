@@ -2,19 +2,19 @@
 <modDesc descVersion="38">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>2.3.0.7</version>
+	<version>2.3.0.8</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v3.0 build 307 von Mogli</de>
-			  <en>Gearbox v3.0 build 307 by mogli</en>
-				 <it>Cambio v3.0 build 307 by mogli</it>
-	 <fr>Transmission v3.0 build 307 by mogli</fr>
-				 <cz>Řazení v3.0 build 307 by mogli</cz>
-<pl>Skrzynia biegów v3.0 build 307 by mogli</pl>
-				<ru>Gearbox v3.0 build 307 by mogli</ru>
-				<ro>Gearbox v3.0 build 307 by mogli</ro>
+			 <de>Getriebe v3.0 build 308 von Mogli</de>
+			  <en>Gearbox v3.0 build 308 by mogli</en>
+				 <it>Cambio v3.0 build 308 by mogli</it>
+	 <fr>Transmission v3.0 build 308 by mogli</fr>
+				 <cz>Řazení v3.0 build 308 by mogli</cz>
+<pl>Skrzynia biegów v3.0 build 308 by mogli</pl>
+				<ru>Gearbox v3.0 build 308 by mogli</ru>
+				<ro>Gearbox v3.0 build 308 by mogli</ro>
 		</text>                  
 	</l10n>
 
@@ -50,7 +50,8 @@ Changelog 3.0:
 - open and lockable differentials
 - new settings UI
 - multiple transmission configurations per vehicle
-- works with FS17_moreRealistic
+- compatible with FS17_moreRealistic
+- compatible with FS17_handbrake
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
@@ -69,7 +70,8 @@ Changelog 3.0:
 - offene und sperrbare Differentiale
 - neuer Einstellungsdialog
 - verschiedenen Getriebekonfigurationen pro Fahrzeug
-- funktioniert auch zusammen mit FS17_moreRealistic
+- kompatibel zu FS17_moreRealistic
+- kompatibel zu FS17_handbrake
 ]]></de>
 
 		<it><![CDATA[

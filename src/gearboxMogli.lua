@@ -3269,6 +3269,17 @@ function gearboxMogli:update(dt)
 	end
 	
 --**********************************************************************************************************			
+-- FS17_handbrake => use self.handBrakeState	
+--**********************************************************************************************************
+	local enableHandbrake = true
+	if g_modIsLoaded["FS17_handbrake"] and type( self.handBrakeState ) == "boolean" then
+		enableHandbrake = false
+		if self.isServer then
+			self:mrGbMSetState( "Handbrake", self.handBrakeState )
+		end
+	end
+	
+--**********************************************************************************************************			
 -- text	
 --**********************************************************************************************************			
 	if self.isServer then
@@ -3412,7 +3423,7 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetState( "AllAuto", simplifiedAtClient )
 		end
 
-		if self.mrGbMS.AllAuto then
+		if enableHandbrake and self.mrGbMS.AllAuto then
 			self:mrGbMSetState( "Handbrake", not self.isMotorStarted )		
 		end
 		
@@ -3602,7 +3613,9 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliECO" ) then
 			self:mrGbMSetState( "EcoMode", not self.mrGbMS.EcoMode )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
-			self:mrGbMSetState( "Handbrake", not self.mrGbMS.Handbrake )
+			if enableHandbrake then
+				self:mrGbMSetState( "Handbrake", not self.mrGbMS.Handbrake )
+			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHUD" ) then
 			-- HUD mode	
 		--local m = self.mrGbMS.HudMode + 1
