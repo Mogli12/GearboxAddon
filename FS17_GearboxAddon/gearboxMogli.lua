@@ -311,8 +311,8 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
 	gearboxMogli.registerState( self, "DoubleClutch",  0 )
 	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
-    gearboxMogli.registerState( self, "HandbrakePullPlay",false )
-    gearboxMogli.registerState( self, "HandbrakeReleasePlay",false )
+    gearboxMogli.registerState( self, "HandbrakePullPlay", false )
+    gearboxMogli.registerState( self, "HandbrakeReleasePlay", false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -1260,19 +1260,18 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.GrindingSoundFile     = getXMLString( xmlFile, xmlString.. ".grindingGearsSound#file" )
 		self.mrGbMS.GrindingSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".grindingGearsSound#volume" ), 1 )
         self.mrGbMS.HandbrakePullSoundFile     = getXMLString( xmlFile, xmlString.. ".handbrakePullSound#file" )
-            self.mrGbMS.HandbrakePullSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSound#volume" ), 1 )
+        self.mrGbMS.HandbrakePullSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSound#volume" ), 1 )
         self.mrGbMS.HandbrakeReleaseSoundFile     = getXMLString( xmlFile, xmlString.. ".handbrakeReleaseSound#file" )
-            self.mrGbMS.HandbrakeReleaseSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakeReleaseSound#volume" ), 1 )
-
+        self.mrGbMS.HandbrakeReleaseSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakeReleaseSound#volume" ), 1 )
 	else
 		self.mrGbMS.BlowOffVentilFile     = nil
 		self.mrGbMS.BlowOffVentilVolume   = 0
 		self.mrGbMS.GrindingSoundFile     = nil
 		self.mrGbMS.GrindingSoundVolume   = 0
         self.mrGbMS.HandbrakePullSoundFile     = nil
-            self.mrGbMS.HandbrakePullSoundVolume   = 0
+        self.mrGbMS.HandbrakePullSoundVolume   = 1
         self.mrGbMS.HandbrakeReleaseSoundFile     = nil
-            self.mrGbMS.HandbrakeReleaseSoundVolume   = 0
+        self.mrGbMS.HandbrakeReleaseSoundVolume   = 1
 	end	
 
 	if self.mrGbMS.BlowOffVentilFile == nil then
@@ -1300,27 +1299,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	else
 		self.mrGbMS.GrindingSoundFile = Utils.getFilename( self.mrGbMS.GrindingSoundFile, self.baseDirectory )
 	end
-    
-    if self.mrGbMS.HandbrakePullSoundFile == nil then
-        if xmlSource == "vehicle" then
-            self.mrGbMS.HandbrakePullSoundVolume = 0
-        else
-            self.mrGbMS.HandbrakePullSoundVolume = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSoundVolume#volume" ), 1.5 )
-       end
-    else
-        self.mrGbMS.HandbrakePullSoundFile = Utils.getFilename( self.mrGbMS.HandbrakePullSoundFile, self.baseDirectory )
-    end
-
-    if self.mrGbMS.HandbrakeReleaseSoundFile == nil then
-        if xmlSource == "vehicle" then
-            self.mrGbMS.HandbrakeReleaseSoundVolume = 0
-        else
-            self.mrGbMS.HandbrakeReleaseSoundVolume = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".HandbrakeReleaseSoundVolume#volume" ), 1.5 )
-        end
-    else
-        self.mrGbMS.HandbrakeReleaseSoundFile = Utils.getFilename( self.mrGbMS.HandbrakeReleaseSoundFile, self.baseDirectory )
-    end
-
 		
 --**************************************************************************************************	
 -- Gears, Ranges, Reverse, ...
