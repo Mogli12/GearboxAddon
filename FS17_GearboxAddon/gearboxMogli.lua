@@ -311,8 +311,6 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
 	gearboxMogli.registerState( self, "DoubleClutch",  0 )
 	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
-    gearboxMogli.registerState( self, "HandbrakePullPlay", false )
-    gearboxMogli.registerState( self, "HandbrakeReleasePlay", false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -1255,23 +1253,23 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.Run2PitchEffect         = getXMLFloat(xmlFile, xmlString .. "#run2PitchEffect" )
 		
 	if xmlSource == "vehicle" then
-		self.mrGbMS.BlowOffVentilFile     = getXMLString( xmlFile, xmlString.. ".blowOffVentilSound#file" )
-		self.mrGbMS.BlowOffVentilVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".blowOffVentilSound#volume" ), 1 )
-		self.mrGbMS.GrindingSoundFile     = getXMLString( xmlFile, xmlString.. ".grindingGearsSound#file" )
-		self.mrGbMS.GrindingSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".grindingGearsSound#volume" ), 1 )
-        self.mrGbMS.HandbrakePullSoundFile     = getXMLString( xmlFile, xmlString.. ".handbrakePullSound#file" )
-        self.mrGbMS.HandbrakePullSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSound#volume" ), 1 )
-        self.mrGbMS.HandbrakeReleaseSoundFile     = getXMLString( xmlFile, xmlString.. ".handbrakeReleaseSound#file" )
-        self.mrGbMS.HandbrakeReleaseSoundVolume   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakeReleaseSound#volume" ), 1 )
+		self.mrGbMS.BlowOffVentilFile           = getXMLString( xmlFile, xmlString.. ".blowOffVentilSound#file" )
+		self.mrGbMS.BlowOffVentilVolume         = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".blowOffVentilSound#volume" ), 1 )
+		self.mrGbMS.GrindingSoundFile           = getXMLString( xmlFile, xmlString.. ".grindingGearsSound#file" )
+		self.mrGbMS.GrindingSoundVolume         = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".grindingGearsSound#volume" ), 1 )
+		self.mrGbMS.HandbrakePullSoundFile      = getXMLString( xmlFile, xmlString.. ".handbrakePullSound#file" )
+		self.mrGbMS.HandbrakePullSoundVolume    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSound#volume" ), 1 )
+		self.mrGbMS.HandbrakeReleaseSoundFile   = getXMLString( xmlFile, xmlString.. ".handbrakeReleaseSound#file" )
+		self.mrGbMS.HandbrakeReleaseSoundVolume = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakeReleaseSound#volume" ), 1 )
 	else
-		self.mrGbMS.BlowOffVentilFile     = nil
-		self.mrGbMS.BlowOffVentilVolume   = 0
-		self.mrGbMS.GrindingSoundFile     = nil
-		self.mrGbMS.GrindingSoundVolume   = 0
-        self.mrGbMS.HandbrakePullSoundFile     = nil
-        self.mrGbMS.HandbrakePullSoundVolume   = 1
-        self.mrGbMS.HandbrakeReleaseSoundFile     = nil
-        self.mrGbMS.HandbrakeReleaseSoundVolume   = 1
+		self.mrGbMS.BlowOffVentilFile           = nil
+		self.mrGbMS.BlowOffVentilVolume         = 0
+		self.mrGbMS.GrindingSoundFile           = nil
+		self.mrGbMS.GrindingSoundVolume         = 0
+		self.mrGbMS.HandbrakePullSoundFile      = nil
+		self.mrGbMS.HandbrakePullSoundVolume    = 1
+		self.mrGbMS.HandbrakeReleaseSoundFile   = nil
+		self.mrGbMS.HandbrakeReleaseSoundVolume = 1
 	end	
 
 	if self.mrGbMS.BlowOffVentilFile == nil then
@@ -3625,11 +3623,43 @@ function gearboxMogli:update(dt)
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHANDBRAKE" ) then
 			if enableHandbrake then
 				self:mrGbMSetState( "Handbrake", not self.mrGbMS.Handbrake )
-                if self.mrGbMS.Handbrake then
-                    self.mrGbMS.HandbrakePullPlay = true
-                else
-                    self.mrGbMS.HandbrakeReleasePlay = true
-                end
+        if self.mrGbMS.Handbrake then
+						-- handbrake pull
+					if self.mrGbMS.HandbrakePullSoundVolume > 0 then
+						if self.mrGbMS.HandbrakePullSoundFile == nil then
+							if gearboxMogli.HandbrakePullSoundSample == nil then
+								gearboxMogli.HandbrakePullSoundSample = createSample("handbrakePullSoundSample")
+								local fileName = Utils.getFilename( "handbrakePull.wav", gearboxMogli.baseDirectory )
+								loadSample(gearboxMogli.HandbrakePullSoundSample, fileName, false)
+							end
+							playSample( gearboxMogli.HandbrakePullSoundSample, 1, self.mrGbMS.HandbrakePullSoundVolume, 0 )
+						else
+							if self.mrGbML.HandbrakePullSoundSample == nil then
+								self.mrGbML.HandbrakePullSoundSample = createSample("handbrakePullSoundSample")
+								loadSample( self.mrGbML.HandbrakePullSoundSample, self.mrGbMS.HandbrakePullSoundFile, false )
+							end
+							playSample( self.mrGbML.HandbrakePullSoundSample, 1, self.mrGbMS.HandbrakePullSoundVolume, 0 )
+						end
+					end
+				else
+					-- handbrake release
+					if self.mrGbMS.HandbrakeReleaseSoundVolume > 0 then
+						if self.mrGbMS.HandbrakeReleaseSoundFile == nil then
+							if gearboxMogli.HandbrakeReleaseSoundSample == nil then
+								gearboxMogli.HandbrakeReleaseSoundSample = createSample("HandbrakeReleaseSoundSample")
+								local fileName = Utils.getFilename( "handbrakeRelease.wav", gearboxMogli.baseDirectory )
+								loadSample(gearboxMogli.HandbrakeReleaseSoundSample, fileName, false)
+							end
+							playSample( gearboxMogli.HandbrakeReleaseSoundSample, 1, self.mrGbMS.HandbrakeReleaseSoundVolume, 0 )
+						else
+							if self.mrGbML.HandbrakeReleaseSoundSample == nil then
+								self.mrGbML.HandbrakeReleaseSoundSample = createSample("HandbrakeReleaseSoundSample")
+								loadSample( self.mrGbML.HandbrakeReleaseSoundSample, self.mrGbMS.HandbrakeReleaseSoundFile, false )
+							end
+							playSample( self.mrGbML.HandbrakeReleaseSoundSample, 1, self.mrGbMS.HandbrakeReleaseSoundVolume, 0 )
+						end
+					end
+				end
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliHUD" ) then
 			-- HUD mode	
@@ -4129,51 +4159,6 @@ function gearboxMogli:update(dt)
 			end
 		end
 	end
-    
-        -- handbrake pull
-    if self.mrGbMS.HandbrakePullSoundVolume > 0 then
-        if self.isEntered and self.mrGbMS.HandbrakePullPlay then
-            self.mrGbMS.HandbrakePullPlay = false
-
-            if self.mrGbMS.HandbrakePullSoundFile == nil then
-                if gearboxMogli.HandbrakePullSoundSample == nil then
-                    gearboxMogli.HandbrakePullSoundSample = createSample("handbrakePullSoundSample")
-                    local fileName = Utils.getFilename( "handbrakePull.wav", gearboxMogli.baseDirectory )
-                    loadSample(gearboxMogli.HandbrakePullSoundSample, fileName, false)
-                end
-                playSample(gearboxMogli.HandbrakePullSoundSample, 1, self.mrGbMS.HandbrakePullSoundVolume, 0)
-            else
-                if self.mrGbML.HandbrakePullSoundSample == nil then
-                    self.mrGbML.HandbrakePullSoundSample = createSample("handbrakePullSoundSample")
-                    loadSample( self.mrGbML.HandbrakePullSoundSample, self.mrGbMS.HandbrakePullSoundFile, false )
-                end
-                playSample( self.mrGbML.HandbrakePullSoundSample, 1, self.mrGbMS.HandbrakePullSoundVolume, 0 )
-            end
-        end
-    end
-
-    -- handbrake release
-    if self.mrGbMS.HandbrakeReleaseSoundVolume > 0 then
-        if self.isEntered and self.mrGbMS.HandbrakeReleasePlay then
-            self.mrGbMS.HandbrakeReleasePlay = false
-
-            if self.mrGbMS.HandbrakeReleaseSoundFile == nil then
-                if gearboxMogli.HandbrakeReleaseSoundSample == nil then
-                    gearboxMogli.HandbrakeReleaseSoundSample = createSample("HandbrakeReleaseSoundSample")
-                    local fileName = Utils.getFilename( "handbrakeRelease.wav", gearboxMogli.baseDirectory )
-                    loadSample(gearboxMogli.HandbrakeReleaseSoundSample, fileName, false)
-                end
-                playSample(gearboxMogli.HandbrakeReleaseSoundSample, 1, self.mrGbMS.HandbrakeReleaseSoundVolume, 0)
-            else
-                if self.mrGbML.HandbrakeReleaseSoundSample == nil then
-                    self.mrGbML.HandbrakeReleaseSoundSample = createSample("HandbrakeReleaseSoundSample")
-                    loadSample( self.mrGbML.HandbrakeReleaseSoundSample, self.mrGbMS.HandbrakeReleaseSoundFile, false )
-                end
-                playSample( self.mrGbML.HandbrakeReleaseSoundSample, 1, self.mrGbMS.HandbrakeReleaseSoundVolume, 0 )
-            end
-        end
-    end
-
 end 
 
 --**********************************************************************************************************	
@@ -7561,22 +7546,36 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 				
 		if acceleration < -0.001 then
 			brakeLights = true
+	--elseif self.isMotorStarted and doHandbrake then
+	--	brakeLights = true
 		end
 	elseif doHandbrake  then
 		self.motor.speedLimitS = 0
 		self:mrGbMSetNeutralActive( true )
 		acceleration = -1
+		if self.isMotorStarted and self.isHired then
+			brakeLights = true
+		end
 	elseif self.movingDirection*currentSpeed*acc < -0.0003 then
 		acceleration = -( 1 - ( 1 - math.abs( acc ) )^2 )
 		self:mrGbMSetNeutralActive( true )
+		if self.isMotorStarted and self.isHired then
+			brakeLights = true
+		end
 	elseif math.abs( acc ) > 0.001 then
 		acceleration = ( 1 - ( 1 - math.abs( acc ) )^2 )
 		self:mrGbMSetReverseActive( acc < 0 )
 		self:mrGbMSetNeutralActive( false )
+		if currentSpeed * 3600 > self.motor.speedLimit + 1 then
+			brakeLights = true
+		end			
 	else
 		acceleration = 0
 		self.motor.speedLimitS = 0
 		self:mrGbMSetNeutralActive( true )
+		if currentSpeed * 3600 > self.motor.speedLimit + 1 then
+			brakeLights = true
+		end			
 	end
 	
 	-- blow off ventil
