@@ -4148,7 +4148,7 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- keep on going if not entered 
 --**********************************************************************************************************		
-			if      self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE then
+			if      self.cruiseControl.state > 0 then
 				Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
 			elseif  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm then
 				if self.mrGbMS.AutoHold then
@@ -4279,6 +4279,7 @@ function gearboxMogli:updateTick(dt)
 				if self.mrGbMS.CurrentGear ~= self.mrGbML.aiBackupGear then
 					self:mrGbMSetCurrentGear( self.mrGbML.aiBackupGear ) 	
 				end
+				self:setCruiseControlState(0)
 			else		
 				self:mrGbMSetState( "IsOn", true ) 
 			end 	
