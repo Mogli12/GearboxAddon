@@ -8510,6 +8510,15 @@ function gearboxMogli:showSettingsUI()
 	end
 	self.mrGbMUI.MaxAutoGearSpeed = self.mrGbMUI.MinAutoGearSpeed
 	
+	for n,t in pairs(self.mrGbMUI) do
+		if type( t ) == "table" and g_gearboxMogliScreen[n] ~= nil then
+			local element = g_gearboxMogliScreen[n]
+			if type( element.setDisabled ) == "function" then
+				element:setDisabled( table.getn( t ) <= 1 )
+			end
+		end
+	end
+	
 	g_gearboxMogliScreen:setVehicle( self )
 	g_gui:showGui( "gearboxMogliScreen" )
 end

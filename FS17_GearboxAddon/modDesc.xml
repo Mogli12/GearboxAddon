@@ -2,19 +2,19 @@
 <modDesc descVersion="38">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>3.0.0.2</version>
+	<version>3.0.0.3</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v3.0.0.2 von Mogli</de>
-			  <en>Gearbox v3.0.0.2 by mogli</en>
-				 <it>Cambio v3.0.0.2 by mogli</it>
-	 <fr>Transmission v3.0.0.2 by mogli</fr>
-				 <cz>Řazení v3.0.0.2 by mogli</cz>
-<pl>Skrzynia biegów v3.0.0.2 by mogli</pl>
-				<ru>Gearbox v3.0.0.2 by mogli</ru>
-				<ro>Gearbox v3.0.0.2 by mogli</ro>
+			 <de>Getriebe v3.1 build 3 von Mogli</de>
+			  <en>Gearbox v3.1 build 3 by mogli</en>
+				 <it>Cambio v3.1 build 3 by mogli</it>
+	 <fr>Transmission v3.1 build 3 by mogli</fr>
+				 <cz>Řazení v3.1 build 3 by mogli</cz>
+<pl>Skrzynia biegów v3.1 build 3 by mogli</pl>
+				<ru>Gearbox v3.1 build 3 by mogli</ru>
+				<ro>Gearbox v3.1 build 3 by mogli</ro>
 		</text>                  
 	</l10n>
 
@@ -51,7 +51,12 @@ Changelog 3.0:
 - new settings UI
 - multiple transmission configurations per vehicle
 - compatible with FS17_moreRealistic
+
+Changelog 3.1:
+- tool tips in the settings UI (thanks to KITT3000)
+- hand brake sound (thanks to wriley)
 - compatible with FS17_handbrake
+- transmissions tag in vehicle.xml (top level only)
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
@@ -71,7 +76,12 @@ Changelog 3.0:
 - neuer Einstellungsdialog
 - verschiedenen Getriebekonfigurationen pro Fahrzeug
 - kompatibel zu FS17_moreRealistic
+
+Changelog 3.1:
+- ToolTips im Einstellungsdialog (Dank an KITT3000)
+- Töne für Handbremse (Dank an wriley)
 - kompatibel zu FS17_handbrake
+- transmissions Tag in vehicle.xml (nur auf oberster Ebene)
 ]]></de>
 
 		<it><![CDATA[
