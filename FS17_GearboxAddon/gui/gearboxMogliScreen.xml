@@ -269,8 +269,8 @@
 			</GuiElement>
 
 			<GuiElement type="flowLayout" profile="buttonBox" id="buttonsPC" >
-				<GuiElement type="button" profile="buttonBack"   size="500px 40px" text="$l10n_button_back" onClick="onClickBack"  onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="101" focusChangeTop="1"   focusChangeBottom="102" />
-				<GuiElement type="button" profile="buttonSave"   size="500px 40px" text="$l10n_button_ok"   onClick="onClickOk"    onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="102" focusChangeTop="101" focusChangeBottom="101" />
+				<GuiElement type="button" profile="buttonBack"   size="500px 40px" text="$l10n_button_back" onClick="onClickBack"  focusId="101" focusChangeTop="1"   focusChangeBottom="102" />
+				<GuiElement type="button" profile="buttonSave"   size="500px 40px" text="$l10n_button_ok"   onClick="onClickOk"    focusId="102" focusChangeTop="101" focusChangeBottom="1" />
 			</GuiElement>
 			
 			<GuiElement type="bitmap" profile="ingameMenuHelpRowBg" position="0px 30px" id="mogliToolTipBox" visible="false">
