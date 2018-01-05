@@ -23,7 +23,7 @@
 		<text name="input_gearboxMogliOFF"                 text="Ручная КПП [Выкл]"/>
 		<text name="input_gearboxMogliON"                  text="Ручная КПП [Вкл]"/>
 		<text name="input_gearboxMogliON_OFF"              text="Gearbox: ВКЛ/ВЫКЛ"/>
-		<text name="input_gearboxMogliSETTINGS"            text="Gearbox: Настройки Gearbox"/>
+		<text name="input_gearboxMogliSETTINGS"            text="Gearbox: Настройки"/>
 		<text name="input_gearboxMogliHUD"                 text="Gearbox: HUD Вкл/Выкл"/>
 		<text name="input_gearboxMogliAllAuto"             text="Gearbox: Реальное переключение"/>
 		<text name="input_gearboxMogliAllAutoON"           text="Gearbox [упрощенная]"/>
@@ -31,7 +31,7 @@
 		<text name="input_gearboxMogliREVERSE"             text="Gearbox: Задний ход"/>
 		<text name="input_gearboxMogliHANDBRAKE"           text="Gearbox: Стояночный тормоз"/>
 		<text name="input_gearboxMogliAUTOCLUTCH2"         text="Gearbox: Автоматическое сцепление"/>
-		<text name="input_gearboxMogliCLUTCH"              text="Gearbox: Аналоговое сцепление"/> <!-- !!!!!!!!!!! -->
+		<text name="input_gearboxMogliCLUTCH"              text="Gearbox: Аналоговое сцепление"/>
 		<text name="input_gearboxMogliCLUTCH_1"            text="Gearbox: Сцепление выжать"/>
 		<text name="input_gearboxMogliCLUTCH_2"            text="Gearbox: Сцепление отпустить"/>
 		<text name="input_gearboxMogliCLUTCH_3"            text="Gearbox: Цифровое сцепление"/>
@@ -129,25 +129,25 @@
 		<text name="gearboxMogliTIP_Inputs"                text="Сочетание клавиш"/>
 		
 		<!-- tool tips -->
-		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Ограничивает максимальную скорость для текущего диапазона круиз-контроля"/>
-		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"        text="Привод на четыре колеса или блокировка промежуточного дифференциала"/>
-		<text name="gearboxMogliTIP_DIFFLOCKFRONT"         text="Блокировка переднего осевого дифференциала; необходим 4wd"/>
+		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Ограничение максимальной скорости до текущего значения скорости круиз-контроля"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"        text="Привод на четыре колеса или блокировка межосевого дифференциала"/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"         text="Блокировка переднего осевого дифференциала; необходимо включить 4wd"/>
 		<text name="gearboxMogliTIP_DIFFLOCKBACK"          text="Блокировка заднего осевого дифференциала"/>
 		<text name="gearboxMogliTIP_MINRPM"                text="Ручной газ"/>
-		<text name="gearboxMogliTIP_FIXEDRATIO"            text="Фиксированное передаточное отношение для бесступенчатых коробок передач"/> <!-- !!!!!!!!!!! -->
-		<text name="gearboxMogliTIP_AUTOCLUTCH2"           text="Автоматическое сцепление"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"            text="Фиксированное передаточное отношение для бесступенчатых коробок передач"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"           text="Если ВКЛ, тогда нет необходимости его выжимать для переключения передачи"/>
 		<text name="gearboxMogliTIP_AUTOMATIC"             text="Автоматическое переключение, как у реального автомобиля"/>
 		<text name="gearboxMogliTIP_AllAutoMode"           text="Настройка для упрощенного режима; вы можете выбрать, что должно переключаться автоматически"/>
 		<text name="gearboxMogliTIP_DrawTargetRpm"         text="Отображать текущие обороты на HUD"/>
 		<text name="gearboxMogliTIP_DrawReqPower"          text="Отображать текущую мощность на HUD"/>
 		<text name="gearboxMogliTIP_EnableAI"              text="Настройка для наемного работника"/>
-		<text name="gearboxMogliTIP_SwapGearRangeKeys"     text="Поменять местами сочетание клавиш для переключения диапазонов с сочетанием клавиш для передач"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"     text="Поменять местами сочетание клавиш для переключения диапазонов с сочетанием клавиш для переключения передач"/>
 		<text name="gearboxMogliTIP_GearShifterMode"       text="Этот параметр имеет смысл только с рулевым колесом с рычагом переключения передач"/>
 		<text name="gearboxMogliTIP_ShuttleShifterMode"    text="Этот параметр имеет смысл только с рулевым колесом с рычагом переключения передач"/>
-		<text name="gearboxMogliTIP_MinTargetRpm"          text="Минимальные целевые обороты"/>
-		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Максимальные целевые обороты"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"          text="Минимальные заданные обороты"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Максимальные заданные обороты"/>
 		<text name="gearboxMogliTIP_MatchGears"            text="Автоматическая настройка передач при переключении групп"/>
-		<text name="gearboxMogliTIP_MatchRanges"           text="Автоматическая настройка группы при переключении передач"/>
+		<text name="gearboxMogliTIP_MatchRanges"           text="Автоматическая настройка диапазонов при переключении передач"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
