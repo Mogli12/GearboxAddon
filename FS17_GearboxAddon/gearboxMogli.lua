@@ -4895,18 +4895,15 @@ function gearboxMogli:draw()
 			end
 			renderText(ovRight, drawY, 0.5*deltaY, text )  		          
 		elseif self.mrGbMS.HudMode == 2 then
-		--setTextAlignment(RenderText.ALIGN_LEFT) 
-			setTextAlignment(RenderText.ALIGN_RIGHT) 
+			setTextAlignment(RenderText.ALIGN_LEFT) 
 			setTextBold(false)
 			
-			local w  = math.floor(0.0095 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
-			local h = w * g_screenAspectRatio
-		--local x = g_currentMission.speedMeterIconOverlay.x
-			local x = 1
-			local y = g_currentMission.speedMeterIconOverlay.y
+			local h = gearboxMogli.ovDiffLockBack.height
+			local x = gearboxMogli.ovDiffLockBack.x + gearboxMogli.ovDiffLockBack.width * 1.1
+			local y = gearboxMogli.ovDiffLockBack.y
 	
 			local text = self.mrGbMS.DrawText2 .." "..gearText
-			renderText( x, y+h, h, text )
+			renderText( x, y, h, text )
 
 			if InputBinding.gearboxMogliHUD ~= nil then
 				g_currentMission:addHelpButtonText(gearboxMogli.getText("gearboxMogliHUD", "Gearbox HUD"),  InputBinding.gearboxMogliHUD)		
