@@ -28,8 +28,6 @@ gearboxMogli.rpmMinus             = 300 -- 100  -- min RPM at 900 RPM
 gearboxMogli.rpmPlus              = 200  -- braking at 2350 RPM
 gearboxMogli.minRpmInSpeedHudDelta=  500
 gearboxMogli.maxRpmInSpeedHudDelta= 2500
-gearboxMogli.ptoRpmFactor         = 0.900 -- 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
-gearboxMogli.ptoRpmFactorEco      = 2/3   -- 0.5  -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
 gearboxMogli.autoShiftRpmDiff     = gearboxMogli.huge -- 200
 gearboxMogli.autoShiftPowerRatio  = 1.03
 gearboxMogli.autoShiftMaxDeltaRpm = 1E-3
@@ -186,6 +184,11 @@ gearboxMogliGlobals.uiFixedRatioStep      = 2
 gearboxMogliGlobals.uiHandThrottleStep    = 50    -- 50 RPM step, little more to avoid runding problems
 gearboxMogliGlobals.clutchAxisOpen        = -0.9  -- clutch axis from value from -1 to -0.9 => clutch = 0
 gearboxMogliGlobals.clutchAxisClosed      =  0.9  -- clutch axis from value from 0.9 to 1   => clutch = 1
+gearboxMogliGlobals.ptoRpmFactor          = 0.900 -- 0.75 -- reduce PTO RPM; e.g. 1900 with PTO and 2200 rated RPM
+gearboxMogliGlobals.ptoRpmFactorEco       = 2/3   -- 0.5  -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
+gearboxMogliGlobals.minTargetRpmFactor    = 0.3   -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
+gearboxMogliGlobals.hydroRpmFactor        = 0.3   -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
+gearboxMogliGlobals.increaseRpmForPTO     = true  -- increase RPM automatically if PTO is turned on
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -637,7 +640,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	local torqueI = 0
 	local torqueP = 0
 	local realEngineBaseKey = nil
-	local minTgtDft = 0.7 * math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) + 0.3 * self.mrGbMS.RatedRpm -- ~1330 RPM if rated = 2100
+	
+	local baseIdle  = 50 * math.floor( 0.5 + 0.02 * math.max( 0.4545 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm ) )
+	local minTgtDft = 10 * math.floor( 0.5 + 0.10 * ( baseIdle + self.mrGbMG.minTargetRpmFactor * ( self.mrGbMS.RatedRpm - baseIdle ) ) )
 	
 	if xmlMotor ~= nil then
 		for i=1,3 do
@@ -779,6 +784,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			elseif self.mrGbMS.MaxTargetRpm == nil then
 				self.mrGbMS.MaxTargetRpm = 0.5 * ( self.mrGbMS.RatedRpm + math.max(self.mrGbMS.RatedRpm, self.mrGbMS.Engine.maxRpm ) )
 			end
+			baseIdle  = math.max( 0.475 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm )
 		end
 		
 		self.mrGbMS.BoostMinSpeed = Utils.getNoNil( getXMLFloat(xmlFile, realEngineBaseKey.."#boostMinSpeed"), 30 ) / 3.6
@@ -844,15 +850,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.Sound.MaxRpm = self.mrGbMS.OrigRatedRpm
 	end
 	
-	self.mrGbMS.HydraulicRpm = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#hydraulicRpm"), self.mrGbMS.MinTargetRpm)
+	self.mrGbMS.HydraulicRpm 	= Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#hydraulicRpm"), 
+																							10 * math.floor( 0.5 + 0.10 * ( baseIdle + self.mrGbMG.hydroRpmFactor  * ( self.mrGbMS.RatedRpm - baseIdle ) ) ) )
 
 --**************************************************************************************************	
 -- PTO RPM
 --**************************************************************************************************		
-	self.mrGbMS.PtoRpm                  = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpm"),    
-																												self.mrGbMS.IdleRpm + 50 * math.floor( 0.5 + 0.02 * gearboxMogli.ptoRpmFactor * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) ) ) 
-	self.mrGbMS.PtoRpmEco               = Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpmEco"),    
-																												self.mrGbMS.IdleRpm + 50 * math.floor( 0.5 + 0.02 * gearboxMogli.ptoRpmFactorEco * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) ) ) 
+	self.mrGbMS.PtoRpm       	= Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpm"),    
+																							50 * math.floor( 0.5 + 0.02 * ( baseIdle + self.mrGbMG.ptoRpmFactor    * ( self.mrGbMS.RatedRpm - baseIdle ) ) ) )
+	self.mrGbMS.PtoRpmEco   	= Utils.getNoNil( getXMLFloat(xmlFile, xmlString .. "#ptoRpmEco"),    
+																							50 * math.floor( 0.5 + 0.02 * ( baseIdle + self.mrGbMG.ptoRpmFactorEco * ( self.mrGbMS.RatedRpm - baseIdle ) ) ) )
 	if self.mrGbMS.PtoRpmEco > self.mrGbMS.PtoRpm then
 		self.mrGbMS.PtoRpmEco             = self.mrGbMS.PtoRpm
 	end
@@ -962,7 +969,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 					and self.sampleThreshing.cuttingPitchOffset < self.sampleThreshing.pitchOffset then
 				self.mrGbMS.ThreshingMinRpm = self.mrGbMS.ThreshingMaxRpm * self.sampleThreshing.cuttingPitchOffset / self.sampleThreshing.pitchOffset
 			else
-				self.mrGbMS.ThreshingMinRpm = math.max( self.mrGbMS.MinTargetRpm, 0.2 * self.mrGbMS.IdleRpm + 0.8 * self.mrGbMS.RatedRpm )
+				self.mrGbMS.ThreshingMinRpm = math.max( self.mrGbMS.MinTargetRpm, 0.2 * baseIdle + 0.8 * self.mrGbMS.RatedRpm )
 			end
 		end
 		
@@ -1084,11 +1091,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if torqueConverterProfile == "wheelLoader" then 
 		default = gearboxMogli.huge
 	elseif torqueConverterProfile == "oldCar" then 
-		default = 0.7 * self.mrGbMS.RatedRpm + 0.3 * self.mrGbMS.IdleRpm
+		default = 0.7 * self.mrGbMS.RatedRpm + 0.3 * baseIdle
 	elseif torqueConverterProfile == "modernCar" then 
-		default = 0.5 * self.mrGbMS.RatedRpm + 0.5 * self.mrGbMS.IdleRpm
+		default = 0.5 * self.mrGbMS.RatedRpm + 0.5 * baseIdle
 	else
-		default = math.max( 0.62 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm )
+		default = math.max( 0.62 * self.mrGbMS.RatedRpm, baseIdle )
 		if self.mrGbMS.Engine.maxTorque > 0 then
 			default = math.min( default, self.mrGbMS.Engine.maxTorqueRpm )
 		end

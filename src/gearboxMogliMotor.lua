@@ -1802,6 +1802,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		handThrottle = -1
 	end
 	
+	local targetRequiredRpm0 = targetRequiredRpm
+	
 	self.lastThrottle = math.max( 0, accelerationPedal )
 	
 	-- acceleration pedal and speed limit
@@ -1989,9 +1991,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 
 	if ptoToolOn then
-		constantRpm           = true
 		self.lastPtoToolOn    = true
 		targetRequiredRpm     = math.max( targetRequiredRpm, self.ptoMotorRpm )
+		if self.vehicle.mrGbMG.increaseRpmForPTO then
+			constantRpm         = true
+		end
 	else
 		self.lastPtoToolOn    = nil
 	end
@@ -2012,11 +2016,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		targetRequiredRpm = self.maxTargetRpm
 	end
 	
-	local minRpmReduced = Utils.clamp( targetRequiredRpm * gearboxMogli.rpmReduction, 
+	if self.vehicle.mrGbMG.increaseRpmForPTO then
+		targetRequiredRpm0 = targetRequiredRpm
+	end
+	
+	local minRpmReduced = Utils.clamp( targetRequiredRpm0 * gearboxMogli.rpmReduction, 
 																		 self.vehicle.mrGbMS.CurMinRpm, 
 																		 self.vehicle.mrGbMS.RatedRpm * gearboxMogli.rpmReduction )		
 	
-	self.minRequiredRpm = self.minRequiredRpm + Utils.clamp( targetRequiredRpm - self.minRequiredRpm, 
+	self.minRequiredRpm = self.minRequiredRpm + Utils.clamp( targetRequiredRpm0 - self.minRequiredRpm, 
 																													-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, 
 																													 self.tickDt * self.vehicle.mrGbMS.RpmIncFactor )
 	minRpmReduced       = math.min( minRpmReduced, self.minRequiredRpm )
@@ -2131,19 +2139,19 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		self.lastHighLoadTime = nil
 	end
 	
-	if self.vehicle.mrGbMS.ConstantRpm then
+	if self.vehicle.mrGbMS.ConstantRpm or ptoToolOn then
 		if     self.vehicle.mrGbMS.IsCombine   then
-			targetRpm = self.minRequiredRpm
+			targetRpm = targetRequiredRpm
 		elseif self.vehicle.mrGbMS.Hydrostatic then
 			-- PTO or hand throttle 
-			targetRpm = self.minRequiredRpm
+			targetRpm = targetRequiredRpm
 			minTarget = Utils.clamp( self.maxPowerRpm, minRpmReduced, self.minRequiredRpm )
 			if minTarget < targetRpm and lowFactor > 0 then
 				targetRpm = targetRpm + lowFactor * ( minTarget - targetRpm )
 			end
 		else
 		-- reduce target RPM to accelerate and increase to brake 
-			targetRpm = Utils.clamp( self.minRequiredRpm - accelerationPedal * gearboxMogli.ptoRpmThrottleDiff, minRpmReduced, self.maxTargetRpm )
+			targetRpm = Utils.clamp( targetRequiredRpm - accelerationPedal * gearboxMogli.ptoRpmThrottleDiff, minRpmReduced, self.maxTargetRpm )
 		end			
 	else
 		if     lastNoTransmission then
