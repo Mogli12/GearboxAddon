@@ -3704,6 +3704,17 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				local nextGear  = -1
 				local nextSpeed = gearboxMogli.eps
 				
+				if self.lastAutoShiftScore ~= nil then 
+					for _,g in pairs( self.lastAutoShiftScore ) do 
+						for _,r1 in pairs( g ) do 
+							for _,r2 in pairs( r1 ) do 
+								r2.lastValid = r2.nextValid 
+								r2.nextValid = false 								
+							end 
+						end 
+					end 
+				end 
+				
 				for i,p in pairs( possibleCombinations ) do
 					p.score = math.huge
 					p.rpmHi = self.absWheelSpeedRpmS * gearboxMogli.gearSpeedToRatio( self.vehicle, p.gearSpeed )
@@ -3915,6 +3926,32 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					end
 					
 					if isValidEntry then
+						if self.lastAutoShiftScore == nil then	 
+							self.lastAutoShiftScore = {} 
+						end 
+						--p.gear  
+						--p.range2
+						--p.range1
+						
+						if self.lastAutoShiftScore[p.gear] == nil then 
+							self.lastAutoShiftScore[p.gear] = {} 
+						end 
+						if self.lastAutoShiftScore[p.gear][p.range1] == nil then 
+							self.lastAutoShiftScore[p.gear][p.range1] = {} 
+						end 
+						if self.lastAutoShiftScore[p.gear][p.range1][p.range2] == nil then 
+							self.lastAutoShiftScore[p.gear][p.range1][p.range2] = {} 
+						end 
+						local lastScore = self.lastAutoShiftScore[p.gear][p.range1][p.range2] 
+						
+						if lastScore.lastValid then 
+							lastScore.score = lastScore.score + self.vehicle.mrGbML.smoothFast * ( p.score - lastScore.score ) 
+						else 
+							lastScore.score = 4 + self.vehicle.mrGbML.smoothFast * ( p.score - 4 ) 
+						end 
+						p.score = lastScore.score
+						lastScore.nextValid = true 
+					
 						-- gear is possible 																			
 						if     bestScore == nil
 								or bestScore > p.score

@@ -6644,6 +6644,7 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 			self.motor.ratioFactorR       = nil
 			self.motor.torqueRpmReduxMode = nil
 			self.motor.maxAccSpeedLimit   = nil
+			self.motor.lastAutoShiftScore = nil
 		else
 			self.mrGbML.afterShiftClutch  = nil
 			self.mrGbML.beforeShiftRpm    = nil
