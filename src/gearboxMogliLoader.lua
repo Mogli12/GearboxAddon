@@ -425,7 +425,7 @@ function gearboxMogliLoader:loadgearboxMogli( savegame )
 		local xmlFile = self.xmlFile 
 		
 		if configuration.config ~= nil then 
-			key = configuration.baseName ..string.format("vehicle.transmissions.transmission(%d)", configuration.config - 1 )
+			key = string.format("vehicle.transmissions.transmission(%d)", configuration.config - 1 )
 			gearboxMogli.initFromXml( self, self.xmlFile, key, nil, "vehicle", false )
 			self.mrGbMLGearbox1 = true
 			return 
