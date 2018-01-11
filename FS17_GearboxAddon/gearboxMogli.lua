@@ -7488,6 +7488,9 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	local brakeLights         = false
 	
 	local oldHts              = self.lastSpeedReal*1000
+	if self.motor.wheelSlipFactor ~= nil and self.motor.wheelSlipFactor > gearboxMogli.eps then 
+		oldHts = oldHts / self.motor.wheelSlipFactor
+	end
 	if self.mrGbML.hydroTargetSpeed ~= nil then
 		oldHts = math.min( oldHts, self.mrGbML.hydroTargetSpeed )
 		self.mrGbML.hydroTargetSpeed = nil
@@ -7502,7 +7505,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	--		and self.mrGbMS.HandThrottle > 0.97 then
 	--	-- full power to the "bauer"
 		elseif  self.mrGbMS.Hydrostatic 
-				and self.mrGbMS.ConstantRpm then
+				and self.mrGbMS.ConstantRpm then 
 			-- acceleration pedal controls speed instead of throttle 
 			local m = self.motor.maxForwardSpeed
 			if self.mrGbMS.ReverseActive then
@@ -7523,31 +7526,15 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			if self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 then
 				m = math.min( m, self.cruiseControl.speed * gearboxMogli.kmhTOms )
 			end
-			 
-			local decHts = Utils.clamp( ( 1.4142 * math.min( 0, acceleration ) )^2, self.mrGbMG.HydroSpeedIdleRedux, 1 )			
-			local newHts = math.max( acceleration * m, oldHts - decHts * 0.001 * dt * self:mrGbMGetDecelerateToLimit() )
-
-			if acceleration < 0 then
-				if self.axisForwardIsAnalog then
-					self.mrGbML.hydroTargetTimer = nil
-					if acceleration > -0.7071 then
-						acceleration = 0
-					end
-				else
-					if self.mrGbML.hydroTargetTimer == nil then
-						self.mrGbML.hydroTargetTimer = g_currentMission.time + 1000
-					end
-					if g_currentMission.time < self.mrGbML.hydroTargetTimer then
-						acceleration = 0
-					end
-				end
-			elseif self.mrGbML.hydroTargetTimer ~= nil then
-				self.mrGbML.hydroTargetTimer = nil
+			
+			oldHts = math.max( 0, oldHts - self.mrGbMG.HydroSpeedIdleRedux * 0.001 * dt * self:mrGbMGetDecelerateToLimit() )
+			self.mrGbML.hydroTargetSpeed = Utils.clamp( acceleration * m, oldHts, m )	
+			
+			if acceleration < -0.2 and self.motor.lastRealMotorRpm < self.motor.minRequiredRpm * gearboxMogli.rpmReduction then 
+				acceleration = -0.2
 			end
 			
-			self.mrGbML.hydroTargetSpeed = Utils.clamp( newHts, 0, m )
-			
-		--print(string.format("%3d %%, %3d km/h %3d km/h", acceleration*100, m*3.6, newHts*3.6 ))
+		--print(string.format("%3d %%, %3d km/h %3d km/h", acceleration*100, m*3.6, self.mrGbML.hydroTargetSpeed*3.6 ))
 		end		
 				
 		if acceleration < -0.001 then

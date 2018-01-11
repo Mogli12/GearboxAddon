@@ -3204,8 +3204,12 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 						end
 					end
 					
-					hDF = self.vehicle.mrGbMS.HydrostaticDecFactor
-					hIF = self.vehicle.mrGbMS.HydrostaticIncFactor	
+					if accelerationPedal < -gearboxMogli.accDeadZone then 
+						hDF = 1
+					else 
+						hDF = self.vehicle.mrGbMS.HydrostaticDecFactor
+					end 
+					hIF   = self.vehicle.mrGbMS.HydrostaticIncFactor	
 					
 					if self.torqueRpmReduxMode ~= nil then 
 						hDF = 1
@@ -3214,10 +3218,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 						else
 							hIF = 0
 						end
-					elseif not self.vehicle.mrGbMS.ConstantRpm and accelerationPedal < 0.95 and self.accP < self.accS then
-						hIF = 0
 					elseif self.vehicle.mrGbMS.ConstantRpm then
 						hIF = hIF * ( 1 - self.motorLoadS )
+					elseif accelerationPedal < 0.95 and self.accP < self.accS then
+						hIF = 0
 					end
 					
 					hMin1 = math.min( math.max( hMin, self.hydrostaticFactor - self.tickDt * hDF, wMin * r / rMax ),
