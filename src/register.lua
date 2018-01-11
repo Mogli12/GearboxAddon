@@ -264,14 +264,13 @@ function gearboxMogliRegister:addConfigurations()
 			dummySelf.configFileName = storeItem.xmlFilename
 			dummySelf.customEnvironment, dummySelf.baseDirectory = Utils.getModNameAndBaseDirectory(storeItem.xmlFilename)
 			dummySelf.xmlFile = loadXMLFile("TempConfig", storeItem.xmlFilename)
-			
-			print(storeItem.xmlFilename)
-			
+						
 			if type( Vehicle.mrLoadFinished1 ) == "function" then
 				local state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
-			--print("MR hack: "..tostring(state).." / "..tostring(dummySelf.mrIsMrVehicle).." / "..tostring(dummySelf.mrConfigFileName).." ("..tostring(result)..")")
 				if state and dummySelf.mrIsMrVehicle then
 					vehXmlName = dummySelf.mrConfigFileName
+				else	
+					print("Error load MR vehicle into FS17_GearboxAddon: "..tostring(result))
 				end
 			end
 						
@@ -287,11 +286,11 @@ function gearboxMogliRegister:addConfigurations()
 				if s == nil then
 					break
 				end
+				j = j + 1
 				if vehicleTransConf == nil then
 					vehicleTransConf = {}
 				end
 				vehicleTransConf[j] = s
-				j = j + 1
 			end
 			
 			delete(dummySelf.xmlFile)

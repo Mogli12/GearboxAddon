@@ -1509,15 +1509,17 @@ function gearboxMogliMotor:updateMotorRpm( dt )
 			if     lastTrustClutchRpmTimer == nil 
 					or lastTrustClutchRpmTimer > g_currentMission.time + 1000 then
 				self.wheelSpeedRpm = self.wheelSpeedRpmReal / self.wheelSlipFactor 
+				self.clutchRpm     = self.wheelSpeedRpm * self.gearRatio
 				self.trustClutchRpmTimer = g_currentMission.time + 1000
-			elseif lastTrustClutchRpmTimer < g_currentMission.time then	
-				self.wheelSpeedRpm = w
 			else
-				self.wheelSpeedRpm = self.wheelSpeedRpmReal / self.wheelSlipFactor 
-				self.wheelSpeedRpm = self.wheelSpeedRpm + 0.001 * ( lastTrustClutchRpmTimer - g_currentMission.time ) * ( w - self.wheelSpeedRpm )
-			end
-			if self.trustClutchRpmTimer >= g_currentMission.time then
-				self.clutchRpm = self.wheelSpeedRpm * self.gearRatio
+				self.trustClutchRpmTimer = lastTrustClutchRpmTimer
+				if self.trustClutchRpmTimer < g_currentMission.time then	
+					self.wheelSpeedRpm = w
+				else
+					self.wheelSpeedRpm = self.wheelSpeedRpmReal / self.wheelSlipFactor 
+					self.wheelSpeedRpm = self.wheelSpeedRpm + 0.001 * ( self.trustClutchRpmTimer - g_currentMission.time ) * ( w - self.wheelSpeedRpm )
+					self.clutchRpm     = self.wheelSpeedRpm * self.gearRatio
+				end
 			end
 		end
 	else
