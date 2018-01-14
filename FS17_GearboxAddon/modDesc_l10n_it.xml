@@ -55,8 +55,8 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati]]>
 		<text name="input_gearboxMogliSWAPSPEED"         text="Cambio: limitatore 2"/>
 		<text name="input_gearboxMogliSWAPSPEEDR"        text="Cambio: limitatore precedente"/>
 		<text name="input_gearboxMogliSETSPEED"          text="Cambio: imposta limite"/>
-		<text name="input_gearboxMogliACCTOLIMIT"        text="Cambio: accellera"/>
-		<text name="input_gearboxMogliDECTOLIMIT"        text="Cambio: decellera"/>
+		<text name="input_gearboxMogliACCTOLIMIT"        text="Cambio: accelera"/>
+		<text name="input_gearboxMogliDECTOLIMIT"        text="Cambio: decelera"/>
 		<text name="input_gearboxMogliECO"               text="Cambio: Eco attivo/disattivo"/>
 		<text name="input_gearboxMogliKEEPSPEED"         text="Cambio: mantieni la velocità"/>
 		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"   text="Cambio: mantieni la velocità"/>
@@ -116,10 +116,46 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati]]>
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
 		
+		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min target RPM"/>
+		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max target RPM"/>
+		<text name="gearboxMogliTEXT_MatchGears"         text="speed matching (gears)"/>
+		<text name="gearboxMogliTEXT_MatchRanges"        text="speed matching (range)"/>
+		<text name="gearboxMogliTEXT_MATCH_1"            text="do not match"/>
+		<text name="gearboxMogliTEXT_MATCH_2"            text="only at first or last"/>
+		<text name="gearboxMogliTEXT_MATCH_3"            text="match automatically"/>
+		
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="settings"/>
 		<text name="gearboxMogliTIP_Help_1"              text="help 1"/>
 		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
+		
+		<!-- tool tips -->
+		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Limits the maximum speed according to the current cruise control speed"/>
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="For wheel drive or locking of the middle differential"/>
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Locking of the front axle differential; requires 4wd"/>
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Locking of the back axle differential"/>
+		<text name="gearboxMogliTIP_MINRPM"              text="Manual throttle"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Fixed gear ratio for continous variable transmissions"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatic clutch"/>
+		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatic shifting like the vehicle has in real life"/>
+		<text name="gearboxMogliTIP_AllAutoMode"         text="Setting for simplified mode; you can choose what should be shifted automatically"/>
+		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Shows the target RPM in the HUD"/>
+		<text name="gearboxMogliTIP_DrawReqPower"        text="Shows the current power in the HUD"/>
+		<text name="gearboxMogliTIP_EnableAI"            text="Setting for the hired worker"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Swaps gears and group one"/>
+		<text name="gearboxMogliTIP_GearShifterMode"     text="Setting for sterring wheels with shifter"/>
+		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Setting for sterring wheels with shifter"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"        text="Minimum target RPM"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Maximum target RPM"/>
+		
+		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"       text="cannot shift gear; RPM"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="RPM is too low"/>
+		<text name="gearboxMogliTEXT_Stall2"             text="motor stopped because RPM was too low"/>
+		<text name="gearboxMogliTEXT_Stall3"             text="too much PTO power requested"/>
+		<text name="gearboxMogliTEXT_Stall4"             text="motor stopped because too much PTO power was requested"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"  text="clutch is overheating"/>
 		
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
@@ -137,9 +173,23 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati]]>
 		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
 		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
 		
-		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
-		<text name="gearboxMogliUNIT_HP"                 text="CV"/>		
-		<text name="gearboxMogliUNIT_kph"                text="km/h"/>		
-		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>
+		<text name="gearboxMogliUNIT_HP"                 text="CV"/>
+		<text name="gearboxMogliUNIT_kph"                text="km/h"/>
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>
+		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
+		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
+		<text name="gearboxMogliUNIT_tph"                text="t/h"/>
 	</texts>
+		
+	<longTexts>
+		<longText name="gearboxMogliHelp_1"><![CDATA[
+Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in FS15. This mod adds on the basis of the file gearboxAddonConfig.xml  a gearbox to all configured tractors. Many various transmission types can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. In modern tractors power shift transmissions are often combined with automatic gear shifting.
+
+Additionally, continuously variable transmissions are supported. There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio. 
+
+There are additional modes like AllAuto and ECO. In ECO mode the vehicle still has maximum torque but only 90% power to safe fuel. In AllAuto the gearbox will shift automatically.
+]]></longText>
+	</longTexts>
+
 </l10n>
