@@ -269,8 +269,8 @@ function gearboxMogliRegister:addConfigurations()
 				local state, result = pcall( Vehicle.mrLoadFinished1, dummySelf, -1, nil )
 				if state and dummySelf.mrIsMrVehicle then
 					vehXmlName = dummySelf.mrConfigFileName
-				else	
-					print("Error load MR vehicle into FS17_GearboxAddon: "..tostring(result))
+				elseif not ( state ) then
+					print("Error loading MR vehicle '"..tostring(storeItem.xmlFilename).."' into FS17_GearboxAddon: "..tostring(result))
 				end
 			end
 						
