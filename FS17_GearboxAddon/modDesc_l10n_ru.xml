@@ -67,7 +67,7 @@
 		<text name="gearboxMogliTEXT_AI"                   text="Наймит"/>
 		<text name="gearboxMogliTEXT_CP"                   text="CP"/>
 		<text name="gearboxMogliTEXT_BRAKE"                text="Ручник"/>
-		<text name="gearboxMogliTEXT_DC"                   text="Двойное сцепление"/>
+		<text name="gearboxMogliTEXT_DC"                   text="Двойной выжим"/>
 		<text name="gearboxMogliTEXT_NEUTRAL"              text="Нейтральная"/>
 		<text name="gearboxMogliTEXT_AUTO"                 text="Автомат"/>
 		<text name="gearboxMogliTEXT_MANUAL"               text="Ручная"/>
