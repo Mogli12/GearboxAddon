@@ -125,8 +125,9 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_MATCH_3"            text="conforme automatiquement"/>
 
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"            text="paramètres"/>
-		<text name="gearboxMogliTIP_Help_1"              text="aide 1"/>
+		<text name="gearboxMogliTIP_Settings"            text="paramètres 1"/>
+		<text name="gearboxMogliTIP_Settings2"           text="paramètres 2"/>
+		<text name="gearboxMogliTIP_Help_1"              text="aide"/>
 		<text name="gearboxMogliTIP_Inputs"              text="entrées"/>
 		
 		<!-- tool tips -->

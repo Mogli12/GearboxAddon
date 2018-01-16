@@ -126,7 +126,8 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_MATCH_3"            text="Dostosuj automatycznie"/>
 		
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"            text="Ustawienia"/>
+		<text name="gearboxMogliTIP_Settings"            text="Ustawienia 1"/>
+		<text name="gearboxMogliTIP_Settings2"           text="Ustawienia 2"/>
 		<text name="gearboxMogliTIP_Help_1"              text="Wstęp"/>
 		<text name="gearboxMogliTIP_Inputs"              text="Klawisze"/>
 		

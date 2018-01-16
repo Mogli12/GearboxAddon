@@ -15,7 +15,7 @@
 			</GuiElement>
 
       <GuiElement type="paging" onPageChange="onPageChange" onPageUpdate="onPageUpdate" onCreate="onCreatePaging" id="pagingElement">
-				<GuiElement type="empty" profile="page" name="ALL" toolTip="$l10n_gearboxMogliTIP_Settings">
+				<GuiElement type="empty" profile="page" name="SET1" toolTip="$l10n_gearboxMogliTIP_Settings">
 
 					<GuiElement type="boxLayout" profile="settingsBox" position="20px 550px">
 						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SpeedLimiter" toolTip="$l10n_gearboxMogliTIP_SPEEDLIMIT"  onCreate="onCreateSubElement" 
@@ -64,20 +64,11 @@
 						</GuiElement>
 						
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="FixedRatio" toolTip="$l10n_gearboxMogliTIP_FIXEDRATIO" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="16" focusChangeTop="15" focusChangeBottom="17">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="16" focusChangeTop="15" focusChangeBottom="101">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
 							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliFIXEDRATIO"/>
-							<GuiElement type="bitmap" profile="multiTextOptionBg" />
-						</GuiElement>
-
-						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="EnableAI" toolTip="$l10n_gearboxMogliTIP_EnableAI" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="17" focusChangeTop="16" focusChangeBottom="101">
-							<GuiElement type="button" profile="multiTextOptionLeft" />
-							<GuiElement type="button" profile="multiTextOptionRight"/>
-							<GuiElement type="text"   profile="multiTextOptionText" />
-							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_EnableAI"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 					</GuiElement>
@@ -128,8 +119,20 @@
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ShuttleFactor" toolTip="ShuttleFactor" onCreate="onCreateSubElement" onCreateArgs="percent10"
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="26" focusChangeTop="25" focusChangeBottom="101">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text"   profile="multiTextOptionText" />
+							<GuiElement type="text"   profile="multiTextOptionTitle" text="ShuttleFactor"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
+					</GuiElement>
+
+					<GuiElement type="boxLayout" profile="settingsBox" position="675px 550px">
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MinAutoGearSpeed" toolTip="MinAutoGearSpeed" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="26" focusChangeTop="25" focusChangeBottom="27">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="31" focusChangeTop="102" focusChangeBottom="32">										
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
@@ -138,45 +141,16 @@
 						</GuiElement>
 
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MaxAutoGearSpeed" toolTip="MaxAutoGearSpeed" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="27" focusChangeTop="26" focusChangeBottom="101">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="32" focusChangeTop="31" focusChangeBottom="33">										
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
 							<GuiElement type="text"   profile="multiTextOptionTitle" text="MaxAutoGearSpeed"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
-					</GuiElement>
-
-					<GuiElement type="boxLayout" profile="settingsBox" position="675px 550px">
-						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SwapGearRangeKeys" toolTip="$l10n_gearboxMogliTIP_SwapGearRangeKeys"  onCreate="onCreateSubElement" 
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="31" focusChangeTop="102" focusChangeBottom="32">										
-							<GuiElement type="button" profile="multiTextOptionLeft" />
-							<GuiElement type="button" profile="multiTextOptionRight"/>
-							<GuiElement type="text" profile="multiTextOptionText" />
-							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_SwapGearRangeKeys"/>
-							<GuiElement type="bitmap" profile="multiTextOptionBg" />
-						</GuiElement>
-
-						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="GearShifterMode" toolTip="$l10n_gearboxMogliTIP_GearShifterMode" onCreate="onCreateSubElement" onCreateArgs="list0"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="32" focusChangeTop="31" focusChangeBottom="33">										
-							<GuiElement type="button" profile="multiTextOptionLeft" />
-							<GuiElement type="button" profile="multiTextOptionRight"/>
-							<GuiElement type="text" profile="multiTextOptionText" />
-							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_GearShifterMode"/>
-							<GuiElement type="bitmap" profile="multiTextOptionBg" />
-						</GuiElement>
-						
-						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ShuttleShifterMode" toolTip="$l10n_gearboxMogliTIP_ShuttleShifterMode"  onCreate="onCreateSubElement" onCreateArgs="list0"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="33" focusChangeTop="32" focusChangeBottom="34">
-							<GuiElement type="button" profile="multiTextOptionLeft" />
-							<GuiElement type="button" profile="multiTextOptionRight"/>
-							<GuiElement type="text" profile="multiTextOptionText" />
-							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_ShuttleShifterMode"/>
-							<GuiElement type="bitmap" profile="multiTextOptionBg" />
-						</GuiElement>
 						
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MinTarget" toolTip="$l10n_gearboxMogliTIP_MinTargetRpm" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="34" focusChangeTop="33" focusChangeBottom="35">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="33" focusChangeTop="32" focusChangeBottom="34">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
@@ -185,7 +159,7 @@
 						</GuiElement>
 						
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="MaxTarget" toolTip="$l10n_gearboxMogliTIP_MaxTargetRpm" onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="35" focusChangeTop="34" focusChangeBottom="36">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="34" focusChangeTop="33" focusChangeBottom="35">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text"   profile="multiTextOptionText" />
@@ -194,7 +168,7 @@
 						</GuiElement>
 						
 						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="DrawTargetRpm" toolTip="$l10n_gearboxMogliTIP_DrawTargetRpm"  onCreate="onCreateSubElement" 
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="36" focusChangeTop="35" focusChangeBottom="37">										
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="35" focusChangeTop="34" focusChangeBottom="36">										
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text" profile="multiTextOptionText" />
@@ -203,13 +177,61 @@
 						</GuiElement>
 
 						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="DrawReqPower" toolTip="$l10n_gearboxMogliTIP_DrawReqPower"  onCreate="onCreateSubElement" 
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="37" focusChangeTop="36" focusChangeBottom="102">										
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="36" focusChangeTop="35" focusChangeBottom="102">										
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text" profile="multiTextOptionText" />
 							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_DrawReqPower"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
+					</GuiElement>
+				</GuiElement>
+				
+				<GuiElement type="empty" profile="page" name="SET2" toolTip="$l10n_gearboxMogliTIP_Settings2">
+
+					<GuiElement type="boxLayout" profile="settingsBox" position="20px 550px">
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="EnableAI" toolTip="$l10n_gearboxMogliTIP_EnableAI" onCreate="onCreateSubElement" onCreateArgs="list"
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="41" focusChangeTop="101" focusChangeBottom="42">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text"   profile="multiTextOptionText" />
+							<GuiElement type="text"   profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_EnableAI"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
+						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SwapGearRangeKeys" toolTip="$l10n_gearboxMogliTIP_SwapGearRangeKeys"  onCreate="onCreateSubElement" 
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="42" focusChangeTop="41" focusChangeBottom="43">										
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text" profile="multiTextOptionText" />
+							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_SwapGearRangeKeys"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="GearShifterMode" toolTip="$l10n_gearboxMogliTIP_GearShifterMode" onCreate="onCreateSubElement" onCreateArgs="list0"
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="43" focusChangeTop="42" focusChangeBottom="44">										
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text" profile="multiTextOptionText" />
+							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_GearShifterMode"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ShuttleShifterMode" toolTip="$l10n_gearboxMogliTIP_ShuttleShifterMode"  onCreate="onCreateSubElement" onCreateArgs="list0"
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="44" focusChangeTop="43" focusChangeBottom="102">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text" profile="multiTextOptionText" />
+							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_ShuttleShifterMode"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
+					</GuiElement>
+
+					<GuiElement type="boxLayout" profile="settingsBox" position="347px 550px">
+					</GuiElement>
+
+					<GuiElement type="boxLayout" profile="settingsBox" position="675px 550px">
 					</GuiElement>
 				</GuiElement>
 				
@@ -273,7 +295,7 @@
 				<GuiElement type="button" profile="buttonSave"   size="500px 40px" text="$l10n_button_ok"   onClick="onClickOk"    focusId="102" focusChangeTop="101" focusChangeBottom="1" />
 			</GuiElement>
 			
-			<GuiElement type="bitmap" profile="ingameMenuHelpRowBg" position="0px 30px" id="mogliToolTipBox" visible="false">
+			<GuiElement type="bitmap" profile="ingameMenuHelpRowBg" id="mogliToolTipBox" visible="false">
 				<GuiElement type="bitmap" profile="ingameMenuHelpRowIcon" />
 				<GuiElement type="text" profile="ingameMenuHelpRowText" id="mogliToolTipBoxText" text=""/>
 			</GuiElement>

@@ -124,8 +124,9 @@
 		<text name="gearboxMogliTEXT_MATCH_3"              text="автоматическое согласование"/>
 		
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"              text="Настройки"/>
-		<text name="gearboxMogliTIP_Help_1"                text="Справка 1"/>
+		<text name="gearboxMogliTIP_Settings"              text="Настройки 1"/>
+		<text name="gearboxMogliTIP_Settings2"             text="Настройки 2"/>
+		<text name="gearboxMogliTIP_Help_1"                text="Справка"/>
 		<text name="gearboxMogliTIP_Inputs"                text="Сочетание клавиш"/>
 		
 		<!-- tool tips -->

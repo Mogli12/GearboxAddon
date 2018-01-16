@@ -314,6 +314,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "AutoCloseTimer",0 )
 	gearboxMogli.registerState( self, "DoubleClutch",  0 )
 	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
+	gearboxMogli.registerState( self, "ShuttleFactor", 0.5 )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -585,6 +586,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 --**************************************************************************************************	
+	self.mrGbMS.TransmissionName        = getXMLString(xmlFile, xmlString .. "#name" )
 	self.mrGbMS.ConfigVersion           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#version" ),1.4)
 	self.mrGbMS.NoDisable               = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#noDisable" ),self.mrGbMG.noDisable)
 	self.mrGbMS.showHud                 = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#showHud" ),true)
@@ -620,7 +622,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.MinTargetRpm            = getXMLFloat(xmlFile, xmlString .. "#minTargetRpm")
 	self.mrGbMS.MaxTargetRpm            = getXMLFloat(xmlFile, xmlString .. "#maxTargetRpm")
 	self.mrGbMS.IdleEnrichment          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#idleEnrichment"), 0.1 )
-	self.mrGbMS.BrakeForceRatio         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#brakeForceRatio"), self.mrGbMG.brakeForceRatio )
+	
+	default   = 0	
+	if self.motor.brakeForce > gearboxMogli.eps then 
+		default   = self.mrGbMG.brakeForceRatio / self.motor.brakeForce
+	end 
+	self.mrGbMS.BrakeForceRatio         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#brakeForceRatio"), default )
 
 	self.mrGbMS.FuelPerDistanceMinSpeed = getXMLFloat( xmlFile, xmlString .. "#fuelPerDistanceMinSpeed" )
 	
@@ -801,15 +808,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	end
 	
-	do
-		local configuration = self.mrGbMLStoreItem.configurations[self.configurations.GearboxAddon]
-	
-		if configuration.baseName ~= nil and configuration.config ~= nil then
-			if self.mrGbMS.EngineName == nil then
-				self.mrGbMS.EngineName = configuration.title 
-			else
-				self.mrGbMS.EngineName = self.mrGbMS.EngineName.." "..configuration.title 
-			end
+	if self.mrGbMS.TransmissionName ~= nil then
+		if self.mrGbMS.EngineName == nil then
+			self.mrGbMS.EngineName = self.mrGbMS.TransmissionName
+		else
+			self.mrGbMS.EngineName = self.mrGbMS.EngineName.." "..self.mrGbMS.TransmissionName
 		end
 	end
 	
@@ -7687,18 +7690,40 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		accelerationPedal =  acceleration
 	end
 	
-	
-	if      self.isMotorStarted
-			and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
-			and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1
-			and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
-				 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
-		-- wrong direction   
-		local b = math.min( 1, 1800 * math.abs( currentSpeed ) )
-		if b >= 0.5 then
-			brakeLights = true
+	do
+		local fx, ft = 0, 0
+		if self.steeringEnabled and self.mrGbMS.ShuttleFactor < 0.999 then 
+			local x = self.mrGbMS.ShuttleFactor
+			fx = 6 * x * x - 11 * x + 5 -- 0=>5, 0.5=>1, 0=>0
+			ft = fx * 1000
 		end
-		brakePedal = math.max( b, brakePedal )
+			
+		if      math.abs( currentSpeed ) < 2.778e-5 then 
+		-- nothing
+		elseif  self.isMotorStarted
+				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
+				and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1
+				and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
+					 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
+			-- wrong direction   
+			if self.mrGbML.shuttleBrakeTimer == nil then 
+				self.mrGbML.shuttleBrakeTimer = g_currentMission.time 
+			end 
+			local maxB, maxC = 1, 1
+			if g_currentMission.time - self.mrGbML.shuttleBrakeTimer < ft then 
+				maxB = Utils.clamp( ( g_currentMission.time - self.mrGbML.shuttleBrakeTimer ) / ft, 0, 1 )
+			end
+			if math.abs( currentSpeed ) * 3600 < fx then 
+				maxC = math.abs( currentSpeed ) * 1800 / fx 
+			end 
+			local b  = math.min( maxB, maxC  )
+			if b >= 0.2 then
+				brakeLights = true
+			end
+			brakePedal = math.max( b, brakePedal )
+		elseif self.mrGbML.shuttleBrakeTimer ~= nil then 
+			self.mrGbML.shuttleBrakeTimer = nil
+		end
 	end
 	
 	self.setBrakeLightsVisibility(self, brakeLights)
@@ -7726,13 +7751,13 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 
 	
 	if next(self.differentials) ~= nil and self.motorizedNode ~= nil then
-		local torque,_,brakeForce = self.motor:getTorque(accelerationPedal, false) 
+		local torque,brakePedalM,brakeForce = self.motor:getTorque(accelerationPedal, false) 
 		local maxRpm      = self.motor:getCurMaxRpm()
 		local ratio       = self.motor:getGearRatio( true )
 		local maxRotSpeed = maxRpm * gearboxMogli.factorpi30
 		local c           = 0
 		
-		brakePedal = math.max( brakePedal, brakeForce )
+		brakePedal = math.max( brakePedal, brakePedalM, math.min( 1, brakeForce / math.max( gearboxMogli.eps, self.motor:getBrakeForce() ) ) )
 			
 		if self.mrGbMS.TorqueConverter and self.mrGbMS.ManualClutch > 0.9 then
 			c = gearboxMogli.huge

@@ -120,8 +120,9 @@ Adaugă specializarea gearboxMogli la toate vehiculele configurate]]>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="turația țintă max"/>
 	
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"            text="setări"/>
-		<text name="gearboxMogliTIP_Help_1"              text="ajutor 1"/>
+		<text name="gearboxMogliTIP_Settings"            text="setări 1"/>
+		<text name="gearboxMogliTIP_Settings2"           text="setări 2"/>
+		<text name="gearboxMogliTIP_Help_1"              text="ajutor"/>
 		<text name="gearboxMogliTIP_Inputs"              text="taste"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="nu se poate schimba treapta; ambreiaj"/>

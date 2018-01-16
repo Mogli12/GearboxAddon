@@ -103,8 +103,9 @@ Přidává do všech vozidel rozšířené ovládání řízení vozidel pomocí
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
 		
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"            text="settings"/>
-		<text name="gearboxMogliTIP_Help_1"              text="help 1"/>
+		<text name="gearboxMogliTIP_Settings"            text="settings 1"/>
+		<text name="gearboxMogliTIP_Settings2"           text="settings 2"/>
+		<text name="gearboxMogliTIP_Help_1"              text="help"/>
 		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
 		
 		<!-- texts in the HUD => keep them short -->

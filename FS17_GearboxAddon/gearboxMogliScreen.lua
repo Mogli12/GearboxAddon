@@ -36,8 +36,10 @@ if gearboxMogliScreen == nil or gearboxMogliScreen.version == nil or gearboxMogl
 	end
 	
 	function gearboxMogliScreen:mogliScreenGetPageFocus(element)
-		if element.name == "ALL" then
-			return "11", "35"
+		if     element.name == "SET1" then
+			return "11", "36"
+		elseif element.name == "SET2" then
+			return "41", "44"
 		end
 		return gearboxMogliScreen.buttonBackFocusId, gearboxMogliScreen.buttonLeftFocusId
 	end
