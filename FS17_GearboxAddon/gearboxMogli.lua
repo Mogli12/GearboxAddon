@@ -5086,6 +5086,9 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.ShuttleShifterMode ~= 0 then
 			attributes = attributes.." mrGbMShuttleShifter=\"" .. tostring( self.mrGbMS.ShuttleShifterMode ) .. "\""     
 		end
+		if self.mrGbMS.ShuttleFactor ~= 0.5 then
+			attributes = attributes.." mrGbMShuttleFactor=\"" .. tostring( self.mrGbMS.ShuttleFactor ) .. "\""     
+		end
 		if self.mrGbMS.DiffLockMiddle then
 			attributes = attributes.." mrGbMDiffLockMiddle=\"" .. tostring( self.mrGbMS.DiffLockMiddle ) .. "\""     
 		end
@@ -5189,11 +5192,12 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchGears"    , "MatchGears"        )
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchRanges"   , "MatchRanges"       )
 		
+		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMShuttleFactor" , "ShuttleFactor"     )
 		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMinTarget"     , "MinTarget"         )
 		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMaxTarget"     , "MaxTarget"         )
 		
-		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMinAutoSpeed"  , "MinAutoGearSpeed"         )
-		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMaxAutoSpeed"  , "MaxAutoGearSpeed"         )
+		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMinAutoSpeed"  , "MinAutoGearSpeed"  )
+		gearboxMogli.loadHelperFloat(self, xmlFile,key .. "#mrGbMMaxAutoSpeed"  , "MaxAutoGearSpeed"  )
 
 		gearboxMogli.setLaunchGearSpeed( self, true )
 		gearboxMogli.mrGbMDoGearShift( self, true )
@@ -8527,6 +8531,57 @@ function gearboxMogli:showSettingsUI()
 	end
 	self.mrGbMUI.MaxAutoGearSpeed = self.mrGbMUI.MinAutoGearSpeed
 	
+	self.mrGbMUI.AccelerateToLimit = {}
+	for i=1,20 do 
+		table.insert( self.mrGbMUI.AccelerateToLimit, string.format( "+%2.1f %s/s / -%2.1f %s/s", 
+																																 g_i18n:getSpeed(i),
+																																 gearboxMogli.getSpeedMeasuringUnit(),
+																																 g_i18n:getSpeed(i * self.mrGbMG.decAccToLimitRatio),
+																																 gearboxMogli.getSpeedMeasuringUnit() ))
+	end
+	
+	if self.mrGbMS.DisableManual then 
+		self.mrGbMUI.ResetFwdGear   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	  self.mrGbMUI.ResetFwdRange  = self.mrGbMUI.ResetFwdGear
+	  self.mrGbMUI.ResetFwdRange2 = self.mrGbMUI.ResetFwdGear
+		self.mrGbMUI.ResetRevGear   = self.mrGbMUI.ResetFwdGear
+		self.mrGbMUI.ResetRevRange  = self.mrGbMUI.ResetFwdGear
+		self.mrGbMUI.ResetRevRange2 = self.mrGbMUI.ResetFwdGear
+	else
+		local function appendText( tabName, fwdName, revName )
+			self.mrGbMUI[fwdName] = {}
+			self.mrGbMUI[revName] = {}
+			for _,g in pairs( self.mrGbMS[tabName] ) do 
+				if not ( g.reverseOnly ) then	
+					local n = g.name 
+					if g.name == nil or g.name == "" then
+						if table.getn( self.mrGbMS[tabName] ) <= 1 then 
+							n = gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" )
+						else 
+							n = '""' --string.format("(F %d)",1 + table.getn( self.mrGbMUI[fwdName] ))
+						end
+					end 
+					table.insert( self.mrGbMUI[fwdName], n )
+				end
+				if not ( g.forwardOnly ) then	
+					local n = g.name 
+					if g.name == nil or g.name == "" then
+						if table.getn( self.mrGbMS[tabName] ) <= 1 then 
+							n = gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" )
+						else 
+							n = '""' --string.format("(R %d)",1 + table.getn( self.mrGbMUI[revName] ))
+						end
+					end 
+					table.insert( self.mrGbMUI[revName], n )
+				end
+			end 
+		end
+				
+		appendText( "Gears",   "ResetFwdGear",   "ResetRevGear"   )
+		appendText( "Ranges",  "ResetFwdRange",  "ResetRevRange"  )
+		appendText( "Ranges2", "ResetFwdRange2", "ResetRevRange2" )
+	end
+	
 	for n,t in pairs(self.mrGbMUI) do
 		if type( t ) == "table" and g_gearboxMogliScreen[n] ~= nil then
 			local element = g_gearboxMogliScreen[n]
@@ -8826,6 +8881,72 @@ function gearboxMogli:mrGbMUIGetMaxAutoGearSpeed( )
 	end
 	return j
 end
+
+function gearboxMogli:mrGbMUIGetxxxResetxxx( tabName, attrName, checkName )
+	if self.mrGbMS.DisableManual then return 1 end
+	local i = 1
+	for j,g in pairs( self.mrGbMS[tabName] ) do	
+		if not g[checkName] then 
+			if j == self.mrGbMS[attrName] then 
+				return i 
+			end
+			i = i + 1
+		end
+	end
+	return 1 
+end
+
+function gearboxMogli:mrGbMUISetxxxResetxxx( tabName, attrName, checkName, value )
+	if self.mrGbMS.DisableManual then return end
+	local i = 1
+	for j,g in pairs( self.mrGbMS[tabName] ) do	
+		if not g[checkName] then 
+			if i == value then 
+				self:mrGbMSetState( attrName, j )
+				break
+			end 
+			i = i + 1
+		end
+	end
+end
+
+function gearboxMogli:mrGbMUIGetResetFwdGear()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Gears", "ResetFwdGear", "reverseOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetFwdGear( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Gears", "ResetFwdGear", "reverseOnly", value )
+end 
+function gearboxMogli:mrGbMUIGetResetRevGear()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Gears", "ResetRevGear", "forwardOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetRevGear( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Gears", "ResetRevGear", "forwardOnly", value )
+end 
+function gearboxMogli:mrGbMUIGetResetFwdRange()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Ranges", "ResetFwdRange", "reverseOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetFwdRange( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Ranges", "ResetFwdRange", "reverseOnly", value )
+end 
+function gearboxMogli:mrGbMUIGetResetRevRange()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Ranges", "ResetRevRange", "forwardOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetRevRange( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Ranges", "ResetRevRange", "forwardOnly", value )
+end 
+function gearboxMogli:mrGbMUIGetResetFwdRange2()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Ranges2", "ResetFwdRange2", "reverseOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetFwdRange2( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Ranges2", "ResetFwdRange2", "reverseOnly", value )
+end 
+function gearboxMogli:mrGbMUIGetResetRevRange2()
+	return gearboxMogli.mrGbMUIGetxxxResetxxx( self, "Ranges2", "ResetRevRange2", "forwardOnly" )
+end 
+function gearboxMogli:mrGbMUISetResetRevRange2( value )
+	gearboxMogli.mrGbMUISetxxxResetxxx( self, "Ranges2", "ResetRevRange2", "forwardOnly", value )
+end 
+
 
 if _G[g_currentModName..".gearboxMogliMotor"] == nil then
 	source(Utils.getFilename("gearboxMogliMotor.lua", g_currentModDirectory))

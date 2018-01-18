@@ -149,6 +149,31 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTIP_MinTargetRpm"        text="Minimum target RPM"/>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Maximum target RPM"/>
 		
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"    text="Lower limit of the gear speed in automatic mode"/>
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"    text="Upper limit of the gear speed in automatic mode"/>
+		<text name="gearboxMogliTIP_ResetFwdGear"        text="start gear forwards"/>
+		<text name="gearboxMogliTIP_ResetRevGear"        text="start gear backwards"/>
+		<text name="gearboxMogliTIP_ResetFwdRange"       text="start range 1 forwards"/>
+		<text name="gearboxMogliTIP_ResetRevRange"       text="start range 1 backwards"/>
+		<text name="gearboxMogliTIP_ResetFwdRange2"      text="start range 2 forwards"/>
+		<text name="gearboxMogliTIP_ResetRevRange2"      text="start range 2 backwards"/>
+		                                                
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"   text="min gear speed"/>
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"   text="max gear speed"/>
+		<text name="gearboxMogliTEXT_ResetFwdGear"       text="start gear forwards"/>
+		<text name="gearboxMogliTEXT_ResetRevGear"       text="start gear backwards"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange"      text="start range 1 forwards"/>
+		<text name="gearboxMogliTEXT_ResetRevRange"      text="start range 1 backwards"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange2"     text="start range 2 forwards"/>
+		<text name="gearboxMogliTEXT_ResetRevRange2"     text="start range 2 backwards"/>
+		
+		<text name="gearboxMogliTIP_EcoMode"             text="In eco mode the engines is optimized for less fuel consumption"/>
+		<text name="gearboxMogliTEXT_EcoMode"            text="eco mode"/>
+		<text name="gearboxMogliTIP_AccelerateToLimit"   text="Maximum rate to adjust speed to changed cruise control speed"/>
+		<text name="gearboxMogliTEXT_AccelerateToLimit"  text="Cruise control rate"/>
+		<text name="gearboxMogliTIP_ShuttleFactor"       text="Sensitivity of the shuttle control"/>		
+		<text name="gearboxMogliTEXT_ShuttleFactor"      text="sensitivity of shuttle control"/>		
+		                                                
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"       text="cannot shift gear; RPM"/>

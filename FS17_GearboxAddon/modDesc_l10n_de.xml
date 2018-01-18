@@ -151,6 +151,31 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Obere Solldrehzahl manuell einstellen"/>
 		<text name="gearboxMogliTIP_MatchGears"          text="Gang beim Gruppenwechsel automatisch anpassen"/>
 		<text name="gearboxMogliTIP_MatchRanges"         text="Gruppe beim Gangwechsel automatisch anpassen"/>
+		
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"    text="Im Automatikmodus wird kein Gang mit kleinerer Geschwindigkeit gewählt"/>
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"    text="Im Automatikmodus wird kein Gang mit größerer Geschwindigkeit gewählt"/>
+		<text name="gearboxMogliTIP_ResetFwdGear"        text="Startgang forwärts"/>
+		<text name="gearboxMogliTIP_ResetRevGear"        text="Startgang rückwärts"/>
+		<text name="gearboxMogliTIP_ResetFwdRange"       text="Startgruppe 1 forwärts"/>
+		<text name="gearboxMogliTIP_ResetRevRange"       text="Startgruppe 1 rückwärts"/>
+		<text name="gearboxMogliTIP_ResetFwdRange2"      text="Startgruppe 2 forwärts"/>
+		<text name="gearboxMogliTIP_ResetRevRange2"      text="Startgruppe 2 rückwärts"/>
+		                                                
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"   text="min. Ganggeschwindigkeit"/>
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"   text="max. Ganggeschwindigkeit"/>
+		<text name="gearboxMogliTEXT_ResetFwdGear"       text="Startgang vorwärts"/>
+		<text name="gearboxMogliTEXT_ResetRevGear"       text="Startgang rückwärts"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange"      text="Startgruppe 1 vorwärts"/>
+		<text name="gearboxMogliTEXT_ResetRevRange"      text="Startgruppe 1 rückwärts"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange2"     text="Startgruppe 2 vorwärts"/>
+		<text name="gearboxMogliTEXT_ResetRevRange2"     text="Startgruppe 2 rückwärts"/>
+		                                                
+		<text name="gearboxMogliTIP_EcoMode"             text="Im ECO-Modus wird der Motor hinsichtlich Kraftstoffverbrauch optimiert"/>
+		<text name="gearboxMogliTEXT_EcoMode"            text="ECO-Modus"/>
+		<text name="gearboxMogliTIP_AccelerateToLimit"   text="Maximale Rate mit der die Geschwindigkeit an eine veränderte Tempomatgeschwindigkeit angepasst wird"/>
+		<text name="gearboxMogliTEXT_AccelerateToLimit"  text="Tempomatrate"/>
+		<text name="gearboxMogliTIP_ShuttleFactor"       text="Empfindlichkeit der Wendeschaltung"/>		
+		<text name="gearboxMogliTEXT_ShuttleFactor"      text="Empfindlichkeit der Wendeschaltung"/>		
 		                                                
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Schalten nicht möglich; Kupplung"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Schalten nicht möglich; Geschwindigkeit"/>
