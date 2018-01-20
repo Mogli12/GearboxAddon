@@ -3,7 +3,7 @@
 	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
 	<description>
 <![CDATA[Transmission:
-Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vitesses GearboxMogli]]>
+Améliore toute les conduites de véhicules grâce à l'implémentation de la boîte de vitesses GearboxMogli]]>
 </description>
 
 	<texts>
@@ -116,8 +116,8 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="échanger bouton"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="séparer boutons"/>
 
-		<text name="gearboxMogliTEXT_MinTargetRpm"       text="Cible mini RPM"/>
-		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="Cible maxi RPM"/>
+		<text name="gearboxMogliTEXT_MinTargetRpm"       text="cible mini RPM"/>
+		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="cible maxi RPM"/>
 		<text name="gearboxMogliTEXT_MatchGears"         text="vitesse conforme (rapports)"/>
 		<text name="gearboxMogliTEXT_MatchRanges"        text="vitesse conforme (gamme)"/>
 		<text name="gearboxMogliTEXT_MATCH_1"            text="non conforme"/>
@@ -143,16 +143,41 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Affiche le RPM cible dans le HUD"/>
 		<text name="gearboxMogliTIP_DrawReqPower"        text="Affiche la puissance actuelle dans le HUD"/>
 		<text name="gearboxMogliTIP_EnableAI"            text="Paramètre pour l'ouvrier"/>
-		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Échanges les rapports et les groupe en un"/>	<!-- may need tune -->
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Échanger les rapports et les groupe en un"/>	<!-- may need tune seeing nowhere-->
 		<text name="gearboxMogliTIP_GearShifterMode"     text="Réglage pour les volants avec levier de vitesses"/>
 		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Réglage pour les volants avec levier de vitesses"/>
 		<text name="gearboxMogliTIP_MinTargetRpm"        text="Cible minimum RPM"/>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Cible maximum RPM"/>
+		
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"    text="Limiter rapport de vitesse minimum en mode automatique"/>
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"    text="Limiter rapport de vitesse maximum en mode automatique"/>
+		<text name="gearboxMogliTIP_ResetFwdGear"        text="commencer à avancer"/>
+		<text name="gearboxMogliTIP_ResetRevGear"        text="commencer à reculer"/>
+		<text name="gearboxMogliTIP_ResetFwdRange"       text="départ gamme 1 en avant"/>
+		<text name="gearboxMogliTIP_ResetRevRange"       text="départ gamme 1 en arrière"/>
+		<text name="gearboxMogliTIP_ResetFwdRange2"      text="départ gamme 2 en avant"/>
+		<text name="gearboxMogliTIP_ResetRevRange2"      text="départ gamme 2 en arrière"/>
+		                                                
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"   text="min rapport vitesse"/>
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"   text="max rapport vitesse"/>
+		<text name="gearboxMogliTEXT_ResetFwdGear"       text="commencer à avancer"/>
+		<text name="gearboxMogliTEXT_ResetRevGear"       text="commencer à reculer"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange"      text="départ gamme 1 en avant"/>
+		<text name="gearboxMogliTEXT_ResetRevRange"      text="départ gamme 1 en arrière"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange2"     text="départ gamme 2 en avant"/>
+		<text name="gearboxMogliTEXT_ResetRevRange2"     text="départ gamme 2 en arrière"/>
+		
+		<text name="gearboxMogliTIP_EcoMode"             text="En mode éco, les moteurs sont optimisés pour une consommation minimale"/>
+		<text name="gearboxMogliTEXT_EcoMode"            text="mode eco"/>
+		<text name="gearboxMogliTIP_AccelerateToLimit"   text="Niveau maximum pour ajuster la vitesse au régulateur de vitesse"/>
+		<text name="gearboxMogliTEXT_AccelerateToLimit"  text="niveau du régulateur de vitesse"/>
+		<text name="gearboxMogliTIP_ShuttleFactor"       text="Sensibilité du circuit d'inversion"/>		
+		<text name="gearboxMogliTEXT_ShuttleFactor"      text="sensibilité du circuit d'inversion"/>		
 
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="ne peut pas changer de vitesse; embrayage"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="ne peut pas changer de vitesse; vitesse"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"       text="ne peut pas changer de vitesse; RPM"/>
-		<text name="gearboxMogliTEXT_Stall1"             text="RPM est trop bas"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="les RPM sont trop bas"/>
 		<text name="gearboxMogliTEXT_Stall2"             text="le moteur a calé car les RPM étaient trop bas"/>
 		<text name="gearboxMogliTEXT_Stall3"             text="la prise de force nécessite plus de puissance"/>
 		<text name="gearboxMogliTEXT_Stall4"             text="le moteur a calé car la prise de force nécessite plus de puissance"/>
@@ -171,7 +196,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliDRAW_autoClutch"         text="Embrayage auto"/>
 		<text name="gearboxMogliDRAW_hand"               text="Acc. à main"/>
 		<text name="gearboxMogliDRAW_fixed"              text="Cor. de rapport"/>
-		<text name="gearboxMogliDRAW_combine"            text="Combiner"/>	<!-- may need tune if combine harvest is talking about :p -->
+		<text name="gearboxMogliDRAW_combine"            text="Moissoneuse"/>
 		<text name="gearboxMogliDRAW_wheelSlip"          text="Patinage"/>
 
 		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>
@@ -180,7 +205,7 @@ Améliore toute les conduites de véhicules grâce à l'ajout de la boîte de vi
 		<text name="gearboxMogliUNIT_mph"                text="mph"/>
 		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
 		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
-		<text name="gearboxMogliUNIT_tph"                text="t/h"/>tons per hour
+		<text name="gearboxMogliUNIT_tph"                text="t/h"/>
 	</texts>
 	
 	<longTexts>
@@ -192,4 +217,5 @@ Ajouté à cela, un autre type de transmission est la transmission à variation 
 Il est aussi ajouté des modes tels que AllAuto et ECO. Dans le mode ECO le véhicule a toujours le couple maximum avec seulement 90% de puissance pour économiser du carburant. En AllAuto la boite de vitesse passe les rapports automatiquement.
 ]]></longText>
 	</longTexts>
+
 </l10n>
