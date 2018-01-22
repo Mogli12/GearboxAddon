@@ -7474,7 +7474,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	if self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) or self.motor ~= self.mrGbML.motor then		
 		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
 	end
-	if self.motor.updateMotorRpm == nil or self.motor.updateMotorRpm ~= gearboxMogliMotor.updateMotorRpm then
+	if type( self.motor.mrGbMUpdateMotorRpm ) ~= "function" then
 		return superFunc( self, dt, currentSpeed, acc, doHandbrake, requiredDriveMode, ... )
 	end
 	
@@ -7613,7 +7613,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	--*******************
 	-- cruise control 
 	--*******************
-	self.motor:updateMotorRpm( dt )
+--self.motor:updateMotorRpm( dt )
+	self.motor:mrGbMUpdateMotorRpm( dt )
 	local speedLimit = self.motor:updateSpeedLimit( dt, acceleration ) * 3.6
 	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or ( self.cruiseControl.state > 0 )
 	local ccBrake    = self.mrGbMS.CruiseControlBrake or self.mrGbMS.AllAuto
@@ -8005,7 +8006,7 @@ function gearboxMogli:newSetHudValue( superFunc, hud, value, maxValue, ... )
 			or not ( self.mrGbMS.IsOn ) 
 			or self.mrGbMB.motor  == nil then
 		return superFunc( self, hud, value, maxValue, ... )
-	elseif self.motor.updateMotorRpm == nil or self.motor.updateMotorRpm ~= gearboxMogliMotor.updateMotorRpm then
+	elseif type( self.motor.mrGbMUpdateMotorRpm ) ~= "function" then
 		return superFunc( self, hud, value, maxValue, ... )
 	elseif  self.rpmHud   ~= nil
 			and self.rpmHud   == hud then

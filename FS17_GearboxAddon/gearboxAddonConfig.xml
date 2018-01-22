@@ -2256,7 +2256,7 @@
 			<reverse ratio="1"/>
 			
 			<engines>
-				<engine name="Optum 270 CVX" idleRpm="800" ratedRpm="2100">
+				<engine displayName="270" idleRpm="800" ratedRpm="2100">
 					<!-- 1800: 288(288) | 2100: 271(271) | 1400..1400: 1194(1194) | 65 | 0 | 100 | 2 | 2100 | 1320: 205 -->
 					<torque rpm="350" motorTorque="298" fuelUsageRatio="236.7"/>
 					<torque rpm="700" motorTorque="643" fuelUsageRatio="218"/>
@@ -2280,7 +2280,7 @@
 					<torque rpm="2200" motorTorque="0" fuelUsageRatio="455.6"/>
 				</engine>
 
-				<engine name="Optum 300 CVX" idleRpm="800" ratedRpm="2100">
+				<engine displayName="300" idleRpm="800" ratedRpm="2100">
 					<!-- 1800: 313(313) | 2100: 300(300) | 1400..1400: 1282(1282) | 65 | 0 | 100 | 2 | 2100 | 1320: 205 -->
 					<torque rpm="350" motorTorque="320" fuelUsageRatio="214.5"/>
 					<torque rpm="700" motorTorque="690" fuelUsageRatio="208.9"/>

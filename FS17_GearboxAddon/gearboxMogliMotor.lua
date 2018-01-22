@@ -1424,25 +1424,44 @@ end
 -- gearboxMogliMotor:updateMotorRpm
 --**********************************************************************************************************	
 function gearboxMogliMotor:updateMotorRpm( dt )
+-- do nothing
+end
+function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	local vehicle = self.vehicle
 	
 	
 -- currentSpeed	
 	local lastSpeed              = self.currentSpeed
-	local vx, vy, vz = worldDirectionToLocal(vehicle.components[1].node, getLinearVelocity(vehicle.components[1].node))
-	if self.currentSpeedVector == nil then
-		self.currentSpeedVector    = { x=vx, y=vy, z=vz }
-	else
-		self.currentSpeedVector.x  = self.currentSpeedVector.x + self.vehicle.mrGbML.smoothMedium * ( vx - self.currentSpeedVector.x )
-		self.currentSpeedVector.y  = self.currentSpeedVector.y + self.vehicle.mrGbML.smoothMedium * ( vy - self.currentSpeedVector.y )
-		self.currentSpeedVector.z  = vz
-	end
-	self.currentSpeed            = Utils.vector3Length( self.currentSpeedVector.x, self.currentSpeedVector.y, self.currentSpeedVector.z )
-	if      math.abs( self.currentSpeedVector.z ) < math.max( self.currentSpeedVector.x )
-			and math.abs( self.currentSpeedVector.z ) < math.max( self.currentSpeedVector.y ) then
-		self.currentSpeed          = 0
-	elseif self.currentSpeedVector.z < 0 then
-		self.currentSpeed          = - self.currentSpeed 
+	
+	if     vehicle.components[1]      == nil 
+			or vehicle.components[1].node == nil then 
+		self.currentSpeedVector = nil
+		if     self.vehicle.lastSpeedReal == nil 
+				or self.vehicle.movingDirection == nil then
+			self.currentSpeed          = 0
+		elseif self.vehicle.movingDirection < 0 then	
+			self.currentSpeed          = -self.vehicle.lastSpeedReal
+		else 
+			self.currentSpeed          =  self.vehicle.lastSpeedReal
+		end
+	else 
+		local vx, vy, vz = worldDirectionToLocal(vehicle.components[1].node, getLinearVelocity(vehicle.components[1].node))
+		if self.currentSpeedVector == nil then
+			self.currentSpeedVector    = { x=vx, y=vy, z=vz }
+		else
+			self.currentSpeedVector.x  = self.currentSpeedVector.x + self.vehicle.mrGbML.smoothMedium * ( vx - self.currentSpeedVector.x )
+			self.currentSpeedVector.y  = self.currentSpeedVector.y + self.vehicle.mrGbML.smoothMedium * ( vy - self.currentSpeedVector.y )
+			self.currentSpeedVector.z  = vz
+		end
+		if      math.abs( self.currentSpeedVector.z ) < math.max( self.currentSpeedVector.x )
+				and math.abs( self.currentSpeedVector.z ) < math.max( self.currentSpeedVector.y ) then
+			self.currentSpeed          = 0
+		else
+			self.currentSpeed          = Utils.vector3Length( self.currentSpeedVector.x, self.currentSpeedVector.y, self.currentSpeedVector.z )
+			if self.currentSpeedVector.z < 0 then
+				self.currentSpeed        = - self.currentSpeed 
+			end
+		end
 	end
 	
 	self.tickDt                  = dt
