@@ -2,8 +2,8 @@
 <l10n>
 	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
 	<description>
-<![CDATA[Коробка передач. Добавляет специализацию gearboxMogli ко всем сконфигурированным транспортным средствам]]>
-</description>
+<![CDATA[Коробка передач. Добавляет специализацию gearboxMogli ко всем сконфигурированным транспортным средствам]]>																	   
+	</description>
 
 	<texts>
 		<!--GearboxAddon helpPanel text-->
@@ -76,6 +76,7 @@
 		<text name="gearboxMogliTEXT_ALLAUTO"              text="Упрощенная"/>
 		<text name="gearboxMogliTEXT_ECO"                  text="eco"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"            text="Автоудержание"/>
+		
 
 		<text name="gearboxMogliTEXT_DISABLED"             text="Выкл."/>
 		<text name="gearboxMogliTEXT_ENABLED"              text="Вкл."/>
@@ -90,7 +91,7 @@
 		<text name="gearboxMogliTEXT_ShuttleShifterMode"   text="Клавиши переключ. направления"/>
 		 
 		<text name="gearboxMogliTEXT_AllAutoMode"          text="Упрощенные настройки"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_0"        text="последовательная"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_0"        text="всё последовательно"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_1"        text="передачи"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_2"        text="диапазон 1"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_3"        text="передачи и диапазон 1"/>
@@ -149,7 +150,32 @@
 		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Максимальные заданные обороты"/>
 		<text name="gearboxMogliTIP_MatchGears"            text="Автоматическая настройка передач при переключении групп"/>
 		<text name="gearboxMogliTIP_MatchRanges"           text="Автоматическая настройка диапазонов при переключении передач"/>
-		
+				
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"      text="Нижний предел скорости передачи в автоматическом режиме"/>
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"      text="Верхний предел скорости передачи в автоматическом режиме"/>
+		<text name="gearboxMogliTIP_ResetFwdGear"          text="Укажите с какой передачи будет трогаться техника с места вперед"/>
+		<text name="gearboxMogliTIP_ResetRevGear"          text="Укажите с какой передачи будет трогаться техника с места назад"/>
+		<text name="gearboxMogliTIP_ResetFwdRange"         text="Укажите с какого режима 1-го диапазона будет трогаться техника с места вперед"/>
+		<text name="gearboxMogliTIP_ResetRevRange"         text="Укажите с какого режима 1-го диапазона будет трогаться техника с места назад"/>
+		<text name="gearboxMogliTIP_ResetFwdRange2"        text="Укажите с какого режима 2-го диапазона будет трогаться техника с места вперед"/>
+		<text name="gearboxMogliTIP_ResetRevRange2"        text="Укажите с какого режима 2-го диапазона будет трогаться техника с места назад"/>
+
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"     text="min скорость передачи"/>
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"     text="max скорость передачи"/>
+		<text name="gearboxMogliTEXT_ResetFwdGear"         text="Вперед трогаться с передачи"/>
+		<text name="gearboxMogliTEXT_ResetRevGear"         text="Назад трогаться с передачи"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange"        text="Вперед трогаться в 1 диапазоне с"/>
+		<text name="gearboxMogliTEXT_ResetRevRange"        text="Назад трогаться в 1 диапазоне с"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange2"       text="Вперед трогаться во 2 диапазоне с"/>
+		<text name="gearboxMogliTEXT_ResetRevRange2"       text="Назад трогаться во 2 диапазоне с"/>
+
+		<text name="gearboxMogliTIP_EcoMode"               text="В ECO режиме двигатель оптимизирован для снижения расхода топлива"/>
+		<text name="gearboxMogliTEXT_EcoMode"              text="ECO режим"/>
+		<text name="gearboxMogliTIP_AccelerateToLimit"     text="Максимальный прирост при настройке скорости изменения скорости круиз-контроля"/>
+		<text name="gearboxMogliTEXT_AccelerateToLimit"    text="Скорость круиз-контроля"/>
+		<text name="gearboxMogliTIP_ShuttleFactor"         text="Чувствительность переключения определяет насколько быстро будет происходить смена направления движения"/>		
+		<text name="gearboxMogliTEXT_ShuttleFactor"        text="Чувствительность реверса"/>
+
 		<text name="gearboxMogliTEXT_GrindingClutch"       text="Нельзя переключить передачу: сцепление"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="Нельзя переключить передачу: скорость"/>
 		<text name="gearboxMogliTEXT_DoubleClutch"         text="Нельзя переключить передачу: обороты"/>
@@ -158,7 +184,7 @@
 		<text name="gearboxMogliTEXT_Stall3"               text="Слишком много мощности отбирается через ВОМ"/>
 		<text name="gearboxMogliTEXT_Stall4"               text="Двигатель заглох, потому что слишком много мощности отбиралось через ВОМ"/>
 		<text name="gearboxMogliTEXT_ClutchOverheating"    text="Сцепление перегрелось"/>
-		
+
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"             text="Блок.дифф."/>
 		<text name="gearboxMogliDRAW_maxSpeed"             text="Max. скорость"/>
