@@ -74,7 +74,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_MANUAL"			 text="Ręczna"/>
 		<text name="gearboxMogliTEXT_NOGEAR"			 text="Luz"/>
 		<text name="gearboxMogliTEXT_VARIO"				 text="CVT"/>
-		<text name="gearboxMogliTEXT_ALLAUTO"			 text="Prosta"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"			 text="Uproszczona"/>
 		<text name="gearboxMogliTEXT_ECO"				 text="Tryb EKO"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"			 text="Auto hamulec"/>
 		
@@ -128,29 +128,54 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<!-- page headers -->
 		<text name="gearboxMogliTIP_Settings"            text="Ustawienia 1"/>
 		<text name="gearboxMogliTIP_Settings2"           text="Ustawienia 2"/>
-		<text name="gearboxMogliTIP_Help_1"              text="Wstęp"/>
+		<text name="gearboxMogliTIP_Help_1"              text="Info"/>
 		<text name="gearboxMogliTIP_Inputs"              text="Klawisze"/>
 		
 		<!-- tool tips -->
-		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Ograniczenie maksymalnej prędkości jazdy do aktualnej wartości ustawionej na tempomacie"/>
+		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Ogranicza maksymalną prędkości jazdy, do wartości aktualnie ustawionej na tempomacie"/>
 		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="Załączanie napędu na wszystkie koła"/>
 		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Blokowanie tylnego mechanizmu różnicowego (napęd na wszystkie koła musi być włączony!!)"/>
 		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Blokowanie tylnego mechanizmu różnicowego"/>
-		<text name="gearboxMogliTIP_MINRPM"              text="Gaz ręczny"/>
-		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Poprawiny współczynnik dla skrzyni CVT"/>
-		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatyczne sprzęgło"/>
+		<text name="gearboxMogliTIP_MINRPM"              text="Umożliwia ustawienie stałych obrotów silnika"/>
+		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Poprawia przełożenie skrzyni CVT"/>
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatyczne steruje sprzęgłem"/>
 		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatyczna zmiana biegów jak w realnym pojeździe"/>
-		<text name="gearboxMogliTIP_AllAutoMode"         text="Ustawienia skrzyni uproszczonej (czy zakresy i biegi mają przełączane automatycznie)"/>
+		<text name="gearboxMogliTIP_AllAutoMode"         text="Umożliwia dostowanie czy zakresy albo/lub/i biegi mają być przełączane automatycznie"/>
 		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Wyświetla docelowe obroty silnika na HUDzie"/>
-		<text name="gearboxMogliTIP_DrawReqPower"        text="Wyświetla obecną moc na HUDzie"/>
-		<text name="gearboxMogliTIP_EnableAI"            text="Ustawiania dla pomocnika"/>
-		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Zamiana biegów z 1 zakresem"/>
+		<text name="gearboxMogliTIP_DrawReqPower"        text="Wyświetla obecną moc silnika na HUDzie"/>
+		<text name="gearboxMogliTIP_EnableAI"            text="Ustala typ skrzyni używanej przez pomocnika"/>
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Zamienia przełożenia biegów z 1 zakresem"/>
 		<text name="gearboxMogliTIP_GearShifterMode"     text="Zmiana biegów drążkiem (wymagana kierownica z shifterem)"/>
 		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Zmiana kierunku jazdy (wymagana kierownica z shifterem)"/>
-		<text name="gearboxMogliTIP_MinTargetRpm"        text="Najniższe docelowe obroty silnika"/>
-		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Najwyższe docelowe obroty silnika"/>
+		<text name="gearboxMogliTIP_MinTargetRpm"        text="Ustala najniższe docelowe obroty silnika"/>
+		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Ustala najwyższe docelowe obroty silnika"/>
 		<text name="gearboxMogliTIP_MatchGears"          text="Automatycznie dostosowuje bieg podczas zmiany zakresów"/>
 		<text name="gearboxMogliTIP_MatchRanges"         text="Automatycznie dostosowuje zakres podczas zmiany biegów"/>
+		
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"    text="Ustala dolny limit prędkości na biegu w trybie automatycznym"/>
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"    text="Ustala górny limit prędkości na biegu w trybie automatycznym"/>
+		<text name="gearboxMogliTIP_ResetFwdGear"        text="Ustala, który bieg ma zostać włączony po zmianie kierunku jazdy do przodu"/>
+		<text name="gearboxMogliTIP_ResetRevGear"        text="Ustala, który bieg ma zostać włączony po zmianie kierunku jazdy do tyłu"/>
+		<text name="gearboxMogliTIP_ResetFwdRange"       text="Ustala, które przełożenie zakresu 1 ma zostać włączone po zmianie kierunku jazdy do przodu"/>
+		<text name="gearboxMogliTIP_ResetRevRange"       text="Ustala, które przełożenie zakresu 1 ma zostać włączone po zmianie kierunku jazdy do tyłu"/>
+		<text name="gearboxMogliTIP_ResetFwdRange2"      text="Ustala, które przełożenie zakresu 2 ma zostać włączone po zmianie kierunku jazdy do przodu"/>
+		<text name="gearboxMogliTIP_ResetRevRange2"      text="Ustala, które przełożenie zakresu 2 ma zostać włączone po zmianie kierunku jazdy do tyłu"/>
+		                                                
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"   text="Min. prędkość na biegu"/>
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"   text="Max. prędkość na biegu"/>
+		<text name="gearboxMogliTEXT_ResetFwdGear"       text="Początkowy bieg do przodu"/>
+		<text name="gearboxMogliTEXT_ResetRevGear"       text="Początkowy bieg do tyłu"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange"      text="Początkowy zakres 1 do przodu"/>
+		<text name="gearboxMogliTEXT_ResetRevRange"      text="Początkowy zakres 1 do tyłu"/>
+		<text name="gearboxMogliTEXT_ResetFwdRange2"     text="Początkowy zakres 2 do przodu"/>
+		<text name="gearboxMogliTEXT_ResetRevRange2"     text="Początkowy zakres 2 do tyłu"/>
+		
+		<text name="gearboxMogliTIP_EcoMode"             text="W trybie ECO silniki są zoptymalizowane pod kątem mniejszego zużycia paliwa"/>
+		<text name="gearboxMogliTEXT_EcoMode"            text="Tryb ECO"/>
+		<text name="gearboxMogliTIP_AccelerateToLimit"   text="Szybkość przyspieszania i zwalniania w celu dostosowania prędkość do nowo ustawionej wartości na tempomacie"/>
+		<text name="gearboxMogliTEXT_AccelerateToLimit"  text="Wyrównanie do tempomatu"/>
+		<text name="gearboxMogliTIP_ShuttleFactor"       text="Im większa czułość, tym szybciej pojazd zmieni kierunek jazdy"/>		
+		<text name="gearboxMogliTEXT_ShuttleFactor"      text="Czułość rewersu"/>
 		
 		<text name="gearboxMogliTEXT_GrindingClutch"     text="Nie można zmienić biegu; Sprzęgło"/>
 		<text name="gearboxMogliTEXT_GrindingSpeed"      text="Nie można zmienić biegu; Prędkość"/>
@@ -168,7 +193,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliDRAW_currentRpm"         text="Obecne RPM"/>
 		<text name="gearboxMogliDRAW_TargetRpm"          text="Docelowe RPM"/>
 		<text name="gearboxMogliDRAW_power"              text="Moc"/>
-		<text name="gearboxMogliDRAW_load"               text="Obciążenie"/>
+		<text name="gearboxMogliDRAW_load"               text="Obciążenie silnika"/>
 		<text name="gearboxMogliDRAW_fuel"               text="Spalanie"/>
 		<text name="gearboxMogliDRAW_clutch"             text="Sprzęgło"/>
 		<text name="gearboxMogliDRAW_autoClutch"         text="Auto. sprzęgło"/>
@@ -198,7 +223,7 @@ Nie każdy ciągnik posiada bezstopniową skrzynię biegów. Ale nawet bezstopni
 
 Oprócz klasycznych skrzyń biegów, wspierane są też bezstopniowe przekładnie. Są modele z jednym lub dwoma biegami jak np. Fendt Vario. Inne modele łączą cztery automatycznie przełączane biegi z bezstopniowym napędem hydrostatycznym. Wszystkie te bezstopniowe przekładnie mają jedną wspólną cechę, wydajność różni się w zależności od przełożenia.
 
-Ponadto istnieją tryby AllAuto i ECO. W trybie ECO uzyskiwany jest maksymalny moment obrotowy, ale dostępne jest tylko 90% mocy. W trybie ECO RPM silnika są niższe (50% zamiast 75%), gdy zostanie włączony WOM, będzie on też przekazywał trochę mniej mocy. W trybie AllAuto biegi, zakresy (tylko pierwszy zakres skrzyni) i sprzęgło są sterowane automatycznie. W tym trybie również pomocnik jest nastawiony na używanie skrzyni biegów z modu GearboxAddons.
+Ponadto istnieją tryby AllAuto i ECO. W trybie ECO, uzyskiwany jest maksymalny moment obrotowy, ale dostępne jest tylko 90% mocy. W trybie ECO, RPM silnika są niższe (50% zamiast 75%), gdy zostanie włączony WOM, będzie on też przekazywał trochę mniej mocy. W trybie AllAuto biegi, zakresy (tylko pierwszy zakres skrzyni) i sprzęgło są sterowane automatycznie. W tym trybie również pomocnik jest nastawiony na używanie skrzyni biegów z modu GearboxAddons.
 ]]></longText>
 	</longTexts>
 </l10n>
