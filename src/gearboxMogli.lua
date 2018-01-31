@@ -1271,6 +1271,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.HandbrakePullSoundVolume    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakePullSound#volume" ), 1 )
 		self.mrGbMS.HandbrakeReleaseSoundFile   = getXMLString( xmlFile, xmlString.. ".handbrakeReleaseSound#file" )
 		self.mrGbMS.HandbrakeReleaseSoundVolume = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".handbrakeReleaseSound#volume" ), 1 )
+		self.mrGbMS.GearShiftSoundFile          = getXMLString( xmlFile, xmlString.. ".gearShiftSound#file" )
+		self.mrGbMS.GearShiftSoundVolume        = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".gearShiftSound#volume" ), 1 )
 	else
 		self.mrGbMS.BlowOffVentilFile           = nil
 		self.mrGbMS.BlowOffVentilVolume         = 0
@@ -1280,6 +1282,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.HandbrakePullSoundVolume    = 1
 		self.mrGbMS.HandbrakeReleaseSoundFile   = nil
 		self.mrGbMS.HandbrakeReleaseSoundVolume = 1
+		self.mrGbMS.GearShiftSoundFile          = nil
+		self.mrGbMS.GearShiftSoundVolume        = 1 		
 	end	
 
 	if self.mrGbMS.BlowOffVentilFile == nil then
@@ -3425,6 +3429,7 @@ function gearboxMogli:update(dt)
 		self:mrGbMSetState( "DrawText2", text2 )
 	end
 		
+	local gearShiftSoundPlay = -1 
 --**********************************************************************************************************			
 -- inputs	
 --**********************************************************************************************************			
@@ -3709,9 +3714,11 @@ function gearboxMogli:update(dt)
 				self:setCruiseControlState(0)
 			end
 			self:mrGbMSetNeutralActive( not self.mrGbMS.NeutralActive ) 
+			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 1 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliREVERSE" ) then			
 		--self:setCruiseControlState(0)
 			self:mrGbMSetReverseActive( not self.mrGbMS.ReverseActive ) 
+			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliSPEEDLIMIT" ) then -- speed limiter
 			self:mrGbMSetSpeedLimiter( not self.mrGbMS.SpeedLimiter ) 
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliACCTOLIMIT" ) then -- speed limiter acc.
@@ -3734,7 +3741,9 @@ function gearboxMogli:update(dt)
 					break
 				end			
 				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges2[i], nil, nil, i ) then			
-					self:mrGbMSetCurrentRange2(i, false)
+					if self:mrGbMSetCurrentRange2(i, false) then 
+						gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftRanges2 
+					end
 					break
 				end
 			end
@@ -3750,7 +3759,9 @@ function gearboxMogli:update(dt)
 					break
 				end			
 				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges[i], nil, i, nil ) then			
-					self:mrGbMSetCurrentRange(i, false, true)
+					if self:mrGbMSetCurrentRange(i, false, true) then 
+						gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
+					end 
 					break
 				end
 			end
@@ -3766,38 +3777,50 @@ function gearboxMogli:update(dt)
 					break
 				end			
 				if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Gears[i], i, nil, nil ) then			
-					self:mrGbMSetCurrentGear(i, false, true)
+					if self:mrGbMSetCurrentGear(i, false, true) then 
+						gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
+					end 
 					break
 				end
 			end
 		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRange2Up ) then -- high/low range shift
-			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2+1)                                       
+			if self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2+1) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftRanges2
+			end 
 		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRange2Down ) then -- high/low range shift
-			self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2-1)
+			if self:mrGbMSetCurrentRange2(self.mrGbMS.CurrentRange2-1) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftRanges2
+			end 
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeUp ) then -- high/low range shift
-			self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true)   
+			if self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange+1, false, true) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
+			end 
 		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeDown ) then -- high/low range shift
-			self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1, false, true) 
+			if self:mrGbMSetCurrentRange(self.mrGbMS.CurrentRange-1, false, true) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
+			end 
 		elseif gearboxMogli.mbHasInputEvent( keyShiftGearUp ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
 			if autoShiftRequest then
 				self:mrGbMSetState( "AutoShiftRequest", 1 ) 
-			else
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) 
+			elseif self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear+1, false, true) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
 			end
 		elseif gearboxMogli.mbHasInputEvent( keyShiftGearDown ) then
 			self:mrGbMSetState( "G27Mode", 0 ) 
 			if autoShiftRequest then
 				self:mrGbMSetState( "AutoShiftRequest", -1 ) 
-			else
-				self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) 	
+			elseif self:mrGbMSetCurrentGear(self.mrGbMS.CurrentGear-1, false, true) then
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
 			end
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 2 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliGEARFWD" )  then 
 		--self:setCruiseControlState(0) 
 			self:mrGbMSetReverseActive( false ) 
+			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 2 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliGEARBACK" ) then 
 		--self:setCruiseControlState(0) 
 			self:mrGbMSetReverseActive( true ) 
+			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
 		end
 		
 		if self.mrGbMS.DisableManual or self:getIsHired() then
@@ -3872,6 +3895,11 @@ function gearboxMogli:update(dt)
 					elseif gear == 0 then
 					-- neutral
 						curGear = 0 
+						if self.mrGbMS.SwapGearRangeKeys then
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
+						else 
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
+						end 
 					elseif gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
 					-- do not shift because of double clutch 
 					else
@@ -3880,10 +3908,14 @@ function gearboxMogli:update(dt)
 						end
 						
 						if self.mrGbMS.SwapGearRangeKeys then
-							self:mrGbMSetCurrentRange(math.abs(gear), false, true)
+							if self:mrGbMSetCurrentRange(math.abs(gear), false, true) then 
+								gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
+							end
 							curGear = self.mrGbMS.CurrentRange
 						else
-							self:mrGbMSetCurrentGear(math.abs(gear), false, true)
+							if self:mrGbMSetCurrentGear(math.abs(gear), false, true) then 
+								gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
+							end 
 							curGear = self.mrGbMS.CurrentGear
 						end
 						
@@ -3895,7 +3927,7 @@ function gearboxMogli:update(dt)
 				
 				if curGear == 0 then
 					self:mrGbMSetNeutralActive( true, false, true )	
-					self:mrGbMSetState( "G27Mode", 1 ) 
+					self:mrGbMSetState( "G27Mode", 1 )
 				else
 					self:mrGbMSetState( "G27Mode", 2 ) 
 					self:mrGbMSetNeutralActive( false, false, true )
@@ -4050,6 +4082,35 @@ function gearboxMogli:update(dt)
 		self.sampleReverseDrive.sample  = nil
 		self.sampleReverseDrive.sound3D = nil
 	end			
+	
+--**********************************************************************************************************			
+-- gear shift sound
+--**********************************************************************************************************			
+	if      gearShiftSoundPlay >= 0
+			and self.mrGbMS.GearShiftSoundVolume > 0
+			and self:getIsActiveForSound() 
+			and self:getIsIndoorCameraActive() then
+		if gearShiftSoundPlay < self.mrGbMG.shiftEffectTime then 
+			if self.sampleTurnLight then
+				SoundUtil.playSample(self.sampleTurnLight, 1, 0, nil);
+			else
+				SoundUtil.playSample(g_currentMission.sampleTurnLight, 1, 0, nil);
+			end
+		elseif self.mrGbMS.GearShiftSoundFile == nil then
+			if gearboxMogli.GearShiftSoundSample == nil then
+				gearboxMogli.GearShiftSoundSample = createSample("GearShiftSoundSample")
+				local fileName = Utils.getFilename( "shift.wav", gearboxMogli.baseDirectory )
+				loadSample(gearboxMogli.GearShiftSoundSample, fileName, false)
+			end
+			playSample( gearboxMogli.GearShiftSoundSample, 1, self.mrGbMS.GearShiftSoundVolume, 0 )
+		else
+			if self.mrGbML.GearShiftSoundSample == nil then
+				self.mrGbML.GearShiftSoundSample = createSample("GearShiftSoundSample")
+				loadSample( self.mrGbML.GearShiftSoundSample, self.mrGbMS.GearShiftSoundFile, false )
+			end
+			playSample( self.mrGbML.GearShiftSoundSample, 1, self.mrGbMS.GearShiftSoundVolume, 0 )
+		end
+	end
 	
 --**********************************************************************************************************			
 -- threshing sound pitch 
@@ -4508,7 +4569,11 @@ function gearboxMogli:deleteMap()
 												"ovDiffLockMiddle",
 												"ovDiffLockFront",
 												"ovDiffLockBack",
-												"BOVSample" } ) do
+												"BOVSample",
+												"GrindingSample",
+												"HandbrakePullSoundSample",
+												"HandbrakeReleaseSoundSample",
+												"GearShiftSoundSample" } ) do
 		if gearboxMogli[name] ~= nil then
 			local ov = gearboxMogli[name]
 			gearboxMogli[name] = nil
@@ -7697,15 +7762,14 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	do
 		local fx, ft = 0, 0
-		if self.steeringEnabled and self.mrGbMS.ShuttleFactor < 0.999 then 
+		if self.mrGbMS.ShuttleFactor < 0.999 then 
 			local x = self.mrGbMS.ShuttleFactor
-			fx = 6 * x * x - 11 * x + 5 -- 0=>5, 0.5=>1, 0=>0
+			fx = 6 * x * x - 11 * x + 5 -- 0=>5, 0.5=>1, 1=>0
 			ft = fx * 1000
 		end
 			
-		if      math.abs( currentSpeed ) < 2.778e-5 then 
-		-- nothing
-		elseif  self.isMotorStarted
+		if      self.isMotorStarted
+				and math.abs( currentSpeed ) > 2.778e-5
 				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
 				and self.mrGbMS.ManualClutch > self.mrGbMS.MinClutchPercent + 0.1
 				and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
@@ -7728,6 +7792,17 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			brakePedal = math.max( b, brakePedal )
 		elseif self.mrGbML.shuttleBrakeTimer ~= nil then 
 			self.mrGbML.shuttleBrakeTimer = nil
+		end
+		
+		ft = math.max( ft-1000, 0 )
+		
+		if      not ( self.mrGbML.ReverserNeutral )
+				and acceleration                    >  0.001
+				and ft                              >= 1
+				and self.mrGbML.DirectionChangeTime ~= nil 
+				and self.mrGbML.DirectionChangeTime <= g_currentMission.time 
+				and g_currentMission.time           <  self.mrGbML.DirectionChangeTime + ft then
+			acceleration = math.min( acceleration, ( g_currentMission.time - self.mrGbML.DirectionChangeTime ) / ft ) 
 		end
 	end
 	

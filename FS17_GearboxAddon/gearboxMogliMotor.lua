@@ -1261,8 +1261,8 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		local f = 1
 		
 		if      torque < gearboxMogli.eps then
-		elseif  self.vehicle.mrGbML.DirectionChangeTime <= g_currentMission.time and g_currentMission.time < self.vehicle.mrGbML.DirectionChangeTime + 2000 then
-			f = 1 + ( g_currentMission.time - self.vehicle.mrGbML.DirectionChangeTime ) * 0.001
+		elseif  self.vehicle.mrGbML.DirectionChangeTime <= g_currentMission.time and g_currentMission.time < self.vehicle.mrGbML.DirectionChangeTime + 1000 then
+			f = 1 + ( g_currentMission.time - self.vehicle.mrGbML.DirectionChangeTime ) * 0.002
 			if self.ratioFactorR ~= nil then
 				f = math.min( f, self.ratioFactorR )
 			end
