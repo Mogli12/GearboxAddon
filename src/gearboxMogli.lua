@@ -3895,11 +3895,6 @@ function gearboxMogli:update(dt)
 					elseif gear == 0 then
 					-- neutral
 						curGear = 0 
-						if self.mrGbMS.SwapGearRangeKeys then
-							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
-						else 
-							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
-						end 
 					elseif gearboxMogli.mrGbMCheckGrindingGears( self, manClutch, noEventSend ) then
 					-- do not shift because of double clutch 
 					else
@@ -3908,14 +3903,8 @@ function gearboxMogli:update(dt)
 						end
 						
 						if self.mrGbMS.SwapGearRangeKeys then
-							if self:mrGbMSetCurrentRange(math.abs(gear), false, true) then 
-								gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl
-							end
 							curGear = self.mrGbMS.CurrentRange
 						else
-							if self:mrGbMSetCurrentGear(math.abs(gear), false, true) then 
-								gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftGear
-							end 
 							curGear = self.mrGbMS.CurrentGear
 						end
 						
@@ -4102,13 +4091,38 @@ function gearboxMogli:update(dt)
 				local fileName = Utils.getFilename( "shift.wav", gearboxMogli.baseDirectory )
 				loadSample(gearboxMogli.GearShiftSoundSample, fileName, false)
 			end
-			playSample( gearboxMogli.GearShiftSoundSample, 1, self.mrGbMS.GearShiftSoundVolume, 0 )
+			local diff = math.min( 0.4 * gearShiftSoundPlay, self.mrGbML.clutchShiftingTime ) - 90
+			if self.mrGbML.gearShiftSoundTimes == nil then
+				self.mrGbML.gearShiftSoundTimes = {} 
+			end 				
+			table.insert( self.mrGbML.gearShiftSoundTimes, g_currentMission.time + diff )
 		else
 			if self.mrGbML.GearShiftSoundSample == nil then
 				self.mrGbML.GearShiftSoundSample = createSample("GearShiftSoundSample")
 				loadSample( self.mrGbML.GearShiftSoundSample, self.mrGbMS.GearShiftSoundFile, false )
 			end
 			playSample( self.mrGbML.GearShiftSoundSample, 1, self.mrGbMS.GearShiftSoundVolume, 0 )
+		end
+	end
+	
+	if self.mrGbML.gearShiftSoundTimes ~= nil then
+		local nextTimes
+		local playNow = false 
+		for i,t in pairs( self.mrGbML.gearShiftSoundTimes )	do
+			if g_currentMission.time < t then 
+				if nextTimes == nil then		
+					nextTimes = {} 
+				end	
+				table.insert( nextTimes, t )
+			elseif  g_currentMission.time < t + 100
+					and self:getIsActiveForSound() 
+					and self:getIsIndoorCameraActive() then
+				playNow = true
+			end 			
+		end 
+		self.mrGbML.gearShiftSoundTimes = nextTimes
+		if playNow then 
+			playSample( gearboxMogli.GearShiftSoundSample, 1, self.mrGbMS.GearShiftSoundVolume, 0 )		
 		end
 	end
 	
