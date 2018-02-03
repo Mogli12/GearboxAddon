@@ -3903,8 +3903,10 @@ function gearboxMogli:update(dt)
 						end
 						
 						if self.mrGbMS.SwapGearRangeKeys then
+							self:mrGbMSetCurrentRange(math.abs(gear), false, true)
 							curGear = self.mrGbMS.CurrentRange
 						else
+							self:mrGbMSetCurrentGear(math.abs(gear), false, true)
 							curGear = self.mrGbMS.CurrentGear
 						end
 						
