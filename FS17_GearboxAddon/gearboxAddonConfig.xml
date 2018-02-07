@@ -6628,7 +6628,7 @@
 				<gear speed="49.02" name="IV"/>
 			</gears>
 			
-			<ranges defaultRange="5" shiftTimeMs="800" clutchRatio="0.3125">
+			<ranges defaultRange="5" shiftTimeMs="1000" clutchRatio="0.3125">
 				<range ratio="0.121521663" name="1" />
 				<range ratio="0.200774921" name="2" />
 				<range ratio="0.306093695" name="3" />

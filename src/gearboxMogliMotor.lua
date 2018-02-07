@@ -2133,14 +2133,16 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 
 	local mlf = Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 ) 
-	if     lastNoTorque then
-		mlf = 0
-	elseif self.vehicle.mrGbML.gearShiftingNeeded == 2 then
+	if     self.vehicle.mrGbML.gearShiftingNeeded == 2 then
 		mlf = 1
-	elseif ( self.vehicle.mrGbML.gearShiftingNeeded > 0 and self.vehicle.mrGbML.doubleClutch )
+	elseif self.vehicle.mrGbML.gearShiftingEffect then 
+		mlf = math.max( mlf, accelerationPedal )
+	elseif ( self.vehicle.mrGbML.gearShiftingNeeded > 0 and self.vehicle.mrGbML.doubleClutch == 2 )
 			or self.vehicle.mrGbML.gearShiftingNeeded   < 0 
 			or ( self.vehicle.mrGbML.NeutralActive and not self.vehicle:mrGbMGetAutoClutch() ) then
 		mlf = math.max( mlf, 0.5, accelerationPedal )
+	elseif lastNoTorque then
+		mlf = 0
 	elseif not getMaxPower then
 		mlf = 0.87 * mlf
 	end
@@ -4435,7 +4437,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect and not self.noTransmission then 
 		self.lastMotorRpm = self.vehicle.mrGbML.afterShiftRpm
-		self.vehicle.mrGbML.gearShiftingEffect = false
+	end
+	
+	if      self.vehicle.mrGbML.gearShiftingEffect
+			and self.vehicle.mrGbML.gearShiftingNeeded == 0
+			and not self.noTransmission
+			and g_currentMission.time > self.vehicle.mrGbML.lastShiftTime    + 100
+			and g_currentMission.time > self.vehicle.mrGbML.gearShiftingTime + 100 then
+		self.vehicle.mrGbML.gearShiftingEffect = false 
 	end
 	
 ----**********************************************************************************************************		

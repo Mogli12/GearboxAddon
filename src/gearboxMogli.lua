@@ -357,6 +357,8 @@ function gearboxMogli:initClient()
 	
 	gearboxMogli.registerState( self, "GearShifterMode",    0 )
 	gearboxMogli.registerState( self, "ShuttleShifterMode", 0 )
+	gearboxMogli.registerState( self, "Range1ShifterMode",  0 )
+	gearboxMogli.registerState( self, "Range2ShifterMode",  0 )
 	
 	gearboxMogli.registerState( self, "DiffLockMiddle", false )
 	gearboxMogli.registerState( self, "DiffLockFront",  false )
@@ -411,7 +413,7 @@ function gearboxMogli:initClient()
 	self.mrGbML.gearShiftingNeeded = 0 
 	self.mrGbML.gearShiftingTime   = 0 
 	self.mrGbML.clutchShiftingTime = 0 
-	self.mrGbML.doubleClutch       = false
+	self.mrGbML.doubleClutch       = 0
 	self.mrGbML.lastReverse        = false
 	self.mrGbML.dirtyFlag          = self:getNextDirtyFlag() 
 	self.mrGbML.wantedAcceleration = 0
@@ -428,6 +430,7 @@ function gearboxMogli:initClient()
 	self.mrGbML.updateStreamErrors   = 0
 	self.mrGbML.MotorLoad            = 0
 	self.mrGbML.DirectionChangeTime  = 0
+	self.mrGbML.motorSoundLoadFactor = 0
 	
 	if gearboxMogli.ovArrowUpWhite == nil then
 		local w  = math.floor(0.012 * g_screenWidth) / g_screenWidth * gearboxMogli.getUiScale()
@@ -2604,6 +2607,35 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
 			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
 		end
+	elseif self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 1 then
+		self.mrGbMS.ModifyDifferentials = Utils.getNoNil( getXMLBool(xmlFile, xmlString .. "#manual4wd"), true )
+		if self.mrGbMS.ModifyDifferentials then
+			local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
+		
+			self.mrGbMS.TorqueRatioMiddle = -1
+			self.mrGbMS.TorqueSenseMiddle = 0
+			self.mrGbMS.SpeedRatioMiddle  = self.differentials[3].maxSpeedRatio
+			self.mrGbMS.TorqueRatioFront  = -1
+			self.mrGbMS.TorqueSenseFront  = 1
+			self.mrGbMS.SpeedRatioFront   = 1
+			self.mrGbMS.TorqueRatioBack   = self.differentials[2].torqueRatio
+			self.mrGbMS.TorqueSenseBack   = 0.75
+			self.mrGbMS.SpeedRatioBack    = 1
+			
+			if     profile == "off"       then
+				self.mrGbMS.TorqueRatioBack   = -1
+			elseif profile == "lsd"       then
+				self.mrGbMS.TorqueSenseBack   = 0.25
+			elseif profile == "torsen"    then
+				self.mrGbMS.TorqueRatioBack   = 0.5
+				self.mrGbMS.TorqueSenseBack   = -1
+				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
+			end
+
+			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
+			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
+			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
+		end
 	end
 
 --**********************************************************************************************************		
@@ -3430,6 +3462,11 @@ function gearboxMogli:update(dt)
 	end
 		
 	local gearShiftSoundPlay = -1 
+	local lastRange1ShifterState = self.mrGbML.Range1ShifterState
+	local lastRange2ShifterState = self.mrGbML.Range2ShifterState
+	self.mrGbML.Range1ShifterState = nil
+	self.mrGbML.Range2ShifterState = nil
+		
 --**********************************************************************************************************			
 -- inputs	
 --**********************************************************************************************************			
@@ -3729,7 +3766,9 @@ function gearboxMogli:update(dt)
 			self:mrGbMSetAccelerateToLimit( self.mrGbMS.AccelerateToLimit - 1 )
 			self:mrGbMSetState( "InfoText", string.format( "Speed Limiter: +%2.0f km/h/s / -%2.0f km/h/s", 
 													self.mrGbMS.AccelerateToLimit, self.mrGbMS.AccelerateToLimit * self.mrGbMG.decAccToLimitRatio ))
-		elseif table.getn( self.mrGbMS.Ranges2 ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRange2Toggle ) then
+		elseif  self.mrGbMS.Range2ShifterMode == 0 
+				and table.getn( self.mrGbMS.Ranges2 ) > 1
+				and gearboxMogli.mbHasInputEvent( keyShiftRange2Toggle ) then
 			-- toggle range 2
 			local i = self.mrGbMS.CurrentRange2
 			while true do
@@ -3747,7 +3786,9 @@ function gearboxMogli:update(dt)
 					break
 				end
 			end
-		elseif table.getn( self.mrGbMS.Ranges ) > 1 and gearboxMogli.mbHasInputEvent( keyShiftRangeToggle ) then
+		elseif  self.mrGbMS.Range1ShifterMode == 0 
+				and table.getn( self.mrGbMS.Ranges ) > 1
+				and gearboxMogli.mbHasInputEvent( keyShiftRangeToggle ) then
 			-- toggle range 1			
 			local i = self.mrGbMS.CurrentRange
 			while true do
@@ -3927,6 +3968,78 @@ function gearboxMogli:update(dt)
 			elseif self.mrGbMS.G27Mode > 0 then
 				self:mrGbMSetState( "G27Mode", 0 ) 
 			end
+
+			-- set range 1 via on/off button 
+			if self.mrGbMS.Range1ShifterMode > 0 and keyShiftRangeToggle ~= "" then 
+				self.mrGbML.Range1ShifterState = gearboxMogli.mbIsInputPressed( keyShiftRangeToggle )
+				if self.mrGbMS.Range1ShifterMode == 2 then 
+					self.mrGbML.Range1ShifterState = not self.mrGbML.Range1ShifterState
+				end
+				
+				if lastRange1ShifterState == nil or lastRange1ShifterState ~= self.mrGbML.Range1ShifterState then 			
+					local high, low = 1, table.getn( self.mrGbMS.Ranges )
+					
+					for i=table.getn( self.mrGbMS.Ranges ),1,-1 do 
+						if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges[i], nil, i, nil ) then			
+							if high < i then 
+								high = i 
+							end 
+							if low  > i then 
+								low  = i 
+							end 
+							if low < high then 
+								break 
+							end 
+						end 
+					end 
+					
+					if self.mrGbML.Range1ShifterState then 
+						if self:mrGbMSetCurrentRange(high, false) then 
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl 
+						end
+					else 
+						if self:mrGbMSetCurrentRange(low, false) then 
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftHl 
+						end
+					end				
+				end 
+			end 
+			
+			-- set range 2 via on/off button 
+			if self.mrGbMS.Range2ShifterMode > 0 and keyShiftRange2Toggle ~= "" then 
+				self.mrGbML.Range2ShifterState = gearboxMogli.mbIsInputPressed( keyShiftRange2Toggle )
+				if self.mrGbMS.Range2ShifterMode == 2 then 
+					self.mrGbML.Range2ShifterState = not self.mrGbML.Range2ShifterState
+				end
+				
+				if lastRange2ShifterState == nil or lastRange2ShifterState ~= self.mrGbML.Range2ShifterState then 			
+					local high, low = 1, table.getn( self.mrGbMS.Ranges2 )
+					
+					for i=table.getn( self.mrGbMS.Ranges2 ),1,-1 do 
+						if not gearboxMogli.mrGbMIsNotValidEntry( self, self.mrGbMS.Ranges2[i], nil, nil, i ) then			
+							if high < i then 
+								high = i 
+							end 
+							if low  > i then 
+								low  = i 
+							end 
+							if low < high then 
+								break 
+							end 
+						end 
+					end 
+					
+					if self.mrGbML.Range2ShifterState then 
+						if self:mrGbMSetCurrentRange2(high, false) then 
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftRanges2 
+						end
+					else 
+						if self:mrGbMSetCurrentRange2(low, false) then 
+							gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftRanges2 
+						end
+					end				
+				end 
+			end 
 		end
 --**********************************************************************************************************					
 -- auto start stop or manual clutch if vehicle is not controlled 
@@ -4165,11 +4278,18 @@ function gearboxMogli:update(dt)
 
 		if     self.mrGbMS.DoubleClutch == 1 then
 			self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
-			self.motorSoundLoadFactor              = self.actualLoadPercentage
+		--self.motorSoundLoadFactor              = self.actualLoadPercentage
 		elseif self.mrGbMS.DoubleClutch == 2 and self.axisForward ~= nil then
 			self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, -self.axisForward * self.sampleMotorLoad.volume )
-			self.motorSoundLoadFactor              = self.actualLoadPercentage
+		--self.motorSoundLoadFactor              = self.actualLoadPercentage
 		end
+		
+		if     self.mrGbML.motorSoundLoadFactor < self.actualLoadPercentage then
+			self.mrGbML.motorSoundLoadFactor = math.min( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor + 0.010 * dt )		
+		elseif self.mrGbML.motorSoundLoadFactor > self.actualLoadPercentage then
+			self.mrGbML.motorSoundLoadFactor = math.max( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor - 0.002 * dt )	
+		end
+		self.motorSoundLoadFactor          = self.mrGbML.motorSoundLoadFactor
 	end
 	
 	if      self.steeringEnabled 
@@ -5164,6 +5284,12 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.GearShifterMode ~= 0 then
 			attributes = attributes.." mrGbMGearShifter=\"" .. tostring( self.mrGbMS.GearShifterMode ) .. "\""     
 		end
+		if self.mrGbMS.Range1ShifterMode ~= 0 then
+			attributes = attributes.." mrGbMRange1Shifter=\"" .. tostring( self.mrGbMS.Range1ShifterMode ) .. "\""     
+		end
+		if self.mrGbMS.Range2ShifterMode ~= 0 then
+			attributes = attributes.." mrGbMRange2Shifter=\"" .. tostring( self.mrGbMS.Range2ShifterMode ) .. "\""     
+		end
 		if self.mrGbMS.ShuttleShifterMode ~= 0 then
 			attributes = attributes.." mrGbMShuttleShifter=\"" .. tostring( self.mrGbMS.ShuttleShifterMode ) .. "\""     
 		end
@@ -5257,6 +5383,8 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMAllAutoMode"   , "AllAutoMode"       )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMGearShifter"   , "GearShifterMode"   )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMShuttleShifter", "ShuttleShifterMode")
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange1Shifter",  "Range1ShifterMode" )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange2Shifter",  "Range2ShifterMode" )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
@@ -6611,7 +6739,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			self.motor.timeShiftTab = nil
 		end
 		self.mrGbML.autoShiftTime = g_currentMission.time + timeToShift
-		
+				
 		if      shiftingEffect and ( timeToShift >= 0 ) 
 				and not self.mrGbMS.NeutralActive 
 				and self.mrGbML.gearShiftingTime <= self.mrGbML.autoShiftTime then
@@ -6645,9 +6773,17 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			if self.mrGbML.afterShiftClutch == nil or self.mrGbML.afterShiftClutch > clutchPercent then
 				self.mrGbML.afterShiftClutch   = clutchPercent
 			end
-			if doubleClutch then
-				self.mrGbML.doubleClutch       = true
-				self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + 0.4 * timeToShift ) 
+			if     doubleClutch 
+					or ( self.mrGbMS.ClutchShiftTime < 0.41 * timeToShift
+					 and timeToShift                 > 990
+					 and not ( self.mrGbMS.Hydrostatic ) )
+					then 
+				if doubleClutch then 
+					self.mrGbML.doubleClutch     = 2
+				else 
+					self.mrGbML.doubleClutch     = 1 
+				end
+				self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + math.min( 0.4 * timeToShift, self.mrGbMS.ClutchShiftTime ) ) 
 			else
 				self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + self.mrGbMS.ClutchShiftTime ) 
 			end
@@ -6695,12 +6831,12 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 
 		if     self.mrGbML.gearShiftingTime < g_currentMission.time then
 			self.mrGbML.gearShiftingNeeded = 0
-		elseif self.mrGbML.doubleClutch then
+		elseif self.mrGbML.doubleClutch > 0 then
 			self.mrGbML.gearShiftingNeeded = 2
 		else
 			self.mrGbML.gearShiftingNeeded = 3
 		end
-		self.mrGbML.doubleClutch = false
+		self.mrGbML.doubleClutch = 0
 		
 		local gearMaxSpeed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed 
 		                   * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio 
@@ -8447,6 +8583,21 @@ function gearboxMogli:showSettingsUI()
 	self.mrGbMUI.ShuttleShifterMode = { gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_both", "Toggle and Fwd-/Back-Buttons" ), 
 																			gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_toggle", "Toggle" ), 
 																			gearboxMogli.getText( "gearboxMogliTEXT_Shuttle_back_fwd", "Fwd-/Back-Buttons" ) }
+  if self.mrGbMS.CountRange1F > 1 then
+		self.mrGbMUI.Range1ShifterMode  = { gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_toggle", "Toggle button" ), 
+																				gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_high_on", "High if button is pressed" ),
+																				gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_low_on", "Low if button is pressed" ) }
+	else 
+		self.mrGbMUI.Range1ShifterMode  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	end
+	
+  if self.mrGbMS.CountRange2F > 1 then
+		self.mrGbMUI.Range2ShifterMode  = { gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_toggle", "Toggle button" ), 
+																				gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_high_on", "High if button is pressed" ),
+																				gearboxMogli.getText( "gearboxMogliTEXT_RangeShifter_low_on", "Low if button is pressed" ) }
+	else 
+		self.mrGbMUI.Range2ShifterMode  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+	end
 	
 	if not ( self.mrGbMS.IsOn and self.steeringEnabled ) then
 		self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
