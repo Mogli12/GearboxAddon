@@ -87,8 +87,6 @@ Améliore toute les conduites de véhicules grâce à l'implémentation de la bo
 		<text name="gearboxMogliTEXT_DrawReqPower"       text="afficher la puissance"/>
 		<text name="gearboxMogliTEXT_EnableAI"           text="cacher ouvrier"/>
 		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="échanger vitesses ou gamme 1"/>
-		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>
-		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>
 
 		<text name="gearboxMogliTEXT_AllAutoMode"        text="paramètres simplifiés"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="séquentielle"/>
@@ -99,7 +97,8 @@ Améliore toute les conduites de véhicules grâce à l'implémentation de la bo
 		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="vitesses et gamme 2"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="gammes 1 et 2"/>
 		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="vitesses, gammes 1 et 2"/>
-
+	
+		<text name="gearboxMogliTEXT_DiffLock"           text="Verrouiller différentiel"/>	
 		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2RM"/>
 		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4RM"/>
 		<text name="gearboxMogliTEXT_DiffLock_open"      text="décraboté"/>
@@ -107,15 +106,23 @@ Améliore toute les conduites de véhicules grâce à l'implémentation de la bo
 		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatique"/>
 		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="correction rapport"/>
 		<text name="gearboxMogliTEXT_DiffLock_locked"    text="craboté"/>
-
+		
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 et vitesses"/>
 		<text name="gearboxMogliTEXT_GearShifter_both"   text="G27 et touches"/>
 		<text name="gearboxMogliTEXT_GearShifter_key"    text="touches"/>
 		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
-
+	
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="boutons av-/arrière"/>
 		<text name="gearboxMogliTEXT_Shuttle_both"       text="échanger et séparer"/>
 		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="échanger bouton"/>
 		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="séparer boutons"/>
-
+		
+		<text name="gearboxMogliTEXT_Range1ShifterMode"    text="G27 et gamme 1"/>
+		<text name="gearboxMogliTEXT_Range2ShifterMode"    text="G27 et gamme 2"/>
+		<text name="gearboxMogliTEXT_RangeShifter_toggle"	 text="échanger bouton"/>
+		<text name="gearboxMogliTEXT_RangeShifter_high_on" text="gamme haute si activé"/>
+		<text name="gearboxMogliTEXT_RangeShifter_low_on"	 text="gamme basse si activé"/>
+		
 		<text name="gearboxMogliTEXT_MinTargetRpm"       text="cible mini RPM"/>
 		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="cible maxi RPM"/>
 		<text name="gearboxMogliTEXT_MatchGears"         text="vitesse conforme (rapports)"/>
@@ -143,11 +150,15 @@ Améliore toute les conduites de véhicules grâce à l'implémentation de la bo
 		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Affiche le RPM cible dans le HUD"/>
 		<text name="gearboxMogliTIP_DrawReqPower"        text="Affiche la puissance actuelle dans le HUD"/>
 		<text name="gearboxMogliTIP_EnableAI"            text="Paramètre pour l'ouvrier"/>
-		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Échanger les rapports et les groupe en un"/>	<!-- may need tune seeing nowhere-->
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Échanger les rapports ou les gammes"/>
 		<text name="gearboxMogliTIP_GearShifterMode"     text="Réglage pour les volants avec levier de vitesses"/>
 		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Réglage pour les volants avec levier de vitesses"/>
 		<text name="gearboxMogliTIP_MinTargetRpm"        text="Cible minimum RPM"/>
 		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Cible maximum RPM"/>
+		<text name="gearboxMogliTIP_MatchGears"          text="Ajuster automatiquement le rapport lorsque vous changez de gamme"/>
+		<text name="gearboxMogliTIP_MatchRanges"         text="Ajuster la gamme automatiquement lors du changement de vitesse"/>
+		<text name="gearboxMogliTIP_Range1ShifterMode"   text="Réglage pour les volants avec levier de vitesses"/>
+		<text name="gearboxMogliTIP_Range2ShifterMode"   text="Réglage pour les volants avec levier de vitesses"/>
 		
 		<text name="gearboxMogliTIP_MinAutoGearSpeed"    text="Limiter rapport de vitesse minimum en mode automatique"/>
 		<text name="gearboxMogliTIP_MaxAutoGearSpeed"    text="Limiter rapport de vitesse maximum en mode automatique"/>
@@ -206,6 +217,7 @@ Améliore toute les conduites de véhicules grâce à l'implémentation de la bo
 		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
 		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
 		<text name="gearboxMogliUNIT_tph"                text="t/h"/>
+		
 	</texts>
 	
 	<longTexts>
