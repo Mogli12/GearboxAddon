@@ -2614,11 +2614,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		
 			self.mrGbMS.TorqueRatioMiddle = -1
 			self.mrGbMS.TorqueSenseMiddle = 0
-			self.mrGbMS.SpeedRatioMiddle  = self.differentials[3].maxSpeedRatio
+			self.mrGbMS.SpeedRatioMiddle  = 1
 			self.mrGbMS.TorqueRatioFront  = -1
 			self.mrGbMS.TorqueSenseFront  = 1
 			self.mrGbMS.SpeedRatioFront   = 1
-			self.mrGbMS.TorqueRatioBack   = self.differentials[2].torqueRatio
+			self.mrGbMS.TorqueRatioBack   = self.differentials[1].torqueRatio
 			self.mrGbMS.TorqueSenseBack   = 0.75
 			self.mrGbMS.SpeedRatioBack    = 1
 			
@@ -2629,7 +2629,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			elseif profile == "torsen"    then
 				self.mrGbMS.TorqueRatioBack   = 0.5
 				self.mrGbMS.TorqueSenseBack   = -1
-				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
+				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[1].maxSpeedRatio )
 			end
 
 			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
