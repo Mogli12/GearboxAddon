@@ -3029,7 +3029,10 @@ function gearboxMogli:update(dt)
 		self:mrGbMSetState( "ModifyDifferentials", false )
 	end
 	if self.mrGbMS.ModifyDifferentials and self.isServer then
-		if self.mrGbMS.IsOn and self.steeringEnabled and not self.mrGbMS.AllAuto then
+		if      self.mrGbMS.IsOn
+				and self.steeringEnabled 
+				and not self.mrGbMS.AllAuto
+				and ( table.getn( self.differentials ) == 1 or table.getn( self.differentials ) == 3 ) then
       local getSpeedsOfDifferential;
       getSpeedsOfDifferential = function(self, diff)
 				local speed1, speed2;
@@ -3106,23 +3109,31 @@ function gearboxMogli:update(dt)
 			end
 		
 		
-			local diff = self.differentials[3]
-			diff.mogliLocked      = self:mrGbMGetDiffLockMiddle() 
-			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioMiddle
-			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseMiddle
-			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioMiddle
-			
-			diff = self.differentials[1]
-			diff.mogliLocked      = self:mrGbMGetDiffLockFront()
-			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioFront
-			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseFront
-			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioFront
-			
-			diff = self.differentials[2]
-			diff.mogliLocked      = self:mrGbMGetDiffLockBack()
-			diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
-			diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
-			diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioBack
+			if     table.getn( self.differentials ) == 1 then 
+				diff = self.differentials[1]
+				diff.mogliLocked      = self:mrGbMGetDiffLockBack()
+				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
+				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
+				diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioBack
+			elseif table.getn( self.differentials ) == 3 then 
+				local diff = self.differentials[3]
+				diff.mogliLocked      = self:mrGbMGetDiffLockMiddle() 
+				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioMiddle
+				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseMiddle
+				diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioMiddle
+				
+				diff = self.differentials[1]
+				diff.mogliLocked      = self:mrGbMGetDiffLockFront()
+				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioFront
+				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseFront
+				diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioFront
+				
+				diff = self.differentials[2]
+				diff.mogliLocked      = self:mrGbMGetDiffLockBack()
+				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
+				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
+				diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioBack
+			end			
 			
 			for i,diff in pairs( self.differentials ) do
 				local m = 0
@@ -3148,10 +3159,11 @@ function gearboxMogli:update(dt)
 				end
 				diff.mogliMode = m
 			end
-			
-		elseif self.differentials[1].mogliMode ~= nil
-				or self.differentials[2].mogliMode ~= nil
-				or self.differentials[3].mogliMode ~= nil then
+		elseif self.differentials == nil then 
+			--igonre
+		elseif ( self.differentials[1] ~= nil and self.differentials[1].mogliMode ~= nil )
+				or ( self.differentials[2] ~= nil and self.differentials[2].mogliMode ~= nil )
+				or ( self.differentials[3] ~= nil and self.differentials[3].mogliMode ~= nil ) then
 			for i,diff in pairs( self.differentials ) do
 				diff.mogliMode = nil
 				updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.maxSpeedRatio)
