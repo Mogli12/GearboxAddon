@@ -2572,6 +2572,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 				self.mrGbMS.TorqueRatioMiddle = -1
 				self.mrGbMS.TorqueRatioFront  = -1
 				self.mrGbMS.TorqueRatioBack   = -1
+			elseif profile == "rwd"       then 
+				self.mrGbMS.TorqueRatioMiddle = -1
+				self.mrGbMS.TorqueRatioFront  = -1
 			elseif profile == "lsd"       then
 				self.mrGbMS.TorqueSenseBack   = 0.25
 			elseif profile == "permanent" then

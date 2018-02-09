@@ -39,6 +39,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.vehicle          = vehicle
 	self.original         = motor 	
 	self.torqueCurve      = AnimCurve:new( interpolFunction, interpolDegree )
+	self.boostMinSpeed    = gearboxMogli.huge 
 	
 	if gearboxMogli.powerFuelCurve == nil then
 		gearboxMogli.powerFuelCurve = AnimCurve:new( interpolFunction, interpolDegree )
@@ -63,6 +64,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		
 		if vehicle.mrGbMS.Engine.ecoTorqueValues ~= nil then
 			self.ecoTorqueCurve = AnimCurve:new( interpolFunction, interpolDegree )
+			self.boostMinSpeed  = vehicle.mrGbMS.BoostMinSpeed
 			for _,k in pairs(vehicle.mrGbMS.Engine.ecoTorqueValues) do
 				self.ecoTorqueCurve:addKeyframe( k )	
 			end
@@ -72,7 +74,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.maxTorqueRpm   = vehicle.mrGbMS.Engine.maxTorqueRpm
 		self.maxMotorTorque = vehicle.mrGbMS.Engine.maxTorque
 	else
-		local idleTorque    = motor.torqueCurve:get(vehicle.mrGbMS.OrigMinRpm) --/ self.vehicle.mrGbMS.TransmissionEfficiency
+		local idleTorque    = motor.torqueCurve:get(vehicle.mrGbMS.OrigMinRpm)
 		self.torqueCurve:addKeyframe( {v=0.1*idleTorque, time=0} )
 		self.torqueCurve:addKeyframe( {v=0.9*idleTorque, time=vehicle.mrGbMS.CurMinRpm} )
 		local vMax  = 0
@@ -81,18 +83,18 @@ function gearboxMogliMotor:new( vehicle, motor )
 		local vvMax = 0
 		for _,k in pairs(motor.torqueCurve.keyframes) do
 			if k.time > vehicle.mrGbMS.CurMinRpm and ( k.v > 0.000001 or k.time < 0.999999 ) then 
-				local kv = k.v --/ self.vehicle.mrGbMS.TransmissionEfficiency
+				local kv = k.v
 				local kt = math.min( k.time, vehicle.mrGbMS.CurMaxRpm - 1 )
 				
 				if vvMax < k.v then
-					vvMax = k.v
+					vvMax = kv
 					tvMax = k.time
 				end
 				
 				vMax = kv
 				tMax = kt
 				
-				self.torqueCurve:addKeyframe( {v=kv, time=kt} )				
+				self.torqueCurve:addKeyframe( {v=kv, time=kt} )	
 			end
 		end		
 		
@@ -108,6 +110,23 @@ function gearboxMogliMotor:new( vehicle, motor )
 		
 		self.maxTorqueRpm   = tvMax	
 		self.maxMotorTorque = self.torqueCurve:getMaximum()
+		
+		if      vehicle.mrIsMrVehicle
+				and vehicle.mrBoost               ~= nil
+				and vehicle.mrBoost.maxBoostRatio ~= nil
+				and vehicle.mrBoost.maxBoostRatio > 1 then 
+			self.ecoTorqueCurve  = self.torqueCurve
+			self.torqueCurve     = AnimCurve:new( interpolFunction, interpolDegree )
+			self.maxMotorTorque  = self.maxMotorTorque * vehicle.mrBoost.maxBoostRatio
+			if vehicle.mrBoost.speedBoostStartMps ~= nil then 
+				self.boostMinSpeed = vehicle.mrBoost.speedBoostStartMps
+			end
+			for _,k in pairs(self.ecoTorqueCurve.keyframes) do
+				local kv = k.v * vehicle.mrBoost.maxBoostRatio
+				local kt = k.time
+				self.torqueCurve:addKeyframe( {v=kv, time=kt} )	
+			end
+		end
 	end
 
 	self.fuelCurve = AnimCurve:new( interpolFunction, interpolDegree )
@@ -130,7 +149,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.fuelCurve:addKeyframe( { v = 2100, time = vehicle.mrGbMS.CurMaxRpm + 1 } )		
 	end
 	
---local minTargetRpm = math.max( vehicle.mrGbMS.MinTargetRpm, self.vehicle.mrGbMS.IdleRpm+1 )
 	local minTargetRpm = self.vehicle.mrGbMS.IdleRpm+1
 	
 	self.rpmPowerCurve  = AnimCurve:new( interpolFunction, interpolDegree )	
@@ -200,7 +218,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 				self.ecoPowerCurve:addKeyframe( {v=k.time, time=p} )		
 			end
 		end
-		self.rpmPowerCurve:addKeyframe( {v=self.minMaxPowerRpm, time=gearboxMogli.huge} )	
 	end
 	
 	if vehicle.mrGbMS.HydrostaticEfficiency ~= nil then
@@ -739,7 +756,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			and ( self.vehicle.mrGbMS.EcoMode
 				 or not ( self.ptoToolTorque > 0
 							 or ( self.vehicle.mrGbMS.IsCombine and self.vehicle:getIsTurnedOn() )
-							 or self.currentSpeed  > self.vehicle.mrGbMS.BoostMinSpeed ) ) then
+							 or self.currentSpeed  > self.boostMinSpeed ) ) then
 		eco = true
 	end
 	self:chooseTorqueCurve( eco )
@@ -4424,15 +4441,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		if self.maxPossibleRpm > self.vehicle.mrGbMS.CurMaxRpm then
 			self.maxPossibleRpm = self.vehicle.mrGbMS.CurMaxRpm
 		end
-		
-		if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect then
-			if self.maxPossibleRpm > self.vehicle.mrGbML.afterShiftRpm then
-				self.maxPossibleRpm               = self.vehicle.mrGbML.afterShiftRpm
-				self.vehicle.mrGbML.afterShiftRpm = self.vehicle.mrGbML.afterShiftRpm + self.maxRpmIncrease 
-			else
-				self.vehicle.mrGbML.afterShiftRpm = nil
-			end
-		end
 	end
 	
 	if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect and not self.noTransmission then 
@@ -4442,8 +4450,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	if      self.vehicle.mrGbML.gearShiftingEffect
 			and self.vehicle.mrGbML.gearShiftingNeeded == 0
 			and not self.noTransmission
-			and g_currentMission.time > self.vehicle.mrGbML.lastShiftTime    + 100
-			and g_currentMission.time > self.vehicle.mrGbML.gearShiftingTime + 100 then
+			and g_currentMission.time > self.vehicle.mrGbML.lastShiftTime    + 150
+			and g_currentMission.time > self.vehicle.mrGbML.gearShiftingTime + 150 then
 		self.vehicle.mrGbML.gearShiftingEffect = false 
 	end
 	
