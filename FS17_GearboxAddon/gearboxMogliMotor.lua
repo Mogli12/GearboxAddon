@@ -4377,7 +4377,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 
 	--**********************************************************************************************************		
 	-- calculate max RPM increase based on current RPM
-	if self.noTransmission then
+	if      not self.vehicle.mrGbMS.NeutralActive
+			and self.vehicle.mrGbML.gearShiftingNeeded == 1 
+			and self.vehicle.mrGbML.gearShiftingEffect
+			and self.vehicle.mrGbML.beforeShiftRpm     ~= nil 
+			and g_currentMission.time < self.vehicle.mrGbML.gearShiftingTime + 150 then
+		self.maxPossibleRpm = self.vehicle.mrGbML.beforeShiftRpm
+		self.lastMaxRpmTab  = { { t = 0, m = self.maxPossibleRpm } }
+		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorNeutral
+	elseif self.noTransmission then
 		self.maxPossibleRpm = gearboxMogli.huge
 		self.lastMaxRpmTab  = nil
 		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorNeutral
@@ -4409,8 +4417,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			tab = self.lastMaxRpmTab
 		end
 						
-		self.lastMaxRpmTab = {}
-		table.insert( self.lastMaxRpmTab, { t = 0, m = m } )
+		self.lastMaxRpmTab = { { t = 0, m = m } }
 					
 		if tab ~= nil then
 			local mm = m
@@ -4440,6 +4447,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 		if self.maxPossibleRpm > self.vehicle.mrGbMS.CurMaxRpm then
 			self.maxPossibleRpm = self.vehicle.mrGbMS.CurMaxRpm
+		end
+
+		if self.vehicle.mrGbML.afterShiftRpm ~= nil and self.vehicle.mrGbML.gearShiftingEffect then
+			if self.maxPossibleRpm > self.vehicle.mrGbML.afterShiftRpm then
+				self.maxPossibleRpm               = self.vehicle.mrGbML.afterShiftRpm
+				self.vehicle.mrGbML.afterShiftRpm = self.vehicle.mrGbML.afterShiftRpm + self.maxRpmIncrease 
+			else
+				self.vehicle.mrGbML.afterShiftRpm = nil
+			end
 		end
 	end
 	

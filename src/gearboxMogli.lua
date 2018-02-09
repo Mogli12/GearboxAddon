@@ -86,7 +86,7 @@ gearboxMogli.extraSpeedLimit      = 0.15
 gearboxMogli.extraSpeedLimitMs    = gearboxMogli.extraSpeedLimit / 3.6
 gearboxMogli.deltaLimitTimeMs     = 333
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
-gearboxMogli.speedLimitRpmDiff    = 5
+gearboxMogli.speedLimitRpmDiff    = 1 --5
 gearboxMogli.motorBrakeTime       = 250     
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
@@ -109,7 +109,7 @@ gearboxMogliGlobals.defaultOn             = true
 gearboxMogliGlobals.noDisable             = false
 gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
-gearboxMogliGlobals.minTimeToShift			  = 1    -- ms
+gearboxMogliGlobals.minTimeToShift			  = 70   -- ms
 gearboxMogliGlobals.minTimeToShiftReverse = 500  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
@@ -6746,7 +6746,15 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 		self:mrGbMSetState( "AutoShiftRequest", 0 ) 		
 		
 		if self.mrGbML.motor ~= nil then
-			self.mrGbML.beforeShiftRpm = self.motor.lastRealMotorRpm 
+			if     not ( shiftingEffect )
+					or self.mrGbMS.NeutralActive
+					or not ( self.isMotorStarted )
+					or self.mrGbMS.Handbrake
+					or self.mrGbML.beforeShiftRpm ~= nil then
+				self.mrGbML.beforeShiftRpm = nil
+			else 
+				self.mrGbML.beforeShiftRpm = self.motor.lastRealMotorRpm 
+			end 
 			if gearboxMogli.debugGearShift then
 				self.mrGbML.debugTimer = g_currentMission.time + 1000
 			end				
@@ -6876,6 +6884,7 @@ function gearboxMogli:mrGbMDoGearShift( noEventSend )
 			else
 				self.mrGbML.afterShiftRpm = nil
 			end
+			self.mrGbML.beforeShiftRpm    = nil
 			
 		--if self.mrGbMS.Hydrostatic then
 		--	self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
