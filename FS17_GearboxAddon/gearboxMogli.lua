@@ -109,7 +109,7 @@ gearboxMogliGlobals.defaultOn             = true
 gearboxMogliGlobals.noDisable             = false
 gearboxMogliGlobals.disableManual         = false
 gearboxMogliGlobals.blowOffVentilRpmRatio = 0.7
-gearboxMogliGlobals.minTimeToShift			  = 70   -- ms
+gearboxMogliGlobals.minTimeToShift			  = 0    -- ms
 gearboxMogliGlobals.minTimeToShiftReverse = 500  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
@@ -150,7 +150,7 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 1500  -- ms time between idle and rated RPM w/o load
+gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms time between idle and rated RPM w/o load
 gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms time between idle and rated RPM with full load
 gearboxMogliGlobals.DefaultRevUpMsH       = 30000 -- ms time between idle and rated RPM with full load (hydrostat)
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms time between idle and rated RPM in neutral 
@@ -6755,6 +6755,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			else 
 				self.mrGbML.beforeShiftRpm = self.motor.lastRealMotorRpm 
 			end 
+			self.mrGbML.afterShiftClutch  = nil
 			if gearboxMogli.debugGearShift then
 				self.mrGbML.debugTimer = g_currentMission.time + 1000
 			end				
