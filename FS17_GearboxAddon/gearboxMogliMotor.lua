@@ -1675,7 +1675,7 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 				self.lastRealMotorRpm = math.max( self.lastRealMotorRpm, minRpmReduced )
 			end
 
-			local smooth = self.vehicle.mrGbML.smoothFast
+			local smooth = self.vehicle.mrGbML.smoothLittle
 				
 			if     self.vehicle.mrGbML.gearShiftingEffect then 
 				smooth = 1
@@ -1717,17 +1717,24 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	self.usedMotorTorqueS = math.min( self.usedTransTorqueS + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	self.fuelMotorTorque  = math.min( utt + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )	
 	
---if self.vehicle.mrGbML.gearShiftingEffect then
---	print(string.format("%10s: %4d => %4d - %4d = %7.2f (%4d -> %4d), %4.2f, %s %s",
---											self.vehicle:mrGbMGetGearText(),
---											self.prevMotorRpm,
---											self.lastRealMotorRpm, self.lastMotorRpm, self.lastRealMotorRpm - self.lastMotorRpm, 
---											Utils.getNoNil(self.vehicle.mrGbML.beforeShiftRpm,9999), 
---											Utils.getNoNil(self.vehicle.mrGbML.afterShiftRpm,9999), 
---											self.clutchPercent, 
---											tostring(self.vehicle.mrGbML.gearShiftingNeeded),
---											tostring(self.noTransmission)))
---end
+if      self.vehicle.mrGbMG.debugInfo 
+		and not self.vehicle.mrGbMS.NeutralActive 
+		and not self.vehicle.mrGbMS.Handbrake 
+		and ( self.vehicle.mrGbML.gearShiftingEffect or self.vehicle.mrGbML.gearShiftingNeeded ~= 0 ) then
+	print(string.format("%10s: %4d, %4d, %4d, %4d, %4d, %4d (%4d -> %4d), %4.2f, %s %s %s",
+											self.vehicle:mrGbMGetGearText(),
+											self.nonClampedMotorRpm,
+											self:getThrottleRpm(),
+											self.nonClampedMotorRpm-self.prevNonClampedMotorRpm,
+											self.tickDt*self.vehicle.mrGbMS.RpmDecFactor,
+											self.lastRealMotorRpm, self.lastMotorRpm,
+											Utils.getNoNil(self.vehicle.mrGbML.beforeShiftRpm,9999), 
+											Utils.getNoNil(self.vehicle.mrGbML.afterShiftRpm,9999), 
+											self.clutchPercent, 
+											tostring(self.vehicle.mrGbML.gearShiftingNeeded),
+											tostring(self.vehicle.mrGbML.gearShiftingEffect),
+											tostring(self.noTransmission)))
+end
 end
 
 --**********************************************************************************************************	
@@ -2169,6 +2176,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		mlf = 0.87 * mlf
 	end
 	if  not lastNoTransmission
+			and self.vehicle.mrGbML.gearShiftingNeeded == 0
 			and self.nonClampedMotorRpm > self.prevNonClampedMotorRpm + 0.9 * self.maxRpmIncrease then
 		mlf = math.max( 0.9 * accelerationPedal, mlf )
 	end
@@ -2746,7 +2754,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					self.vehicle:mrGbMDoGearShift() 
 				end 
 				self.vehicle.mrGbML.gearShiftingNeeded = 0 
-				self.maxPossibleRpm          = self.vehicle.mrGbMS.CurMaxRpm 
 				self.vehicle.mrGbML.manualClutchTime = 0
 				clutchMode                   = 2 
 			elseif self.vehicle.mrGbML.gearShiftingNeeded < 2 then
@@ -4303,25 +4310,24 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	end
 
 	if self.noTransmission then
+		local r
 		if      not self.vehicle.mrGbMS.NeutralActive
 				and self.vehicle.mrGbML.gearShiftingNeeded == 1 
 				and self.vehicle.mrGbML.gearShiftingEffect
 				and self.vehicle.mrGbML.beforeShiftRpm     ~= nil 
 				and g_currentMission.time < self.vehicle.mrGbML.gearShiftingTime + 150 then
-			self.lastMotorRpm = self.lastMotorRpm + Utils.clamp( self.vehicle.mrGbML.beforeShiftRpm - self.lastMotorRpm,
-																													-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor,
-																													 self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral )
-		elseif self.lastThrottle > 0 and self.lastThrottle * self.vehicle.mrGbMS.MaxTargetRpm > self.lastMotorRpm then
-			self.lastMotorRpm = Utils.clamp( self.lastMotorRpm + f * self.lastThrottle * self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral, 
-																			 self.minRequiredRpm, 
-																			 self:getThrottleMaxRpm( ) )
+			r = self.vehicle.mrGbML.beforeShiftRpm
 		else
-			self.lastMotorRpm = Utils.clamp( self.lastMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, self.minRequiredRpm, self.vehicle.mrGbMS.CurMaxRpm )
-		end	
-		if self.torqueRpmReduction ~= nil then
-			self.lastMotorRpm = math.min( math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm ), self.lastMotorRpm )
+			r = self:getThrottleMaxRpm( ) 
 		end
-		self.minThrottle    = self.idleThrottle
+		if self.torqueRpmReduction ~= nil then
+			r = math.min( math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm ), r )
+		end
+		
+		self.minThrottle  = self.idleThrottle
+		self.lastMotorRpm = self.lastMotorRpm + Utils.clamp( math.max( r, self.minThrottle ) - self.lastMotorRpm,
+																												-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor,
+																												 self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral )
 		self.lastThrottle   = math.max( self.minThrottle, self.lastThrottle )	
 	end	
 	
@@ -4390,52 +4396,36 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 
 	--**********************************************************************************************************		
 	-- calculate max RPM increase based on current RPM
+	local tab = self.lastMaxRpmTab 
+	self.lastMaxRpmTab = nil 
+	
 	if      not self.vehicle.mrGbMS.NeutralActive
 			and self.vehicle.mrGbML.gearShiftingNeeded == 1 
 			and self.vehicle.mrGbML.gearShiftingEffect
 			and self.vehicle.mrGbML.beforeShiftRpm     ~= nil 
 			and g_currentMission.time < self.vehicle.mrGbML.gearShiftingTime + 150 then
 		self.maxPossibleRpm = self.vehicle.mrGbML.beforeShiftRpm
-		self.lastMaxRpmTab  = { { t = 0, m = self.maxPossibleRpm } }
+		self.lastMaxRpmTab = { { t = 0, m = self.vehicle.mrGbML.beforeShiftRpm } }
 		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorNeutral
-	elseif self.noTransmission then
+	elseif self.noTransmission or self.vehicle.mrGbML.gearShiftingNeeded ~= 0 then
 		self.maxPossibleRpm = gearboxMogli.huge
-		self.lastMaxRpmTab  = nil
 		self.rpmIncFactor   = self.vehicle.mrGbMS.RpmIncFactorNeutral
 	elseif self.torqueRpmReduxMode ~= nil and self.torqueRpmReduxMode == 2 then
 	  self.maxPossibleRpm = math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm )
-		self.lastMaxRpmTab  = nil
 	elseif self.maxRpmIncrease >= gearboxMogli.huge then
 		self.maxPossibleRpm = self.vehicle.mrGbMS.CurMaxRpm
-		self.lastMaxRpmTab  = nil
 		self.rpmIncFactorS  = self.vehicle.mrGbMS.RpmIncFactor
 	else
 		local m 
-		if type( self.lastRealMotorRpm ) == "number" then
-			m = self.lastRealMotorRpm
-		else
-			print( 'ERROR in gearboxMogli.lua(7838): type( self.lastRealMotorRpm ) ~= "number"' )
-			m = self.nonClampedMotorRpm
-		end
-		if m < self.vehicle.mrGbMS.IdleRpm then
-			m = self.vehicle.mrGbMS.IdleRpm
-		end
-		
-		local tab = nil
-		if self.lastMaxRpmTab == nil then
-		--tab = nil
-		elseif lastNoTransmission then
-		--tab = nil
-		else
-			tab = self.lastMaxRpmTab
-		end
-						
-		self.lastMaxRpmTab = { { t = 0, m = m } }
-					
-		if tab ~= nil then
+		if tab == nil then
+			m = self.vehicle.mrGbMS.CurMaxRpm
+			self.lastMaxRpmTab = { { t = 0, m = m } }
+		else 
+			m = math.max( self.lastRealMotorRpm, self.vehicle.mrGbMS.IdleRpm )
+			self.lastMaxRpmTab = { { t = 0, m = m } }
+			
 			local mm = m
 			local cm = 1
-			
 			for _,tm in pairs( tab ) do
 				local t = tm.t + self.tickDt 
 				if t < gearboxMogli.deltaLimitTimeMs then
@@ -4527,8 +4517,19 @@ end
 --**********************************************************************************************************	
 -- gearboxMogliMotor:getThrottleRpm
 --**********************************************************************************************************	
-function gearboxMogliMotor:getThrottleRpm( )
-	return math.max( self.minRequiredRpm, self.vehicle.mrGbMS.IdleRpm + self.lastThrottle * ( self.vehicle.mrGbMS.CurMaxRpm - self.vehicle.mrGbMS.IdleRpm ) )
+function gearboxMogliMotor:getThrottleRpm()
+	local r
+	if self.noTorque then 
+		r = self.minRequiredRpm
+	else
+		r = math.max( self.minRequiredRpm, self.vehicle.mrGbMS.IdleRpm + self.lastThrottle * ( self.vehicle.mrGbMS.CurMaxRpm - self.vehicle.mrGbMS.IdleRpm ) )
+	end
+--return Utils.clamp( self.prevNonClampedMotorRpm + Utils.clamp( r - self.prevNonClampedMotorRpm, 
+--																															-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor,
+--																															 self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral ),
+--										self.minRequiredRpm,
+--										self.vehicle.mrGbMS.CurMaxRpm )
+	return math.max( self.prevNonClampedMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, r )
 end
 
 --**********************************************************************************************************	
