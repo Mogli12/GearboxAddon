@@ -4309,7 +4309,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		f = 2
 	end
 
-	if self.noTransmission then
+	if self.noTransmission then		
 		local r
 		if      not self.vehicle.mrGbMS.NeutralActive
 				and self.vehicle.mrGbML.gearShiftingNeeded == 1 
@@ -4318,17 +4318,18 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				and g_currentMission.time < self.vehicle.mrGbML.gearShiftingTime + 150 then
 			r = self.vehicle.mrGbML.beforeShiftRpm
 		else
-			r = self:getThrottleMaxRpm( ) 
+			r = self:getThrottleMaxRpm( accelerationPedal )
 		end
 		if self.torqueRpmReduction ~= nil then
 			r = math.min( math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm ), r )
 		end
 		
-		self.minThrottle  = self.idleThrottle
-		self.lastMotorRpm = self.lastMotorRpm + Utils.clamp( math.max( r, self.minThrottle ) - self.lastMotorRpm,
+		self.lastMotorRpm = self.lastMotorRpm + Utils.clamp( r - self.lastMotorRpm,
 																												-self.tickDt * self.vehicle.mrGbMS.RpmDecFactor,
 																												 self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral )
-		self.lastThrottle   = math.max( self.minThrottle, self.lastThrottle )	
+																												 
+		self.minThrottle  = self.idleThrottle
+		self.lastThrottle = math.max( self.minThrottle, self.lastThrottle )	
 	end	
 	
 	--**********************************************************************************************************		
