@@ -4133,8 +4133,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	self.lastTorqueConverterRatio = nil
 	self.torqueConverterLockupMs  = nil
 	
-	if self.vehicle.isMotorStarted then 
+	if      not ( self.vehicle.isMotorStarted ) then 
+		self.throttleRpm = math.max( 0, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor ) 
+	elseif  self.clutchPercent > 0.999         
+			and not lastNoTransmission              
+			and not self.noTransmission then 
+		self.throttleRpm = self.lastRealMotorRpm 
+	else 
 		local r = self:getThrottleMaxRpm()
+		
 		if not self.vehicle.mrGbMS.NeutralActive and self.vehicle.mrGbML.gearShiftingNeeded > 0 then 
 			if      self.vehicle.mrGbML.gearShiftingNeeded == 1
 					and self.vehicle.mrGbML.beforeShiftRpm     ~= nil
@@ -4142,9 +4149,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				r = self.vehicle.mrGbML.beforeShiftRpm
 			elseif  self.vehicle.mrGbML.gearShiftingNeeded == 2 then 
 				r = self.vehicle.mrGbMS.MaxTargetRpm
-		--elseif  self.vehicle.mrGbML.gearShiftingNeeded == 3 
-		--		and self.vehicle.mrGbML.afterShiftRpm      ~= nil  then 
-		--	r = self.vehicle.mrGbML.afterShiftRpm
 			else 
 				r = self.vehicle.mrGbMS.IdleRpm
 			end
@@ -4153,12 +4157,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		elseif self.torqueRpmReduction ~= nil then
 			r = math.min( math.max( self.torqueRpmReference - self.torqueRpmReduction, self.vehicle.mrGbMS.CurMinRpm ), r )
 		end
-	
-		self.throttleRpm = math.max( self.minRequiredRpm, self.lastRealMotorRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, 
-																 math.min( r, math.max( self.vehicle.mrGbMS.MinTargetRpm, 
-																												self.throttleRpm + self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral ) ) )
-	else 
-		self.throttleRpm = math.max( 0, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor ) 
+		
+		self.throttleRpm = math.max( self.minRequiredRpm, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, 
+																 math.min( r, self.throttleRpm + self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral ) )
 	end 
 	
 	if self.noTransmission then

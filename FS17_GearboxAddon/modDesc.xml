@@ -2,19 +2,19 @@
 <modDesc descVersion="38">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>3.0.2.8</version>
+	<version>3.0.2.9</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v3.1 build 28 von Mogli</de>
-			  <en>Gearbox v3.1 build 28 by mogli</en>
-				 <it>Cambio v3.1 build 28 by mogli</it>
-	 <fr>Transmission v3.1 build 28 by mogli</fr>
-				 <cz>Řazení v3.1 build 28 by mogli</cz>
-<pl>Skrzynia biegów v3.1 build 28 by mogli</pl>
-				<ru>Gearbox v3.1 build 28 by mogli</ru>
-				<ro>Gearbox v3.1 build 28 by mogli</ro>
+			 <de>Getriebe v3.1 build 29 von Mogli</de>
+			  <en>Gearbox v3.1 build 29 by mogli</en>
+				 <it>Cambio v3.1 build 29 by mogli</it>
+	 <fr>Transmission v3.1 build 29 by mogli</fr>
+				 <cz>Řazení v3.1 build 29 by mogli</cz>
+<pl>Skrzynia biegów v3.1 build 29 by mogli</pl>
+				<ru>Gearbox v3.1 build 29 by mogli</ru>
+				<ro>Gearbox v3.1 build 29 by mogli</ro>
 		</text>                  
 	</l10n>
 
@@ -57,6 +57,9 @@ Changelog 3.1:
 - hand brake sound (thanks to wriley)
 - compatible with FS17_handbrake
 - transmissions tag in vehicle.xml (top level only)
+- engine humming sound 
+- gear shifter sound 
+- improvements automatic clutch 
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
