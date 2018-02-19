@@ -49,6 +49,7 @@ gearboxMogli.brakeFxSpeed         = 2.5  -- m/s = 9 km/h
 gearboxMogli.rpmReduction         = 0.925 -- 7.5% --0.85 -- 15% RPM reduction allowed e.g. 330 RPM for 2200 rated RPM 
 gearboxMogli.maxPowerLimit        = 0.97 -- 97% max power is equal to max power
 gearboxMogli.maxMaxPowerRatio     = 1.0  -- RPM where shift to maxMaxPowerRpm starts
+gearboxMogli.autoShiftUpRatio     = 0.98 -- 
 gearboxMogli.smoothLittle         = 0.2
 gearboxMogli.smoothFast           = 0.12
 gearboxMogli.smoothMedium         = 0.04
@@ -113,7 +114,7 @@ gearboxMogliGlobals.minTimeToShift			  = 1    -- ms
 gearboxMogliGlobals.minTimeToShiftReverse = 500  -- ms
 gearboxMogliGlobals.maxTimeToSkipGear  	  = 251  -- ms
 gearboxMogliGlobals.autoShiftTimeoutLong  = 3000 -- ms
-gearboxMogliGlobals.autoShiftTimeoutShort = 600  -- ms -- let it go up to ratedRPM !!!
+gearboxMogliGlobals.autoShiftTimeoutShort = 400  -- ms -- let it go up to ratedRPM !!!
 gearboxMogliGlobals.autoShiftTimeoutHydroL= 1000 -- ms 
 gearboxMogliGlobals.autoShiftTimeoutHydroS= 0    -- ms
 gearboxMogliGlobals.shiftEffectTime			  = 251  -- ms
@@ -150,7 +151,7 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms time between idle and rated RPM w/o load
+gearboxMogliGlobals.DefaultRevUpMs0       = 3000  -- ms time between idle and rated RPM w/o load
 gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms time between idle and rated RPM with full load
 gearboxMogliGlobals.DefaultRevUpMsH       = 30000 -- ms time between idle and rated RPM with full load (hydrostat)
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms time between idle and rated RPM in neutral 
@@ -170,6 +171,7 @@ gearboxMogliGlobals.maxRpmThrottle        = 0.9
 gearboxMogliGlobals.maxRpmThrottleAuto    = true
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
 gearboxMogliGlobals.autoStartStop         = false -- option to enable auto start stop for all vechiles
+gearboxMogliGlobals.noAutoStartStop       = false -- option to disable auto start stop for all vechiles
 gearboxMogliGlobals.useMrUWP              = 10
 gearboxMogliGlobals.reduceMOIClutchLimit  = 0.5   -- reduce moment of inertia if clutch is below 50%
 gearboxMogliGlobals.reduceMOILowRatio     = false -- reduce moment of inertia at low gear ratio, default is off
@@ -1126,6 +1128,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	self.mrGbMS.ClutchMaxTargetRpm      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchMaxTargetRpm"), default )
 	
+	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
+	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
+	self.mrGbMS.Range1DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#doubleClutch"), alwaysDoubleClutch) 
+	self.mrGbMS.Range2DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#doubleClutch"), alwaysDoubleClutch) 
+	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
+	
 	local clutchEngagingTimeMs          = getXMLFloat(xmlFile, xmlString .. "#clutchEngagingTimeMs")
 	local clutchTimeManualDefault      
 	if clutchEngagingTimeMs == nil then
@@ -1141,6 +1149,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			clutchEngagingTimeMs = 200
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
 			clutchEngagingTimeMs = 400
+		elseif alwaysDoubleClutch or self.mrGbMS.GearsDoubleClutch or self.mrGbMS.Range1DoubleClutch then
+			clutchEngagingTimeMs = 2000 
 		else
 			clutchEngagingTimeMs = 1000 
 		end
@@ -1198,12 +1208,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatMaxTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 25000 ) 
-	
-	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
-	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
-	self.mrGbMS.Range1DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#doubleClutch"), alwaysDoubleClutch) 
-	self.mrGbMS.Range2DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(1)#doubleClutch"), alwaysDoubleClutch) 
-	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
 	
 	self.mrGbMS.GearsOnlyStopped        = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#onlyStopped"), false) 
 	self.mrGbMS.Range1OnlyStopped       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#onlyStopped"), false) 
@@ -6592,7 +6596,16 @@ end
 -- gearboxMogli:mrGbMGetAutoStartStop
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoStartStop()
-	return self.mrGbMS.AllAuto or self.mrGbMS.AutoStartStop or self.mrGbMG.autoStartStop or not ( self.steeringEnabled )
+	if self.mrGbMS.AllAuto or not ( self.steeringEnabled ) then 
+		return true 
+	end 
+	if self.mrGbMG.noAutoStartStop then 
+		return false 
+	end 
+	if self.mrGbMG.autoStartStop then 
+		return true 
+	end 
+	return self.mrGbMS.AutoStartStop
 end
 
 --**********************************************************************************************************	
@@ -6838,16 +6851,13 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 				else 
 					self.mrGbML.doubleClutch     = 1 
 				end
-			--self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + math.min( 0.4 * timeToShift, self.mrGbMS.ClutchShiftTime ) ) 
-				self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + 0.4 * timeToShift ) 
-			else
-				self.mrGbML.clutchShiftingTime = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + self.mrGbMS.ClutchShiftTime ) 
-			end
+			end 
+			self.mrGbML.clutchShiftingTime   = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + math.min( 0.7 * timeToShift, self.mrGbMS.ClutchShiftTime ) ) 
 		elseif doubleClutch then
-			self.mrGbML.gearShiftingNeeded  = -1 
+			self.mrGbML.gearShiftingNeeded   = -1 
 		else
 			gearboxMogli.mrGbMDoGearShift(self)		
-			self.mrGbML.gearShiftingNeeded  = 0
+			self.mrGbML.gearShiftingNeeded   = 0
 		end
 	else
 		print("FS17_GearboxAddon: Error! gearboxMogli:mrGbMPrepareGearShift called at client")

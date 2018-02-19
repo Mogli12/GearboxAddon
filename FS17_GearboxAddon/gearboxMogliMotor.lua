@@ -686,6 +686,8 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 			curMaxRpm = self.maxPossibleRpm
 		end
 	else
+		-- smooth braking if we are too fast 
+		curMaxRpm = math.max( curMaxRpm, self.clutchRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
 		self.lastCurMaxRpm = curMaxRpm
 	end
 	
@@ -3402,8 +3404,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				local alwaysShiftRange2 =  self.vehicle.mrGbMS.GearTimeToShiftRanges2 < self.vehicle.mrGbMG.maxTimeToSkipGear
 																or self.vehicle.mrGbMS.ShiftNoThrottleRanges2
 				
-				local downRpm   = math.max( self.vehicle.mrGbMS.IdleRpm,  self.vehicle.mrGbMS.MinTargetRpm * gearboxMogli.rpmReduction )
-				local upRpm     = math.max( self.vehicle.mrGbMS.RatedRpm, self.maxMaxPowerRpm ) --self.vehicle.mrGbMS.MaxTargetRpm
+				local downRpm   = math.max( self.vehicle.mrGbMS.IdleRpm,  self.vehicle.mrGbMS.MinTargetRpm * gearboxMogli.rpmReduction ) 
+				local upRpm     = math.min( self.vehicle.mrGbMS.MaxTargetRpm * gearboxMogli.autoShiftUpRatio, math.max( self.vehicle.mrGbMS.RatedRpm, self.maxMaxPowerRpm ) )
 							
 				if self.vehicle.mrGbMS.AutoShiftDownRpm ~= nil and self.vehicle.mrGbMS.AutoShiftDownRpm > downRpm then
 					downRpm = self.vehicle.mrGbMS.AutoShiftDownRpm
@@ -3713,9 +3715,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					self.lastAccelerationStart = 0
 				end
 				
-				if      self.lastMotorRpm     > upRpm
-						and self.lastRealMotorRpm > upRpm
-						and self.clutchRpm        > upRpm then
+				if      self.lastRealMotorRpm   > upRpm
+						and ( self.lastRealMotorRpm > self.vehicle.mrGbMS.CloseRpm 
+							 or self.clutchRpm        > upRpm ) then
 					-- allow immediate up shift
 					upTimerMode   = 0
 				elseif  accelerationPedal                    < -gearboxMogli.accDeadZone
@@ -3724,7 +3726,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					upTimerMode   = 2
 					downTimerMode = 1
 				elseif  self.clutchOverheatTimer ~= nil
-						and self.clutchPercent       < 0.9 
+						and self.clutchPercent       < self.vehicle.mrGbMS.MaxClutchPercent - 0.1
 						and self.clutchOverheatTimer > 0.5 * self.vehicle.mrGbMS.ClutchOverheatStartTime then
 					downTimerMode = 0
 				elseif  self.clutchRpm           < downRpm then
