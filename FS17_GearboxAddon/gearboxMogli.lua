@@ -57,6 +57,7 @@ gearboxMogli.smoothSlow           = 0.01
 gearboxMogli.hydroEffDiff         = 0
 gearboxMogli.hydroEffDiffInc      = 50
 gearboxMogli.hydroEffMin          = 0.5
+gearboxMogli.motorSmoothRpmDiff   = 10
 gearboxMogli.ptoRpmHydroDiff      = 25
 gearboxMogli.ptoRpmThrottleDiff   = 50
 gearboxMogli.lastMotorRpmDiffReal = 50
@@ -1138,17 +1139,17 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	local clutchTimeManualDefault      
 	if clutchEngagingTimeMs == nil then
 		if     hasHydrostat then
-			clutchEngagingTimeMs = 200
-		elseif torqueConverterProfile == "wheelLoader" then 
 			clutchEngagingTimeMs = 1000
-		elseif torqueConverterProfile == "oldCar" then 
+		elseif torqueConverterProfile == "wheelLoader" then 
 			clutchEngagingTimeMs = 2000
+		elseif torqueConverterProfile == "oldCar" then 
+			clutchEngagingTimeMs = 4000
 		elseif torqueConverterProfile == "modernCar" then 
-			clutchEngagingTimeMs = 400
+			clutchEngagingTimeMs = 1000
 		elseif self.mrGbMS.TorqueConverter then
-			clutchEngagingTimeMs = 200
+			clutchEngagingTimeMs = 2000
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
-			clutchEngagingTimeMs = 400
+			clutchEngagingTimeMs = 1000
 		elseif alwaysDoubleClutch or self.mrGbMS.GearsDoubleClutch or self.mrGbMS.Range1DoubleClutch then
 			clutchEngagingTimeMs = 2000 
 		else
@@ -4278,7 +4279,7 @@ function gearboxMogli:update(dt)
 		local g = self:mrGbMGetCurrentRPM() / self.mrGbMS.MaxTargetRpm
 		
 		f = 0.5 * self.mrGbMG.engineHumVolume * f 
-		g = 0.4 * ( 1 + 5 * ( g - 1 ) )
+		g = 0.2 * ( 1 + 5 * ( g - 1 ) )
 		
 		if not ( self.mrGbML.EngineHumSampleIsPlaying ) then 
 			self.mrGbML.EngineHumSampleIsPlaying = true 
@@ -6599,7 +6600,7 @@ function gearboxMogli:mrGbMGetAutoStartStop()
 	if self.mrGbMS.AllAuto or not ( self.steeringEnabled ) then 
 		return true 
 	end 
-	if self.mrGbMG.noAutoStartStop then 
+	if self.mrGbMG.noAutoStartStop and not self.mrGbMS.NeutralActive then 
 		return false 
 	end 
 	if self.mrGbMG.autoStartStop then 
