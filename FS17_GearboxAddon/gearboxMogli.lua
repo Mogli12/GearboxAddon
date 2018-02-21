@@ -1116,17 +1116,17 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	elseif torqueConverterProfile == "modernCar" then 
 		default = 0.5 * self.mrGbMS.RatedRpm + 0.5 * baseIdle
 	else
-		default = math.min( self.mrGbMS.RatedRpm, math.max( self.mrGbMS.OpenRpm + 0.1 * self.mrGbMS.RatedRpm, self.mrGbMS.IdleRpm + 0.1 * self.mrGbMS.RatedRpm ) )
+		default = math.min( self.mrGbMS.MaxTargetRpm, math.max( self.mrGbMS.OpenRpm + 0.1 * self.mrGbMS.RatedRpm, baseIdle + 0.1 * self.mrGbMS.RatedRpm ) )
 		if self.mrGbMS.Engine.maxTorque > 0 then
 			default = math.min( default, self.mrGbMS.Engine.maxTorqueRpm )
 		end
 	end
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
 		
-	default = self.mrGbMS.CloseRpm-1
-	if self.mrGbMS.TorqueConverter then 
-		default = math.min( self.mrGbMS.RatedRpm, self.mrGbMS.CloseRpm + 0.05 * self.mrGbMS.RatedRpm )
-	end
+	default = math.min( self.mrGbMS.MaxTargetRpm, self.mrGbMS.CloseRpm + 0.05 * self.mrGbMS.RatedRpm )
+	if not ( self.mrGbMS.TorqueConverter ) and self.mrGbMS.Engine.maxTorque > 0 then
+		default = math.min( default, self.mrGbMS.Engine.maxTorqueRpm )
+	end 
 	self.mrGbMS.ClutchMaxTargetRpm      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchMaxTargetRpm"), default )
 	
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 

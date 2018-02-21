@@ -4622,24 +4622,17 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 		return maxPercent 
 	end
 
-	local target = math.min( targetRpm, self.vehicle.mrGbMS.ClutchMaxTargetRpm )
-	
 	if self.throttleRpm < self.clutchRpm then 
 		return maxPercent 
 	end 
-	if self.nonClampedMotorRpm >= closeRpm then 
-		if curPercent ~= nil then
-			minPercent = math.max( minPercent, math.min( curPercent, maxPercent ) ) 
-		end
-		target = math.min( closeRpm - 10, target )
+	if self.clutchRpm > closeRpm then 
+		return maxPercent 
 	end 
 	if self.nonClampedMotorRpm <= openRpm and self.vehicle.mrGbMS.CurMinRpm < openRpm then
-		if curPercent ~= nil then
-			maxPercent = math.min( maxPercent, math.max( curPercent, minPercent ) ) 
-		end
-		target = math.max( openRpm + 10, target )
+		return minPercent
 	end 
 		
+	local target        = math.min( targetRpm, self.vehicle.mrGbMS.ClutchMaxTargetRpm )	
 	local eps           = maxPercent - minPercent
 	local delta         = ( self.throttleRpm - self.clutchRpm ) * eps	
 	local times         = math.max( gearboxMogli.clutchLoopTimes, math.ceil( delta / gearboxMogli.clutchLoopDelta ) )	
