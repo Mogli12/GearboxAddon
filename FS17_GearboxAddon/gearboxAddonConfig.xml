@@ -3100,7 +3100,7 @@
 				<gear maxForwardSpeedRatio="0.099" name="G1"/>
 				<gear maxForwardSpeedRatio="0.231" name="G2"/>
 				<gear maxForwardSpeedRatio="0.406" name="G3"/>
-				<gear maxForwardSpeedRatio="0.943" name="G4"/>
+				<gear maxForwardSpeedRatio="0.943" name="G4"/> <!-- 43 * 0.943 = 40.5 -->
 			</gears>
 			
 			<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" automatic="true">
@@ -3109,6 +3109,54 @@
 				<range name="P3" ratio="0.8375"/>
 				<range name="P4" ratio="1"/>
 			</ranges>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultOldTractor"/>
+
+		<gearboxMogli speedLimiter="false" autoStartStop="false" enableAI="true" maxAIGear="3" defaultOn="false">
+			<blowOffVentilSound volume="2"/>
+			<gears defaultGange="1">
+				<gear name="1" maxForwardSpeedRatio="0.25" />
+				<gear name="2" maxForwardSpeedRatio="0.375"/>
+				<gear name="3" maxForwardSpeedRatio="0.5"  />
+				<gear name="4" maxForwardSpeedRatio="0.75" />
+				<gear name="5" maxForwardSpeedRatio="1"    />
+			</gears>
+			
+			<ranges defaultRange="4">
+				<range name="L" forwardOnly="true" ratio="0.1"   />
+				<range name="M" forwardOnly="true" ratio="0.35"  />
+				<range name="R" reverseOnly="true" ratio="0.4"   />
+				<range name="H" forwardOnly="true" ratio="0.943" /> <!-- 43 * 0.943 = 40.5 -->
+			</ranges>			
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultVario"/>
+			
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" maxAIGear="1" defaultOn="false">
+			<hydrostatic profile="Output"/>		
+			<gears defaultGear="2" clutchRatio="1">	
+				<gear name="Lo" maxForwardSpeedRatio="0.5" />
+				<gear name="Hi" maxForwardSpeedRatio="1.2" /> <!-- 1750 instead of 2100 -->
+			</gears>
+		</gearboxMogli>	
+	</vehicle>
+
+	<vehicle>
+		<configFile xmlName="defaultCVT"/>
+		
+		<gearboxMogli speedLimiter="true" autoStartStop="true" enableAI="true" >
+      <hydrostatic profile="Input"/>
+      <gears automatic="true">		
+        <gear maxForwardSpeedRatio="0.1125"/>
+        <gear maxForwardSpeedRatio="0.225"/>
+        <gear maxForwardSpeedRatio="0.45"/>
+        <gear maxForwardSpeedRatio="0.9"/> <!-- 1750 instead of 2100 with ratio 1.333 -->
+      </gears>
 		</gearboxMogli>	
 	</vehicle>
 

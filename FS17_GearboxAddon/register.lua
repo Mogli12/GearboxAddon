@@ -366,8 +366,10 @@ function gearboxMogliRegister:addConfigurations()
 				end
 
 				if storeItem.category == "tractors" then
-					table.insert( modifiedItem.configurations, { name = "default manual", title = "Default Transmission", source = 3, def = "defaultTractors", isDefault = isDefault } )
-					table.insert( modifiedItem.configurations, { name = "default vario", title = "Default Transmission", source = 3, def = "default", isDefault = false } )
+					table.insert( modifiedItem.configurations, { name = "default powershift", title = "Default PowerShift", source = 3, def = "defaultTractors", isDefault = isDefault } )
+					table.insert( modifiedItem.configurations, { name = "default vario", title = "Default Vario", source = 3, def = "defaultVario", isDefault = false } )
+					table.insert( modifiedItem.configurations, { name = "default cvt", title = "Default CVT", source = 3, def = "defaultCVT", isDefault = false } )
+					table.insert( modifiedItem.configurations, { name = "default old", title = "Default old tractor", source = 3, def = "defaultOldTractor", isDefault = false } )
 				else
 					local defaultConfigName
 					
