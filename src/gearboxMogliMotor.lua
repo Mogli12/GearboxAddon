@@ -626,6 +626,11 @@ end
 --**********************************************************************************************************	
 function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 
+	if forGetTorque and self.ratioFactorR == nil then 
+	-- exit here because there is not connection between wheels and motor 
+		return self.maxPossibleRpm 
+	end 
+	
 	curMaxRpm = gearboxMogli.huge
 						
 	if self.ratioFactorR ~= nil and self.ratioFactorR > 1e-6 then 	
@@ -634,73 +639,66 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 		elseif not ( self.vehicle.mrGbMS.Hydrostatic ) then
 			curMaxRpm = self.maxPossibleRpm / self.ratioFactorR
 		end
+	end
 	
-		local speedLimit   = gearboxMogli.huge
-		
-		if self.ptoSpeedLimit ~= nil then
-			speedLimit = self.ptoSpeedLimit
-		end
-		
-		local limitRpmNow = false
-		if forGetTorque then
-			limitRpmNow = not ( self.limitMaxRpm )
-		else
-			limitRpmNow = self.limitMaxRpm
-		end
-		
-	--if limitRpmNow then
-		if forGetTorque or self.limitMaxRpm then
-			speedLimit = math.min( speedLimit, self:getSpeedLimit() )
-		elseif self.vehicle.mrGbMS.ConstantRpm then
-			speedLimit = math.min( speedLimit, self:getSpeedLimit() + gearboxMogli.speedLimitBrake )
-		end
-		if forGetTorque and self.vehicle.mrGbML.hydroTargetSpeed ~= nil then
-			speedLimit = math.min( speedLimit, self.vehicle.mrGbML.hydroTargetSpeed )
-		end
+	local speedLimit   = gearboxMogli.huge
+	
+	if self.ptoSpeedLimit ~= nil then
+		speedLimit = self.ptoSpeedLimit
+	end
+	
+	local limitRpmNow = false
+	if forGetTorque then
+		limitRpmNow = not ( self.limitMaxRpm )
+	else
+		limitRpmNow = self.limitMaxRpm
+	end
+	
+	if limitRpmNow then
+		speedLimit = math.min( speedLimit, self:getSpeedLimit() )
+	elseif self.vehicle.mrGbMS.ConstantRpm then
+		speedLimit = math.min( speedLimit, self:getSpeedLimit() + gearboxMogli.speedLimitBrake )
+	end
+	if forGetTorque and self.vehicle.mrGbML.hydroTargetSpeed ~= nil then
+		speedLimit = math.min( speedLimit, self.vehicle.mrGbML.hydroTargetSpeed )
+	end
 
+	if speedLimit < gearboxMogli.huge then
+		speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
+		curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
+	--print(string.format("%5s; %5.1fkm/h; %4d; %4d; %4d; (%6g, %6g)",
+	--                    tostring(forGetTorque),
+	--										speedLimit*3.6,
+	--										curMaxRpm,
+	--										self.clutchRpm,
+	--										self.clutchRpm / Utils.getNoNil( self.ratioFactorR, -1 ),
+	--										Utils.getNoNil( self.ratioFactorG, -1 ),
+	--										Utils.getNoNil( self.ratioFactorR, -1 )
+	--										))
+	end
+	
+	if self.rpmLimit ~= nil and self.rpmLimit < curMaxRpm then
+		curMaxRpm  = self.rpmLimit
+	end
+	
+	if curMaxRpm < self.vehicle.mrGbMS.CurMinRpm then
+		curMaxRpm  = self.vehicle.mrGbMS.CurMinRpm 
+	end
+	
+	if limitRpmNow then
+		speedLimit = self.vehicle:getSpeedLimit(true)
 		if speedLimit < gearboxMogli.huge then
+			speedLimit = speedLimit * gearboxMogli.kmhTOms
 			speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
 			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
-		--print(string.format("%5s; %5.1fkm/h; %4d; %4d; %4d; (%6g, %6g)",
-		--                    tostring(forGetTorque),
-		--										speedLimit*3.6,
-		--										curMaxRpm,
-		--										self.clutchRpm,
-		--										self.clutchRpm / Utils.getNoNil( self.ratioFactorR, -1 ),
-		--										Utils.getNoNil( self.ratioFactorG, -1 ),
-		--										Utils.getNoNil( self.ratioFactorR, -1 )
-		--										))
-		end
-		
-		if self.rpmLimit ~= nil and self.rpmLimit < curMaxRpm then
-			curMaxRpm  = self.rpmLimit
-		end
-		
-		if curMaxRpm < self.vehicle.mrGbMS.CurMinRpm then
-			curMaxRpm  = self.vehicle.mrGbMS.CurMinRpm 
-		end
-		
-		if limitRpmNow then
-			speedLimit = self.vehicle:getSpeedLimit(true)
-			if speedLimit < gearboxMogli.huge then
-				speedLimit = speedLimit * gearboxMogli.kmhTOms
-				speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
-				curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
-			end
 		end
 	end
 	
 	if forGetTorque then
-		if self.ratioFactorR ~= nil then
-			curMaxRpm = curMaxRpm * self.ratioFactorR
-		else
-			curMaxRpm = self.maxPossibleRpm
-		end
+		curMaxRpm = curMaxRpm * self.ratioFactorR
 	else
 		-- smooth braking if we are too fast 
-		if self.ratioFactorR ~= nil then
-		  curMaxRpm = math.max( curMaxRpm, self.clutchRpmR - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
-		end
+		curMaxRpm = math.max( curMaxRpm, self.clutchRpmR - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
 		self.lastCurMaxRpm = curMaxRpm
 	end
 	
