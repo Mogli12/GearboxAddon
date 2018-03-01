@@ -2111,6 +2111,38 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1 , v=0.91})
 
 			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
+			
+		elseif self.mrGbMS.HydrostaticProfile == "CMatic" then
+			self.mrGbMS.HydrostaticMin = 0
+			self.mrGbMS.HydrostaticMax = 1
+			self.mrGbMS.TransmissionEfficiency = 0.97
+			self.mrGbMS.HydrostaticEfficiency  = {}
+			
+			mrfg = self.mrGbMG.hydroMaxTorqueOutput
+			
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0    , v=gearboxMogli.hydroEffMin })
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.063, v=0.834})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.112, v=0.907})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.134, v=0.918})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.156, v=0.907})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.179, v=0.907})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.201, v=0.907})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.223, v=0.907})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.246, v=0.902})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.268, v=0.897})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.29 , v=0.887})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.313, v=0.897})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.335, v=0.928})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.357, v=0.939})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.38 , v=0.949})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.447, v=0.96})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.536, v=0.97})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.625, v=0.97})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.714, v=0.965})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=0.893, v=0.939})
+			table.insert(self.mrGbMS.HydrostaticEfficiency, {time=1    , v=0.907})
+                                                                      
+			i = table.getn( self.mrGbMS.HydrostaticEfficiency )
 		else
 			print('FS17_GearboxAddon: Error! Invalid hydrostatic profile "'..tostring(self.mrGbMS.HydrostaticProfile)..'"')
 			self.mrGbMS.HydrostaticProfile = "Direct"
@@ -7908,25 +7940,41 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	
 	local currentSpeedKmh = currentSpeed * 3600
 	
+	lastNoLimitMaxRpmTime = self.mrGbML.noLimitMaxRpmTime
+	self.mrGbML.noLimitMaxRpmTime = nil 
+	
 	if     not self.steeringEnabled then
 	-- hired worker => limit max RPM
 		self.motor.limitMaxRpm = true
 	elseif not ccOn then
 	-- speed limit off => no limit
 		self.motor.limitMaxRpm = false
-	elseif currentSpeedKmh <= speedLimit then
+	elseif currentSpeedKmh <= speedLimit
+	    or currentSpeedKmh <= 5 then 
 	-- below speed limit => limit max RPM
 		self.motor.limitMaxRpm = true
 	elseif self.motor.usedTransTorque < gearboxMogli.eps then
 	-- no torque used => no limit => we can go faster downhill
-		self.motor.limitMaxRpm = false
+		if ccBrake then 
+			if lastNoLimitMaxRpmTime == nil then 
+				self.mrGbML.noLimitMaxRpmTime = g_currentMission.time 
+			else 
+				self.mrGbML.noLimitMaxRpmTime = lastNoLimitMaxRpmTime
+			end 
+		
+			if self.mrGbML.noLimitMaxRpmTime > 200 then 
+				self.motor.limitMaxRpm = false
+			end 
+		else 
+			self.motor.limitMaxRpm = false
+		end 
 	-- else keep current value !!!
 	end
 		
 	do
 		local sl = self:getSpeedLimit(true)
 		if      not self.motor.limitMaxRpm 
-		    and ccOn
+				and ccOn
 				and ccBrake
 				and sl > speedLimit then
 			sl = speedLimit
@@ -7936,7 +7984,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		if currentSpeedKmh >= sl + 1 then
 			bp = 1
 		elseif currentSpeedKmh > sl then
-			bp = currentSpeedKmh - sl
+			bp = ( currentSpeedKmh - sl )^2
 		end
 		if bp > gearboxMogli.eps then
 			if bp > 0.8 then

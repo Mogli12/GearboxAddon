@@ -240,6 +240,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	
 	self.nonClampedMotorRpm      = 0
 	self.clutchRpm               = 0
+	self.clutchRpmR              = 0
 	self.lastMotorRpm            = 0
 	self.lastRealMotorRpm        = 0
 	self.equalizedMotorRpm       = 0
@@ -647,7 +648,8 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 			limitRpmNow = self.limitMaxRpm
 		end
 		
-		if limitRpmNow then
+	--if limitRpmNow then
+		if forGetTorque or self.limitMaxRpm then
 			speedLimit = math.min( speedLimit, self:getSpeedLimit() )
 		elseif self.vehicle.mrGbMS.ConstantRpm then
 			speedLimit = math.min( speedLimit, self:getSpeedLimit() + gearboxMogli.speedLimitBrake )
@@ -659,6 +661,15 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 		if speedLimit < gearboxMogli.huge then
 			speedLimit = speedLimit + gearboxMogli.extraSpeedLimitMs
 			curMaxRpm  = Utils.clamp( speedLimit * gearboxMogli.factor30pi * self:getMogliGearRatio() * self.ratioFactorG / self.wheelSlipFactor, 1, curMaxRpm )
+		--print(string.format("%5s; %5.1fkm/h; %4d; %4d; %4d; (%6g, %6g)",
+		--                    tostring(forGetTorque),
+		--										speedLimit*3.6,
+		--										curMaxRpm,
+		--										self.clutchRpm,
+		--										self.clutchRpm / Utils.getNoNil( self.ratioFactorR, -1 ),
+		--										Utils.getNoNil( self.ratioFactorG, -1 ),
+		--										Utils.getNoNil( self.ratioFactorR, -1 )
+		--										))
 		end
 		
 		if self.rpmLimit ~= nil and self.rpmLimit < curMaxRpm then
@@ -687,7 +698,9 @@ function gearboxMogliMotor:getCurMaxRpm( forGetTorque )
 		end
 	else
 		-- smooth braking if we are too fast 
-		curMaxRpm = math.max( curMaxRpm, self.clutchRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
+		if self.ratioFactorR ~= nil then
+		  curMaxRpm = math.max( curMaxRpm, self.clutchRpmR - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor )
+		end
 		self.lastCurMaxRpm = curMaxRpm
 	end
 	
@@ -1492,6 +1505,7 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	self.nonClampedMotorRpm, self.clutchRpm, self.usedTransTorque = getMotorRotationSpeed(vehicle.motorizedNode)		
 	self.nonClampedMotorRpm  = self.nonClampedMotorRpm * gearboxMogli.factor30pi
 	self.clutchRpm           = self.clutchRpm          * gearboxMogli.factor30pi
+	self.clutchRpmR          = self.clutchRpm
 	self.requiredWheelTorque = self.maxMotorTorque*math.abs(self.gearRatio)	
 	self.wheelSpeedRpm       = self.currentSpeed * gearboxMogli.factor30pi
 	self.wheelSpeedRpmReal   = self.wheelSpeedRpm
