@@ -193,6 +193,7 @@ gearboxMogliGlobals.minTargetRpmFactor    = 0.3   -- reduce PTO RPM in eco mode;
 gearboxMogliGlobals.hydroRpmFactor        = 0.3   -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
 gearboxMogliGlobals.increaseRpmForPTO     = true  -- increase RPM automatically if PTO is turned on
 gearboxMogliGlobals.engineHumVolume       = 1     -- volume of engine hum sound above max target RPM
+gearboxMogliGlobals.shiftingHandbrakeVol  = 1     -- volume factor of gear shifting and handbrake sound
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -1290,6 +1291,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.GearShiftSoundFile          = nil
 		self.mrGbMS.GearShiftSoundVolume        = 1 		
 	end	
+		
+	self.mrGbMS.HandbrakePullSoundVolume      = self.mrGbMS.HandbrakePullSoundVolume    * self.mrGbMG.shiftingHandbrakeVol
+	self.mrGbMS.HandbrakeReleaseSoundVolume   = self.mrGbMS.HandbrakeReleaseSoundVolume * self.mrGbMG.shiftingHandbrakeVol
+	self.mrGbMS.GearShiftSoundVolume          = self.mrGbMS.GearShiftSoundVolume        * self.mrGbMG.shiftingHandbrakeVol
 
 	if self.mrGbMS.BlowOffVentilFile == nil then
 	-- no autoStartStop => old vehicle => louder blow off ventil sound
