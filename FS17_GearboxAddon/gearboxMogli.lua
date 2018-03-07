@@ -193,7 +193,8 @@ gearboxMogliGlobals.minTargetRpmFactor    = 0.3   -- reduce PTO RPM in eco mode;
 gearboxMogliGlobals.hydroRpmFactor        = 0.3   -- reduce PTO RPM in eco mode; e.g. 1600 with PTO and 2200 rated RPM
 gearboxMogliGlobals.increaseRpmForPTO     = true  -- increase RPM automatically if PTO is turned on
 gearboxMogliGlobals.engineHumVolume       = 1     -- volume of engine hum sound above max target RPM
-gearboxMogliGlobals.shiftingHandbrakeVol  = 1     -- volume factor of gear shifting and handbrake sound
+gearboxMogliGlobals.shiftingBaseVolume    = 1     -- volume factor of gear shifting sound
+gearboxMogliGlobals.handbrakeBaseVolume   = 1     -- volume factor of gear handbrake sound
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -1292,9 +1293,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.GearShiftSoundVolume        = 1 		
 	end	
 		
-	self.mrGbMS.HandbrakePullSoundVolume      = self.mrGbMS.HandbrakePullSoundVolume    * self.mrGbMG.shiftingHandbrakeVol
-	self.mrGbMS.HandbrakeReleaseSoundVolume   = self.mrGbMS.HandbrakeReleaseSoundVolume * self.mrGbMG.shiftingHandbrakeVol
-	self.mrGbMS.GearShiftSoundVolume          = self.mrGbMS.GearShiftSoundVolume        * self.mrGbMG.shiftingHandbrakeVol
+	self.mrGbMS.HandbrakePullSoundVolume      = self.mrGbMS.HandbrakePullSoundVolume    * self.mrGbMG.handbrakeBaseVolume
+	self.mrGbMS.HandbrakeReleaseSoundVolume   = self.mrGbMS.HandbrakeReleaseSoundVolume * self.mrGbMG.handbrakeBaseVolume
+	self.mrGbMS.GearShiftSoundVolume          = self.mrGbMS.GearShiftSoundVolume        * self.mrGbMG.shiftingBaseVolume
 
 	if self.mrGbMS.BlowOffVentilFile == nil then
 	-- no autoStartStop => old vehicle => louder blow off ventil sound
@@ -4300,12 +4301,23 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- engine hum above rated 
 --**********************************************************************************************************	
+	local doPlayEngineHumSample = false 
+	
 	if      self.isMotorStarted
 			and self:getIsActiveForSound()
 			and self.mrGbMG.engineHumVolume > 0
 			and self:mrGbMGetCurrentRPM() > self.mrGbMS.MaxTargetRpm
 			and self.mrGbMS.CurMaxRpm     > self.mrGbMS.MaxTargetRpm then 
+		if self.mrGbML.EngineHumSampleStartTime == nil then	
+			self.mrGbML.EngineHumSampleStartTime = g_currentMission.time + 1000 
+		elseif self.mrGbML.EngineHumSampleStartTime < g_currentMission.time then 
+			doPlayEngineHumSample = true 
+		end
+	else 
+		self.mrGbML.EngineHumSampleStartTime = nil
+	end 
 	
+	if doPlayEngineHumSample then 
 		if gearboxMogli.EngineHumSample == nil then
 			gearboxMogli.EngineHumSample = createSample("EngineHumSample")
 			local fileName = Utils.getFilename( "hum.wav", gearboxMogli.baseDirectory )
@@ -4315,7 +4327,7 @@ function gearboxMogli:update(dt)
 		local f = math.min( ( self:mrGbMGetCurrentRPM() - self.mrGbMS.MaxTargetRpm ) / ( self.mrGbMS.CurMaxRpm - self.mrGbMS.MaxTargetRpm ), 1 )
 		local g = self:mrGbMGetCurrentRPM() / self.mrGbMS.MaxTargetRpm
 		
-		f = 0.5 * self.mrGbMG.engineHumVolume * f 
+		f = math.min( 0.5 * self.mrGbMG.engineHumVolume * f, 0.001 * ( g_currentMission.time - self.mrGbML.EngineHumSampleStartTime ) )
 		g = 0.2 * ( 1 + 5 * ( g - 1 ) )
 		
 		if not ( self.mrGbML.EngineHumSampleIsPlaying ) then 
