@@ -82,7 +82,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	--**********************************************************************************************************	
 	function tempomatMogli:newSetCruiseControlState(state, noEventSend)
 		if self.tempomatMogliOnLeave then
-		elseif self.isServer and self.cruiseControl ~= nil and self.tempomatMogliV22.keepSpeedLimit ~= nil then
+		elseif self.isServer and self.cruiseControl ~= nil and self.tempomatMogliV22.KeepSpeed then
 			if     state == Drivable.CRUISECONTROL_STATE_ACTIVE then
 			  self.tempomatMogliV22.keepSpeedLimit = self.cruiseControl.speed 
 			elseif state == Drivable.CRUISECONTROL_STATE_FULL   then
@@ -161,10 +161,13 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 			if self.movingDirection <= 0 and ( self.mrGbMS == nil or not ( self.mrGbMS.IsOn ) ) then
 				self.tempomatMogliV22.keepSpeedLimit = nil		
 			elseif self.tempomatMogliV22.KeepSpeed
-					and ( ( self.axisForward <= 0.2 and self.tempomatMogliV22.keepSpeedLimit ~= nil and self.tempomatMogliV22.keepSpeedLimit > 1 )
+					and ( not self.tempomatMogliV22.KeepSpeedToggle
+					-- fast enough
 						 or math.abs( self.lastSpeedReal*3600 ) > 4
+					-- wish to accelerate
 						 or self.axisForward <= -0.2
-					   or not self.tempomatMogliV22.KeepSpeedToggle ) then
+					-- not full on the brakes
+						 or ( self.axisForward <= 0.95 and self.tempomatMogliV22.keepSpeedLimit ~= nil and self.tempomatMogliV22.keepSpeedLimit > 1 ) ) then
 				if self.tempomatMogliV22.keepSpeedLimit == nil then
 					self.tempomatMogliV22.lastAxisFoward = 0
 					if self.cruiseControl ~= nil and self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE then

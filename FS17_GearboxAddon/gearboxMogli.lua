@@ -321,6 +321,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "DoubleClutch",  0 )
 	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
 	gearboxMogli.registerState( self, "ShuttleFactor", 0.5 )
+	gearboxMogli.registerState( self, "NoRetarderSound", false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -2553,6 +2554,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
+		self.mrGbMS.Sound.RetarderSoundMinSpeed   = self.retarderSoundMinSpeed
 		if self.sampleMotorLoad ~= nil and self.sampleMotorLoad.volume ~= nil then
 			self.mrGbMS.Sound.MotorLoadVolume       = self.sampleMotorLoad.volume / 0.8
 		end
@@ -2959,6 +2961,7 @@ function gearboxMogli:update(dt)
 	local processInput = true
 	
 	self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
+	self.retarderSoundMinSpeed             = self.mrGbMS.Sound.RetarderSoundMinSpeed
 	
 	if     self.hasChangedGearBoxAddon then
 	-- IncreaseRPMWhileTipping.lua
@@ -4392,6 +4395,13 @@ function gearboxMogli:update(dt)
 		end
 		self.motorSoundLoadFactor          = self.mrGbML.motorSoundLoadFactor
 	end
+	
+--**********************************************************************************************************	
+-- gearboxMogli:update
+--**********************************************************************************************************		
+	if self.mrGbMS.NoRetarderSound then 
+		self.retarderSoundMinSpeed = gearboxMogli.huge 
+	end 
 	
 	if      self.steeringEnabled 
 			and self.isServer 
@@ -7979,7 +7989,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 				self.mrGbML.noLimitMaxRpmTime = lastNoLimitMaxRpmTime
 			end 
 		
-			if self.mrGbML.noLimitMaxRpmTime > 200 then 
+			if self.mrGbML.noLimitMaxRpmTime > 1000 then 
 				self.motor.limitMaxRpm = false
 			end 
 		else 
@@ -7987,7 +7997,13 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		end 
 	-- else keep current value !!!
 	end
-		
+	
+	if self.motor.usedTransTorque > gearboxMogli.eps then
+		self:mrGbMSetState( "NoRetarderSound", true )
+	else
+		self:mrGbMSetState( "NoRetarderSound", false )
+	end 
+	
 	do
 		local sl = self:getSpeedLimit(true)
 		if      not self.motor.limitMaxRpm 

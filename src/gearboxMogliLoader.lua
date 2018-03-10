@@ -152,6 +152,10 @@ function gearboxMogliLoader:load(savegame)
 	elseif self.mrGbMLGearboxAddonConfiguration ~= nil then
 		self:addBoughtConfiguration("GearboxAddon", self.mrGbMLGearboxAddonConfiguration)
 	end
+	if self.mrGbMS == nil then 
+		self.mrGbMS = {}
+		self.mrGbMS.IsOnOff = false 
+	end	
 end 
 
 function gearboxMogliLoader:readStream(streamId, connection)
