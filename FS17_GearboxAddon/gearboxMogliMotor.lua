@@ -545,9 +545,12 @@ function gearboxMogliMotor:updateSpeedLimit( dt, acceleration )
 	speedLimit = speedLimit * gearboxMogli.kmhTOms
 
 	if     self.vehicle.mrGbMS.SpeedLimiter 
-			or self.vehicle.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE then
+			or ( self.vehicle.cruiseControl ~= nil and self.vehicle.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE ) then
 
-		local cruiseSpeed = math.min( speedLimit, self.vehicle.cruiseControl.speed * gearboxMogli.kmhTOms )
+		local cruiseSpeed = speedLimit
+		if self.vehicle.cruiseControl ~= nil then 
+			cruiseSpeed = math.min( speedLimit, self.vehicle.cruiseControl.speed * gearboxMogli.kmhTOms )
+		end 
 		if dt == nil then
 			dt = self.tickDt
 		end
@@ -942,6 +945,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	elseif  self.lastMissingTorque > gearboxMogli.ptoSpeedLimitRatio * self.lastMotorTorque 
 			and self.vehicle.mrGbMS.PtoSpeedLimit 
 			and ( not ( self.vehicle.steeringEnabled ) 
+				or  self.vehicle.cruiseControl       == nil
 				or  self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE
 				or  self.vehicle.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_FULL )
 			and self.currentSpeed > gearboxMogli.ptoSpeedLimitMin then
@@ -2316,7 +2320,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			targetRpm = minTarget	
 		elseif targetRpm > self.maxTargetRpm then
 			targetRpm = self.maxTargetRpm
-		elseif self.vehicle.cruiseControl.state ~= 0
+		elseif ( self.vehicle.cruiseControl ~= nil and self.vehicle.cruiseControl.state ~= 0 )
 				or not self.vehicle.steeringEnabled then
 		-- nothing
 		elseif gearboxMogli.eps < accelerationPedal and accelerationPedal < self.vehicle.mrGbMS.MaxRpmThrottle then
@@ -2624,7 +2628,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			and self.vehicle.mrGbMS.HydrostaticMin < gearboxMogli.eps
 			and accelerationPedal >= -0.001 then
 		brakeNeutral = false
-	elseif self.vehicle.cruiseControl.state ~= 0 
+	elseif ( self.vehicle.cruiseControl ~= nil and self.vehicle.cruiseControl.state ~= 0 ) 
 			or not autoOpenClutch then
 	-- no automatic stop or cruise control is on 
 		brakeNeutral = false
@@ -2760,7 +2764,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				end
 				accelerationPedal = 0
 				self.noTorque     = true
-			elseif ( accelerationPedal < gearboxMogli.accDeadZone and self.vehicle.cruiseControl.state == 0 )
+			elseif ( accelerationPedal < gearboxMogli.accDeadZone and ( self.vehicle.cruiseControl == nil or self.vehicle.cruiseControl.state == 0 ) )
 					or self.vehicle.mrGbMS.ManualClutch < 0.1 then
 				self.vehicle:mrGbMDoGearShift() 
 				self.vehicle.mrGbML.gearShiftingNeeded = 0 
@@ -2843,7 +2847,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			
 	--**********************************************************************************************************		
 	-- no transmission while braking 
-			if      self.vehicle.cruiseControl.state == 0 
+			if      ( self.vehicle.cruiseControl == nil or self.vehicle.cruiseControl.state == 0 )
 					and self.vehicle.steeringEnabled
 					and autoOpenClutch 
 					and accelerationPedal       < self.vehicle.mrGbMG.brakeNeutralLimit 
@@ -2918,7 +2922,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					local tooBig    = false
 					local tooSmall  = false
 					
-					if      self.vehicle.cruiseControl.state > 0 
+					if      self.vehicle.cruiseControl ~= nil
+							and self.vehicle.cruiseControl.state > 0 
 							and self.vehicle.mrGbMS.CurrentGearSpeed * self.vehicle.mrGbMS.IdleRpm / self.vehicle.mrGbMS.RatedRpm > currentSpeedLimit then
 						-- allow down shift after short timeout
 					elseif self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed + gearboxMogli.eps then
@@ -3165,7 +3170,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					elseif hMin1 > hMax1 - gearboxMogli.eps then
 						hTgt = hMin1
 					elseif  self.vehicle.mrGbMS.ConstantRpm 
-							and ( self.vehicle.cruiseControl.state     == Drivable.CRUISECONTROL_STATE_ACTIVE 
+							and ( ( self.vehicle.cruiseControl ~= nil and self.vehicle.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE )
 								 or self.vehicle.mrGbML.hydroTargetSpeed ~= nil
 								 or self.ptoSpeedLimit                   ~= nil ) then					
 						hTgt = Utils.clamp( self.vehicle.mrGbMS.RatedRpm * currentSpeedLimit / ( t * self.vehicle.mrGbMS.CurrentGearSpeed ), hMin1, hMax1 )						
@@ -3769,7 +3774,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				--if self.vehicle.mrGbMS.CurrentGearSpeed > self.vehicle.mrGbMS.LaunchGearSpeed then
 				--	downTimerMode = 0
 				--end
-				elseif  self.vehicle.cruiseControl.state > 0 
+				elseif  self.vehicle.cruiseControl ~= nil
+						and self.vehicle.cruiseControl.state > 0 
 						and self.vehicle.mrGbMS.CurrentGearSpeed * downRpm / self.vehicle.mrGbMS.RatedRpm > currentSpeedLimit then
 					-- allow down shift after short timeout
 				elseif self.vehicle.mrGbML.lastGearSpeed < self.vehicle.mrGbMS.CurrentGearSpeed - gearboxMogli.eps then
@@ -3897,7 +3903,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 						p.priority = 10
 					end
 					
-					if      self.vehicle.cruiseControl.state > 0 
+					if      self.vehicle.cruiseControl ~= nil 
+							and self.vehicle.cruiseControl.state > 0 
 							and p.gearSpeed * self.vehicle.mrGbMS.IdleRpm > currentSpeedLimit * self.vehicle.mrGbMS.RatedRpm then
 						p.priority = 10
 					end			

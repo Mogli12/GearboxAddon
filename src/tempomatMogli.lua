@@ -352,13 +352,13 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	function tempomatMogli:newDrivableOnLeave( superFunc )
 		local oldFunc
 		
-		if not ( self.deactivateOnLeave ) and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then
+		if not ( self.deactivateOnLeave ) and self.cruiseControl ~= nil and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then
 			self.tempomatMogliOnLeave = true
 		end
 		
 		superFunc( self )
 		
-		self.tempomatMogliOnLeave = true
+		self.tempomatMogliOnLeave = false
 	end
 	
 	Drivable.updateVehiclePhysics = Utils.overwrittenFunction( Drivable.updateVehiclePhysics, tempomatMogli.newUpdateVehiclePhysics )
@@ -367,14 +367,19 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 	-- tempomatMogli:tempomatMogliSetSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliSetSpeedLimit( noEventSend )
-		self:setCruiseControlMaxSpeed(math.floor( self.lastSpeedReal*3600 + 0.5 ))
+		if self.setCruiseControlMaxSpeed ~= nil then 
+			self:setCruiseControlMaxSpeed(math.floor( self.lastSpeedReal*3600 + 0.5 ))
+		end 
 	end 
 	
 	--**********************************************************************************************************	
 	-- tempomatMogli:tempomatMogliSetSpeedLimit
 	--**********************************************************************************************************	
 	function tempomatMogli:tempomatMogliGetSpeedLimit( )
-		return self.cruiseControl.speed
+		if self.cruiseControl ~= nil then 
+			return self.cruiseControl.speed
+		end
+		return math.floor( self.lastSpeedReal*3600 + 0.5 )
 	end 
 	
 	--**********************************************************************************************************	
@@ -456,7 +461,7 @@ if tempomatMogli == nil or tempomatMogli.version == nil or tempomatMogli.version
 		--end
 		end
 		
-		if self.tempomatMogliV22.baseSpeed1 ~= nil then
+		if self.cruiseControl ~= nil and self.tempomatMogliV22.baseSpeed1 ~= nil then
 			if     math.abs( self.cruiseControl.speed - self.tempomatMogliV22.baseSpeed2 ) < 1 then
 				self.tempomatMogliV22.SpeedLimit2 = self.tempomatMogliV22.SpeedLimit3
 				self.tempomatMogliV22.SpeedLimit3 = self.tempomatMogliV22.baseSpeed1
