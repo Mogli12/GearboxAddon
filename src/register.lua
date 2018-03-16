@@ -173,6 +173,15 @@ function gearboxMogliRegister:add()
 				end
 			end
 		end
+		if correctLocation then
+			correctLocation = false
+			for i,vs in pairs(typeDef.specializations) do
+				if vs == SpecializationUtil.getSpecialization("drivable") then
+					correctLocation = true
+					break
+				end
+			end
+		end
 		
 		if addSpecialization1 and correctLocation then
 			typeDef.addMogliGearbox = true

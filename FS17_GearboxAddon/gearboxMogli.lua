@@ -2720,9 +2720,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMB.motor = self.motor	
 		end
 	end
-	if self.cruiseControl ~= nil then 
-		self.mrGbMB.cruiseControlMaxSpeed = self.cruiseControl.maxSpeed
-	end 
+	self.mrGbMB.cruiseControlMaxSpeed = self.cruiseControl.maxSpeed
 --**********************************************************************************************************		
   
 	self.mrGbML.smoothSlow   = 1
@@ -3554,7 +3552,7 @@ function gearboxMogli:update(dt)
 					and self:mrGbMGetAutoStartStop()
 					and self.mrGbMS.G27Mode <= 0 
 					and g_currentMission.time > self.motorStartTime
-					and ( self.axisForward < -0.1 or ( self.cruiseControl ~= nil and self.cruiseControl.state ~= 0 ) ) then
+					and ( self.axisForward < -0.1 or self.cruiseControl.state ~= 0 ) then
 				self:mrGbMSetNeutralActive( false ) 
 			end
 			
@@ -4107,7 +4105,6 @@ function gearboxMogli:update(dt)
 	elseif  self.steeringEnabled 
 			and self.isMotorStarted
 			and not self.isHired
-			and self.cruiseControl ~= nil
 			and self.cruiseControl.state <= 0
 			and self.isClient then
 		-- open clutch if RPM is too low
@@ -4408,7 +4405,6 @@ function gearboxMogli:update(dt)
 	
 	if      self.steeringEnabled 
 			and self.isServer 
-			and self.cruiseControl ~= nil
 			and not ( self.isEntered or self.isControlled ) then
 		if self.isMotorStarted then
 
@@ -4532,7 +4528,7 @@ function gearboxMogli:onLeave()
 	if      self.steeringEnabled 
 			and self.mrGbMS.IsOn 
 		--and self.isMotorStarted
-			and ( self.cruiseControl == nil or self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE )
+			and self.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_ACTIVE
 			and not self.isHired then
 		if self:mrGbMGetAutoStartStop() then 
 			self:mrGbMSetNeutralActive( true, false, true )
@@ -7742,16 +7738,14 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 		self:mrGbMSetLanuchGear( noEventSend )
 		self:mrGbMDoGearShift( noEventSend ) 
 		
-		if self.cruiseControl ~= nil then 
-			self.cruiseControl.maxSpeed   = self.mrGbMS.MaxGearSpeed * self.mrGbMS.MaxTargetRpmRatio * 3.6
-			if self.mrGbMS.Hydrostatic then
-				self.cruiseControl.maxSpeed = self.cruiseControl.maxSpeed * self.mrGbMS.HydrostaticMax
-			end
-			if self.mrGbMS.MaxSpeedLimiter and self.motor.maxForwardSpeed ~= nil and self.cruiseControl.maxSpeed > self.motor.maxForwardSpeed * 3.6 then
-				self.cruiseControl.maxSpeed = self.motor.maxForwardSpeed * 3.6
-			end	
-			self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
-		end 
+		self.cruiseControl.maxSpeed   = self.mrGbMS.MaxGearSpeed * self.mrGbMS.MaxTargetRpmRatio * 3.6
+		if self.mrGbMS.Hydrostatic then
+			self.cruiseControl.maxSpeed = self.cruiseControl.maxSpeed * self.mrGbMS.HydrostaticMax
+		end
+		if self.mrGbMS.MaxSpeedLimiter and self.motor.maxForwardSpeed ~= nil and self.cruiseControl.maxSpeed > self.motor.maxForwardSpeed * 3.6 then
+			self.cruiseControl.maxSpeed = self.motor.maxForwardSpeed * 3.6
+		end	
+		self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
 		
 		if self.mrUseMrTransmission then
 			self.mrGbMB.mrUseMrTransmission = true
@@ -7765,12 +7759,10 @@ function gearboxMogli:mrGbMOnSetIsOn( old, new, noEventSend )
 				self.motor = self.mrGbMB.motor
 			end
 			
-			if self.cruiseControl ~= nil then 
-				if self.mrGbMB.cruiseControlMaxSpeed ~= nil then
-					self.cruiseControl.maxSpeed = self.mrGbMB.cruiseControlMaxSpeed 
-				end
-				self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
-			end 
+			if self.mrGbMB.cruiseControlMaxSpeed ~= nil then
+				self.cruiseControl.maxSpeed = self.mrGbMB.cruiseControlMaxSpeed 
+			end
+			self.cruiseControl.speed = math.min( self.cruiseControl.speed, self.cruiseControl.maxSpeed )
 			
 			if self.mrGbMB.dcShuttle then
 				self.mrGbMB.dcShuttle = false
@@ -7854,9 +7846,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 
 	if self.steeringEnabled then
 	-- driveControl and GPS
-		if      self.cruiseControl ~= nil
-				and ( self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE
-					 or self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_FULL ) then
+		if      self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE
+				or  self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_FULL then
 			acceleration = 1
 	--elseif  acceleration             > 0.97
 	--		and self.mrGbMS.HandThrottle > 0.97 then
@@ -7880,7 +7871,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			else 
 				m = n
 			end
-			if self.cruiseControl ~= nil and ( self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 ) then
+			if self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 then
 				m = math.min( m, self.cruiseControl.speed * gearboxMogli.kmhTOms )
 			end
 			
@@ -7966,7 +7957,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 --self.motor:updateMotorRpm( dt )
 	self.motor:mrGbMUpdateMotorRpm( dt )
 	local speedLimit = self.motor:updateSpeedLimit( dt, acceleration ) * 3.6
-	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or ( self.cruiseControl ~= nil and self.cruiseControl.state > 0 )
+	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 
 	local ccBrake    = self.mrGbMS.CruiseControlBrake or self.mrGbMS.AllAuto
 	if self.tempomatMogliV22 ~= nil and self.tempomatMogliV22.keepSpeedLimit ~= nil then
 		ccOn    = true
