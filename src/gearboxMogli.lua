@@ -4832,7 +4832,7 @@ function gearboxMogli:updateTick(dt)
 									x2,y2,z2 = localToWorld(wheel.repr, x + width, 0, z + l0 + l1 )
 								end
 								
-								Utils.updatePloughArea(x0,z0, x1,z1, x2,z2, true, true, angle)
+								Utils.updatePloughArea(x0,z0, x1,z1, x2,z2, false, false, angle)
 							end
 						end
 					end 
