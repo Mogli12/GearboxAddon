@@ -20,6 +20,21 @@ gearboxMogliMotor_mt = Class(gearboxMogliMotor)
 
 setmetatable( gearboxMogliMotor, { __index = function (table, key) return VehicleMotor[key] end } )
 
+local function rpm2String( r )
+	if type( r ) == "number" then 
+		return string.format( "%4d", r )
+	end 
+	return "NaN"
+end
+
+local function per2String( p )
+	if type( r ) == "number" then 
+		return string.format( "%3d%%", r * 100 )
+	end 
+	return "NaN"
+end
+
+
 --**********************************************************************************************************	
 -- gearboxMogliMotor:new
 --**********************************************************************************************************	
@@ -4170,8 +4185,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	local lastTCR = self.lastTorqueConverterRatio 
 	local lastTCL = self.torqueConverterLockupMs
+	local lastCOT = self.lastClutchOpenTime
 	self.lastTorqueConverterRatio = nil
 	self.torqueConverterLockupMs  = nil
+	self.lastClutchOpenTime       = nil
 	
 	if      not ( self.vehicle.isMotorStarted ) then 
 		self.throttleRpm = math.max( 0, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor ) 
@@ -4201,6 +4218,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		self.throttleRpm = math.max( self.minRequiredRpm, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor, 
 																 math.min( r, self.throttleRpm + self.tickDt * self.vehicle.mrGbMS.RpmIncFactorNeutral ) )
 	end 
+	
+	if self.vehicle.mrGbMG.debugInfo then
+		self.vehicle.mrGbML.clutchDebug = ""
+	end
 	
 	if self.noTransmission then
 	elseif clutchMode < 0 then
@@ -4277,6 +4298,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				and self.autoClutchPercent  > 0.999 then 
 			self.autoClutchPercent = 1
 		else			
+			if lastCOT == nil or self.vehicle.mrGbMS.ManualClutch < 0.8 then 
+				self.lastClutchOpenTime = g_currentMission.time 
+			else 
+				self.lastClutchOpenTime = lastCOT
+			end
 			self.autoClutchPercent = Utils.clamp( self.autoClutchPercent, 0, math.min( self.vehicle.mrGbMS.ManualClutch, self.vehicle.mrGbMS.MaxClutchPercent ) )
 			if self.vehicle.mrGbMS.TorqueConverter then				
 				local d = self.tickDt / math.max( 10, self.vehicle.mrGbMS.TorqueConverterTime + self.motorLoadS * self.vehicle.mrGbMS.TorqueConverterTimeInc )
@@ -4302,7 +4328,31 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			toClutchPercent = math.min( toClutchPercent, math.max( self.vehicle.mrGbMS.MinClutchPercent, self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc ) )
 			fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent - self.tickDt/self.vehicle.mrGbMS.ClutchTimeDec )
 			
+			if     targetRpm > self.vehicle.mrGbMS.ClutchMaxTargetRpm then 
+				targetRpm = self.vehicle.mrGbMS.ClutchMaxTargetRpm
+			elseif targetRpm < self.vehicle.mrGbMS.IdleRpm            then 
+			elseif g_currentMission.time > self.lastClutchOpenTime + 2500 then 
+				targetRpm = self.vehicle.mrGbMS.IdleRpm 
+			else
+				targetRpm = math.min( targetRpm,
+															self.vehicle.mrGbMS.ClutchMaxTargetRpm + ( g_currentMission.time - self.lastClutchOpenTime ) * 0.0004 * ( self.vehicle.mrGbMS.IdleRpm - self.vehicle.mrGbMS.ClutchMaxTargetRpm ) )
+			end 
+			
+			local prevPercent = self.autoClutchPercent
+			
 			self.autoClutchPercent = self:getClutchPercent( targetRpm, openRpm, closeRpm, fromClutchPercent, self.autoClutchPercent, toClutchPercent )
+			
+			if self.vehicle.mrGbMG.debugInfo then
+				self.vehicle.mrGbML.clutchDebug = string.format( "%4s = self:getClutchPercent( %4s %4s, %4s, %4s, %4s, %4s )",
+																												 per2String( self.autoClutchPercent ),
+																												 rpm2String( targetRpm ),
+																												 rpm2String( openRpm ),
+																												 rpm2String( closeRpm ),
+																												 rpm2String( fromClutchPercent ),
+																												 rpm2String( self.autoClutchPercent ),
+																												 rpm2String( toClutchPercent )
+																												)																			
+			end
 		end
 	end 					
 	
@@ -4644,7 +4694,7 @@ function gearboxMogliMotor:getClutchPercent( targetRpm, openRpm, closeRpm, fromP
 		return minPercent
 	end 
 		
-	local target        = math.min( targetRpm, self.vehicle.mrGbMS.ClutchMaxTargetRpm )	
+	local target        = math.max( self.clutchRpm, targetRpm	)
 	local eps           = maxPercent - minPercent
 	local delta         = ( self.throttleRpm - self.clutchRpm ) * eps	
 	local times         = math.max( gearboxMogli.clutchLoopTimes, math.ceil( delta / gearboxMogli.clutchLoopDelta ) )	

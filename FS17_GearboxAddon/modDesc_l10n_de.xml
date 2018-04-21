@@ -193,7 +193,10 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_Stall3"             text="Gerät benötigt zu viel Kraft"/>
 		<text name="gearboxMogliTEXT_Stall4"             text="Motor abgewürgt, da Gerät zu viel Kraft benötigte"/>
 		<text name="gearboxMogliTEXT_ClutchOverheating"  text="Kupplung überhitzt"/>
-		
+	
+		<text name="gearboxMogliTIP_SlipPlough"          text="Durchdrehende Räder wirken wie ein Pflug"/>
+		<text name="gearboxMogliTEXT_SlipPlough"         text="Durchdrehende Räder"/>
+	
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Sperren"/>
 		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. Geschw."/>
