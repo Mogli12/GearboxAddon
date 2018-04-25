@@ -191,8 +191,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_Stall4"             text="motor stopped because too much PTO power was requested"/>
 		<text name="gearboxMogliTEXT_ClutchOverheating"  text="clutch is overheating"/>
 		
-		<text name="gearboxMogliTIP_SlipPlough"          text="Slipping wheels "/>
-		<text name="gearboxMogliTEXT_SlipPlough"         text="Durchdrehende Räder"/>
+		<text name="gearboxMogliTIP_SlipPlough"          text="Slipping wheels dig the ground like a plough"/>
+		<text name="gearboxMogliTEXT_SlipPlough"         text="slipping wheels"/>
 	
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>

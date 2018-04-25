@@ -2112,8 +2112,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			targetRequiredRpm = math.max( targetRequiredRpm, result * self.original.ptoMotorRpmRatio )
 		end
 	end	
-	if      self.vehicle.mrGbMS.ToolIsDirty
-			and ( self.vehicle.mrGbMS.Hydrostatic or lastNoTransmission ) then
+	if self.vehicle.mrGbMS.ToolIsDirty and lastNoTransmission then
 		targetRequiredRpm = math.max( targetRequiredRpm, self.vehicle.mrGbMS.HydraulicRpm )
 	end
 	
@@ -2128,7 +2127,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	local minRpmReduced
 	
 	if accelerationPedal < 0.1 then
-		minRpmReduced = self.vehicle.mrGbMS.IdleRpm
+		minRpmReduced = self.vehicle.mrGbMS.CurMinRpm
 	else
 		minRpmReduced = Utils.clamp( targetRequiredRpm0 * gearboxMogli.rpmReduction, 
 																 self.vehicle.mrGbMS.CurMinRpm, 
