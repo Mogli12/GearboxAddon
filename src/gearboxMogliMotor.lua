@@ -4232,8 +4232,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	if self.noTransmission then
 		self.lastClutchOpenTime = g_currentMission.time 
+		self.autoClutchPercent  = 0 
 	elseif clutchMode < 0 then
-		self.autoClutchPercent = self.vehicle.mrGbMS.MaxClutchPercent
+		self.autoClutchPercent  = self.vehicle.mrGbMS.MaxClutchPercent
 	elseif clutchMode > 0 then
 		local openRpm   = self.vehicle.mrGbMS.OpenRpm  + self.vehicle.mrGbMS.ClutchRpmShift * math.max( 1.4*self.motorLoadS - 0.4, 0 )
 		local closeRpm  = self.vehicle.mrGbMS.CloseRpm + self.vehicle.mrGbMS.ClutchRpmShift * math.max( 1.4*self.motorLoadS - 0.4, 0 ) 
