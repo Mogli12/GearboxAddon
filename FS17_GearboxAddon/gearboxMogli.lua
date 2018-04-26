@@ -32,7 +32,7 @@ gearboxMogli.autoShiftRpmDiff     = gearboxMogli.huge -- 200
 gearboxMogli.autoShiftPowerRatio  = 1.03
 gearboxMogli.autoShiftMaxDeltaRpm = 1E-3
 gearboxMogli.minClutchPercent     = 0.01
-gearboxMogli.minClutchPercentStd  = 0.2
+gearboxMogli.minClutchPercentStd  = 0.6
 gearboxMogli.minClutchPercentTC   = 0.2
 gearboxMogli.minClutchPercentTCL  = 0.2
 gearboxMogli.maxClutchPercentTC   = 0.96
@@ -195,6 +195,7 @@ gearboxMogliGlobals.increaseRpmForPTO     = true  -- increase RPM automatically 
 gearboxMogliGlobals.engineHumVolume       = 1     -- volume of engine hum sound above max target RPM
 gearboxMogliGlobals.shiftingBaseVolume    = 1     -- volume factor of gear shifting sound
 gearboxMogliGlobals.handbrakeBaseVolume   = 1     -- volume factor of gear handbrake sound
+gearboxMogliGlobals.slipPloughDefault     = -1    -- 0: always off; 1: always on; -1: check for FS17_ForRealModule03_GroundResponse and FS17_ForRealModule01_CropDestruction
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -1110,7 +1111,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	elseif self.mrGbMS.TorqueConverter then 
 		default = self.mrGbMS.MinTargetRpm
 	else
-		default = self.mrGbMS.CurMinRpm-1 -- no automatic opening of clutch by default!!!
+		default = 0 -- no automatic opening of clutch by default!!!
 	end
 		
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), default )
@@ -1124,16 +1125,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	elseif torqueConverterProfile == "modernCar" then 
 		default = getRpm( 0.5 )
 	else
-		default = math.min( self.mrGbMS.MaxTargetRpm, math.max( self.mrGbMS.OpenRpm + 0.1 * self.mrGbMS.RatedRpm, getRpm( 0.1 ) ) )
-		if self.mrGbMS.Engine.maxTorque > 0 then
-			default = math.min( default, self.mrGbMS.Engine.maxTorqueRpm )
-		end
+		default = self.mrGbMS.MaxTargetRpm
 	end
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
 		
-	default = self.mrGbMS.MaxTargetRpm
-	self.mrGbMS.ClutchMaxTargetRpm      = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchMaxTargetRpm"), default )
-	
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
 	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
 	self.mrGbMS.Range1DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#doubleClutch"), alwaysDoubleClutch) 
@@ -1199,7 +1194,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		elseif self.mrGbMS.TorqueConverterOrHydro then
 			self.mrGbMS.MinClutchPercent    = gearboxMogli.minClutchPercentTC
 		else
-			self.mrGbMS.MinClutchPercent    = gearboxMogli.minClutchPercentStd 
+			self.mrGbMS.MinClutchPercent    = gearboxMogli.minClutchPercentStd
 		end
 	end
 	if self.mrGbMS.MinClutchPercent < 2 * gearboxMogli.minClutchPercent then 
@@ -2689,11 +2684,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	end
 
-	
-	self.mrGbMS.SlipPlough = false 	
-	if g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"] then 
-		self.mrGbMS.SlipPlough = true 
-	end
+	if     self.mrGbMG.slipPloughDefault == 0 then 
+		self.mrGbMS.SlipPlough      = false 
+	elseif self.mrGbMG.slipPloughDefault == 1 then 
+		self.mrGbMS.SlipPlough      = true 
+	else 
+		self.mrGbMS.SlipPlough      = g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"]
+	end	
+	self.mrGbMS.SlipPloughDefault = self.mrGbMS.SlipPlough
 	
 --**********************************************************************************************************		
 -- server fields...	
@@ -5645,7 +5643,7 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.MaxAutoGearSpeed > self.mrGbMG.minAutoGearSpeed then
 			attributes = attributes.." mrGbMMaxAutoSpeed=\"" .. tostring( self.mrGbMS.MaxAutoGearSpeed ) .. "\""     
 		end
-		if self.mrGbMS.SlipPlough ~= ( g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"] ) then 
+		if self.mrGbMS.SlipPlough ~= self.mrGbMS.SlipPloughDefault then 
 			attributes = attributes.." mrGbMSlipPlough=\"" .. tostring( self.mrGbMS.SlipPlough ) .. "\""     
 		end
 	end 
