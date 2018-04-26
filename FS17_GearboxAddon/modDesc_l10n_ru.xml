@@ -192,6 +192,9 @@
 		<text name="gearboxMogliTEXT_Stall3"               text="Слишком много мощности отбирается через ВОМ"/>
 		<text name="gearboxMogliTEXT_Stall4"               text="Двигатель заглох, потому что слишком много мощности отбиралось через ВОМ"/>
 		<text name="gearboxMogliTEXT_ClutchOverheating"    text="Сцепление перегрелось"/>
+		
+		<text name="gearboxMogliTIP_SlipPlough"            text="Буксующие колеса будут закапываться в землю, как плуг"/>
+		<text name="gearboxMogliTEXT_SlipPlough"           text="Пробуксовка колёс"/>
 
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"             text="Блок.дифф."/>
