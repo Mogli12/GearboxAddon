@@ -36,6 +36,7 @@ gearboxMogli.minClutchPercentStd  = 0.6
 gearboxMogli.minClutchPercentTC   = 0.2
 gearboxMogli.minClutchPercentTCL  = 0.2
 gearboxMogli.maxClutchPercentTC   = 0.96
+gearboxMogli.clutchPercentShift   = 0.2
 gearboxMogli.clutchLoopTimes      = 10
 gearboxMogli.clutchLoopDelta      = 10
 gearboxMogli.minHydrostaticFactor = 5e-3
@@ -5852,10 +5853,10 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMCheckGrindingGears( checkIt, noEventSend )
 	if self.steeringEnabled and checkIt and not ( self:mrGbMGetAutoClutch() ) and not ( self:mrGbMGetAutomatic() ) then
-		if self.mrGbMS.ManualClutch > 0.1 then
+		if self.mrGbMS.ManualClutch > gearboxMogli.clutchPercentShift then
 			gearboxMogli.mrGbMSetGrindingGears( self, string.format("%s > %3.0f%%", 
 																															gearboxMogli.getText( "gearboxMogliTEXT_GrindingClutch", "Cannot shift gear; clutch" ),
-																															100*Utils.clamp( 0.1, 0, 1 ) ), noEventSend )
+																															100*Utils.clamp( gearboxMogli.clutchPercentShift, 0, 1 ) ), noEventSend )
 			return true
 		end		
 	end		
@@ -6019,7 +6020,7 @@ function gearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 				and not ( self:mrGbMGetAutoClutch() ) 
 				and not ( self:mrGbMGetAutomatic() ) 
 				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= 0.1 then	
+				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then	
 			self:mrGbMSetNeutralActive( false, noEventSend, true )
 		end
 		
@@ -6141,7 +6142,7 @@ function gearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 				and not ( self:mrGbMGetAutoClutch() ) 
 				and not ( self:mrGbMGetAutomatic() ) 
 				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= 0.1 then
+				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
 			self:mrGbMSetNeutralActive( false, noEventSend, true )
 		end
 
@@ -6243,7 +6244,7 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 				and not ( self:mrGbMGetAutoClutch() ) 
 				and not ( self:mrGbMGetAutomatic() ) 
 				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= 0.1 then
+				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
 			self:mrGbMSetNeutralActive( false, noEventSend, true )
 		end
 
@@ -6334,7 +6335,7 @@ function gearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 			and not ( self:mrGbMGetAutoClutch() ) 
 			and not ( self:mrGbMGetAutomatic() ) 
 			and self.mrGbMS.IsNeutral
-			and self.mrGbMS.ManualClutch <= 0.1 then
+			and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
 		self:mrGbMSetNeutralActive( false, noEventSend, true )
 	end
 	
@@ -7103,7 +7104,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			if     self.mrGbML.gearShiftingNeeded ~= 0 then
 			-- nothing
 			elseif self.mrGbMS.NeutralActive 
-					or self.mrGbMS.ManualClutch < 0.1 then
+					or self.mrGbMS.ManualClutch < gearboxMogli.clutchPercentShift then
 				gearboxMogli.mrGbMDoGearShift(self)
 			else
 				self.mrGbML.gearShiftingNeeded = gearboxMogli.gearShiftingNoThrottle
@@ -8316,7 +8317,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		if      self.isMotorStarted
 				and math.abs( currentSpeed ) > 2.778e-5
 				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
-				and self.mrGbMS.ManualClutch > 0.1
+				and self.mrGbMS.ManualClutch > gearboxMogli.clutchPercentShift
 				and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
 					 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
 			-- wrong direction   

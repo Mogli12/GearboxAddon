@@ -112,58 +112,86 @@
 	<vehicle>huerlimannH488
 		<configFile xmlName="data/vehicles/steerable/huerlimann/huerlimannH488.xml"/>
 		
-		<gearboxMogli autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800">
-			<blowOffVentilSound volume="0"/>
-			
-			<gears>
-				<gear speed="10.125"  />
-				<gear speed="14.46"  />
-				<gear speed="20.72"/>
-				<gear speed="28.96"/>
-				<gear speed="40.28"/>
-			</gears>
+		<transmissions>
+			<transmission name="20+20" autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800" ptoRpm="2450" ptoRpmEco="1913">
+				<gears>
+					<gear speed="10.88"/>
+					<gear speed="16.12"/>
+					<gear speed="21.45"/>
+					<gear speed="28.30"/>
+					<gear speed="37.56"/>
+				</gears>
+				
+				<ranges defaultRange="4">
+					<range ratio="0.03498" name="SR"/>
+					<range ratio="0.09859" name="L"/>
+					<range ratio="0.31465" name="N"/>
+					<range ratio="1"       name="V"/>
+				</ranges>
+				
+				<reverse ratio="1.037" manualClutch="true"/>
+			</transmission>
 
-			<ranges defaultRange="3">
-				<range ratio="0.029" name="L"/>
-				<range ratio="0.182" name="M"/>
-				<range ratio="1"     name="V"/>
-			</ranges>
-			
-			<reverse manualClutch="true"/>
-			
-			<realEngine idleRpm="800" ratedRpm="2500">
-        <!-- 2500: 88(88) | 2500: 88(88) | 1300..1300: 323(323) | 85 | 0.5 | 149 | 2 | 2600 | 1300: 220 -->
-        <torque rpm="350" motorTorque="170" fuelUsageRatio="255.3"/>
-        <torque rpm="700" motorTorque="255" fuelUsageRatio="234.1"/>
-        <torque rpm="900" motorTorque="292" fuelUsageRatio="226.3"/>
-        <torque rpm="1000" motorTorque="306" fuelUsageRatio="223.5"/>
-        <torque rpm="1100" motorTorque="315" fuelUsageRatio="221.6"/>
-        <torque rpm="1200" motorTorque="321" fuelUsageRatio="220.4"/>
-        <torque rpm="1300" motorTorque="323" fuelUsageRatio="220"/>
-        <torque rpm="1400" motorTorque="320" fuelUsageRatio="220.2"/>
-        <torque rpm="1500" motorTorque="316" fuelUsageRatio="220.7"/>
-        <torque rpm="1600" motorTorque="311" fuelUsageRatio="221.5"/>
-        <torque rpm="1700" motorTorque="306" fuelUsageRatio="222.7"/>
-        <torque rpm="1800" motorTorque="301" fuelUsageRatio="224.2"/>
-        <torque rpm="1850" motorTorque="298" fuelUsageRatio="225.1"/>
-        <torque rpm="1900" motorTorque="295" fuelUsageRatio="226.1"/>
-        <torque rpm="1950" motorTorque="291" fuelUsageRatio="227.2"/>
-        <torque rpm="2000" motorTorque="288" fuelUsageRatio="228.3"/>
-        <torque rpm="2050" motorTorque="284" fuelUsageRatio="229.5"/>
-        <torque rpm="2100" motorTorque="281" fuelUsageRatio="230.9"/>
-        <torque rpm="2150" motorTorque="277" fuelUsageRatio="232.3"/>
-        <torque rpm="2200" motorTorque="273" fuelUsageRatio="233.8"/>
-        <torque rpm="2250" motorTorque="269" fuelUsageRatio="235.3"/>
-        <torque rpm="2300" motorTorque="265" fuelUsageRatio="237"/>
-        <torque rpm="2350" motorTorque="261" fuelUsageRatio="238.7"/>
-        <torque rpm="2400" motorTorque="256" fuelUsageRatio="240.5"/>
-        <torque rpm="2450" motorTorque="252" fuelUsageRatio="242.4"/>
-        <torque rpm="2500" motorTorque="247" fuelUsageRatio="244.4"/>
-        <torque rpm="2550" motorTorque="219" fuelUsageRatio="260.4"/>
-        <torque rpm="2600" motorTorque="136" fuelUsageRatio="334.6"/>
-        <torque rpm="2650" motorTorque="0" fuelUsageRatio="488.9"/>
-			</realEngine>
-		</gearboxMogli>
+			<transmission name="40+40" autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800" ptoRpm="2450" ptoRpmEco="1913">
+				<gears>
+					<gear speed="10.88"/>
+					<gear speed="16.12"/>
+					<gear speed="21.45"/>
+					<gear speed="28.30"/>
+					<gear speed="37.56"/>
+				</gears>
+
+				<ranges defaultRange="2" shiftTimeMs="0" clutchRatio="1" speedMatching="false">
+					<range ratio="0.88" name="-"/>
+					<range ratio="1"    name="+"/>
+				</ranges>
+				
+				<ranges defaultRange="4">
+					<range ratio="0.03498" name="SR"/>
+					<range ratio="0.09859" name="L"/>
+					<range ratio="0.31465" name="N"/>
+					<range ratio="1"       name="V"/>
+				</ranges>
+				
+				<reverse ratio="1.037" manualClutch="false"/>
+			</transmission>
+		</transmissions>
+		
+		<engines>
+			<engine name="H-488T" idleRpm="800" ratedRpm="2500">
+        <!-- 2500: 90(90) | 2500: 90(90) | 1300..1400: 323(323) | 95 | 0.55 | 249 | 1.7 | 2600 | 1270: 225 -->
+        <torque rpm="350" motorTorque="208" fuelUsageRatio="286.8"/>
+        <torque rpm="700" motorTorque="288" fuelUsageRatio="248.7"/>
+        <torque rpm="900" motorTorque="307" fuelUsageRatio="235"/>
+        <torque rpm="1000" motorTorque="314" fuelUsageRatio="230.3"/>
+        <torque rpm="1100" motorTorque="319" fuelUsageRatio="227.1"/>
+        <torque rpm="1200" motorTorque="322" fuelUsageRatio="225.4"/>
+        <torque rpm="1300" motorTorque="323" fuelUsageRatio="225"/>
+        <torque rpm="1400" motorTorque="323" fuelUsageRatio="225.3"/>
+        <torque rpm="1500" motorTorque="319" fuelUsageRatio="225.9"/>
+        <torque rpm="1600" motorTorque="315" fuelUsageRatio="226.8"/>
+        <torque rpm="1700" motorTorque="310" fuelUsageRatio="228.1"/>
+        <torque rpm="1800" motorTorque="305" fuelUsageRatio="229.6"/>
+        <torque rpm="1850" motorTorque="302" fuelUsageRatio="230.6"/>
+        <torque rpm="1900" motorTorque="299" fuelUsageRatio="231.6"/>
+        <torque rpm="1950" motorTorque="296" fuelUsageRatio="232.6"/>
+        <torque rpm="2000" motorTorque="293" fuelUsageRatio="233.8"/>
+        <torque rpm="2050" motorTorque="289" fuelUsageRatio="235.1"/>
+        <torque rpm="2100" motorTorque="286" fuelUsageRatio="236.4"/>
+        <torque rpm="2150" motorTorque="282" fuelUsageRatio="237.8"/>
+        <torque rpm="2200" motorTorque="278" fuelUsageRatio="239.3"/>
+        <torque rpm="2250" motorTorque="274" fuelUsageRatio="240.9"/>
+        <torque rpm="2300" motorTorque="270" fuelUsageRatio="242.5"/>
+        <torque rpm="2350" motorTorque="266" fuelUsageRatio="244.3"/>
+        <torque rpm="2400" motorTorque="262" fuelUsageRatio="246.1"/>
+        <torque rpm="2450" motorTorque="257" fuelUsageRatio="248"/>
+        <torque rpm="2500" motorTorque="253" fuelUsageRatio="250"/>
+        <torque rpm="2550" motorTorque="236" fuelUsageRatio="272.8"/>
+        <torque rpm="2600" motorTorque="199" fuelUsageRatio="330"/>
+        <torque rpm="2650" motorTorque="146" fuelUsageRatio="458.9"/>
+        <torque rpm="2750" motorTorque="0" fuelUsageRatio="0"/>
+			</engine>
+		</engines>
 	</vehicle>
 
 	<vehicle>sameFortis

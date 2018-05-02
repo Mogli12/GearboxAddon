@@ -2755,8 +2755,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 		
 		-- acceleration for idle/minimum rpm		
-		local minThrottle = math.max( 0.2, self.vehicle.mrGbMS.HandThrottle )
-		if     accelerationPedal < -gearboxMogli.accDeadZone then
+		local minThrottle = 0.2
+		if handThrottle >= 0 then	
+			minThrottle = 1 
+		end 
+		if handThrottle >= 0 and lastNoTransmission then	
+			minThrottle = math.max( minThrottle, handThrottle ) 
+		elseif accelerationPedal < -gearboxMogli.accDeadZone then
 		-- no min throttle while braking 
 			minThrottle   = 0
 		elseif self.vehicle.mrGbMS.Hydrostatic and self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticMin then
@@ -4327,11 +4332,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					self.lastTorqueConverterRatio = lastTCR
 				end
 				
-				if openRpm > minRpmReduced then
-					openRpm  = math.min( self.maxTargetRpm + self.lastTorqueConverterRatio * ( minRpmReduced - self.maxTargetRpm ), openRpm )
+				if openRpm > self.vehicle.mrGbMS.IdleRpm then
+					openRpm  = math.min( self.maxTargetRpm + self.lastTorqueConverterRatio * ( self.vehicle.mrGbMS.IdleRpm - self.maxTargetRpm ), openRpm )
 				end
-				if closeRpm > self.minRequiredRpm then
-					closeRpm = math.min( self.maxTargetRpm + self.lastTorqueConverterRatio * ( self.minRequiredRpm - self.maxTargetRpm ), closeRpm )
+				if closeRpm > self.vehicle.mrGbMS.IdleRpm then
+					closeRpm = math.min( self.maxTargetRpm + self.lastTorqueConverterRatio * ( self.vehicle.mrGbMS.IdleRpm - self.maxTargetRpm ), closeRpm )
 				end
 			else 		
 				local r = math.max( openRpm, self.vehicle.mrGbMS.IdleRpm )
