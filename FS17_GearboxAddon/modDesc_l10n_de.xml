@@ -196,6 +196,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 	
 		<text name="gearboxMogliTIP_SlipPlough"          text="Durchdrehende Räder wirken wie ein Pflug"/>
 		<text name="gearboxMogliTEXT_SlipPlough"         text="Durchdrehende Räder"/>
+		<text name="gearboxMogliTIP_ClutchSpeed"         text="Reaktionsgeschwindigkeit Kupplungsknopf"/>
+		<text name="gearboxMogliTEXT_ClutchSpeed"        text="Reaktionsgeschwindigkeit Kupplungsknopf"/>
 	
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Sperren"/>

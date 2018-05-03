@@ -265,11 +265,20 @@
 						</GuiElement>
 						
 						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SlipPlough" toolTip="$l10n_gearboxMogliTIP_SlipPlough"  onCreate="onCreateSubElement" 
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="54" focusChangeTop="53" focusChangeBottom="61">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="54" focusChangeTop="53" focusChangeBottom="55">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text" profile="multiTextOptionText" />
 							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_SlipPlough"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ClutchSpeedOneButton" toolTip="$l10n_gearboxMogliTIP_ClutchSpeed"  onCreate="onCreateSubElement" onCreateArgs="list"
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="55" focusChangeTop="54" focusChangeBottom="61">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text" profile="multiTextOptionText" />
+							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_ClutchSpeed"/>
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 					</GuiElement>

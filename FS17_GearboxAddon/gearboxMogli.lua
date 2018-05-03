@@ -95,6 +95,7 @@ gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
 gearboxMogli.brakeForceLimitRpm   = 25
+gearboxMogli.clutchSpeedOneButton = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
 
 gearboxMogli.enabledAtClient      = true
 gearboxMogli.simplifiedAtClient   = false
@@ -1206,6 +1207,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
+	self.mrGbMS.ClutchSpeedOneButton    = gearboxMogli.clutchSpeedOneButton
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
@@ -3729,9 +3731,6 @@ function gearboxMogli:update(dt)
 		end
 		
 		local clutchSpeed = 1 / math.max( self.mrGbMS.ClutchShiftTime, 1 )
-	--if not ( self:mrGbMGetAutoClutch() ) then
-	--	clutchSpeed     = math.max( 0.002, clutchSpeed )
-	--end
 		
 		if     self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
 			if self.mrGbMS.ManualClutch < 1 then
@@ -3739,7 +3738,12 @@ function gearboxMogli:update(dt)
 			end
 		elseif gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
-			self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt * clutchSpeed ))
+			
+			if self.mrGbMS.ClutchSpeedOneButton < 2 then 
+				self:mrGbMSetManualClutch( 0 )
+			else 
+				self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt / math.max( self.mrGbMS.ClutchShiftTime * ( self.mrGbMS.ClutchSpeedOneButton - 1 ) * 0.1, 1 ) ))
+			end
 		elseif InputBinding.gearboxMogliCLUTCH ~= nil then
 			local targetClutchPercent = InputBinding.getDigitalInputAxis(InputBinding.gearboxMogliCLUTCH)
 			if InputBinding.isAxisZero(targetClutchPercent) then
@@ -5647,6 +5651,9 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.SlipPlough ~= self.mrGbMS.SlipPloughDefault then 
 			attributes = attributes.." mrGbMSlipPlough=\"" .. tostring( self.mrGbMS.SlipPlough ) .. "\""     
 		end
+		if self.mrGbMS.ClutchSpeedOneButton ~= gearboxMogli.clutchSpeedOneButton then 
+			attributes = attributes.." mrGbMClutchSpeed=\"" .. tostring( self.mrGbMS.ClutchSpeedOneButton ) .. "\""     
+		end
 	end 
 	
 	return attributes
@@ -5715,6 +5722,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMShuttleShifter", "ShuttleShifterMode")
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange1Shifter",  "Range1ShifterMode" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange2Shifter",  "Range2ShifterMode" )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMClutchSpeed"   , "ClutchSpeedOneButton" )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
@@ -9183,6 +9191,11 @@ function gearboxMogli:showSettingsUI()
 																																 gearboxMogli.getSpeedMeasuringUnit(),
 																																 g_i18n:getSpeed(i * self.mrGbMG.decAccToLimitRatio),
 																																 gearboxMogli.getSpeedMeasuringUnit() ))
+	end
+	
+	self.mrGbMUI.ClutchSpeedOneButton = {}
+	for i=1,21 do 
+		table.insert( self.mrGbMUI.ClutchSpeedOneButton, string.format( "%3.0f%% / %5dms", (i-1)*10, self.mrGbMS.ClutchShiftTime * (i-1) * 0.1 ) )
 	end
 	
 	if self.mrGbMS.DisableManual then 

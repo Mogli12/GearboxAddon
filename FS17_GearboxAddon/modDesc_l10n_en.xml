@@ -193,6 +193,8 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		
 		<text name="gearboxMogliTIP_SlipPlough"          text="Slipping wheels dig the ground like a plough"/>
 		<text name="gearboxMogliTEXT_SlipPlough"         text="slipping wheels"/>
+		<text name="gearboxMogliTIP_ClutchSpeed"         text="Speed of clutch button"/>
+		<text name="gearboxMogliTEXT_ClutchSpeed"        text="Speed of clutch button"/>
 	
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
