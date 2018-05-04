@@ -196,6 +196,8 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 
 		<text name="gearboxMogliTIP_SlipPlough"          	text="Gdy koła zaczną grzęznąć, teren pod nimi zmieni się na zaorany, a uprawy zostaną zniszczone."/>
 		<text name="gearboxMogliTEXT_SlipPlough"         	text="Grzęźnięcie kół"/>
+		<text name="gearboxMogliTIP_ClutchSpeed"			text="Szybkość reakcji sprzęgła"/>
+		<text name="gearboxMogliTEXT_ClutchSpeed"			text="Czas reakcji sprzęgła po wciśnięciu przycisku"/>
 
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"           	text="Blok. dyf."/>
