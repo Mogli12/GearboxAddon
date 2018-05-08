@@ -95,7 +95,6 @@ gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
 gearboxMogli.brakeForceLimitRpm   = 25
-gearboxMogli.clutchSpeedOneButton = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
 
 gearboxMogli.enabledAtClient      = true
 gearboxMogli.simplifiedAtClient   = false
@@ -144,7 +143,7 @@ gearboxMogliGlobals.ddsDirectory          = "dds/"
 gearboxMogliGlobals.initMotorOnLoad       = true
 gearboxMogliGlobals.ptoSpeedLimit         = true
 gearboxMogliGlobals.clutchExp             = 1.0
-gearboxMogliGlobals.clutchFactor          = 1.2
+gearboxMogliGlobals.clutchFactor          = 1.5 -- 1.2
 gearboxMogliGlobals.grindingMinRpmDelta   = 200
 gearboxMogliGlobals.grindingMaxRpmSound   = 600
 gearboxMogliGlobals.grindingMaxRpmDelta   = gearboxMogli.huge
@@ -198,6 +197,7 @@ gearboxMogliGlobals.engineHumVolume       = 1     -- volume of engine hum sound 
 gearboxMogliGlobals.shiftingBaseVolume    = 1     -- volume factor of gear shifting sound
 gearboxMogliGlobals.handbrakeBaseVolume   = 1     -- volume factor of gear handbrake sound
 gearboxMogliGlobals.slipPloughDefault     = -1    -- 0: always off; 1: always on; -1: check for FS17_ForRealModule03_GroundResponse and FS17_ForRealModule01_CropDestruction
+gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -325,6 +325,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "ToolIsDirty2",  true )
 	gearboxMogli.registerState( self, "ShuttleFactor", 0.5 )
 	gearboxMogli.registerState( self, "NoRetarderSound", false )
+	gearboxMogli.registerState( self, "NeutralNoSync",   false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -1207,7 +1208,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
-	self.mrGbMS.ClutchSpeedOneButton    = gearboxMogli.clutchSpeedOneButton
+	self.mrGbMS.ClutchSpeedOneButton    = self.mrGbMG.clutchSpeedOneButton
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
 	self.mrGbMS.ClutchOverheatStartTime = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatStartTimeMs"), 5000 ) 
 	self.mrGbMS.ClutchOverheatIncTime   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOverheatIncTimeMs"), 5000 ) 
@@ -3738,12 +3739,14 @@ function gearboxMogli:update(dt)
 			end
 		elseif gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
+			self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer )
 			
 			if self.mrGbMS.ClutchSpeedOneButton < 2 then 
 				self:mrGbMSetManualClutch( 0 )
 			else 
 				self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt / math.max( self.mrGbMS.ClutchShiftTime * ( self.mrGbMS.ClutchSpeedOneButton - 1 ) * 0.1, 1 ) ))
 			end
+			self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ManualClutch *  self.mrGbMS.ClutchTimeManual )
 		elseif InputBinding.gearboxMogliCLUTCH ~= nil then
 			local targetClutchPercent = InputBinding.getDigitalInputAxis(InputBinding.gearboxMogliCLUTCH)
 			if InputBinding.isAxisZero(targetClutchPercent) then
@@ -3786,11 +3789,15 @@ function gearboxMogli:update(dt)
 				or g_currentMission.time >= self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ClutchTimeManual then
 			if self.mrGbMS.ManualClutch < 1 then
 				self:mrGbMSetManualClutch( 1 )
+				self:mrGbMSetState( "AutoCloseTimer", 0 )
 			end
 		elseif g_currentMission.time > self.mrGbML.oneButtonClutchTimer then
-			if self.mrGbMS.ManualClutch < 1 then
-				self:mrGbMSetManualClutch( 1 )
-				self:mrGbMSetState( "AutoCloseTimer", g_currentMission.time - 1 )
+			if self.mrGbMS.ManualClutch < 1 then 
+				if self.mrGbMS.ClutchSpeedOneButton < 2 then 
+					self:mrGbMSetManualClutch( 1 )
+				else
+					self:mrGbMSetManualClutch( math.min( 1, self.mrGbMS.ManualClutch + dt / math.max( self.mrGbMS.ClutchShiftTime * ( self.mrGbMS.ClutchSpeedOneButton - 1 ) * 0.1, 1 ) ))
+				end
 			end
 		end
 		
@@ -4067,12 +4074,16 @@ function gearboxMogli:update(dt)
 			end
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 2 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliGEARFWD" )  then 
 		--self:setCruiseControlState(0) 
-			self:mrGbMSetReverseActive( false ) 
-			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
+			if self.mrGbMS.ReverseActive then 
+				self:mrGbMSetReverseActive( false ) 
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
+			end 
 		elseif ( self.mrGbMS.ShuttleShifterMode == 0 or self.mrGbMS.ShuttleShifterMode == 2 ) and gearboxMogli.mbHasInputEvent( "gearboxMogliGEARBACK" ) then 
 		--self:setCruiseControlState(0) 
-			self:mrGbMSetReverseActive( true ) 
-			gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
+			if not ( self.mrGbMS.ReverseActive ) then 
+				self:mrGbMSetReverseActive( true ) 
+				gearShiftSoundPlay = self.mrGbMS.GearTimeToShiftReverse
+			end
 		end
 		
 		if self.mrGbMS.DisableManual or self:getIsHired() then
@@ -5651,7 +5662,7 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.SlipPlough ~= self.mrGbMS.SlipPloughDefault then 
 			attributes = attributes.." mrGbMSlipPlough=\"" .. tostring( self.mrGbMS.SlipPlough ) .. "\""     
 		end
-		if self.mrGbMS.ClutchSpeedOneButton ~= gearboxMogli.clutchSpeedOneButton then 
+		if self.mrGbMS.ClutchSpeedOneButton ~= self.mrGbMG.clutchSpeedOneButton then 
 			attributes = attributes.." mrGbMClutchSpeed=\"" .. tostring( self.mrGbMS.ClutchSpeedOneButton ) .. "\""     
 		end
 	end 
@@ -5967,7 +5978,7 @@ function gearboxMogli:mrGbMGetRangeForNewGear( newGear )
 end
 
 --**********************************************************************************************************	
--- gearboxMogli:mrGbMSetCurrentGear
+-- gearboxMogli:isReallyInNeutral
 --**********************************************************************************************************	
 function gearboxMogli:isReallyInNeutral()
 	
@@ -6296,11 +6307,11 @@ function gearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 
 	if      not ( value )
 			and self.mrGbMS.NeutralActive
-			and not ( noCheck )
+			and not ( noCheck ) 
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchNeutral, noEventSend ) then
 		return false
 	end
-
+	
 	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
 	
 	return true
@@ -6387,6 +6398,9 @@ function gearboxMogli:mrGbMGetAutoClutchPercent()
 		return self.mrGbMS.ManualClutch
 	end
 	if not self:mrGbMGetAutoClutch() and g_currentMission.time >= self.mrGbMS.AutoCloseTimer + self.mrGbMS.ClutchTimeManual then
+		return self.mrGbMS.ManualClutch
+	end
+	if not self:mrGbMGetAutoClutch() and self.mrGbMS.NeutralActive then 
 		return self.mrGbMS.ManualClutch
 	end
 	return self.motor.clutchPercent
@@ -7863,6 +7877,11 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:checkGearShiftDC( new, what, noEventSend )
 
+	if self.mrGbMS.NeutralActive then
+		self:mrGbMSetState( "NeutralNoSync", true )
+		return true 
+	end 
+
 	local g1 = self.mrGbMS.CurrentGear
 	local g2 = self.mrGbMS.CurrentRange 
 	local g3 = self.mrGbMS.CurrentRange2 
@@ -7884,7 +7903,7 @@ function gearboxMogli:checkGearShiftDC( new, what, noEventSend )
 	else
 		return true
 	end
-
+	
 	if      gearboxMogli.mrGbMCheckDoubleClutch( self, dc, noEventSend )
 			and self.motor.transmissionInputRpm ~= nil then				
 		

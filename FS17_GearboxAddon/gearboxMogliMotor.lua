@@ -1727,8 +1727,11 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	self.lastAbsDeltaRpm = self.lastAbsDeltaRpm + self.vehicle.mrGbML.smoothMedium * ( math.abs( self.prevNonClampedMotorRpm - self.nonClampedMotorRpm ) - self.lastAbsDeltaRpm )	
 	self.deltaMotorRpm   = math.floor( self.lastRealMotorRpm - self.nonClampedMotorRpm + 0.5 )
 	
-	local c = self.clutchPercent
-	if not ( self.vehicle.mrGbMS.Hydrostatic or self.vehicle:mrGbMGetAutoClutch() ) then
+	local c = 0
+	if     self.vehicle.mrGbMS.Hydrostatic 
+			or self.vehicle:mrGbMGetAutoClutch() then
+		c = self.clutchPercent
+	else
 		c = self.vehicle.mrGbMS.ManualClutch
 	end
 	local tir = math.max( 0, self.transmissionInputRpm - dt * self.vehicle.mrGbMS.RatedRpm * 0.0001 )
@@ -2586,7 +2589,49 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			and g_currentMission.time <  autoClutchTimer + self.vehicle.mrGbMS.ClutchTimeManual then
 		autoCloseClutch = true
 	end
+	
+	if self.vehicle.mrGbMS.NeutralActive then	
+		autoCloseClutch = false 
+	end
 		
+--**********************************************************************************************************		
+-- trying to turn off neutral and double clutch
+--**********************************************************************************************************		
+	if self.vehicle.mrGbMS.NeutralNoSync and not self.vehicle.mrGbMS.NeutralActive then				
+		local v = 0			
+		if self.transmissionInputRpm < self.clutchRpm then
+			v = ( self.clutchRpm - self.transmissionInputRpm ) / self.vehicle.mrGbMG.grindingMinRpmDelta
+		else
+			v = ( self.transmissionInputRpm - self.clutchRpm ) / self.vehicle.mrGbMG.grindingMaxRpmSound
+			if v > 1 and self.transmissionInputRpm - self.clutchRpm < self.vehicle.mrGbMG.grindingMaxRpmDelta then
+				v = 0.999
+			end
+		end
+		
+		-- grinding sound if v > 0.5, no shift if v > 1
+		v = math.max( v + v - 1, 0 )
+		
+		if self.vehicle.mrGbMG.debugPrint then
+			print(string.format("DC: %3.0fkm/h (%3.0f) %3.0fkm/h (%3.0f) => in %4.0f U/min / out %4.0f U/min => %1.2f", self.vehicle.mrGbMS.CurrentGearSpeed, r1, s, r2, self.transmissionInputRpm, self.clutchRpm, v ))
+		end
+			
+		if     v > 1 then
+			self.vehicle:mrGbMSetNeutralActive( true )
+			self.vehicle:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+																												self.transmissionInputRpm, self.clutchRpm ))
+			self.vehicle.mrGbMS.GrindingGearsVol = 0
+			self.vehicle:mrGbMSetState( "GrindingGearsVol", 1 )
+		elseif v > 0 and v > self.vehicle.mrGbMS.GrindingGearsVol then
+			self.vehicle:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+																												self.transmissionInputRpm, self.clutchRpm ))
+			self.vehicle:mrGbMSetState( "GrindingGearsVol", v )
+		elseif self.vehicle.mrGbMS.GrindingGearsVol > 0 then
+			self.vehicle:mrGbMSetState( "GrindingGearsVol", 0 )
+		end
+	end
+	
 --**********************************************************************************************************		
 -- no transmission / neutral 
 --**********************************************************************************************************		
@@ -2755,13 +2800,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 		
 		-- acceleration for idle/minimum rpm		
-		local minThrottle = 0.2
-		if handThrottle >= 0 then	
-			minThrottle = 1 
-		end 
-		if handThrottle >= 0 and lastNoTransmission then	
-			minThrottle = math.max( minThrottle, handThrottle ) 
-		elseif accelerationPedal < -gearboxMogli.accDeadZone then
+		local minThrottle = math.max( 0.2, handThrottle ) 
+		if     accelerationPedal < -gearboxMogli.accDeadZone then
 		-- no min throttle while braking 
 			minThrottle   = 0
 		elseif self.vehicle.mrGbMS.Hydrostatic and self.hydrostaticFactor > self.vehicle.mrGbMS.HydrostaticMin then
@@ -2772,9 +2812,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		elseif self.nonClampedMotorRpm >= self.minRequiredRpm then
 		-- not needed 
 			minThrottle   = 0
-		elseif minRpmReduced < self.nonClampedMotorRpm and self.nonClampedMotorRpm < self.minRequiredRpm then
+		else
 		-- smooth transition 
-			minThrottle = minThrottle * ( self.minRequiredRpm - self.nonClampedMotorRpm ) / ( self.minRequiredRpm - minRpmReduced )
+			minThrottle = math.min( minThrottle * ( self.minRequiredRpm - self.nonClampedMotorRpm ) / ( self.minRequiredRpm - minRpmReduced ) )
 		end
 	
 		if     self.vehicle.mrGbML.gearShiftingNeeded == gearboxMogli.gearShiftingNoThrottle then
@@ -2859,6 +2899,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	-- normal drive with gear and clutch
 			self.noTransmission = false
 
+			if self.vehicle.mrGbMS.NeutralNoSync then 
+				self.vehicle:mrGbMSetState( "NeutralNoSync", false )
+			end 
+			
 			local accHydrostaticTarget = false
 
 	--**********************************************************************************************************		
@@ -4390,8 +4434,17 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	else
 		if autoCloseClutch then
 		-- shuttle and manual clutch 
-			local c = ( autoClutchTimer - g_currentMission.time ) / self.vehicle.mrGbMS.ClutchTimeManual
+			local c = ( g_currentMission.time - autoClutchTimer ) / self.vehicle.mrGbMS.ClutchTimeManual
 			self.clutchPercent = math.min( math.max( c, self.autoClutchPercent ), self.vehicle.mrGbMS.ManualClutch )		
+			
+			if self.vehicle.mrGbMG.debugInfo then
+				self.vehicle.mrGbML.autoCloseClutch = string.format("%5d / %5d, %5.3f, %5.3f => %5.3f", 
+																														g_currentMission.time - autoClutchTimer,
+																														self.vehicle.mrGbMS.ClutchTimeManual,
+																														c,
+																														self.autoClutchPercent,
+																														self.vehicle.mrGbMS.ManualClutch ) 
+			end
 		else
 			self.clutchPercent = self.vehicle.mrGbMS.ManualClutch
 		end
