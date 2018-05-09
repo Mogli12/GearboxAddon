@@ -1,196 +1,251 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
 	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
-	<description>
-<![CDATA[Trasmissione:
-Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati]]>
-</description>
+	<description><![CDATA[
+Trasmissione:
+Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
+	]]></description>
 
 	<texts>
-		<!--GearboxAddon helpPanel text-->
-		<text name="gearboxMogliInputPrefix"             text="Cambio: "/>
-		
-		<text name="input_gearboxMogliSHIFTGEARUP"       text="Cambio: marcia su"/>
-		<text name="input_gearboxMogliSHIFTGEARDOWN"     text="Cambio: marcia giù"/>
-		<text name="input_gearboxMogliSHIFTGEARTOGGLE"   text="Cambio: cambia marcia"/>
-		<text name="input_gearboxMogliSHIFTRANGEUP"      text="Cambio: gruppo su"/>
-		<text name="input_gearboxMogliSHIFTRANGE2UP"     text="Cambio: gruppo 2 su"/>
-		<text name="input_gearboxMogliSHIFTRANGEDOWN"    text="Cambio: gruppo giù"/>
-		<text name="input_gearboxMogliSHIFTRANGE2DOWN"   text="Cambio: gruppo 2 giù"/>
-		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Cambio: cambia gruppo"/>
-		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Cambio: cambia gruppo 2"/>
-		<text name="input_gearboxMogliNEUTRAL"           text="Cambio: folle"/>
-		<text name="input_gearboxMogliAUTOMATIC"         text="Cambio: automatico"/>
-		<text name="input_gearboxMogliOFF"               text="Cambio manuale: [disattivo]"/>
-		<text name="input_gearboxMogliON"                text="Cambio manuale: [attivo]"/>
-		<text name="input_gearboxMogliON_OFF"            text="Cambio: attivo/disattivo"/>
-		<text name="input_gearboxMogliSETTINGS"          text="Cambio: impostazioni"/>
-		<text name="input_gearboxMogliHUD"               text="Cambio: HUD attivo/disattivo"/>
-		<text name="input_gearboxMogliAllAuto"           text="Cambio: realtà attivo/disattivo"/>
-		<text name="input_gearboxMogliAllAutoON"         text="Cambio: [semplificato]"/>
-		<text name="input_gearboxMogliAllAutoOFF"        text="Cambio: [realistico]"/>
-		<text name="input_gearboxMogliREVERSE"           text="Cambio: frizione automatica"/>
-		<text name="input_gearboxMogliHANDBRAKE"         text="Cambio: retromarcia"/>
-		<text name="input_gearboxMogliAUTOCLUTCH2"       text="Cambio: freno a mano"/>
-		<text name="input_gearboxMogliCLUTCH"            text="Cambio: frizione"/>
-		<text name="input_gearboxMogliCLUTCH_1"          text="Cambio: frizione aperta"/>
-		<text name="input_gearboxMogliCLUTCH_2"          text="Cambio: frizione chiusa"/>
-		<text name="input_gearboxMogliCLUTCH_3"          text="Cambio: frizione"/>
-		<text name="input_gearboxMogliMINRPM"            text="Cambio: accelleratore a mano"/>
-		<text name="input_gearboxMogliMINRPM_1"          text="Cambio: accelleratore a mano giù"/>
-		<text name="input_gearboxMogliMINRPM_2"          text="Cambio: accelleratore a mano su"/>
-		<text name="input_gearboxMogliFIXEDRATIO"        text="Cambio: rapporto fisso"/>
-		<text name="input_gearboxMogliFIXEDRATIO_1"      text="Cambio: rapporto fisso giù"/>
-		<text name="input_gearboxMogliFIXEDRATIO_2"      text="Cambio: rapporto fisso sù"/>
-		<text name="input_gearboxMogliGEAR1"             text="Cambio: G27 1"/>
-		<text name="input_gearboxMogliGEAR2"             text="Cambio: G27 2"/>
-		<text name="input_gearboxMogliGEAR3"             text="Cambio: G27 3"/>
-		<text name="input_gearboxMogliGEAR4"             text="Cambio: G27 4"/>
-		<text name="input_gearboxMogliGEAR5"             text="Cambio: G27 5"/>
-		<text name="input_gearboxMogliGEAR6"             text="Cambio: G27 6"/>
-		<text name="input_gearboxMogliGEARR"             text="Cambio: G27 R"/>
-		<text name="input_gearboxMogliGEARFWD"           text="Cambio: avanti"/>
-		<text name="input_gearboxMogliGEARBACK"          text="Cambio: indietro"/>
-		<text name="input_gearboxMogliSPEEDLIMIT"        text="Cambio: limitatore"/>
-		<text name="input_gearboxMogliSWAPSPEED"         text="Cambio: limitatore 2"/>
-		<text name="input_gearboxMogliSWAPSPEEDR"        text="Cambio: limitatore precedente"/>
-		<text name="input_gearboxMogliSETSPEED"          text="Cambio: imposta limite"/>
-		<text name="input_gearboxMogliACCTOLIMIT"        text="Cambio: accelera"/>
-		<text name="input_gearboxMogliDECTOLIMIT"        text="Cambio: decelera"/>
-		<text name="input_gearboxMogliECO"               text="Cambio: Eco attivo/disattivo"/>
-		<text name="input_gearboxMogliKEEPSPEED"         text="Cambio: mantieni la velocità"/>
-		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"   text="Cambio: mantieni la velocità"/>
-		<text name="input_gearboxMogliDIFFLOCKMIDDLE"    text="Cambio: 4wd"/>
-		<text name="input_gearboxMogliDIFFLOCKFRONT"     text="Cambio: blocca diff.ant"/>
-		<text name="input_gearboxMogliDIFFLOCKBACK"      text="Cambio: blocca diff.post"/>
-		
-		<text name="gearboxMogliTEXT_OFF"                text="Motore: spento"/>
-		<text name="gearboxMogliTEXT_AI"                 text="Operaio"/>
-		<text name="gearboxMogliTEXT_CP"                 text="CP"/>
-		<text name="gearboxMogliTEXT_BRAKE"              text="Freno a mano"/>
-		<text name="gearboxMogliTEXT_DC"                 text="Doppia frizione"/>
-		<text name="gearboxMogliTEXT_NEUTRAL"            text="Folle"/>
-		<text name="gearboxMogliTEXT_AUTO"               text="Automatico"/>
-		<text name="gearboxMogliTEXT_MANUAL"             text="Manuale"/>
-		<text name="gearboxMogliTEXT_NOGEAR"             text="Senza marce"/>
-		<text name="gearboxMogliTEXT_VARIO"              text="Variatore"/>
-		<text name="gearboxMogliTEXT_ALLAUTO"            text="Semplificato"/>
-		<text name="gearboxMogliTEXT_ECO"                text="Eco"/>
-		<text name="gearboxMogliTEXT_AUTO_HOLD"          text="Parcheggio"/>
-		                                                 
-		<text name="gearboxMogliTEXT_DISABLED"           text="off"/>
-		<text name="gearboxMogliTEXT_ENABLED"            text="on"/>
-		<text name="gearboxMogliTEXT_POWERSHIFT"         text="auto power shift"/>
-		<text name="gearboxMogliTEXT_N_A"                text="n/a"/>
-		
-		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="show target RPM"/>
-		<text name="gearboxMogliTEXT_DrawReqPower"       text="show power"/>
-		<text name="gearboxMogliTEXT_EnableAI"           text="hired worker"/>
-		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="swap gears and range 1"/>
-		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 and gears"/>
-		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="for-/backwards buttons"/>
-		 
-		<text name="gearboxMogliTEXT_AllAutoMode"        text="settings simplified"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="sequential"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="gears"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="range 1"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_3"      text="gears and range 1"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_4"      text="range 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="gears and range 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="ranges 1 and 2"/>
-		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="gears, ranges 1 and 2"/>
-		
-		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2wd"/>
-		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4wd"/>
-		<text name="gearboxMogliTEXT_DiffLock_open"      text="open"/>
-		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="limited slip"/>
-		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automatic"/>
-		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="fixed ratio"/>
-		<text name="gearboxMogliTEXT_DiffLock_locked"    text="locked"/>
-		
-		<text name="gearboxMogliTEXT_GearShifter_both"   text="keys and G27"/>
-		<text name="gearboxMogliTEXT_GearShifter_key"    text="keys"/>
-		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
-		
-		<text name="gearboxMogliTEXT_Shuttle_both"       text="toggle and separate"/>
-		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="toggle button"/>
-		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="separate buttons"/>
-		
-		<text name="gearboxMogliTEXT_MinTargetRpm"       text="min target RPM"/>
-		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="max target RPM"/>
-		<text name="gearboxMogliTEXT_MatchGears"         text="speed matching (gears)"/>
-		<text name="gearboxMogliTEXT_MatchRanges"        text="speed matching (range)"/>
-		<text name="gearboxMogliTEXT_MATCH_1"            text="do not match"/>
-		<text name="gearboxMogliTEXT_MATCH_2"            text="only at first or last"/>
-		<text name="gearboxMogliTEXT_MATCH_3"            text="match automatically"/>
-		
+		<!-- GearboxAddon helpPanel text -->
+		<text name="gearboxMogliInputPrefix"               text="Cambio: " />
+
+		<text name="input_gearboxMogliSHIFTGEARUP"         text="Cambio: marcia su" />
+		<text name="input_gearboxMogliSHIFTGEARDOWN"       text="Cambio: marcia giù" />
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE"     text="Cambio: cambia marcia" />
+		<text name="input_gearboxMogliSHIFTRANGEUP"        text="Cambio: gruppo su" />
+		<text name="input_gearboxMogliSHIFTRANGE2UP"       text="Cambio: gruppo 2 su" />
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"      text="Cambio: gruppo giù" />
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN"     text="Cambio: gruppo 2 giù" />
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"    text="Cambio: cambia gruppo" />
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE"   text="Cambio: cambia gruppo 2" />
+		<text name="input_gearboxMogliNEUTRAL"             text="Cambio: folle" />
+		<text name="input_gearboxMogliAUTOMATIC"           text="Cambio: automatico" />
+		<text name="input_gearboxMogliOFF"                 text="Cambio manuale: [disattivo]" />
+		<text name="input_gearboxMogliON"                  text="Cambio manuale: [attivo]" />
+		<text name="input_gearboxMogliON_OFF"              text="Cambio: attivo/disattivo" />
+		<text name="input_gearboxMogliSETTINGS"            text="Cambio: impostazioni" />
+		<text name="input_gearboxMogliHUD"                 text="Cambio: HUD attivo/disattivo" />
+		<text name="input_gearboxMogliAllAuto"             text="Cambio: realtà attivo/disattivo" />
+		<text name="input_gearboxMogliAllAutoON"           text="Cambio: [semplificato]" />
+		<text name="input_gearboxMogliAllAutoOFF"          text="Cambio: [realistico]" />
+		<text name="input_gearboxMogliREVERSE"             text="Cambio: frizione automatica" />
+		<text name="input_gearboxMogliHANDBRAKE"           text="Cambio: retromarcia" />
+		<text name="input_gearboxMogliAUTOCLUTCH2"         text="Cambio: freno a mano" />
+		<text name="input_gearboxMogliCLUTCH"              text="Cambio: frizione" />
+		<text name="input_gearboxMogliCLUTCH_1"            text="Cambio: frizione aperta" />
+		<text name="input_gearboxMogliCLUTCH_2"            text="Cambio: frizione chiusa" />
+		<text name="input_gearboxMogliCLUTCH_3"            text="Cambio: frizione" />
+		<text name="input_gearboxMogliMINRPM"              text="Cambio: accelleratore a mano" />
+		<text name="input_gearboxMogliMINRPM_1"            text="Cambio: accelleratore a mano giù" />
+		<text name="input_gearboxMogliMINRPM_2"            text="Cambio: accelleratore a mano su" />
+		<text name="input_gearboxMogliFIXEDRATIO"          text="Cambio: rapporto fisso" />
+		<text name="input_gearboxMogliFIXEDRATIO_1"        text="Cambio: rapporto fisso giù" />
+		<text name="input_gearboxMogliFIXEDRATIO_2"        text="Cambio: rapporto fisso sù" />
+		<text name="input_gearboxMogliGEAR1"               text="Cambio: G27 1" />
+		<text name="input_gearboxMogliGEAR2"               text="Cambio: G27 2" />
+		<text name="input_gearboxMogliGEAR3"               text="Cambio: G27 3" />
+		<text name="input_gearboxMogliGEAR4"               text="Cambio: G27 4" />
+		<text name="input_gearboxMogliGEAR5"               text="Cambio: G27 5" />
+		<text name="input_gearboxMogliGEAR6"               text="Cambio: G27 6" />
+		<text name="input_gearboxMogliGEARR"               text="Cambio: G27 R" />
+		<text name="input_gearboxMogliGEARFWD"             text="Cambio: avanti" />
+		<text name="input_gearboxMogliGEARBACK"            text="Cambio: indietro" />
+		<text name="input_gearboxMogliSPEEDLIMIT"          text="Cambio: limitatore" />
+		<text name="input_gearboxMogliSWAPSPEED"           text="Cambio: limitatore 2" />
+		<text name="input_gearboxMogliSWAPSPEEDR"          text="Cambio: limitatore precedente" />
+		<text name="input_gearboxMogliSETSPEED"            text="Cambio: imposta limite" />
+		<text name="input_gearboxMogliACCTOLIMIT"          text="Cambio: accelera" />
+		<text name="input_gearboxMogliDECTOLIMIT"          text="Cambio: decelera" />
+		<text name="input_gearboxMogliECO"                 text="Cambio: Eco attivo/disattivo" />
+		<text name="input_gearboxMogliKEEPSPEED"           text="Cambio: mantieni la velocità" />
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"     text="Cambio: mantieni la velocità" />
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"      text="Cambio: 4wd" />
+		<text name="input_gearboxMogliDIFFLOCKFRONT"       text="Cambio: blocca diff.ant" />
+		<text name="input_gearboxMogliDIFFLOCKBACK"        text="Cambio: blocca diff.post" />
+
+		<text name="gearboxMogliTEXT_OFF"                  text="Motore: spento" />
+		<text name="gearboxMogliTEXT_AI"                   text="Operaio" />
+		<text name="gearboxMogliTEXT_CP"                   text="CP" />
+		<text name="gearboxMogliTEXT_BRAKE"                text="Freno a mano" />
+		<text name="gearboxMogliTEXT_DC"                   text="Doppia frizione" />
+		<text name="gearboxMogliTEXT_NEUTRAL"              text="Folle" />
+		<text name="gearboxMogliTEXT_AUTO"                 text="Automatico" />
+		<text name="gearboxMogliTEXT_MANUAL"               text="Manuale" />
+		<text name="gearboxMogliTEXT_NOGEAR"               text="Senza marce" />
+		<text name="gearboxMogliTEXT_VARIO"                text="Variatore" />
+		<text name="gearboxMogliTEXT_ALLAUTO"              text="Semplificato" />
+		<text name="gearboxMogliTEXT_ECO"                  text="Eco" />
+		<text name="gearboxMogliTEXT_AUTO_HOLD"            text="Parcheggio" />
+
+		<text name="gearboxMogliTEXT_DISABLED"             text="off" />
+		<text name="gearboxMogliTEXT_ENABLED"              text="on" />
+		<text name="gearboxMogliTEXT_POWERSHIFT"           text="auto power shift" />
+		<text name="gearboxMogliTEXT_N_A"                  text="n/a" />
+
+		<text name="gearboxMogliTEXT_DrawTargetRpm"        text="mostra obiettivo RPM" />
+		<text name="gearboxMogliTEXT_DrawReqPower"         text="mostra potenza" />
+		<text name="gearboxMogliTEXT_EnableAI"             text="lavoratore assunto" />
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"    text="scambiare marce e gamma 1" />
+
+		<text name="gearboxMogliTEXT_AllAutoMode"          text="impostazioni semplificate" />
+		<text name="gearboxMogliTEXT_AllAutoMode_0"        text="sequenziale" />
+		<text name="gearboxMogliTEXT_AllAutoMode_1"        text="marce" />
+		<text name="gearboxMogliTEXT_AllAutoMode_2"        text="gamma 1" />
+		<text name="gearboxMogliTEXT_AllAutoMode_3"        text="marce e gamma 1" />
+		<text name="gearboxMogliTEXT_AllAutoMode_4"        text="gamma 2" />
+		<text name="gearboxMogliTEXT_AllAutoMode_5"        text="marce e gamma 2" />
+		<text name="gearboxMogliTEXT_AllAutoMode_6"        text="gamme 1 and 2" />
+		<text name="gearboxMogliTEXT_AllAutoMode_7"        text="marce e gamma 1 and 2" />
+
+		<text name="gearboxMogliTEXT_DiffLock"             text="bloccaggio differenziali" />
+		<text name="gearboxMogliTEXT_DiffLock_2wd"         text="2wd" />
+		<text name="gearboxMogliTEXT_DiffLock_4wd"         text="4wd" />
+		<text name="gearboxMogliTEXT_DiffLock_open"        text="aperto" />
+		<text name="gearboxMogliTEXT_DiffLock_lsd"         text="slittamento limitato" />
+		<text name="gearboxMogliTEXT_DiffLock_auto"        text="automatico" />
+		<text name="gearboxMogliTEXT_DiffLock_fixed"       text="rapporto fisso" />
+		<text name="gearboxMogliTEXT_DiffLock_locked"      text="bloccato" />
+
+		<text name="gearboxMogliTEXT_GearShifterMode"      text="G27 e marce" />
+		<text name="gearboxMogliTEXT_GearShifter_both"     text="tasti e G27" />
+		<text name="gearboxMogliTEXT_GearShifter_key"      text="tasti" />
+		<text name="gearboxMogliTEXT_GearShifter_G27"      text="G27" />
+
+		<text name="gearboxMogliTEXT_ShuttleShifterMode"   text="bottone per-/retromarcia" />
+		<text name="gearboxMogliTEXT_Shuttle_both"         text="attivare e separare" />
+		<text name="gearboxMogliTEXT_Shuttle_toggle"       text="interruttore" />
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"     text="pulsanti separati" />
+
+		<text name="gearboxMogliTEXT_Range1ShifterMode"    text="G27 e gamma 1" />
+		<text name="gearboxMogliTEXT_Range2ShifterMode"    text="G27 e gamma 2" />
+		<text name="gearboxMogliTEXT_RangeShifter_toggle"  text="interruttore" />
+		<text name="gearboxMogliTEXT_RangeShifter_high_on" text="Gamma superiore, se premuto" />
+		<text name="gearboxMogliTEXT_RangeShifter_low_on"  text="Gamma inferiore, se premuto" />
+
+		<text name="gearboxMogliTEXT_MinTargetRpm"         text="obiettivo min RPM" />
+		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="obiettivo max RPM" />
+		<text name="gearboxMogliTEXT_MatchGears"           text="corrispondenza di velocità (marce)" />
+		<text name="gearboxMogliTEXT_MatchRanges"          text="corrispondenza di velocità (gamma)" />
+		<text name="gearboxMogliTEXT_MATCH_1"              text="non corrisponde" />
+		<text name="gearboxMogliTEXT_MATCH_2"              text="solo al primo o all'ultimo" />
+		<text name="gearboxMogliTEXT_MATCH_3"              text="abbinare automaticamente" />
+
 		<!-- page headers -->
-		<text name="gearboxMogliTIP_Settings"            text="settings 1"/>
-		<text name="gearboxMogliTIP_Settings2"           text="settings 2"/>
-		<text name="gearboxMogliTIP_Help_1"              text="help"/>
-		<text name="gearboxMogliTIP_Inputs"              text="inputs"/>
-		
+		<text name="gearboxMogliTIP_Settings"              text="impostazioni 1" />
+		<text name="gearboxMogliTIP_Settings2"             text="impostazioni 2" />
+		<text name="gearboxMogliTIP_Help_1"                text="aiuto" />
+		<text name="gearboxMogliTIP_Inputs"                text="inputs" />
+
 		<!-- tool tips -->
-		<text name="gearboxMogliTIP_SPEEDLIMIT"          text="Limits the maximum speed according to the current cruise control speed"/>
-		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"      text="For wheel drive or locking of the middle differential"/>
-		<text name="gearboxMogliTIP_DIFFLOCKFRONT"       text="Locking of the front axle differential; requires 4wd"/>
-		<text name="gearboxMogliTIP_DIFFLOCKBACK"        text="Locking of the back axle differential"/>
-		<text name="gearboxMogliTIP_MINRPM"              text="Manual throttle"/>
-		<text name="gearboxMogliTIP_FIXEDRATIO"          text="Fixed gear ratio for continous variable transmissions"/>
-		<text name="gearboxMogliTIP_AUTOCLUTCH2"         text="Automatic clutch"/>
-		<text name="gearboxMogliTIP_AUTOMATIC"           text="Automatic shifting like the vehicle has in real life"/>
-		<text name="gearboxMogliTIP_AllAutoMode"         text="Setting for simplified mode; you can choose what should be shifted automatically"/>
-		<text name="gearboxMogliTIP_DrawTargetRpm"       text="Shows the target RPM in the HUD"/>
-		<text name="gearboxMogliTIP_DrawReqPower"        text="Shows the current power in the HUD"/>
-		<text name="gearboxMogliTIP_EnableAI"            text="Setting for the hired worker"/>
-		<text name="gearboxMogliTIP_SwapGearRangeKeys"   text="Swaps gears and group one"/>
-		<text name="gearboxMogliTIP_GearShifterMode"     text="Setting for sterring wheels with shifter"/>
-		<text name="gearboxMogliTIP_ShuttleShifterMode"  text="Setting for sterring wheels with shifter"/>
-		<text name="gearboxMogliTIP_MinTargetRpm"        text="Minimum target RPM"/>
-		<text name="gearboxMogliTIP_MaxTargetRpm"        text="Maximum target RPM"/>
-		
-		<text name="gearboxMogliTEXT_GrindingClutch"     text="cannot shift gear; clutch"/>
-		<text name="gearboxMogliTEXT_GrindingSpeed"      text="cannot shift gear; speed"/>
-		<text name="gearboxMogliTEXT_DoubleClutch"       text="cannot shift gear; RPM"/>
-		<text name="gearboxMogliTEXT_Stall1"             text="RPM is too low"/>
-		<text name="gearboxMogliTEXT_Stall2"             text="motor stopped because RPM was too low"/>
-		<text name="gearboxMogliTEXT_Stall3"             text="too much PTO power requested"/>
-		<text name="gearboxMogliTEXT_Stall4"             text="motor stopped because too much PTO power was requested"/>
-		<text name="gearboxMogliTEXT_ClutchOverheating"  text="clutch is overheating"/>
-		
+		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Limita la velocità massima in base alla velocità attuale della velocità di crociera" />
+		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"        text="Per trazione su ruote o bloccaggio del differenziale centrale" />
+		<text name="gearboxMogliTIP_DIFFLOCKFRONT"         text="Bloccaggio del differenziale dell'asse anteriore; richiede 4wd" />
+		<text name="gearboxMogliTIP_DIFFLOCKBACK"          text="Bloccaggio del differenziale dell'asse posteriore" />
+		<text name="gearboxMogliTIP_MINRPM"                text="Acceleratore manuale" />
+		<text name="gearboxMogliTIP_FIXEDRATIO"            text="Rapporto di trasmissione fisso per trasmissioni a variazione continua" />
+		<text name="gearboxMogliTIP_AUTOCLUTCH2"           text="Frizione automatica" />
+		<text name="gearboxMogliTIP_AUTOMATIC"             text="Cambio automatico come il veicolo nella vita reale" />
+		<text name="gearboxMogliTIP_AllAutoMode"           text="Impostazione per la modalità semplificata; puoi scegliere cosa deve essere cambiato automaticamente" />
+		<text name="gearboxMogliTIP_DrawTargetRpm"         text="Mostra l'RPM obiettivo nell'HUD" />
+		<text name="gearboxMogliTIP_DrawReqPower"          text="Mostra la potenza corrente nell'HUD" />
+		<text name="gearboxMogliTIP_EnableAI"              text="Impostazione per il lavoratore assunto" />
+		<text name="gearboxMogliTIP_SwapGearRangeKeys"     text="Sostituisce le marce e gamma uno" />
+		<text name="gearboxMogliTIP_GearShifterMode"       text="Impostazione per volanti con cambio" />
+		<text name="gearboxMogliTIP_ShuttleShifterMode"    text="Impostazione per volanti con cambio" />
+		<text name="gearboxMogliTIP_MinTargetRpm"          text="Obiettivo minimo RPM" />
+		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Obiettivo massimo RPM" />
+		<text name="gearboxMogliTIP_MatchGears"            text="Regola automaticamente la marcia quando cambi gamma" />
+		<text name="gearboxMogliTIP_MatchRanges"           text="Regola automaticamente la gamma quando cambi marcia" />
+		<text name="gearboxMogliTIP_Range1ShifterMode"     text="Questa impostazione ha senso solo con un volante con leva del cambio" />
+		<text name="gearboxMogliTIP_Range2ShifterMode"     text="Questa impostazione ha senso solo con un volante con leva del cambio" />
+
+		<text name="gearboxMogliTIP_MinAutoGearSpeed"      text="In modalità automatica, non è selezionata alcuna marcia con velocità inferiore" />
+		<text name="gearboxMogliTIP_MaxAutoGearSpeed"      text="In modalità automatica, non è selezionata nessuna marcia ad una velocità maggiore" />
+		<text name="gearboxMogliTIP_ResetFwdGear"          text="Inizia a marcia avanti" />
+		<text name="gearboxMogliTIP_ResetRevGear"          text="Inizia a marcia indietro" />
+		<text name="gearboxMogliTIP_ResetFwdRange"         text="avviare gamma 1 avanti" />
+		<text name="gearboxMogliTIP_ResetRevRange"         text="avviare gamma 1 indietro" />
+		<text name="gearboxMogliTIP_ResetFwdRange2"        text="avviare gamma 2 avanti" />
+		<text name="gearboxMogliTIP_ResetRevRange2"        text="avviare gamma 2 indietro" />
+
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"     text="min. Velocità dell'cambio" />
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"     text="max. Velocità dell'cambio" />
+		<text name="gearboxMogliTEXT_ResetFwdGear"         text="Inizia a marcia avanti" />
+		<text name="gearboxMogliTEXT_ResetRevGear"         text="Inizia a marcia indietro" />
+		<text name="gearboxMogliTEXT_ResetFwdRange"        text="avviare gamma 1 vorwärts" />
+		<text name="gearboxMogliTEXT_ResetRevRange"        text="avviare gamma 1 indietro" />
+		<text name="gearboxMogliTEXT_ResetFwdRange2"       text="avviare gamma 2 vorwärts" />
+		<text name="gearboxMogliTEXT_ResetRevRange2"       text="avviare gamma 2 indietro" />
+
+		<text name="gearboxMogliTIP_EcoMode"               text="In modalità ECO, il motore è ottimizzato per il risparmio di carburante" />
+		<text name="gearboxMogliTEXT_EcoMode"              text="modalità ECO" />
+		<text name="gearboxMogliTIP_AccelerateToLimit"     text="Massima rapporto per regolare la velocità alla velocità di crociera modificata" />
+		<text name="gearboxMogliTEXT_AccelerateToLimit"    text="Rapporto velocità di crociera" />
+		<text name="gearboxMogliTIP_ShuttleFactor"         text="Sensiblità dell'inversore" />
+		<text name="gearboxMogliTEXT_ShuttleFactor"        text="Sensiblità dell'inversore" />
+
+		<text name="gearboxMogliTEXT_GrindingClutch"       text="cambio marcia non possibile; frizione" />
+		<text name="gearboxMogliTEXT_GrindingSpeed"        text="cambio marcia non possibile; velocità" />
+		<text name="gearboxMogliTEXT_DoubleClutch"         text="cambio marcia non possibile; RPM" />
+		<text name="gearboxMogliTEXT_Stall1"               text="RPM sono troppo bassi" />
+		<text name="gearboxMogliTEXT_Stall2"               text="motore spento perché RPM erano troppo bassi" />
+		<text name="gearboxMogliTEXT_Stall3"               text="troppa potenza alla PTO richiesta" />
+		<text name="gearboxMogliTEXT_Stall4"               text="motore spento perché la richiesta di potenza da PTO era troppo alta" />
+		<text name="gearboxMogliTEXT_ClutchOverheating"    text="la frizione si sta surriscaldando" />
+
+		<text name="gearboxMogliTIP_SlipPlough"            text="Gli pneumatici slittando si comportano come un aratro" />
+		<text name="gearboxMogliTEXT_SlipPlough"           text="Gli pneumatici slittano" />
+		<text name="gearboxMogliTIP_ClutchSpeed"           text="Velocità del bottone della frizione" />
+		<text name="gearboxMogliTEXT_ClutchSpeed"          text="Velocità del bottone della frizione" />
+
 		<!-- texts in the HUD => keep them short -->
-		<text name="gearboxMogliDRAW_difflock"           text="Diff.Lock"/>
-		<text name="gearboxMogliDRAW_maxSpeed"           text="Max. speed"/>
-		<text name="gearboxMogliDRAW_speed"              text="Speed"/>
-		<text name="gearboxMogliDRAW_currentRpm"         text="Current rpm"/>
-		<text name="gearboxMogliDRAW_TargetRpm"          text="Target rpm"/>
-		<text name="gearboxMogliDRAW_power"              text="Power"/>
-		<text name="gearboxMogliDRAW_load"               text="Load"/>
-		<text name="gearboxMogliDRAW_fuel"               text="Fuel used"/>
-		<text name="gearboxMogliDRAW_clutch"             text="Clutch"/>
-		<text name="gearboxMogliDRAW_autoClutch"         text="Auto clutch"/>
-		<text name="gearboxMogliDRAW_hand"               text="Hand throttle"/>
-		<text name="gearboxMogliDRAW_fixed"              text="Fixed ratio"/>
-		<text name="gearboxMogliDRAW_combine"            text="Combine"/>
-		<text name="gearboxMogliDRAW_wheelSlip"          text="Wheel slip"/>
-		
-		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>
-		<text name="gearboxMogliUNIT_HP"                 text="CV"/>
-		<text name="gearboxMogliUNIT_kph"                text="km/h"/>
-		<text name="gearboxMogliUNIT_mph"                text="mph"/>
-		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
-		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
-		<text name="gearboxMogliUNIT_tph"                text="t/h"/>
+		<text name="gearboxMogliDRAW_difflock"             text="Diff Bloc" />
+		<text name="gearboxMogliDRAW_maxSpeed"             text="Velocità Max" />
+		<text name="gearboxMogliDRAW_speed"                text="Velocità" />
+		<text name="gearboxMogliDRAW_currentRpm"           text="RPM attuali" />
+		<text name="gearboxMogliDRAW_TargetRpm"            text="RPM obiettivo" />
+		<text name="gearboxMogliDRAW_power"                text="Potenza" />
+		<text name="gearboxMogliDRAW_load"                 text="Carico" />
+		<text name="gearboxMogliDRAW_fuel"                 text="Utilizzo carburante" />
+		<text name="gearboxMogliDRAW_clutch"               text="Frizione" />
+		<text name="gearboxMogliDRAW_autoClutch"           text="Frizione auto" />
+		<text name="gearboxMogliDRAW_hand"                 text="Acc. man." />
+		<text name="gearboxMogliDRAW_fixed"                text="Rapp. Fisso" />
+		<text name="gearboxMogliDRAW_combine"              text="Trebbia" />
+		<text name="gearboxMogliDRAW_wheelSlip"            text="Slittamento" />
+
+		<text name="gearboxMogliUNIT_rpm"                  text="RPM" />
+		<text name="gearboxMogliUNIT_HP"                   text="CV" />
+		<text name="gearboxMogliUNIT_kph"                  text="km/h" />
+		<text name="gearboxMogliUNIT_mph"                  text="mph" />
+		<text name="gearboxMogliUNIT_lph"                  text="l/h" />
+		<text name="gearboxMogliUNIT_lp100km"              text="l/100km" />
+		<text name="gearboxMogliUNIT_tph"                  text="t/h" />
 	</texts>
-		
+
 	<longTexts>
 		<longText name="gearboxMogliHelp_1"><![CDATA[
-Not every tractor has a continuously variable transmission. And even the continuously variable transmissions are not as simple in construction as the standard one in FS15. This mod adds on the basis of the file gearboxAddonConfig.xml  a gearbox to all configured tractors. Many various transmission types can be simulated. There are classic gearboxes with gears, one or two groups and reverse gears or groups. Shorting the response time to zero will result into a power shift transmission. In modern tractors power shift transmissions are often combined with automatic gear shifting.
+Non tutti i trattori hanno una trasmissione a variazione continua.
+E anche le trasmissioni a variazione continua non sono semplici come la trasmissione standard di FS17.
+Sulla base del file di configurazione gearboxAddonConfig.xml, questa mod aggiungerà il cambio ai trattori preconfigurati.
+In questo caso è possibile simulare trasmissioni molto diverse.
+Ci sono cambi classici con ingranaggi, a uno o due gruppi e le retromarce come ingranaggio nel primo o secondo gruppo o come circuito di inversione.
+Se accorciate il tempo di commutazione a zero (o poco più), allora è una trasmissione in power shift.
+Nei trattori moderni, le fasi del powershift vengono spesso commutate automaticamente.
 
-Additionally, continuously variable transmissions are supported. There are models with one or two gears like the Fendt Vario. Other models combine four automatically switched mechanical gears with a continuously variable hydrostatic drive. All of these continuously variable transmission have one thing in common. The efficiency varies quite strongly depending on the gear ratio. 
+Oltre alle normali trasmissioni a gradino e trasmissioni a variazione continua sono supportate.
+Ci sono modelli con una o due marce, come il Fendt Vario.
+Altri modelli combinano automaticamente quattro ingranaggi meccanici con una trasmissione idrostatica a variazione continua.
+Tutte queste trasmissioni a variazione continua hanno in comune che l'efficienza varia piuttosto fortemente a seconda del rapporto di trasmissione.
 
-There are additional modes like AllAuto and ECO. In ECO mode the vehicle still has maximum torque but only 90% power to safe fuel. In AllAuto the gearbox will shift automatically.
-]]></longText>
+Inoltre ci sono le modalità AllAuto ed ECO.
+In modalità ECO, la coppia massima è disponibile ma solo al 90% della potenza.
+In modalità ECO, la velocità della presa di forza è inferiore (50% anziché 75%) e si alza un po 'più velocemente.
+Nella modalità AllAuto, le marce, i gruppi (solo la trasmissione del primo gruppo) e la frizione vengono controllati automaticamente.
+In questa modalità, l'helper guida con il cambio di GearboxAddons.
+		]]></longText>
 	</longTexts>
 
 </l10n>
+
