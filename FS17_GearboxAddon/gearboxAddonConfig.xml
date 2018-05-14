@@ -3912,7 +3912,7 @@
 	<vehicle>
 		<configFile xmlName="bigBudPack/vehicles/steerable/bigBud/bigBud450.xml"/>
 		<gearboxMogli autoStartStop="true" speedLimiter="false" torqueConverter="true" minClutchRatio="0.3125" torqueConverterMaxFactor="3">
-			<gears defaultGear="4" shiftTimeMs="100" clutchRatio="0.3125">	
+			<gears defaultGear="4" shiftTimeMs="0" shiftEffect="false" clutchRatio="0.3125">	
 				<gear name="1" forwardOnly="true" speed="4.075"/>
 				<gear name="R" reverseOnly="true" speed="5.120"/>
 				<gear name="2" forwardOnly="true" speed="6.370"/>
@@ -3951,7 +3951,7 @@
 	<vehicle>
 		<configFile xmlName="bigBudPack/vehicles/steerable/bigBud/bigBud747.xml"/>
 		<gearboxMogli autoStartStop="true" speedLimiter="false" torqueConverter="true" minClutchRatio="0.3125" torqueConverterMaxFactor="3">
-			<gears defaultGear="4" shiftTimeMs="100" clutchRatio="0.3125">	
+			<gears defaultGear="4" shiftTimeMs="0" shiftEffect="false" clutchRatio="0.3125">	
 				<gear name="1" forwardOnly="true" speed="4.075"/>
 				<gear name="R" reverseOnly="true" speed="5.120"/>
 				<gear name="2" forwardOnly="true" speed="6.370"/>

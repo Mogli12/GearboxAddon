@@ -153,13 +153,14 @@ gearboxMogliGlobals.minAutoGearSpeed      = 1.0   -- 0.2777 -- m/s
 gearboxMogliGlobals.minAbsSpeed           = 1.0   -- km/h
 gearboxMogliGlobals.brakeNeutralTimeout   = 1000  -- ms
 gearboxMogliGlobals.brakeNeutralLimit     = -0.3
-gearboxMogliGlobals.DefaultRevUpMs0       = 3000  -- ms time between idle and rated RPM w/o load
-gearboxMogliGlobals.DefaultRevUpMs1       = 30000 -- ms time between idle and rated RPM with full load
+gearboxMogliGlobals.DefaultRevUpMs0       = 2000  -- ms time between idle and rated RPM w/o load
+gearboxMogliGlobals.DefaultRevUpMs1       = 15000 -- ms time between idle and rated RPM with full load
 gearboxMogliGlobals.DefaultRevUpMsH       = 30000 -- ms time between idle and rated RPM with full load (hydrostat)
 gearboxMogliGlobals.DefaultRevUpMs2       = 750   -- ms time between idle and rated RPM in neutral 
 gearboxMogliGlobals.DefaultRevDownMs      = 1500  -- ms time between rated and idle RPM
 gearboxMogliGlobals.HydroSpeedIdleRedux   = 1e-3  -- 0.04  -- default reduce by 10 km/h per second => 0.4 km/h with const. RPM and w/o acc.
 gearboxMogliGlobals.smoothGearRatio       = true  -- smooth gear ratio with hydrostatic drive
+gearboxMogliGlobals.smoothGearRatioTC     = true  -- smooth gear ratio with torque converter
 gearboxMogliGlobals.hydroMaxTorqueInput   = 0 -- 2
 gearboxMogliGlobals.hydroMaxTorqueOutput  = 0 -- 3
 gearboxMogliGlobals.hydroMaxTorqueDirect  = 0 -- 4
@@ -1120,16 +1121,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), default )
 	self.mrGbMS.ClutchRpmShift          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchRpmShift"), 0 )
 	
-	local defaultRatio = 0.1
+	default   = self.mrGbMS.MaxTargetRpm
 	if torqueConverterProfile == "wheelLoader" then 
-		default = gearboxMogli.huge
+		default = gearboxMogli.huge 
 	elseif torqueConverterProfile == "oldCar" then 
-		default = getRpm( 0.7 )
-	elseif torqueConverterProfile == "modernCar" then 
-		default = getRpm( 0.5 )
-	else
-		default = self.mrGbMS.MaxTargetRpm
-	end
+		default = gearboxMogli.huge 
+	elseif self.mrGbMS.TorqueConverter then 
+		default = math.max( self.mrGbMS.OpenRpm + 0.044 * self.mrGbMS.MaxTargetRpm, getRpm( 0.4 ) )
+	end 	
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
 		
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
@@ -1146,9 +1145,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		elseif torqueConverterProfile == "wheelLoader" then 
 			clutchEngagingTimeMs = 2000
 		elseif torqueConverterProfile == "oldCar" then 
-			clutchEngagingTimeMs = 2000
-		elseif torqueConverterProfile == "modernCar" then 
 			clutchEngagingTimeMs = 1000
+		elseif torqueConverterProfile == "modernCar" then 
+			clutchEngagingTimeMs = 2000
 		elseif self.mrGbMS.TorqueConverter then
 			clutchEngagingTimeMs = 1500
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
@@ -1172,9 +1171,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		default = 3.2 -- hanomag or car
 		if torqueConverterProfile == "clutch" then
 			default = 1.25 -- voith
-		end
-		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),default) * self.mrGbMS.TransmissionEfficiency / self.mrGbMS.ClutchEfficiency
-	
+		end		
+		self.mrGbMS.TorqueConverterFactor   = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterMaxFactor"),default) * self.mrGbMS.TransmissionEfficiency / self.mrGbMS.ClutchEfficiency	
 		self.mrGbMS.TorqueConverterLockupMs = getXMLFloat(xmlFile, xmlString .. "#torqueConverterLockupMs")
 		if self.mrGbMS.CloseRpm < self.mrGbMS.RatedRpm and self.mrGbMS.TorqueConverterLockupMs == nil then
 			self.mrGbMS.TorqueConverterLockupMs = 200
@@ -1184,8 +1182,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		if torqueConverterProfile == "wheelLoader" then
 			default = 20000
 		end
-		self.mrGbMS.TorqueConverterTime    = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"), default )
-		self.mrGbMS.TorqueConverterTimeInc = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTimeInc"), 0 )
+		self.mrGbMS.TorqueConverterTime     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"), default )
+		self.mrGbMS.TorqueConverterTimeInc  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTimeInc"), 0 )		
 	end
 	
 	self.mrGbMS.MinClutchPercent        = getXMLFloat(xmlFile, xmlString .. "#minClutchRatio")
@@ -2610,7 +2608,26 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueSenseBack   = 0.75
 			self.mrGbMS.SpeedRatioBack    = 1
 			self.mrGbMS.TorqueRatioMiddleLocked = self.differentials[3].torqueRatio
-			self.mrGbMS.SpeedRatioMiddleLocked  = 1.05
+			
+			self.mrGbMS.SpeedRatioMiddleLocked  = 1			
+			if table.getn( self.wheels ) == 4 then 
+				self.mrGbMS.SpeedRatioMiddleLocked  = 1.05
+				
+				local minR, maxR
+				for _,w in pairs( self.wheels ) do 
+					if minR == nil then 
+						minR = w.radius
+						maxR = w.radius 
+					else	
+						minR = math.min( minR, w.radius )
+						maxR = math.max( maxR, w.radius )
+					end 
+				end 
+				
+				if minR > 0.95 * maxR then 
+					self.mrGbMS.SpeedRatioMiddleLocked  = 1
+				end 
+			end 
 			
 			-- profile == "manual" is default 
 			if     profile == "off"       then
@@ -2686,7 +2703,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
 			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
 		end
+		
 	end
+	self.mrGbMS.UnlockDiffSpeed   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  ), 25 ) / 3600
 
 	if     self.mrGbMG.slipPloughDefault == 0 then 
 		self.mrGbMS.SlipPlough      = false 
@@ -4846,7 +4865,22 @@ function gearboxMogli:updateTick(dt)
 									x2,y2,z2 = localToWorld(wheel.repr, x + width, 0, z + l0 + l1 )
 								end
 								
-								Utils.updatePloughArea(x0,z0, x1,z1, x2,z2, false, false, angle)
+								gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle)
+								
+								if wheel.additionalWheels ~= nil then 
+									for _,additionalWheel in pairs(wheel.additionalWheels) do
+										local refNode = wheel.node;
+										if wheel.repr ~= wheel.driveNode then
+											refNode = wheel.repr;
+										end
+										local xShift,yShift,zShift = localToLocal(additionalWheel.wheelTire, refNode, additionalWheel.xOffset,0,0);
+										width = 0.3 * additionalWheel.width
+										x0,y0,z0 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 - l1 )
+										x1,y1,z1 = localToWorld(refNode, xShift - width, yShift-additionalWheel.radius, zShift + l0 - l1 )
+										x2,y2,z2 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 + l1 )
+										gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle)
+									end 
+								end
 							end
 						end
 					end 
@@ -6635,14 +6669,22 @@ function gearboxMogli:mrGbMGetDecelerateToLimit()
 end
 
 function gearboxMogli:mrGbMGetDiffLockMiddle()
-	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
+	if not ( self.mrGbMS.ModifyDifferentials ) then
+		return false 
+	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
+		return false 
+	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		return self.mrGbMS.DiffLockMiddle
 	end
 	return false
 end
 
 function gearboxMogli:mrGbMGetDiffLockFront()
-	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
+	if not ( self.mrGbMS.ModifyDifferentials ) then
+		return false 
+	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
+		return false 
+	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		if      self.mrGbMS.DiffLockFront 
 				and ( self.mrGbMS.DiffLockMiddle
 					 or self.mrGbMS.TorqueRatioMiddle < 0
@@ -6655,7 +6697,11 @@ function gearboxMogli:mrGbMGetDiffLockFront()
 end
 
 function gearboxMogli:mrGbMGetDiffLockBack()
-	if self.mrGbMS.ModifyDifferentials and self.mrGbMS.IsOn and self.steeringEnabled then
+	if not ( self.mrGbMS.ModifyDifferentials ) then
+		return false 
+	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
+		return false 
+	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		return self.mrGbMS.DiffLockBack
 	end
 	return false
@@ -7557,7 +7603,7 @@ end
 function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )	
 	self.mrGbMS.NeutralActive = new 
 
-	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0  then
+	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0 and not ( self.mrGbMS.NeutralNoSync ) then
 		self:mrGbMSetLanuchGear( noEventSend )
 	end
 	
@@ -7919,40 +7965,49 @@ function gearboxMogli:checkGearShiftDC( new, what, noEventSend )
 		local r2 = gearboxMogli.gearSpeedToRatio( self, s )
 		local w  = self.motor.clutchRpm * r2 / r1
 		
-		local v = 0			
-		if self.motor.transmissionInputRpm < w then
-			v = ( w - self.motor.transmissionInputRpm ) / self.mrGbMG.grindingMinRpmDelta
-		else
-			v = ( self.motor.transmissionInputRpm - w ) / self.mrGbMG.grindingMaxRpmSound
-			if v > 1 and self.motor.transmissionInputRpm - w < self.mrGbMG.grindingMaxRpmDelta then
-				v = 0.999
-			end
+		return gearboxMogli.checkTransmissionInOutRpm( self, w, noEventSend )
+	end
+	
+	return true
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli:checkTransmissionInOutRpm
+--**********************************************************************************************************	
+function gearboxMogli:checkTransmissionInOutRpm( outRpm, noEventSend )
+
+	if not self.isServer or self.motor.transmissionInputRpm == nil then 
+		return true 
+	end
+
+	local v = 0			
+	if self.motor.transmissionInputRpm < outRpm then
+		v = ( outRpm - self.motor.transmissionInputRpm ) / self.mrGbMG.grindingMinRpmDelta
+	else
+		v = ( self.motor.transmissionInputRpm - outRpm ) / self.mrGbMG.grindingMaxRpmSound
+		if v > 1 and self.motor.transmissionInputRpm - outRpm < self.mrGbMG.grindingMaxRpmDelta then
+			v = 0.999
 		end
-		
-		-- grinding sound if v > 0.5, no shift if v > 1
-		v = math.max( v + v - 1, 0 )
-		
-		if self.mrGbMG.debugPrint then
-			print(string.format("DC: %3.0fkm/h (%3.0f) %3.0fkm/h (%3.0f) => in %4.0f U/min / out %4.0f U/min => %1.2f", self.mrGbMS.CurrentGearSpeed, r1, s, r2, self.motor.transmissionInputRpm, w, v ))
-		end
-			
-		if     v > 1 then
-			self:mrGbMSetNeutralActive( true, noEventSend )
-			self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
-																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
-																												self.motor.transmissionInputRpm, w ))
-			self.mrGbMS.GrindingGearsVol = 0
-			self:mrGbMSetState( "GrindingGearsVol", 1 )
-			return false
-		elseif v > 0 and v > self.mrGbMS.GrindingGearsVol then
-			self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
-																												gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
-																												self.motor.transmissionInputRpm, w ))
-			self:mrGbMSetState( "GrindingGearsVol", v )
-			return true
-		elseif self.mrGbMS.GrindingGearsVol > 0 then
-			self:mrGbMSetState( "GrindingGearsVol", 0 )
-		end
+	end
+	
+	-- grinding sound if v > 0.5, no shift if v > 1
+	v = math.max( v + v - 1, 0 )
+	
+	if     v > 1 then
+		self:mrGbMSetNeutralActive( true, noEventSend )
+		self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+																											gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+																											self.motor.transmissionInputRpm, outRpm ))
+		self.mrGbMS.GrindingGearsVol = 0
+		self:mrGbMSetState( "GrindingGearsVol", 1 )
+		return false
+	elseif v > 0 and v > self.mrGbMS.GrindingGearsVol then
+	--self:mrGbMSetState( "WarningText", string.format( "%s (in: %4.0f / out: %4.0f)",
+	--																									gearboxMogli.getText( "gearboxMogliTEXT_DoubleClutch", "cannot shift gear; RPM" ),
+	--																									self.motor.transmissionInputRpm, outRpm ))
+		self:mrGbMSetState( "GrindingGearsVol", v )
+	elseif self.mrGbMS.GrindingGearsVol > 0 then
+		self:mrGbMSetState( "GrindingGearsVol", 0 )
 	end
 	
 	return true
@@ -8899,6 +8954,48 @@ function gearboxMogli:mrGbMDebug()
 	end
 	
 	print("debugGearShift: "..tostring(gearboxMogli.debugGearShift))
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli.updatePloughArea
+--**********************************************************************************************************
+function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle)
+	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
+	
+	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
+	
+	setDensityCompareParams(g_currentMission.terrainDetailId, "greater", -1);	
+	setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli.updateDestroyCommonArea
+--**********************************************************************************************************	
+function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
+	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
+	
+	local firstEntry = nil
+	-- set spray level
+	for index, entry in pairs(g_currentMission.fruits) do
+		if firstEntry == nil then
+			firstEntry = entry
+		end
+	end
+	
+	-- destroy all fruits
+	setDensityNewTypeIndexMode(firstEntry.id, 2);
+	setDensityTypeIndexCompareMode(firstEntry.id, 2);
+	-- note: this asumes firstEntry.id has the lowest channel offset
+	setDensityMaskedParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
+	setDensityNewTypeIndexMode(firstEntry.id, 0);
+	setDensityTypeIndexCompareMode(firstEntry.id, 0);
+	
+	for i=1, table.getn(g_currentMission.dynamicFoliageLayers) do
+		local id = g_currentMission.dynamicFoliageLayers[i];
+		local numChannels = getTerrainDetailNumChannels(id);
+		local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
+		setDensityMaskedParallelogram(id, x, z, widthX, widthZ, heightX, heightZ, 0, numChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
+	end
 end
 
 --**********************************************************************************************************	
