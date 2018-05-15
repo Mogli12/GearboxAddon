@@ -4229,7 +4229,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			and not self.noTransmission then 
 		self.throttleRpm = self.lastRealMotorRpm 
 	else 
-		local r = self:getThrottleMaxRpm()
+		local r = self:getThrottleMaxRpm( math.max( 0, handThrottle, accelerationPedal ), true )
 		
 		if not self.vehicle.mrGbMS.NeutralActive and self.vehicle.mrGbML.gearShiftingNeeded > 0 then 
 			if      self.vehicle.mrGbML.gearShiftingNeeded == 1

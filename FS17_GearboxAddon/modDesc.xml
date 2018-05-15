@@ -2,19 +2,19 @@
 <modDesc descVersion="38">
 	<author>Mogli aka Biedens</author>
 	<iconFilename>dds/store.dds</iconFilename>
-	<version>3.0.4.9</version>
+	<version>3.0.5.0</version>
 	<multiplayer supported="true"/>
 	
 	<l10n filenamePrefix="modDesc_l10n">
 		<text name="gearboxMogliVERSION">
-			 <de>Getriebe v3.1 build 49 von Mogli</de>
-			  <en>Gearbox v3.1 build 49 by mogli</en>
-				 <it>Cambio v3.1 build 49 by mogli</it>
-	 <fr>Transmission v3.1 build 49 by mogli</fr>
-				 <cz>Řazení v3.1 build 49 by mogli</cz>
-<pl>Skrzynia biegów v3.1 build 49 by mogli</pl>
-				<ru>Gearbox v3.1 build 49 by mogli</ru>
-				<ro>Gearbox v3.1 build 49 by mogli</ro>
+			 <de>Getriebe v3.1 build 50 von Mogli</de>
+			  <en>Gearbox v3.1 build 50 by mogli</en>
+				 <it>Cambio v3.1 build 50 by mogli</it>
+	 <fr>Transmission v3.1 build 50 by mogli</fr>
+				 <cz>Řazení v3.1 build 50 by mogli</cz>
+<pl>Skrzynia biegów v3.1 build 50 by mogli</pl>
+				<ru>Gearbox v3.1 build 50 by mogli</ru>
+				<ro>Gearbox v3.1 build 50 by mogli</ro>
 		</text>                  
 	</l10n>
 
@@ -60,6 +60,7 @@ Changelog 3.1:
 - engine humming sound 
 - gear shifter sound 
 - improvements automatic clutch 
+- digging wheels
 ]]></en>
 		<de><![CDATA[
 Nicht jeder Traktor hat ein stufenloses Getriebe. Und selbst die stufenlosen Getriebe sind nicht so einfach aufgebaut wie das Standardgetriebe im Landwirtschafts Simulator. 
@@ -85,6 +86,10 @@ Changelog 3.1:
 - Töne für Handbremse (Dank an wriley)
 - kompatibel zu FS17_handbrake
 - transmissions Tag in vehicle.xml (nur auf oberster Ebene)
+- Motor rattelt bei Überschreitung der Drehzahl
+- Gangwechselklang
+- Verbesserung automatische Kupplung
+- Räder können sich eingraben
 ]]></de>
 
 		<it><![CDATA[ Non tutti i trattori hanno una trasmissione a variazione continua.
