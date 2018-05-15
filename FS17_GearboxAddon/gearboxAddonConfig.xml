@@ -3258,7 +3258,7 @@
 	<vehicle>caseIH1660
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1660.xml" />
 
-		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true" globalRatioFactor="0.913">
+		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true">
 			<combine defaultWidth="4.3" minRpm="1800" maxRpm="2200"/>
 			<blowOffVentilSound volume="0"/>
 			
@@ -4403,6 +4403,219 @@
 			</realEngine>
 		</gearboxMogli>
 	</vehicle>
+	
+<!-- ********** Moddern Classic DLC ******************** -->	
+<!-- ********** Moddern Classic DLC ******************** -->	
+<!-- ********** Moddern Classic DLC ******************** -->	
+
+	<vehicle>masseyFerguson390t
+		<mod>
+			<xmlFile name="modernClassicsDLC/masseyFerguson390t/masseyFerguson390t.xml"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="false" speedLimiter="false" maxAIRange="2" minFuelUsageRatio="235">
+			<gears speedMatching="end">
+				<gear speed="15.5"/>
+				<gear speed="25"/>
+				<gear speed="30"/>
+				<gear speed="39"/>
+			</gears>
+			
+			<ranges>
+				<range ratio="0.1375"/>
+				<range ratio="0.375"/>
+				<range ratio="1"/>
+			</ranges>
+			
+			<revers ratio="1" resetRange="false" resetGear="false"/>
+		</gearboxMogli>
+	</vehicle>
+
+	<vehicle>caseMaxxum5150
+		<mod>
+			<xmlFile name="modernClassicsDLC/caseMaxxum5150/caseMaxxum5150.xml"/>
+		</mod>
+		
+		<!-- http://www.ihace.de/01_schlepper/5150/5150ger.jpg -->
+		<gearboxMogli maxAIGear="3" autoStartStop="true" speedLimiter="false" minFuelUsageRatio="227">				
+			<gears defaultGear="3">	
+				<gear speed="5.0"  name="1-4">
+					<extraName range1="1" name="1"/>
+					<extraName range1="2" name="2"/>
+					<extraName range1="3" name="3"/>
+					<extraName range1="4" name="4"/>
+				</gear>
+				<gear speed="11.5" name="5-8">
+					<extraName range1="1" name="5"/>
+					<extraName range1="2" name="6"/>
+					<extraName range1="3" name="7"/>
+					<extraName range1="4" name="8"/>
+				</gear>
+				<gear speed="18.5" name="9-12">
+					<extraName range1="1" name="9"/>
+					<extraName range1="2" name="10"/>
+					<extraName range1="3" name="11"/>
+					<extraName range1="4" name="12"/>
+				</gear>
+				<gear speed="37.5" name="13-16" forwardOnly="true">
+					<extraName range1="1" name="13"/>
+					<extraName range1="2" name="14"/>
+					<extraName range1="3" name="15"/>
+					<extraName range1="4" name="16"/>
+				</gear>
+			</gears>
+
+			<ranges shiftTimeMs="0" clutchRatio="1" defaultRange="1" speedMatching="true">
+				<range ratio="0.537" name="S" />
+				<range ratio="0.649" name="L" />
+				<range ratio="0.803" name="M" />
+				<range ratio="1.000" name="H" />
+			</ranges>
+
+			<reverse ratio="1.184" shiftTimeMs="500" manualClutch="false" resetRange="false" resetGear="false"/>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>jcbFastrac150
+		<mod>
+			<!-- 40 km/h -->
+			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="1"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="4">
+				<gear speed="5"  name="1"/>
+				<gear speed="9"  name="2"/>
+				<gear speed="14" name="3"/>
+				<gear speed="20" name="4"/>
+				<gear speed="30" name="5"/> 
+				<gear speed="39" name="6"/>
+			</gears>
+			
+			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="false" defaultRange="1">
+				<range ratio="0.8" name="I"/>
+				<range ratio="1.0" name="II"/>
+			</ranges>
+			
+			<ranges defaultRange="4">
+				<range ratio="0.192" name="L" forwardOnly="true"/>
+				<range ratio="0.451" name="R" reverseOnly="true"/>
+				<range ratio="0.564" name="M" forwardOnly="true"/>
+				<range ratio="1"     name="H" forwardOnly="true"/>
+			</ranges>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<mod>
+			<!-- 55 km/h -->
+			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="2"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="3">
+				<gear speed="7"  name="1"/>
+				<gear speed="13" name="2"/>
+				<gear speed="19" name="3"/>
+				<gear speed="29" name="4"/>
+				<gear speed="42" name="5"/> 
+				<gear speed="55" name="6"/>
+			</gears>
+			
+			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+				<range ratio="0.8" name="I"/>
+				<range ratio="1.0" name="II"/>
+			</ranges>
+			
+			<ranges defaultRange="4">
+				<range ratio="0.192" name="L" forwardOnly="true"/>
+				<range ratio="0.451" name="R" reverseOnly="true"/>
+				<range ratio="0.564" name="M" forwardOnly="true"/>
+				<range ratio="1"     name="H" forwardOnly="true"/>
+			</ranges>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<mod>
+			<!-- 65 km/h -->
+			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="3"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="3">
+				<gear speed="8"  name="1"/>
+				<gear speed="15" name="2"/>
+				<gear speed="23" name="3"/>
+				<gear speed="34" name="4"/>
+				<gear speed="49" name="5"/> 
+				<gear speed="65" name="6"/>
+			</gears>
+			
+			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+				<range ratio="0.679" name="I"/>
+				<range ratio="0.824" name="II"/>
+				<range ratio="1.000" name="III"/>
+			</ranges>
+			
+			<ranges defaultRange="4">
+				<range ratio="0.192" name="L" forwardOnly="true"/>
+				<range ratio="0.451" name="R" reverseOnly="true"/>
+				<range ratio="0.564" name="M" forwardOnly="true"/>
+				<range ratio="1"     name="H" forwardOnly="true"/>
+			</ranges>
+		</gearboxMogli>
+	</vehicle>
+	
+	<vehicle>
+		<mod>
+			<!-- 75 km/h -->
+			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="4"/>
+		</mod>
+		
+		<gearboxMogli autoStartStop="true" speedLimiter="true" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="3">
+				<gear speed="10" name="1"/>
+				<gear speed="18" name="2"/>
+				<gear speed="27" name="3"/>
+				<gear speed="41" name="4"/>
+				<gear speed="59" name="5"/> 
+				<gear speed="78" name="6"/>
+			</gears>
+			
+			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+				<range ratio="0.679" name="I"/>
+				<range ratio="0.824" name="II"/>
+				<range ratio="1.000" name="III"/>
+			</ranges>
+			
+			<ranges defaultRange="4">
+				<range ratio="0.192" name="L" forwardOnly="true"/>
+				<range ratio="0.451" name="R" reverseOnly="true"/>
+				<range ratio="0.564" name="M" forwardOnly="true"/>
+				<range ratio="1"     name="H" forwardOnly="true"/>
+			</ranges>
+		</gearboxMogli>
+	</vehicle>	
+
+	<vehicle>
+		<mod>
+			<xmlFile name="modernClassicsDLC/newHollandTX34/newHollandTX34.xml"/>
+		</mod>
+	
+		<gearboxMogli speedLimiter="false" autoStartStop="true" enableAI="true" maxAIGear="2" defaultOn="false" onlyHandThrottle="true">
+			<combine defaultWidth="4.3" minRpm="1800" maxRpm="2200"/>
+			<blowOffVentilSound volume="0"/>
+			
+			<hydrostatic profile="Hydrostat" minRatio="0"/>		
+			<gears defaultGear="4" reverseReset="true" onlyStopped="true">	
+				<gear name="I"   speed="8"  forwardOnly="true"/>
+				<gear name="II"  speed="14" forwardOnly="true"/>
+				<gear name="R"   speed="14" reverseOnly="true"/>
+				<gear name="III" speed="23" forwardOnly="true"/>
+			</gears>
+		</gearboxMogli>
+	</vehicle> 
 	
 <!-- ********** Some mods ******************** -->	
 <!-- ********** Some mods ******************** -->	
