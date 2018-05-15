@@ -515,18 +515,22 @@ function gearboxMogli:mrGbMGetFuelUsageRate( getRawValue )
 end
 
 function gearboxMogli.getBit3( value, bit )
-	if     bit == 1 then
-		if value == 1 or value == 3 or value == 5 or value == 7 then
+	if     value <= 0 then
+		return 0
+	elseif value >= 7 then	
+		return 1
+	elseif bit == 1 then
+		if value == 1 or value == 3 or value == 5 then
 			return 1
 		end
 		return 0
 	elseif bit == 2 then
-		if value == 2 or value == 3 or value == 6 or value == 7 then
+		if value == 2 or value == 3 or value == 6 then
 			return 1
 		end
 		return 0
 	elseif bit == 3 then
-		if value == 4 or value == 5 or value == 6 or value == 7 then
+		if value == 4 or value == 5 or value == 6 then
 			return 1
 		end
 		return 0
@@ -540,12 +544,12 @@ function gearboxMogli.completeXMLGearboxEntry( xmlFile, baseName, fixEntry )
 	local newEntry = fixEntry
 	newEntry.reverseOnly    = getXMLBool( xmlFile, baseName .. "#reverseOnly" )		
 	newEntry.forwardOnly    = getXMLBool( xmlFile, baseName .. "#forwardOnly" )
-	newEntry.minGear        = getXMLInt(xmlFile, baseName .. "#minGear" )
-	newEntry.maxGear        = getXMLInt(xmlFile, baseName .. "#maxGear" )
-	newEntry.minRange       = getXMLInt(xmlFile, baseName .. "#minRange" )
-	newEntry.maxRange       = getXMLInt(xmlFile, baseName .. "#maxRange" )
-	newEntry.minRange2      = getXMLInt(xmlFile, baseName .. "#minRange2" )
-	newEntry.maxRange2      = getXMLInt(xmlFile, baseName .. "#maxRange2" )
+	newEntry.minGear        = getXMLInt(  xmlFile, baseName .. "#minGear" )
+	newEntry.maxGear        = getXMLInt(  xmlFile, baseName .. "#maxGear" )
+	newEntry.minRange       = getXMLInt(  xmlFile, baseName .. "#minRange" )
+	newEntry.maxRange       = getXMLInt(  xmlFile, baseName .. "#maxRange" )
+	newEntry.minRange2      = getXMLInt(  xmlFile, baseName .. "#minRange2" )
+	newEntry.maxRange2      = getXMLInt(  xmlFile, baseName .. "#maxRange2" )
 	newEntry.upShiftMs      = getXMLFloat(xmlFile, baseName .. "#upShiftTimeMs" )
 	newEntry.downShiftMs    = getXMLFloat(xmlFile, baseName .. "#downShiftTimeMs" )
 	return newEntry

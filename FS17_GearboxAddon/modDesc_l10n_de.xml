@@ -99,7 +99,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="Gänge, Gruppen 1 und 2"/>
 	
 		<text name="gearboxMogliTEXT_DiffLock"           text="Differentialsperren"/>	
-		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="Vorderradantrieb"/>
+		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="Hinterradantrieb"/>
 		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="Allradantrieb"/>
 		<text name="gearboxMogliTEXT_DiffLock_open"      text="offen"/>
 		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="selbst sperrend"/>

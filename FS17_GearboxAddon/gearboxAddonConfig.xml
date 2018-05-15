@@ -4482,8 +4482,8 @@
 			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="1"/>
 		</mod>
 		
-		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
-			<gears defaultGear="4">
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="3">
 				<gear speed="5"  name="1"/>
 				<gear speed="9"  name="2"/>
 				<gear speed="14" name="3"/>
@@ -4492,10 +4492,10 @@
 				<gear speed="39" name="6"/>
 			</gears>
 			
-			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="false" defaultRange="1">
+			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="false" defaultRange="1">
 				<range ratio="0.8" name="I"/>
 				<range ratio="1.0" name="II"/>
-			</ranges>
+			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
@@ -4512,7 +4512,7 @@
 			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="2"/>
 		</mod>
 		
-		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
 			<gears defaultGear="3">
 				<gear speed="7"  name="1"/>
 				<gear speed="13" name="2"/>
@@ -4522,10 +4522,10 @@
 				<gear speed="55" name="6"/>
 			</gears>
 			
-			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
 				<range ratio="0.8" name="I"/>
 				<range ratio="1.0" name="II"/>
-			</ranges>
+			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
@@ -4542,8 +4542,8 @@
 			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="3"/>
 		</mod>
 		
-		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
-			<gears defaultGear="3">
+		<gearboxMogli autoStartStop="true" speedLimiter="false" maxAIRange="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="2">
 				<gear speed="8"  name="1"/>
 				<gear speed="15" name="2"/>
 				<gear speed="23" name="3"/>
@@ -4552,11 +4552,11 @@
 				<gear speed="65" name="6"/>
 			</gears>
 			
-			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
 				<range ratio="0.679" name="I"/>
 				<range ratio="0.824" name="II"/>
 				<range ratio="1.000" name="III"/>
-			</ranges>
+			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
@@ -4573,8 +4573,8 @@
 			<xmlFile name="modernClassicsDLC/jcbFastrac150/jcbFastrac150.xml" engines="4"/>
 		</mod>
 		
-		<gearboxMogli autoStartStop="true" speedLimiter="true" maxAIRange2="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
-			<gears defaultGear="3">
+		<gearboxMogli autoStartStop="true" speedLimiter="true" maxAIRange="3" minFuelUsageRatio="235" soundMaxRpm="2600">	
+			<gears defaultGear="2">
 				<gear speed="10" name="1"/>
 				<gear speed="18" name="2"/>
 				<gear speed="27" name="3"/>
@@ -4583,11 +4583,11 @@
 				<gear speed="78" name="6"/>
 			</gears>
 			
-			<ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
+			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
 				<range ratio="0.679" name="I"/>
 				<range ratio="0.824" name="II"/>
 				<range ratio="1.000" name="III"/>
-			</ranges>
+			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
