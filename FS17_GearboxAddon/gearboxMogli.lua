@@ -1645,7 +1645,14 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.ReverseResetRange2    = b1
 	end
 
-	--**************************************************************************************************		
+	--**************************************************************************************************	
+	local manualClutch = not self.mrGbMS.AutoStartStop
+	if     self.mrGbMG.noAutoStartStop     then
+		manualClutch = true 
+	elseif self.mrGbMG.autoStartStop       then 
+		manualClutch = false  
+	end
+	
 	self.mrGbMS.ReverseRatio            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. ".reverse#ratio"), 1) 
 	self.mrGbMS.ManualClutchReverse   	= getXMLBool( xmlFile, xmlString .. ".reverse#manualClutch")
 	if self.mrGbMS.ManualClutchReverse == nil then
@@ -1655,7 +1662,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.ManualClutchReverse = f + 0.1 <= self.mrGbMS.MaxClutchPercent
 		elseif self.mrGbMS.ReverseOnlyStopped then
 			self.mrGbMS.ManualClutchReverse = true
-		elseif self.mrGbMS.AutoStartStop      then
+		elseif not manualClutch then
 			self.mrGbMS.ManualClutchReverse = false 
 		elseif  self.mrGbMS.ManualClutchGear
 				and self.mrGbMS.ManualClutchHl 
@@ -1682,7 +1689,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end
 		end
 	end
-	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#manualClutchNeutral"),    not self.mrGbMS.AutoStartStop )
+	self.mrGbMS.ManualClutchNeutral   	= Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#manualClutchNeutral"), manualClutch )
 	--**************************************************************************************************		
 	
 	local hasDefaultGear = true
@@ -4567,12 +4574,12 @@ function gearboxMogli:update(dt)
 			self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
 		end		
 
-		if     self.mrGbMS.DoubleClutch == 1 then
-			self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
-		--self.motorSoundLoadFactor              = self.actualLoadPercentage
-		elseif self.mrGbMS.DoubleClutch == 2 and self.axisForward ~= nil then
-			self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, -self.axisForward * self.sampleMotorLoad.volume )
-		--self.motorSoundLoadFactor              = self.actualLoadPercentage
+		if self.mrGbMS.DoubleClutch == 1 or self.mrGbMS.DoubleClutch == 2 then 
+			if self.axisForward == nil then
+				self.motorSoundLoadMinimalVolumeFactor = self.sampleMotorLoad.volume
+			else 
+				self.motorSoundLoadMinimalVolumeFactor = math.max( self.motorSoundLoadMinimalVolumeFactor, math.max( 0.25, -self.axisForward ) * self.sampleMotorLoad.volume )
+			end
 		end
 		
 		if     self.mrGbML.motorSoundLoadFactor < self.actualLoadPercentage then
@@ -6343,11 +6350,12 @@ function gearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 --	gearboxMogli.debugEvent( self, self.mrGbMS.NeutralActive, value, noEventSend )
 --end
 
-	if      not ( value )
-			and self.mrGbMS.NeutralActive
+	if      value ~= self.mrGbMS.NeutralActive
 			and not ( noCheck ) 
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchNeutral, noEventSend ) then
-		return false
+		if not value then 
+			return false
+		end
 	end
 	
 	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
@@ -6950,10 +6958,13 @@ function gearboxMogli:mrGbMGetAutoStartStop()
 	if self.mrGbMS.AllAuto or not ( self.steeringEnabled ) then 
 		return true 
 	end 
-	if self.mrGbMG.noAutoStartStop and not self.mrGbMS.NeutralActive then 
-		return false 
-	end 
-	if self.mrGbMG.autoStartStop then 
+	if     self.mrGbMG.noAutoStartStop     then
+		if     not self.mrGbMS.NeutralActive then 
+			return false 
+		elseif not self.mrGbMS.AutoClutch    then 
+			return false 
+		end
+	elseif self.mrGbMG.autoStartStop       then 
 		return true 
 	end 
 	return self.mrGbMS.AutoStartStop
