@@ -3367,6 +3367,10 @@ function gearboxMogli:update(dt)
 				else
 					m = 4
 				end
+				if diff.mogliMode == nil or diff.mogliMode ~= m then
+					diff.mogliFullyLocked     = nil 
+					diff.lastMogliTorqueRatio = nil 
+				end
 				if     m == 5 then
 					unlockDiff( self, i, diff )
 				elseif m == 2 then 
@@ -3374,16 +3378,10 @@ function gearboxMogli:update(dt)
 				elseif diff.mogliMode == nil or diff.mogliMode ~= m then
 					if     m == 1 then
 						updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.mogliSpeedRatio)
-				--elseif m == 2 then
-				--	updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,1)
 					else
 						updateDifferential(self.motorizedNode,i-1,diff.mogliTorqueRatio,gearboxMogli.huge)
 					end
 				end
-				
-				if m < 4 then 
-					diff.lastMogliTorqueRatio = nil 
-				end 
 				
 				diff.mogliMode = m
 			end
