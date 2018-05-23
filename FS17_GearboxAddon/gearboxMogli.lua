@@ -95,6 +95,7 @@ gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
 gearboxMogli.brakeForceLimitRpm   = 25
+gearboxMogli.setSprayLevel        = true -- digging wheels increas the spray level
 
 gearboxMogli.enabledAtClient      = true
 gearboxMogli.simplifiedAtClient   = false
@@ -411,7 +412,7 @@ function gearboxMogli:initClient()
 	self.mrGbMGetDiffLockMiddle    = gearboxMogli.mrGbMGetDiffLockMiddle
 	self.mrGbMGetDiffLockFront     = gearboxMogli.mrGbMGetDiffLockFront 
 	self.mrGbMGetDiffLockBack      = gearboxMogli.mrGbMGetDiffLockBack 
-
+	self.mrGbMGetModifyDifferentials = gearboxMogli.mrGbMGetModifyDifferentials
 --**********************************************************************************************************	
 
 	self.mrGbML.lastSumDt          = 0 
@@ -3123,7 +3124,7 @@ function gearboxMogli:update(dt)
 			wheel.mogliBrakeForce = nil
 		end 
 	end
-	if self.mrGbMS.ModifyDifferentials and self.isServer then
+	if self:mrGbMGetModifyDifferentials() and self.isServer then
 		if      self.mrGbMS.IsOn
 				and self.steeringEnabled 
 				and self.isMotorStarted
@@ -3280,7 +3281,7 @@ function gearboxMogli:update(dt)
 				end 
 				diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + self.mrGbML.smoothFast * ( q - diff.lastMogliTorqueRatio ), 0, 1 )
 			
-				local p = 1.01 * math.max( diff.mogliSpeedRatioL, 1 / diff.mogliSpeedRatioL )
+				local p = math.max( 1.01 * diff.mogliSpeedRatioL, 1.01 / diff.mogliSpeedRatioL )
 				updateDifferential(self.motorizedNode,idx-1,diff.lastMogliTorqueRatio,p)				
 				
 				if sameSign then
@@ -3973,15 +3974,15 @@ function gearboxMogli:update(dt)
 			end
 			self:mrGbMSetState( "HudMode", m )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKMIDDLE" ) then
-			if self.mrGbMS.ModifyDifferentials then
+			if self:mrGbMGetModifyDifferentials() then
 				self:mrGbMSetState( "DiffLockMiddle", not self.mrGbMS.DiffLockMiddle )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKFRONT" ) then
-			if self.mrGbMS.ModifyDifferentials then
+			if self:mrGbMGetModifyDifferentials() then
 				self:mrGbMSetState( "DiffLockFront", not self.mrGbMS.DiffLockFront )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKBACK" ) then
-			if self.mrGbMS.ModifyDifferentials then
+			if self:mrGbMGetModifyDifferentials() then
 				self:mrGbMSetState( "DiffLockBack", not self.mrGbMS.DiffLockBack )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOMATIC" ) then
@@ -5184,11 +5185,13 @@ function gearboxMogli:draw()
 				ovRows = ovRows + 1 infos[ovRows] = "engine"
 			end
 			
-			if     self:mrGbMGetDiffLockMiddle()
-					or self:mrGbMGetDiffLockFront()
-					or self:mrGbMGetDiffLockBack() then
-				ovRows = ovRows + 1 infos[ovRows] = "difflock"
-			end
+			if self:mrGbMGetModifyDifferentials() then
+				if     self:mrGbMGetDiffLockMiddle()
+						or self:mrGbMGetDiffLockFront()
+						or self:mrGbMGetDiffLockBack() then
+					ovRows = ovRows + 1 infos[ovRows] = "difflock"
+				end
+			end 
 			
 			if      self.mrGbMS.Hydrostatic 
 					and ( self:mrGbMGetOnlyHandThrottle() or self.mrGbMS.HandThrottle > 0 )
@@ -5534,14 +5537,16 @@ function gearboxMogli:draw()
 			end
 		end
 		
-		if self:mrGbMGetDiffLockMiddle() then
-			gearboxMogli.ovDiffLockMiddle:render()
-		end
-		if self:mrGbMGetDiffLockFront()  then
-			gearboxMogli.ovDiffLockFront:render()
-		end
-		if self:mrGbMGetDiffLockBack()   then
-			gearboxMogli.ovDiffLockBack:render()
+		if self:mrGbMGetModifyDifferentials() then 
+			if self:mrGbMGetDiffLockMiddle() then
+				gearboxMogli.ovDiffLockMiddle:render()
+			end
+			if self:mrGbMGetDiffLockFront()  then
+				gearboxMogli.ovDiffLockFront:render()
+			end
+			if self:mrGbMGetDiffLockBack()   then
+				gearboxMogli.ovDiffLockBack:render()
+			end
 		end
 	end
 	
@@ -6681,8 +6686,6 @@ end
 function gearboxMogli:mrGbMGetDiffLockMiddle()
 	if not ( self.mrGbMS.ModifyDifferentials ) then
 		return false 
-	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
-		return false 
 	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		return self.mrGbMS.DiffLockMiddle
 	end
@@ -6691,8 +6694,6 @@ end
 
 function gearboxMogli:mrGbMGetDiffLockFront()
 	if not ( self.mrGbMS.ModifyDifferentials ) then
-		return false 
-	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
 		return false 
 	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		if      self.mrGbMS.DiffLockFront 
@@ -6708,8 +6709,6 @@ end
 
 function gearboxMogli:mrGbMGetDiffLockBack()
 	if not ( self.mrGbMS.ModifyDifferentials ) then
-		return false 
-	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
 		return false 
 	elseif self.mrGbMS.IsOn and self.steeringEnabled then
 		return self.mrGbMS.DiffLockBack
@@ -7135,6 +7134,19 @@ function gearboxMogli:mrGbMGetAutomatic()
 		return true
 	end
 	return false
+end
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMGetModifyDifferentials
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMGetModifyDifferentials()
+	if     not ( self.mrGbMS.IsOn and self.steeringEnabled )
+			or not ( self.mrGbMS.ModifyDifferentials ) then
+		return false 
+	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
+		return false 
+	end 
+	return true 
 end
 
 --**********************************************************************************************************	
@@ -8993,6 +9005,17 @@ function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWor
 		if firstEntry == nil then
 			firstEntry = entry
 		end
+		if gearboxMogli.setSprayLevel then 
+			local desc = FruitUtil.fruitIndexToDesc[index]
+			setDensityMaskParams(g_currentMission.terrainDetailId, "between", 2, desc.cutState-1);
+			if g_currentMission.missionInfo.fertilizerStatesEnabled then
+				addDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.sprayLevelFirstChannel, g_currentMission.sprayLevelNumChannels, entry.id, 0, g_currentMission.numFruitStateChannels, 1);
+			else
+				setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.sprayLevelFirstChannel, g_currentMission.sprayLevelNumChannels, entry.id, 0, g_currentMission.numFruitStateChannels, 3);
+			end
+			setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.sprayFirstChannel, g_currentMission.sprayNumChannels, entry.id, 0, g_currentMission.numFruitStateChannels, 1);
+			setDensityMaskParams(g_currentMission.terrainDetailId, "greater", 0);
+		end
 	end
 	
 	-- destroy all fruits
@@ -9138,7 +9161,7 @@ function gearboxMogli:showSettingsUI()
 		self.mrGbMUI.Range2ShifterMode  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 	end
 	
-	if not ( self.mrGbMS.IsOn and self.steeringEnabled ) then
+	if not ( self.mrGbMS.IsOn and self.steeringEnabled ) or self.mrGbMS.AllAuto then
 		self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		self.mrGbMUI.DiffLockFront  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }

@@ -1382,6 +1382,19 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.transmissionEfficiency = h * torque / transInputTorque
 	end
 	
+	--**********************************************************************************************************		
+	-- adjust speed of front wheels
+	--**********************************************************************************************************		
+	if      self.vehicle:mrGbMGetModifyDifferentials() 
+			and self.vehicle.mrGbMS.TorqueRatioMiddle       > -0.01
+			and self.vehicle:mrGbMGetDiffLockMiddle()
+			and self.vehicle.lastSpeedReal * self.wheelSlipFactor > 0.000544
+			and self.vehicle.mrGbMS.SpeedRatioMiddleLocked ~= nil
+			and self.vehicle.mrGbMS.SpeedRatioMiddleLocked ~= 1 then 
+		local f = math.min( self.vehicle.mrGbMS.SpeedRatioMiddleLocked, 1 / self.vehicle.mrGbMS.SpeedRatioMiddleLocked )
+		self.ratioFactorG = self.ratioFactorG * f 
+	end 
+	
 	self.lastTransTorque        = torque
 	
 	--**********************************************************************************************************		

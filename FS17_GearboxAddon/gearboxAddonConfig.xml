@@ -4492,11 +4492,6 @@
 				<gear speed="39" name="6"/>
 			</gears>
 			
-			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="false" defaultRange="1">
-				<range ratio="0.8" name="I"/>
-				<range ratio="1.0" name="II"/>
-			</ranges-->
-			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
 				<range ratio="0.451" name="R" reverseOnly="true"/>
@@ -4521,11 +4516,6 @@
 				<gear speed="42" name="5"/> 
 				<gear speed="55" name="6"/>
 			</gears>
-			
-			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
-				<range ratio="0.8" name="I"/>
-				<range ratio="1.0" name="II"/>
-			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
@@ -4552,12 +4542,6 @@
 				<gear speed="65" name="6"/>
 			</gears>
 			
-			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
-				<range ratio="0.679" name="I"/>
-				<range ratio="0.824" name="II"/>
-				<range ratio="1.000" name="III"/>
-			</ranges-->
-			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
 				<range ratio="0.451" name="R" reverseOnly="true"/>
@@ -4582,12 +4566,6 @@
 				<gear speed="59" name="5"/> 
 				<gear speed="78" name="6"/>
 			</gears>
-			
-			<!--ranges shiftTimeMs="0" clutchRatio="1" speedMatching="true" defaultRange="1">
-				<range ratio="0.679" name="I"/>
-				<range ratio="0.824" name="II"/>
-				<range ratio="1.000" name="III"/>
-			</ranges-->
 			
 			<ranges defaultRange="4">
 				<range ratio="0.192" name="L" forwardOnly="true"/>
