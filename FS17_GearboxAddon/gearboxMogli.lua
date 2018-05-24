@@ -350,7 +350,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "ReverseActive", false, gearboxMogli.mrGbMOnSetReverse )
 	gearboxMogli.registerState( self, "NeutralActive", true,  gearboxMogli.mrGbMOnSetNeutral ) 	
 	gearboxMogli.registerState( self, "Handbrake",     false ) 	
-	gearboxMogli.registerState( self, "AutoHold",      false ) 	
+	gearboxMogli.registerState( self, "AutoHold",      false, gearboxMogli.mrGbMOnSetAutoHold )
 	gearboxMogli.registerState( self, "AutoClutch",    true  )
 	gearboxMogli.registerState( self, "ManualClutch",  1,     gearboxMogli.mrGbMOnSetManualClutch )
 	gearboxMogli.registerState( self, "HandThrottle",  0 )
@@ -6048,6 +6048,19 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli:mrGbMSetCurrentGear
 --**********************************************************************************************************	
+function gearboxMogli:mrGbMNoNeutralOnGearChange()
+	if      self.steeringEnabled 
+			and not ( self:mrGbMGetAutoClutch() ) 
+			and not ( self:mrGbMGetAutomatic() ) 
+			and self.mrGbMS.IsNeutral
+			and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then	
+		self:mrGbMSetNeutralActive( false, noEventSend, true )
+	end
+end 
+
+--**********************************************************************************************************	
+-- gearboxMogli:mrGbMSetCurrentGear
+--**********************************************************************************************************	
 function gearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 	if  		gearboxMogli.mrGbMCheckShiftOnlyIfStopped( self, self.mrGbMS.GearsOnlyStopped, noEventSend ) then
 		return false
@@ -6083,13 +6096,7 @@ function gearboxMogli:mrGbMSetCurrentGear( new, noEventSend, manual )
 		self:mrGbMSetState( "CurrentRange2", gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
 
-		if      self.steeringEnabled 
-				and not ( self:mrGbMGetAutoClutch() ) 
-				and not ( self:mrGbMGetAutomatic() ) 
-				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then	
-			self:mrGbMSetNeutralActive( false, noEventSend, true )
-		end
+		gearboxMogli.mrGbMNoNeutralOnGearChange( self )
 		
 		if      self.isServer 
 				and manual 
@@ -6205,13 +6212,7 @@ function gearboxMogli:mrGbMSetCurrentRange( new, noEventSend, manual )
 		self:mrGbMSetState( "CurrentRange2", gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2,  self.mrGbMS.CurrentRange2, "range2" ), noEventSend ) 
 		self:mrGbMSetState( "CurrentRange", newRange, noEventSend ) 
 	
-		if      self.steeringEnabled 
-				and not ( self:mrGbMGetAutoClutch() ) 
-				and not ( self:mrGbMGetAutomatic() ) 
-				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
-			self:mrGbMSetNeutralActive( false, noEventSend, true )
-		end
+		gearboxMogli.mrGbMNoNeutralOnGearChange( self )
 
 		if      self.isServer 
 				and manual 
@@ -6307,13 +6308,7 @@ function gearboxMogli:mrGbMSetCurrentRange2(new, noEventSend)
 		self:mrGbMSetState( "CurrentGear",  newGear,  noEventSend ) 		
 		self:mrGbMSetState( "CurrentRange2", newRange2, noEventSend ) 
 
-		if      self.steeringEnabled 
-				and not ( self:mrGbMGetAutoClutch() ) 
-				and not ( self:mrGbMGetAutomatic() ) 
-				and self.mrGbMS.IsNeutral
-				and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
-			self:mrGbMSetNeutralActive( false, noEventSend, true )
-		end
+		gearboxMogli.mrGbMNoNeutralOnGearChange( self )
 
 		if      self.isServer 
 				and manual 
@@ -6349,16 +6344,11 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMSetNeutralActive( value, noEventSend, noCheck )
 
---if value ~= self.mrGbMS.NeutralActive then
---	gearboxMogli.debugEvent( self, self.mrGbMS.NeutralActive, value, noEventSend )
---end
-
-	if      value ~= self.mrGbMS.NeutralActive
+	if      not ( value )
+			and self.mrGbMS.NeutralActive
 			and not ( noCheck ) 
 			and gearboxMogli.mrGbMCheckGrindingGears( self, self.mrGbMS.ManualClutchNeutral, noEventSend ) then
-		if not value then 
-			return false
-		end
+		return false
 	end
 	
 	self:mrGbMSetState( "NeutralActive", value, noEventSend ) 
@@ -6399,13 +6389,7 @@ function gearboxMogli:mrGbMSetReverseActive( value, noEventSend )
 		end
 	end
 
-	if      self.steeringEnabled 
-			and not ( self:mrGbMGetAutoClutch() ) 
-			and not ( self:mrGbMGetAutomatic() ) 
-			and self.mrGbMS.IsNeutral
-			and self.mrGbMS.ManualClutch <= gearboxMogli.clutchPercentShift then
-		self:mrGbMSetNeutralActive( false, noEventSend, true )
-	end
+	gearboxMogli.mrGbMNoNeutralOnGearChange( self )
 	
 	self:mrGbMSetState( "ReverseActive", value, noEventSend ) 
 
@@ -6955,6 +6939,9 @@ function gearboxMogli:mrGbMGetAutoStartStop()
 	if self.mrGbMS.AllAuto or not ( self.steeringEnabled ) then 
 		return true 
 	end 
+	if not self:mrGbMGetAutoClutch() then 
+		return false 
+	end
 	if     self.mrGbMG.noAutoStartStop     then
 		if     not self.mrGbMS.NeutralActive then 
 			return false 
@@ -7597,6 +7584,15 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 end 
 
 --**********************************************************************************************************	
+-- gearboxMogli:mrGbMOnSetAutoHold
+--**********************************************************************************************************	
+function gearboxMogli:mrGbMOnSetAutoHold( old, new, noEventSend )
+--gearboxMogli.printCallStack()
+--print("AutoHold: "..tostring(old).." => "..tostring(new))
+	self.mrGbMS.AutoHold = new
+end
+
+--**********************************************************************************************************	
 -- gearboxMogli:mrGbMGetAutoHold
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetAutoHold( )
@@ -7606,6 +7602,8 @@ function gearboxMogli:mrGbMGetAutoHold( )
 		return false
 	elseif self:mrGbMGetAutoStartStop() then
 		return true
+	elseif not self:mrGbMGetAutoClutch() then
+		return false 
 	end
 	return self.mrGbMG.autoHold
 end
@@ -7626,6 +7624,9 @@ end
 -- gearboxMogli:mrGbMOnSetNeutral
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )	
+--gearboxMogli.printCallStack()
+--print("AutoHold: "..tostring(old).." => "..tostring(new))
+	
 	self.mrGbMS.NeutralActive = new 
 
 	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0 and not ( self.mrGbMS.NeutralNoSync ) then

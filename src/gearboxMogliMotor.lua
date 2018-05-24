@@ -2720,7 +2720,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	-- handbrake 
 		if      self.vehicle.mrGbMS.NeutralActive 
 				and self.vehicle:mrGbMGetAutoHold( )
-				and self.brakeNeutralTimer  < g_currentMission.time then
+				and self.brakeNeutralTimer  < g_currentMission.time
+				and ( accelerationPedal     < -0.5 
+					 or currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed ) then
 			self.vehicle:mrGbMSetState( "AutoHold", true )
 		end
 				
