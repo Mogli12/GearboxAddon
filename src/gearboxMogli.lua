@@ -90,7 +90,8 @@ gearboxMogli.extraSpeedLimitMs    = gearboxMogli.extraSpeedLimit / 3.6
 gearboxMogli.deltaLimitTimeMs     = 500
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
 gearboxMogli.speedLimitRpmDiff    = 1 --5
-gearboxMogli.motorBrakeTime       = 250     
+gearboxMogli.motorBrakeTimeInv    = 0.002
+gearboxMogli.motorBrakeFactor     = 1
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
@@ -328,6 +329,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "ShuttleFactor", 0.5 )
 	gearboxMogli.registerState( self, "NoRetarderSound", false )
 	gearboxMogli.registerState( self, "NeutralNoSync",   false )
+	gearboxMogli.registerState( self, "MotorBrake",      false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -2564,6 +2566,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.Sound.IdlePitchScale, self.mrGbMS.Sound.IdlePitchMax = soundHelper( self.sampleMotor,     self.motorSoundPitchScale,     self.motorSoundPitchMax,     self.mrGbMS.IdlePitchFactor, self.mrGbMS.IdlePitchMax )
 		self.mrGbMS.Sound.RunPitchScale,  self.mrGbMS.Sound.RunPitchMax  = soundHelper( self.sampleMotorRun,  self.motorSoundRunPitchScale,  self.motorSoundRunPitchMax,  self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )
 		self.mrGbMS.Sound.LoadPitchScale, self.mrGbMS.Sound.LoadPitchMax = soundHelper( self.sampleMotorLoad, self.motorSoundLoadPitchScale, self.motorSoundLoadPitchMax, self.mrGbMS.RunPitchFactor,  self.mrGbMS.RunPitchMax  )		
+		self.mrGbMS.Sound.RunMinimalVolumeFactor  = self.motorSoundRunMinimalVolumeFactor
 		self.mrGbMS.Sound.LoadMinimalVolumeFactor = self.motorSoundLoadMinimalVolumeFactor
 		self.mrGbMS.Sound.RetarderSoundMinSpeed   = self.retarderSoundMinSpeed
 		if self.sampleMotorLoad ~= nil and self.sampleMotorLoad.volume ~= nil then
@@ -3005,6 +3008,7 @@ function gearboxMogli:update(dt)
 	
 	local processInput = true
 	
+	self.motorSoundRunMinimalVolumeFactor  = self.mrGbMS.Sound.RunMinimalVolumeFactor
 	self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
 	self.retarderSoundMinSpeed             = self.mrGbMS.Sound.RetarderSoundMinSpeed
 	
@@ -4566,6 +4570,21 @@ function gearboxMogli:update(dt)
 	if self.sampleMotorLoad.volume == nil then
 		self.motorSoundLoadMinimalVolumeFactor = self.mrGbMS.Sound.LoadMinimalVolumeFactor
 	else
+		if gearboxMogli.motorBrakeTimeInv > 0 and gearboxMogli.motorBrakeFactor > 0 then 
+			if self.mrGbML.MotorBrakeFactor == nil then 
+				self.mrGbML.MotorBrakeFactor = 0
+			end 
+			
+			if self.mrGbMS.MotorBrake then 
+				self.mrGbML.MotorBrakeFactor = math.min( 1, self.mrGbML.MotorBrakeFactor + dt * gearboxMogli.motorBrakeTimeInv )
+			else 
+				self.mrGbML.MotorBrakeFactor = math.max( 0, self.mrGbML.MotorBrakeFactor - dt * gearboxMogli.motorBrakeTimeInv )
+			end
+			if self.mrGbML.MotorBrakeFactor > 0 then 
+				self.motorSoundRunMinimalVolumeFactor = math.max( self.mrGbMS.Sound.RunMinimalVolumeFactor, self.sampleMotorRun.volume * self.mrGbML.MotorBrakeFactor * gearboxMogli.motorBrakeFactor )
+			end
+		end
+	
 		if self.motorSoundLoadFactor ~= nil and self.motorSoundLoadFactor > 0.5 then
 		-- at least half of the motor sound load volume even at low RPM
 			self.motorSoundLoadMinimalVolumeFactor = math.max( self.mrGbMS.Sound.LoadMinimalVolumeFactor, ( self.motorSoundLoadFactor - 0.5 ) * self.sampleMotorLoad.volume )
@@ -8490,6 +8509,16 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		local ratio       = self.motor:getGearRatio( true )
 		local maxRotSpeed = maxRpm * gearboxMogli.factorpi30
 		local c           = 0
+		
+		if     brakeForce <= gearboxMogli.eps then 
+			self:mrGbMSetState( "MotorBrake", false )
+		elseif self.motor.noTransmission then 
+			self:mrGbMSetState( "MotorBrake", false )
+		elseif self.motor.usedTransTorque > gearboxMogli.eps then 
+			self:mrGbMSetState( "MotorBrake", false )
+		else
+			self:mrGbMSetState( "MotorBrake", true )
+		end
 		
 		brakePedal = math.max( brakePedal, brakePedalM, math.min( 1, brakeForce / math.max( gearboxMogli.eps, self.motor:getBrakeForce() ) ) )
 			
