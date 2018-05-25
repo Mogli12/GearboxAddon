@@ -90,8 +90,8 @@ gearboxMogli.extraSpeedLimitMs    = gearboxMogli.extraSpeedLimit / 3.6
 gearboxMogli.deltaLimitTimeMs     = 500
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
 gearboxMogli.speedLimitRpmDiff    = 1 --5
-gearboxMogli.motorBrakeTimeInv    = 0.002
-gearboxMogli.motorBrakeFactor     = 1
+gearboxMogli.motorBrakeTimeInv    = 0.003
+gearboxMogli.motorBrakeFactor     = 1.2
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
@@ -4580,8 +4580,22 @@ function gearboxMogli:update(dt)
 			else 
 				self.mrGbML.MotorBrakeFactor = math.max( 0, self.mrGbML.MotorBrakeFactor - dt * gearboxMogli.motorBrakeTimeInv )
 			end
+			
 			if self.mrGbML.MotorBrakeFactor > 0 then 
-				self.motorSoundRunMinimalVolumeFactor = math.max( self.mrGbMS.Sound.RunMinimalVolumeFactor, self.sampleMotorRun.volume * self.mrGbML.MotorBrakeFactor * gearboxMogli.motorBrakeFactor )
+				local minRpm = self.mrGbMS.IdleRpm
+				local maxRpm = self.mrGbMS.MaxTargetRpm
+				local motorRpm = self:mrGbMGetCurrentRPM()
+				local f          
+				if     motorRpm < minRpm + gearboxMogli.eps then 
+					f = 0
+				elseif motorRpm > maxRpm - gearboxMogli.eps then 
+					f = 1
+				else 
+					f = ( motorRpm - minRpm ) / ( maxRpm - minRpm ) 
+				end 
+				f = ( 1 - ( 1 - f )^3 ) * self.mrGbML.MotorBrakeFactor * gearboxMogli.motorBrakeFactor
+				
+				self.motorSoundRunMinimalVolumeFactor = math.max( self.mrGbMS.Sound.RunMinimalVolumeFactor, self.sampleMotorRun.volume * f )
 			end
 		end
 	
@@ -8510,11 +8524,11 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		local maxRotSpeed = maxRpm * gearboxMogli.factorpi30
 		local c           = 0
 		
-		if     brakeForce <= gearboxMogli.eps then 
-			self:mrGbMSetState( "MotorBrake", false )
-		elseif self.motor.noTransmission then 
-			self:mrGbMSetState( "MotorBrake", false )
-		elseif self.motor.usedTransTorque > gearboxMogli.eps then 
+		if     brakeForce <= gearboxMogli.eps 
+				or self.motor.noTransmission 
+				or self.motor.usedMotorTorque > gearboxMogli.eps
+				or self.mrGbML.gearShiftingNeeded > 0
+				or self.motor.clutchPercent < self.mrGbMS.MinClutchPercent then
 			self:mrGbMSetState( "MotorBrake", false )
 		else
 			self:mrGbMSetState( "MotorBrake", true )
