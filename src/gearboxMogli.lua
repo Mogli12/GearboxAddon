@@ -3779,7 +3779,7 @@ function gearboxMogli:update(dt)
 			else 
 				self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt / math.max( self.mrGbMS.ClutchShiftTime * ( self.mrGbMS.ClutchSpeedOneButton - 1 ) * 0.1, 1 ) ))
 			end
-			self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ManualClutch *  self.mrGbMS.ClutchTimeManual )
+		--self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ManualClutch *  self.mrGbMS.ClutchTimeManual )
 		elseif InputBinding.gearboxMogliCLUTCH ~= nil then
 			local targetClutchPercent = InputBinding.getDigitalInputAxis(InputBinding.gearboxMogliCLUTCH)
 			if InputBinding.isAxisZero(targetClutchPercent) then
@@ -8457,7 +8457,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			
 		if      self.isMotorStarted
 				and math.abs( currentSpeed ) > 2.778e-5
-				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > 0.001 ) )
+				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > -gearboxMogli.accDeadZone ) )
 				and self.mrGbMS.ManualClutch > gearboxMogli.clutchPercentShift
 				and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
 					 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
