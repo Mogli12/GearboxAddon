@@ -83,10 +83,10 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTEXT_POWERSHIFT"           text="auto power shift" />
 		<text name="gearboxMogliTEXT_N_A"                  text="n/a" />
 
-		<text name="gearboxMogliTEXT_DrawTargetRpm"        text="mostra obiettivo RPM" />
+		<text name="gearboxMogliTEXT_DrawTargetRpm"        text="mostra RPM di riferimento" />
 		<text name="gearboxMogliTEXT_DrawReqPower"         text="mostra potenza" />
 		<text name="gearboxMogliTEXT_EnableAI"             text="lavoratore assunto" />
-		<text name="gearboxMogliTEXT_SwapGearRangeKeys"    text="scambiare marce e gamma 1" />
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"    text="cambiare marce e gamma 1" />
 
 		<text name="gearboxMogliTEXT_AllAutoMode"          text="impostazioni semplificate" />
 		<text name="gearboxMogliTEXT_AllAutoMode_0"        text="sequenziale" />
@@ -95,8 +95,8 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTEXT_AllAutoMode_3"        text="marce e gamma 1" />
 		<text name="gearboxMogliTEXT_AllAutoMode_4"        text="gamma 2" />
 		<text name="gearboxMogliTEXT_AllAutoMode_5"        text="marce e gamma 2" />
-		<text name="gearboxMogliTEXT_AllAutoMode_6"        text="gamme 1 and 2" />
-		<text name="gearboxMogliTEXT_AllAutoMode_7"        text="marce e gamma 1 and 2" />
+		<text name="gearboxMogliTEXT_AllAutoMode_6"        text="gamme 1 e 2" />
+		<text name="gearboxMogliTEXT_AllAutoMode_7"        text="marce e gamma 1 e 2" />
 
 		<text name="gearboxMogliTEXT_DiffLock"             text="bloccaggio differenziali" />
 		<text name="gearboxMogliTEXT_DiffLock_2wd"         text="2wd" />
@@ -113,9 +113,9 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTEXT_GearShifter_G27"      text="G27" />
 
 		<text name="gearboxMogliTEXT_ShuttleShifterMode"   text="bottone per-/retromarcia" />
-		<text name="gearboxMogliTEXT_Shuttle_both"         text="attivare e separare" />
-		<text name="gearboxMogliTEXT_Shuttle_toggle"       text="interruttore" />
-		<text name="gearboxMogliTEXT_Shuttle_back_fwd"     text="pulsanti separati" />
+		<text name="gearboxMogliTEXT_Shuttle_both"         text="tasti 1 e 2" />
+		<text name="gearboxMogliTEXT_Shuttle_toggle"       text="un tasto" />
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"     text="tasti separati" />
 
 		<text name="gearboxMogliTEXT_Range1ShifterMode"    text="G27 e gamma 1" />
 		<text name="gearboxMogliTEXT_Range2ShifterMode"    text="G27 e gamma 2" />
@@ -123,8 +123,8 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTEXT_RangeShifter_high_on" text="Gamma superiore, se premuto" />
 		<text name="gearboxMogliTEXT_RangeShifter_low_on"  text="Gamma inferiore, se premuto" />
 
-		<text name="gearboxMogliTEXT_MinTargetRpm"         text="obiettivo min RPM" />
-		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="obiettivo max RPM" />
+		<text name="gearboxMogliTEXT_MinTargetRpm"         text="RPM di riferimento min" />
+		<text name="gearboxMogliTEXT_MaxTargetRpm"         text="RPM di riferimento max" />
 		<text name="gearboxMogliTEXT_MatchGears"           text="corrispondenza di velocità (marce)" />
 		<text name="gearboxMogliTEXT_MatchRanges"          text="corrispondenza di velocità (gamma)" />
 		<text name="gearboxMogliTEXT_MATCH_1"              text="non corrisponde" />
@@ -138,7 +138,7 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTIP_Inputs"                text="inputs" />
 
 		<!-- tool tips -->
-		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Limita la velocità massima in base alla velocità attuale della velocità di crociera" />
+		<text name="gearboxMogliTIP_SPEEDLIMIT"            text="Limitazione della velocità massima al valore corrente della velocità di crociera" />
 		<text name="gearboxMogliTIP_DIFFLOCKMIDDLE"        text="Per trazione su ruote o bloccaggio del differenziale centrale" />
 		<text name="gearboxMogliTIP_DIFFLOCKFRONT"         text="Bloccaggio del differenziale dell'asse anteriore; richiede 4wd" />
 		<text name="gearboxMogliTIP_DIFFLOCKBACK"          text="Bloccaggio del differenziale dell'asse posteriore" />
@@ -147,14 +147,14 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTIP_AUTOCLUTCH2"           text="Frizione automatica" />
 		<text name="gearboxMogliTIP_AUTOMATIC"             text="Cambio automatico come il veicolo nella vita reale" />
 		<text name="gearboxMogliTIP_AllAutoMode"           text="Impostazione per la modalità semplificata; puoi scegliere cosa deve essere cambiato automaticamente" />
-		<text name="gearboxMogliTIP_DrawTargetRpm"         text="Mostra l'RPM obiettivo nell'HUD" />
-		<text name="gearboxMogliTIP_DrawReqPower"          text="Mostra la potenza corrente nell'HUD" />
+		<text name="gearboxMogliTIP_DrawTargetRpm"         text="Consente di visualizzare gli RPM correnti nell'HUD" />
+		<text name="gearboxMogliTIP_DrawReqPower"          text="Consente di visualizzare la potenza corrente nell'HUD" />
 		<text name="gearboxMogliTIP_EnableAI"              text="Impostazione per il lavoratore assunto" />
 		<text name="gearboxMogliTIP_SwapGearRangeKeys"     text="Sostituisce le marce e gamma uno" />
 		<text name="gearboxMogliTIP_GearShifterMode"       text="Impostazione per volanti con cambio" />
 		<text name="gearboxMogliTIP_ShuttleShifterMode"    text="Impostazione per volanti con cambio" />
-		<text name="gearboxMogliTIP_MinTargetRpm"          text="Obiettivo minimo RPM" />
-		<text name="gearboxMogliTIP_MaxTargetRpm"          text="Obiettivo massimo RPM" />
+		<text name="gearboxMogliTIP_MinTargetRpm"          text="RPM di riferimento minimi" />
+		<text name="gearboxMogliTIP_MaxTargetRpm"          text="RPM di riferimento massimi" />
 		<text name="gearboxMogliTIP_MatchGears"            text="Regola automaticamente la marcia quando cambi gamma" />
 		<text name="gearboxMogliTIP_MatchRanges"           text="Regola automaticamente la gamma quando cambi marcia" />
 		<text name="gearboxMogliTIP_Range1ShifterMode"     text="Questa impostazione ha senso solo con un volante con leva del cambio" />
@@ -169,18 +169,18 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTIP_ResetFwdRange2"        text="avviare gamma 2 avanti" />
 		<text name="gearboxMogliTIP_ResetRevRange2"        text="avviare gamma 2 indietro" />
 
-		<text name="gearboxMogliTEXT_MinAutoGearSpeed"     text="min. Velocità dell'cambio" />
-		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"     text="max. Velocità dell'cambio" />
-		<text name="gearboxMogliTEXT_ResetFwdGear"         text="Inizia a marcia avanti" />
-		<text name="gearboxMogliTEXT_ResetRevGear"         text="Inizia a marcia indietro" />
-		<text name="gearboxMogliTEXT_ResetFwdRange"        text="avviare gamma 1 vorwärts" />
+		<text name="gearboxMogliTEXT_MinAutoGearSpeed"     text="min. velocità del cambio" />
+		<text name="gearboxMogliTEXT_MaxAutoGearSpeed"     text="max. velocità del cambio" />
+		<text name="gearboxMogliTEXT_ResetFwdGear"         text="Inizia marcia avanti" />
+		<text name="gearboxMogliTEXT_ResetRevGear"         text="Inizia marcia indietro" />
+		<text name="gearboxMogliTEXT_ResetFwdRange"        text="avviare gamma 1 avanti" />
 		<text name="gearboxMogliTEXT_ResetRevRange"        text="avviare gamma 1 indietro" />
-		<text name="gearboxMogliTEXT_ResetFwdRange2"       text="avviare gamma 2 vorwärts" />
+		<text name="gearboxMogliTEXT_ResetFwdRange2"       text="avviare gamma 2 avanti" />
 		<text name="gearboxMogliTEXT_ResetRevRange2"       text="avviare gamma 2 indietro" />
 
 		<text name="gearboxMogliTIP_EcoMode"               text="In modalità ECO, il motore è ottimizzato per il risparmio di carburante" />
 		<text name="gearboxMogliTEXT_EcoMode"              text="modalità ECO" />
-		<text name="gearboxMogliTIP_AccelerateToLimit"     text="Massima rapporto per regolare la velocità alla velocità di crociera modificata" />
+		<text name="gearboxMogliTIP_AccelerateToLimit"     text="Massima velocità per regolare la velocità di cambiata la velocità di crociera" />
 		<text name="gearboxMogliTEXT_AccelerateToLimit"    text="Rapporto velocità di crociera" />
 		<text name="gearboxMogliTIP_ShuttleFactor"         text="Sensiblità dell'inversore" />
 		<text name="gearboxMogliTEXT_ShuttleFactor"        text="Sensiblità dell'inversore" />
@@ -189,15 +189,15 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliTEXT_GrindingSpeed"        text="cambio marcia non possibile; velocità" />
 		<text name="gearboxMogliTEXT_DoubleClutch"         text="cambio marcia non possibile; RPM" />
 		<text name="gearboxMogliTEXT_Stall1"               text="RPM sono troppo bassi" />
-		<text name="gearboxMogliTEXT_Stall2"               text="motore spento perché RPM erano troppo bassi" />
-		<text name="gearboxMogliTEXT_Stall3"               text="troppa potenza alla PTO richiesta" />
-		<text name="gearboxMogliTEXT_Stall4"               text="motore spento perché la richiesta di potenza da PTO era troppo alta" />
+		<text name="gearboxMogliTEXT_Stall2"               text="motore spento perché la velocità era troppo bassa" />
+		<text name="gearboxMogliTEXT_Stall3"               text="troppa potenza richiesta dalla PTO" />
+		<text name="gearboxMogliTEXT_Stall4"               text="motore spento perché la richiesta di potenza dalla PTO era troppo alta" />
 		<text name="gearboxMogliTEXT_ClutchOverheating"    text="la frizione si sta surriscaldando" />
 
-		<text name="gearboxMogliTIP_SlipPlough"            text="Gli pneumatici slittando si comportano come un aratro" />
-		<text name="gearboxMogliTEXT_SlipPlough"           text="Gli pneumatici slittano" />
-		<text name="gearboxMogliTIP_ClutchSpeed"           text="Velocità del bottone della frizione" />
-		<text name="gearboxMogliTEXT_ClutchSpeed"          text="Velocità del bottone della frizione" />
+		<text name="gearboxMogliTIP_SlipPlough"            text="Se gli pneumatici slittando si comportano come un aratro" />
+		<text name="gearboxMogliTEXT_SlipPlough"           text="Slittamento pneumatici" />
+		<text name="gearboxMogliTIP_ClutchSpeed"           text="velocità di reazione tasto della frizione" />
+		<text name="gearboxMogliTEXT_ClutchSpeed"          text="velocità di reazione tasto della frizione" />
 
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"             text="Diff Bloc" />
@@ -207,7 +207,7 @@ Aggiunge la specializzazione gearboxMogli a tutti i veicoli configurati
 		<text name="gearboxMogliDRAW_TargetRpm"            text="RPM obiettivo" />
 		<text name="gearboxMogliDRAW_power"                text="Potenza" />
 		<text name="gearboxMogliDRAW_load"                 text="Carico" />
-		<text name="gearboxMogliDRAW_fuel"                 text="Utilizzo carburante" />
+		<text name="gearboxMogliDRAW_fuel"                 text="Consumo" />
 		<text name="gearboxMogliDRAW_clutch"               text="Frizione" />
 		<text name="gearboxMogliDRAW_autoClutch"           text="Frizione auto" />
 		<text name="gearboxMogliDRAW_hand"                 text="Acc. man." />
