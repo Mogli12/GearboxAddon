@@ -749,8 +749,9 @@ end
 -- gearboxMogliMotor:motorStall
 --**********************************************************************************************************	
 function gearboxMogliMotor:motorStall( warningText1, warningText2 )
-	self.vehicle:mrGbMSetNeutralActive(true, false, true)
-	if not ( g_currentMission.missionInfo.automaticMotorStartEnabled ) then
+	if self.vehicle:mrGbMGetAutoClutch() or g_currentMission.missionInfo.automaticMotorStartEnabled then
+		self.vehicle:mrGbMSetNeutralActive(true, false, true)
+	else
 		self.vehicle:stopMotor()
 	end
 end
@@ -2633,8 +2634,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 --**********************************************************************************************************		
 	local brakeNeutral   = 0
 	local autoOpenClutch = ( self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch )
-											or ( ( self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverter )
-											 and ( accelerationPedal < -gearboxMogli.accDeadZone or doHandbrake ) )
+											or self.vehicle:mrGbMGetAutoClutch()
+											or self.vehicle.mrGbMS.TorqueConverter
 											or ( not self.vehicle.mrGbMS.ManualClutchReverse
 											 and self.vehicle.mrGbML.DirectionChangeTime <= g_currentMission.time 
 											 and g_currentMission.time <  self.vehicle.mrGbML.DirectionChangeTime + autoClutchSpeed ) 
@@ -2683,29 +2684,16 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			or not autoOpenClutch then
 	-- no automatic stop or cruise control is on 
 		brakeNeutral = -2
-	elseif accelerationPedal >= -gearboxMogli.accDeadZone then
-	-- not braking 
+	elseif  accelerationPedal    >= gearboxMogli.accDeadZone then
+	-- accelerating
 		brakeNeutral = -4 
-		
-		if accelerationPedal < gearboxMogli.accDeadZone then
-			if      self.clutchRpm               <  0
-					and self.vehicle:mrGbMGetAutoStartStop() 
-					and self.vehicle.mrGbMS.G27Mode  <= 0 
-					and not self.vehicle.mrGbMS.TorqueConverterOrHydro then				
-		-- idle
-				brakeNeutral = 5
-			elseif  self.nonClampedMotorRpm < self.vehicle.mrGbMS.CurMinRpm then 
-			-- emergency I 
-				brakeNeutral = 6
-			elseif  self.clutchOverheatTimer ~= nil 
-					and self.clutchOverheatTimer > self.vehicle.mrGbMS.ClutchOverheatStartTime then
-			-- emergency II
-				brakeNeutral = 7 
-			end
-		end
-	elseif currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
-			or self.lastMotorRpm     < minRpmReduced 
-			or ( self.lastMotorRpm   < self.minRequiredRpm and self.minThrottle > 0.2 ) then
+	elseif  accelerationPedal    >= -gearboxMogli.accDeadZone
+			and currentAbsSpeed       > self.vehicle.mrGbMG.minAbsSpeed then
+	-- roling  
+		brakeNeutral = -4 
+	elseif  currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed + self.vehicle.mrGbMG.minAbsSpeed 
+			or  self.lastMotorRpm     < minRpmReduced 
+			or  ( self.lastMotorRpm   < self.minRequiredRpm and self.minThrottle > 0.2 ) then
 	-- no transmission 
 		brakeNeutral = 8
 	else
@@ -4253,12 +4241,14 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	local lastTCR = self.lastTorqueConverterRatio 
 	local lastTCL = self.torqueConverterLockupMs
 	local lastCOT = self.lastClutchOpenTime
+	local lastCCF = self.lastClutchCloseForced
 	if lastTCR ~= nil and lastTCR > 0 then 
 		local d = self.tickDt / math.max( 10, self.vehicle.mrGbMS.TorqueConverterTime )
 		self.lastTorqueConverterRatio = math.max( 0, lastTCR - d )
 	end 		
 	self.torqueConverterLockupMs  = nil
 	self.lastClutchOpenTime       = nil
+	self.lastClutchCloseForced    = nil
 	
 	if      not ( self.vehicle.isMotorStarted ) then 
 		self.throttleRpm = math.max( 0, self.throttleRpm - self.tickDt * self.vehicle.mrGbMS.RpmDecFactor ) 
@@ -4303,7 +4293,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		local closeRpm  = self.vehicle.mrGbMS.CloseRpm + self.vehicle.mrGbMS.ClutchRpmShift * math.max( 1.4*self.motorLoadS - 0.4, 0 ) 
 		local targetRpm = self.targetRpm
 		
-		local r0 = math.min( math.max( minRpmReduced, self.vehicle.mrGbMS.CurMinRpm, closeRpm * gearboxMogli.rpmReduction ), self.vehicle.mrGbMS.IdleRpm )
+	--local r0 = math.min( math.max( minRpmReduced, self.vehicle.mrGbMS.CurMinRpm, closeRpm * gearboxMogli.rpmReduction ), self.vehicle.mrGbMS.IdleRpm )
+		local r0 = self.vehicle.mrGbMS.IdleRpm
 		
 		if targetRpm > r0 and accelerationPedal < 0.5 then 
 			targetRpm = r0 + 2 * ( accelerationPedal - 1 ) * ( targetRpm - r0 )
@@ -4391,25 +4382,30 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 					openRpm = math.min( self.maxTargetRpm + f * ( self.vehicle.mrGbMS.IdleRpm - self.maxTargetRpm ), openRpm )
 				end
 				closeRpm  = self.maxTargetRpm + f * ( self.vehicle.mrGbMS.IdleRpm - self.maxTargetRpm )
-			else 		
-				local r = math.max( openRpm, self.vehicle.mrGbMS.CurMinRpm, self.vehicle.mrGbMS.IdleRpm * gearboxMogli.rpmReduction )
-				if     closeRpm < r then 
-				elseif g_currentMission.time >= self.lastClutchOpenTime + 4000 then 	
-					closeRpm = r
-				else
-					local deltaT = ( 1 - ( g_currentMission.time - self.lastClutchOpenTime ) * 0.00025 ) ^2
-					closeRpm = r + deltaT * ( closeRpm - r )
+			else
+				if lastCCF then 
+					self.lastClutchCloseForced = true 
+					if self.autoClutchPercent < self.vehicle.mrGbMS.MinClutchPercent then 
+						fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc )
+					elseif self.nonClampedMotorRpm > openRpm and self.vehicle.mrGbMS.ClutchTimeIncForced > 0 then 
+						fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeIncForced )
+					end 
+				elseif  g_currentMission.time   < self.lastClutchOpenTime + 100 then
+				elseif  self.nonClampedMotorRpm > closeRpm
+						and self.nonClampedMotorRpm > minRpmReduced then 
+					self.lastClutchCloseForced = true  
+				elseif  accelerationPedal       > gearboxMogli.accDeadZone 
+						and g_currentMission.time   > self.lastClutchOpenTime + 1000 then
+					self.lastClutchCloseForced = true  
 				end 
-			end		
-
+				closeRpm = self.vehicle.mrGbMS.MaxTargetRpm
+			end 
+			
 			toClutchPercent   = math.min( toClutchPercent,   
 																		math.max( math.min( self.vehicle.mrGbMS.MinClutchPercent, 
 																												self.autoClutchPercent + 10 * self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc ),
 																							self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc ) )
-			fromClutchPercent = math.max( fromClutchPercent, 
-																		math.min( self.vehicle.mrGbMS.MinClutchPercent,
-																							self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc ),
-																		self.autoClutchPercent - self.tickDt/self.vehicle.mrGbMS.ClutchTimeDec )
+			fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent - self.tickDt/self.vehicle.mrGbMS.ClutchTimeDec )
 			
 			local prevPercent = self.autoClutchPercent
 			
@@ -4437,14 +4433,11 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		self.clutchPercent = 0
 	elseif self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch then
 		self.clutchPercent = 1
-	elseif self.vehicle:mrGbMGetAutoClutch() or self.vehicle.mrGbMS.TorqueConverterOrHydro then
-		self.clutchPercent = math.min( self.autoClutchPercent, self.vehicle.mrGbMS.ManualClutch )
-		
-		if not ( self.noTransmission ) and self.vehicle.mrGbML.debugTimer ~= nil and g_currentMission.time < self.vehicle.mrGbML.debugTimer and self.autoClutchPercent < self.vehicle.mrGbMS.MaxClutchPercent then
-			self.vehicle.mrGbML.debugTimer = math.max( g_currentMission.time + 200, self.vehicle.mrGbML.debugTimer )
-		end
 	else
-		if autoCloseClutch then
+		if     self.vehicle:mrGbMGetAutoClutch()
+				or self.vehicle.mrGbMS.TorqueConverterOrHydro then
+			self.clutchPercent = math.min( self.autoClutchPercent, self.vehicle.mrGbMS.ManualClutch )
+		elseif autoCloseClutch then
 		-- shuttle and manual clutch 
 			local c = ( g_currentMission.time - autoClutchTimer ) / autoClutchSpeed
 			self.clutchPercent = math.min( math.max( c, self.autoClutchPercent ), self.vehicle.mrGbMS.ManualClutch )		
@@ -4462,7 +4455,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 		
 		local minRpm = math.max( 0.5 * self.vehicle.mrGbMS.CurMinRpm, self.vehicle.mrGbMS.CurMinRpm - 100 )
-		if not ( self.noTransmission ) and self.vehicle.mrGbMS.ManualClutch > 0.1 and self.nonClampedMotorRpm < minRpm then
+		if not ( self.noTransmission ) and self.clutchPercent > 0.1 and self.nonClampedMotorRpm < minRpm then
 			if lastStallWarningTimer == nil then
 				self.stallWarningTimer = g_currentMission.time
 			else

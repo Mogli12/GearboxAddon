@@ -1135,6 +1135,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		default = gearboxMogli.huge 
 	elseif self.mrGbMS.TorqueConverter then 
 		default = math.max( self.mrGbMS.OpenRpm + 0.044 * self.mrGbMS.MaxTargetRpm, getRpm( 0.4 ) )
+	else
+		default = math.max( self.mrGbMS.OpenRpm + 0.044 * self.mrGbMS.MaxTargetRpm, getRpm( 0.4 ) )
 	end 	
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
 		
@@ -1210,6 +1212,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end	
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
+	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), 4 * clutchEngagingTimeMs )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
