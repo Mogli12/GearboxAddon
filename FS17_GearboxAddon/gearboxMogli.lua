@@ -1212,7 +1212,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end	
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
-	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), 4 * clutchEngagingTimeMs )
+	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), 5000 )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
@@ -8460,7 +8460,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 			
 		if      self.isMotorStarted
 				and math.abs( currentSpeed ) > 2.778e-5
-				and ( self:mrGbMGetAutoHold() or ( self:mrGbMGetAutoClutch() and acceleration > -gearboxMogli.accDeadZone ) )
+				and ( self:mrGbMGetAutoHold() or self:mrGbMGetAutoClutch() or not self.mrGbMS.ManualClutchReverse )
 				and self.mrGbMS.ManualClutch > gearboxMogli.clutchPercentShift
 				and ( ( self.movingDirection * currentSpeed > 0 and self.mrGbMS.ReverseActive )
 					 or ( self.movingDirection * currentSpeed < 0 and not ( self.mrGbMS.ReverseActive ) ) ) then
