@@ -32,7 +32,7 @@ gearboxMogli.autoShiftRpmDiff     = gearboxMogli.huge -- 200
 gearboxMogli.autoShiftPowerRatio  = 1.03
 gearboxMogli.autoShiftMaxDeltaRpm = 1E-3
 gearboxMogli.minClutchPercent     = 0.01
-gearboxMogli.minClutchPercentStd  = 0.6
+gearboxMogli.minClutchPercentStd  = 0.4
 gearboxMogli.minClutchPercentTC   = 0.2
 gearboxMogli.minClutchPercentTCL  = 0.2
 gearboxMogli.maxClutchPercentTC   = 0.96
@@ -1212,7 +1212,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end	
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
-	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), 5000 )
+	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), math.max( self.mrGbMS.ClutchTimeInc * 4, 4000 ) )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), clutchEngagingTimeMs ) 		
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeDec) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
@@ -4856,7 +4856,7 @@ function gearboxMogli:updateTick(dt)
 					and self.mrGbMS.IsOn
 					and self.steeringEnabled 
 					and self.isMotorStarted then 
-				local refSpeed = self.lastSpeed * 1000
+				local refSpeed = math.max( self.lastSpeed * 1000, 0.544 )
 				local maxSlip  = 1.2
 				if     self.rotatedTime < -gearboxMogli.eps then 
 					maxSlip = maxSlip + 0.5 * self.rotatedTime / self.minRotTime
@@ -4887,7 +4887,7 @@ function gearboxMogli:updateTick(dt)
 							else 
 								wheel.mogliTooFast = lastTooFast
 							end 
-							if wheel.mogliTooFast + 500 < g_currentMission.time then 
+							if wheel.mogliTooFast + 1000 < g_currentMission.time then 
 							  local dx,_,dz = localDirectionToWorld(wheel.driveNode, 0, 0, 1);
                 local angle = Utils.convertToDensityMapAngle(Utils.getYRotationFromDirection(dx, dz), g_currentMission.terrainDetailAngleMaxValue);
 
@@ -7614,6 +7614,10 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 				end
 				self.mrGbML.motor.speedLimitS       = 0
 				self.mrGbML.motor.motorLoadOverflow = 0
+			end
+			for wheelIndex, wheel in pairs( self.wheels ) do 
+				wheel.mogliTooFast       = nil
+				wheel.mogliAvgWheelSpeed = nil
 			end
 		end	
 	end

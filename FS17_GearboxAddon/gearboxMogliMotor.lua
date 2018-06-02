@@ -4405,22 +4405,36 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 				end
 				closeRpm  = self.maxTargetRpm + f * ( self.vehicle.mrGbMS.IdleRpm - self.maxTargetRpm )
 			else
-				if lastCCF then 
-					self.lastClutchCloseForced = true 
-					if self.autoClutchPercent < self.vehicle.mrGbMS.MinClutchPercent then 
-						fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeInc )
-					elseif self.nonClampedMotorRpm > openRpm and self.vehicle.mrGbMS.ClutchTimeIncForced > 0 then 
-						fromClutchPercent = math.max( fromClutchPercent, self.autoClutchPercent + self.tickDt/self.vehicle.mrGbMS.ClutchTimeIncForced )
-					end 
+				local fx = 2 * ( 1 - self.vehicle.mrGbMS.ShuttleFactor )
+				local t0 = self.vehicle.mrGbMS.ClutchTimeIncForced						
+				local t1 = 250 + ( fx - 1 ) * t0
+				
+				if lastCCF ~= nil then 
+					self.lastClutchCloseForced = lastCCF 
 				elseif  self.nonClampedMotorRpm > closeRpm
 						and self.nonClampedMotorRpm > minRpmReduced then 
-					self.lastClutchCloseForced = true  
-				elseif  g_currentMission.time   < self.lastClutchOpenTime + 1000 then
-				else 
-					self.lastClutchCloseForced = true  
+					self.lastClutchCloseForced = g_currentMission.time 
+				elseif g_currentMission.time > self.lastClutchOpenTime + t1 then
+					self.lastClutchCloseForced = g_currentMission.time 
 				end 
+				
+				if self.lastClutchCloseForced ~= nil then 
+					local t3 = self.lastClutchOpenTime + fx * t0
+					local t2 = self.lastClutchCloseForced + self.vehicle.mrGbMS.MinClutchPercent * math.min( self.vehicle.mrGbMS.ClutchTimeInc, t3 - self.lastClutchCloseForced )					                                                  
+					
+					local fc = fromClutchPercent 
+					if     g_currentMission.time > t3 then 
+						fc = 1 
+					elseif g_currentMission.time > t2 then 
+						fc = self.vehicle.mrGbMS.MinClutchPercent + ( 1 - self.vehicle.mrGbMS.MinClutchPercent ) * ( g_currentMission.time - t2 ) / ( t3 - t2 )
+					else 
+						fc = self.vehicle.mrGbMS.MinClutchPercent * ( g_currentMission.time - self.lastClutchCloseForced ) / ( t2 - self.lastClutchCloseForced )
+					end 
+					fromClutchPercent = math.min( math.max( fc, fromClutchPercent ), toClutchPercent ) 
+				end 
+				fromClutchPercent = math.min( fromClutchPercent, toClutchPercent )
+				targetRpm = math.min( targetRpm, math.max( minRpmReduced, closeRpm ) )
 				closeRpm  = self.vehicle.mrGbMS.MaxTargetRpm
-			--targetRpm = math.max( minRpmReduced, math.min( targetRpm, closeRpm ) )
 			end 
 			
 			toClutchPercent   = math.min( toClutchPercent,   
