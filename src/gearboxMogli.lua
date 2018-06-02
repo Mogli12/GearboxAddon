@@ -91,7 +91,7 @@ gearboxMogli.deltaLimitTimeMs     = 500
 gearboxMogli.speedLimitBrake      = 2 / 3.6 -- m/s
 gearboxMogli.speedLimitRpmDiff    = 1 --5
 gearboxMogli.motorBrakeTimeInv    = 0.003
-gearboxMogli.motorBrakeFactor     = 1.2
+gearboxMogli.motorBrakeFactor     = 0.8
 gearboxMogli.motorLoadExp         = 1.5
 gearboxMogli.gearShiftingNoThrottle = 178 -- just a big integer
 gearboxMogli.trustClutchRpmTimer  = 50
@@ -1147,7 +1147,6 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.ReverseDoubleClutch     = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".reverse#doubleClutch"), alwaysDoubleClutch) 
 	
 	local clutchEngagingTimeMs          = getXMLFloat(xmlFile, xmlString .. "#clutchEngagingTimeMs")
-	local clutchTimeManualDefault      
 	if clutchEngagingTimeMs == nil then
 		if     hasHydrostat then
 			clutchEngagingTimeMs =  500
@@ -1160,11 +1159,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		elseif self.mrGbMS.TorqueConverter then
 			clutchEngagingTimeMs = 1500
 		elseif getXMLBool(xmlFile, xmlString .. ".gears#automatic") then
-			clutchEngagingTimeMs =  800
+			clutchEngagingTimeMs =  500
 		elseif alwaysDoubleClutch or self.mrGbMS.GearsDoubleClutch or self.mrGbMS.Range1DoubleClutch then
-			clutchEngagingTimeMs = 1500 
+			clutchEngagingTimeMs =  800 
 		else
-			clutchEngagingTimeMs = 1000 
+			clutchEngagingTimeMs =  500 
 		end
 	end
 	
@@ -1212,9 +1211,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end	
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
-	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), math.max( self.mrGbMS.ClutchTimeInc * 4, 4000 ) )
-	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), 0.6 * self.mrGbMS.ClutchTimeInc )
-	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.3 * self.mrGbMS.ClutchTimeInc ) 
+	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), math.max( self.mrGbMS.ClutchTimeInc * 3, 3000 ) )
+	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), self.mrGbMS.ClutchTimeInc )
+	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeInc ) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
 	self.mrGbMS.ClutchSpeedOneButton    = self.mrGbMG.clutchSpeedOneButton
 	self.mrGbMS.ClutchCanOverheat       = Utils.getNoNil(getXMLBool( xmlFile, xmlString .. "#clutchCanOverheat"), not self.mrGbMS.TorqueConverterOrHydro ) 
@@ -8534,6 +8533,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 		if     brakeForce <= gearboxMogli.eps 
 				or self.motor.noTransmission 
 				or self.motor.usedMotorTorque > gearboxMogli.eps
+				or self.motor.lastTransTorque > gearboxMogli.eps
+				or self.motor.minThrottle     > gearboxMogli.eps
 				or self.mrGbML.gearShiftingNeeded > 0
 				or self.motor.clutchPercent < self.mrGbMS.MinClutchPercent then
 			self:mrGbMSetState( "MotorBrake", false )
