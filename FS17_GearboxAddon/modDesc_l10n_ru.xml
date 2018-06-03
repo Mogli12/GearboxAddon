@@ -195,6 +195,8 @@
 		
 		<text name="gearboxMogliTIP_SlipPlough"            text="Буксующие колеса будут закапываться в землю, как плуг"/>
 		<text name="gearboxMogliTEXT_SlipPlough"           text="Пробуксовка колёс"/>
+		<text name="gearboxMogliTIP_ClutchSpeed"           text="Скорость кнопки сцепления"/>
+		<text name="gearboxMogliTEXT_ClutchSpeed"          text="Скорость кнопки сцепления"/>
 
 		<!-- texts in the HUD => keep them short -->
 		<text name="gearboxMogliDRAW_difflock"             text="Блок.дифф."/>
