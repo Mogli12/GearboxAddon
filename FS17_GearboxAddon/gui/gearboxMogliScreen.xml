@@ -264,7 +264,7 @@
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 						
-						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="SlipPlough" toolTip="$l10n_gearboxMogliTIP_SlipPlough"  onCreate="onCreateSubElement" 
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="SlipPlough" toolTip="$l10n_gearboxMogliTIP_SlipPlough"  onCreate="onCreateSubElement" onCreateArgs="list0" 
 												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="54" focusChangeTop="53" focusChangeBottom="55">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
@@ -273,8 +273,17 @@
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 						
+						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="ManualDiffLock" toolTip="$l10n_gearboxMogliTIP_ManualDiffLock"  onCreate="onCreateSubElement" 
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="55" focusChangeTop="54" focusChangeBottom="56">
+							<GuiElement type="button" profile="multiTextOptionLeft" />
+							<GuiElement type="button" profile="multiTextOptionRight"/>
+							<GuiElement type="text" profile="multiTextOptionText" />
+							<GuiElement type="text" profile="multiTextOptionTitle" text="$l10n_gearboxMogliTEXT_ManualDiffLock"/>
+							<GuiElement type="bitmap" profile="multiTextOptionBg" />
+						</GuiElement>
+						
 						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ClutchSpeedOneButton" toolTip="$l10n_gearboxMogliTIP_ClutchSpeed"  onCreate="onCreateSubElement" onCreateArgs="list"
-												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="55" focusChangeTop="54" focusChangeBottom="61">
+												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="56" focusChangeTop="55" focusChangeBottom="61">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
 							<GuiElement type="text" profile="multiTextOptionText" />

@@ -548,6 +548,14 @@ function gearboxMogliMotor:updateSpeedLimit( dt, acceleration )
 	
 	local speedLimit = self.vehicle:getSpeedLimit(true)
 	
+	if      self.vehicle:mrGbMGetModifyDifferentials()
+			and self.vehicle.mrGbMS.LockedDiffSpeedLimit ~= nil
+			and ( self.vehicle:mrGbMGetDiffLockMiddle()
+				 or self.vehicle:mrGbMGetDiffLockFront() 
+				 or self.vehicle:mrGbMGetDiffLockBack() ) then   
+		speedLimit = math.min( speedLimit, self.vehicle.mrGbMS.LockedDiffSpeedLimit ) 
+	end
+	
 	if not ( self.vehicle.steeringEnabled ) then
 		speedLimit = math.min( speedLimit, self.speedLimit )
 	end
@@ -2240,7 +2248,13 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 	end
 
-	local mlf = Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 ) 
+	local mlf
+	if 0.999 < gearboxMogli.motorLoadExp and gearboxMogli.motorLoadExp < 1.001 then 
+		mlf = Utils.clamp( self.motorLoadP, 0, 1 ) 
+	else 
+		mlf = Utils.clamp( 1 - ( 1 - self.motorLoadP )^gearboxMogli.motorLoadExp, 0, 1 ) 
+	end
+	
 	if     self.vehicle.mrGbML.gearShiftingNeeded == 2 then
 		mlf = math.max( mlf, accelerationPedal )
 	elseif self.vehicle.mrGbML.gearShiftingEffect then 
@@ -2269,7 +2283,16 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		mlf = 0
 	end 
 	
-	self.motorLoad = math.max( 0, self.maxMotorTorque * mlf - pt0 / self.ptoMotorRpmRatio )
+	if     lastNoTorque
+			or lastNoTransmission
+			or self.vehicle.mrGbML.gearShiftingNeeded ~= 0
+			or self.motorLoadFactor == nil then 
+		self.motorLoadFactor = mlf 
+	else
+		self.motorLoadFactor = self.motorLoadFactor + self.vehicle.mrGbML.smoothFast * ( mlf - self.motorLoadFactor )
+	end
+	
+	self.motorLoad = math.max( 0, self.maxMotorTorque * self.motorLoadFactor - pt0 / self.ptoMotorRpmRatio )
 	
 	local wheelLoad    = 0
 --local acceleration = 0

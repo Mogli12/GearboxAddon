@@ -330,6 +330,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "NoRetarderSound", false )
 	gearboxMogli.registerState( self, "NeutralNoSync",   false )
 	gearboxMogli.registerState( self, "MotorBrake",      false )
+	gearboxMogli.registerState( self, "UnlockDiff",      false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -375,6 +376,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "Range1ShifterMode",  0 )
 	gearboxMogli.registerState( self, "Range2ShifterMode",  0 )
 	
+	gearboxMogli.registerState( self, "ManualDiffLock", true  )
 	gearboxMogli.registerState( self, "DiffLockMiddle", false )
 	gearboxMogli.registerState( self, "DiffLockFront",  false )
 	gearboxMogli.registerState( self, "DiffLockBack",   false )
@@ -2722,14 +2724,50 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 		
 	end
-	self.mrGbMS.UnlockDiffSpeed   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  ), 25 ) / 3600
-
-	if     self.mrGbMG.slipPloughDefault == 0 then 
-		self.mrGbMS.SlipPlough      = false 
-	elseif self.mrGbMG.slipPloughDefault == 1 then 
-		self.mrGbMS.SlipPlough      = true 
+	self.mrGbMS.LockedDiffSpeedLimit  = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
+	self.mrGbMS.UnlockDiffSpeed       = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
+	self.mrGbMS.LockDiffSpeed         = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
+	if      self.mrGbMS.LockedDiffSpeedLimit == nil
+			and self.mrGbMS.UnlockDiffSpeed      == nil
+			and self.mrGbMS.LockDiffSpeed        == nil then 
+		if self.mrGbMS.AutoStartStop then 
+			self.mrGbMS.UnlockDiffSpeed   = 27
+			self.mrGbMS.LockDiffSpeed     = 23 
+		else 
+			self.mrGbMS.LockedDiffSpeedLimit = 25
+		end 
+	elseif  self.mrGbMS.LockedDiffSpeedLimit == nil then
+		if     self.mrGbMS.UnlockDiffSpeed == nil and self.mrGbMS.LockDiffSpeed == nil then 
+			self.mrGbMS.UnlockDiffSpeed   = 27
+			self.mrGbMS.LockDiffSpeed     = 23 
+		elseif self.mrGbMS.UnlockDiffSpeed == nil then 
+			self.mrGbMS.UnlockDiffSpeed   = self.mrGbMS.LockDiffSpeed   * 27 / 23
+		elseif self.mrGbMS.LockDiffSpeed   == nil then 
+			self.mrGbMS.LockDiffSpeed     = self.mrGbMS.UnlockDiffSpeed * 23 / 27 
+		end
+		
+		if     self.mrGbMS.UnlockDiffSpeed < self.mrGbMG.minAbsSpeed + self.mrGbMG.minAbsSpeed then 
+			self.mrGbMS.UnlockDiffSpeed   = nil 
+			self.mrGbMS.LockDiffSpeed     = nil 
+		else 
+			self.mrGbMS.LockDiffSpeed     = Utils.clamp( self.mrGbMS.LockDiffSpeed, self.mrGbMG.minAbsSpeed, self.mrGbMS.UnlockDiffSpeed - self.mrGbMG.minAbsSpeed )
+		end 
 	else 
-		self.mrGbMS.SlipPlough      = g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"]
+		self.mrGbMS.UnlockDiffSpeed     = nil
+		self.mrGbMS.LockDiffSpeed       = nil 
+	end 
+		
+	
+	if     self.mrGbMG.slipPloughDefault == 0 then 
+		self.mrGbMS.SlipPlough      = 0 
+	elseif self.mrGbMG.slipPloughDefault == 1 then 
+		self.mrGbMS.SlipPlough      = 1 
+	elseif self.mrGbMG.slipPloughDefault == 2 then 
+		self.mrGbMS.SlipPlough      = 2
+	elseif g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"] then
+		self.mrGbMS.SlipPlough      = 1
+	else
+		self.mrGbMS.SlipPlough      = 0
 	end	
 	self.mrGbMS.SlipPloughDefault = self.mrGbMS.SlipPlough
 	
@@ -3130,6 +3168,20 @@ function gearboxMogli:update(dt)
 			wheel.mogliBrakeForce = nil
 		end 
 	end
+	if      self.isServer
+			and self.mrGbMS.UnlockDiffSpeed ~= nil 
+			and self.mrGbMS.LockDiffSpeed   ~= nil then 
+		if self.mrGbMS.UnlockDiff then 
+			if self.lastSpeed*3600 < self.mrGbMS.LockDiffSpeed   then
+				self:mrGbMSetState( "UnlockDiff", false ) 	
+			end 
+		else 
+			if self.lastSpeed*3600 > self.mrGbMS.UnlockDiffSpeed then
+				self:mrGbMSetState( "UnlockDiff", true ) 	
+			end 
+		end 
+	end 
+	
 	if self:mrGbMGetModifyDifferentials() and self.isServer then
 		if      self.mrGbMS.IsOn
 				and self.steeringEnabled 
@@ -4851,7 +4903,7 @@ function gearboxMogli:updateTick(dt)
 				end
 			end 	
 			
-			if      self.mrGbMS.SlipPlough
+			if      self.mrGbMS.SlipPlough > 0
 					and self.mrGbMS.IsOn
 					and self.steeringEnabled 
 					and self.isMotorStarted then 
@@ -4910,7 +4962,7 @@ function gearboxMogli:updateTick(dt)
 									x2,y2,z2 = localToWorld(wheel.repr, x + width, 0, z + l0 + l1 )
 								end
 								
-								gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle)
+								gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1)
 								
 								if wheel.additionalWheels ~= nil then 
 									for _,additionalWheel in pairs(wheel.additionalWheels) do
@@ -4923,7 +4975,7 @@ function gearboxMogli:updateTick(dt)
 										x0,y0,z0 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 - l1 )
 										x1,y1,z1 = localToWorld(refNode, xShift - width, yShift-additionalWheel.radius, zShift + l0 - l1 )
 										x2,y2,z2 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 + l1 )
-										gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle)
+										gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1)
 									end 
 								end
 							end
@@ -5743,11 +5795,14 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 			attributes = attributes.." mrGbMMaxAutoSpeed=\"" .. tostring( self.mrGbMS.MaxAutoGearSpeed ) .. "\""     
 		end
 		if self.mrGbMS.SlipPlough ~= self.mrGbMS.SlipPloughDefault then 
-			attributes = attributes.." mrGbMSlipPlough=\"" .. tostring( self.mrGbMS.SlipPlough ) .. "\""     
+			attributes = attributes.." mrGbMSlipPlough2=\"" .. tostring( self.mrGbMS.SlipPlough ) .. "\""     
 		end
 		if self.mrGbMS.ClutchSpeedOneButton ~= self.mrGbMG.clutchSpeedOneButton then 
 			attributes = attributes.." mrGbMClutchSpeed=\"" .. tostring( self.mrGbMS.ClutchSpeedOneButton ) .. "\""     
 		end
+		if self.mrGbMS.ModifyDifferentials and not ( self.mrGbMS.ManualDiffLock ) then
+			attributes = attributes.." mrGbMManualDiffLock=\"" .. tostring( self.mrGbMS.ManualDiffLock ) .. "\""     
+		end 
 	end 
 	
 	return attributes
@@ -5785,6 +5840,14 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 	local i, b
 	
 	if self.mrGbMS ~= nil then
+		local b = getXMLBool( xmlFile, key .. "#mrGbMSlipPlough" )
+		if b == nil then 
+		elseif b then
+			self.mrGbMS.SlipPlough = 1 
+		else 
+			self.mrGbMS.SlipPlough = 0 
+		end 
+	
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetFwdGear"  , "ResetFwdGear"      )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetFwdRange" , "ResetFwdRange"     )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetFwdRange2", "ResetFwdRange2"    )
@@ -5817,6 +5880,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange1Shifter",  "Range1ShifterMode" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange2Shifter",  "Range2ShifterMode" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMClutchSpeed"   , "ClutchSpeedOneButton" )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSlipPlough2"   , "SlipPlough"      )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
@@ -5828,7 +5892,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockMiddle", "DiffLockMiddle"    )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockFront" , "DiffLockFront"     )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockBack"  , "DiffLockBack"      )
-		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMSlipPlough"    , "SlipPlough"      )
+		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMManualDiffLock", "ManualDiffLock"    )
 
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchGears"    , "MatchGears"        )
@@ -7163,9 +7227,10 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetModifyDifferentials()
 	if     not ( self.mrGbMS.IsOn and self.steeringEnabled )
-			or not ( self.mrGbMS.ModifyDifferentials ) then
+			or not ( self.mrGbMS.ModifyDifferentials )
+			or not ( self.mrGbMS.ManualDiffLock ) then
 		return false 
-	elseif math.abs( self.lastSpeed ) > self.mrGbMS.UnlockDiffSpeed then 
+	elseif self.mrGbMS.UnlockDiff then 
 		return false 
 	end 
 	return true 
@@ -8352,7 +8417,8 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 --self.motor:updateMotorRpm( dt )
 	self.motor:mrGbMUpdateMotorRpm( dt )
 	local speedLimit = self.motor:updateSpeedLimit( dt, acceleration ) * 3.6
-	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 
+	local sl, slo    = self:getSpeedLimit(true)
+	local ccOn       = self.mrGbMS.MaxSpeedLimiter or self.mrGbMS.SpeedLimiter or self.cruiseControl.state > 0 or slo
 	local ccBrake    = self.mrGbMS.CruiseControlBrake or self.mrGbMS.AllAuto
 	if self.tempomatMogliV22 ~= nil and self.tempomatMogliV22.keepSpeedLimit ~= nil then
 		ccOn    = true
@@ -8399,7 +8465,6 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end 
 	
 	do
-		local sl = self:getSpeedLimit(true)
 		if      not self.motor.limitMaxRpm 
 				and ccOn
 				and ccBrake
@@ -9036,19 +9101,25 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli.updatePloughArea
 --**********************************************************************************************************
-function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle)
-	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
+function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle, limitToField)
+	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField)
 	
 	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
 	
 	setDensityCompareParams(g_currentMission.terrainDetailId, "greater", -1);	
-	setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+	if limitToField then 
+		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, angle);
+	else 
+		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
+	end 
 end
 
 --**********************************************************************************************************	
 -- gearboxMogli.updateDestroyCommonArea
 --**********************************************************************************************************	
-function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
+function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField)
 	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
 	
 	local firstEntry = nil
@@ -9074,7 +9145,11 @@ function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWor
 	setDensityNewTypeIndexMode(firstEntry.id, 2);
 	setDensityTypeIndexCompareMode(firstEntry.id, 2);
 	-- note: this asumes firstEntry.id has the lowest channel offset
-	setDensityMaskedParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
+	if limitToField then
+		setDensityMaskedParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
+	else
+		setDensityParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, 0);
+	end
 	setDensityNewTypeIndexMode(firstEntry.id, 0);
 	setDensityTypeIndexCompareMode(firstEntry.id, 0);
 	
@@ -9396,6 +9471,10 @@ function gearboxMogli:showSettingsUI()
 																																 g_i18n:getSpeed(i * self.mrGbMG.decAccToLimitRatio),
 																																 gearboxMogli.getSpeedMeasuringUnit() ))
 	end
+
+	self.mrGbMUI.SlipPlough = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
+															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_1", "field" ), 
+															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_2", "everywhere" ) }
 	
 	self.mrGbMUI.ClutchSpeedOneButton = {}
 	for i=1,21 do 
@@ -9442,6 +9521,11 @@ function gearboxMogli:showSettingsUI()
 		appendText( "Gears",   "ResetFwdGear",   "ResetRevGear"   )
 		appendText( "Ranges",  "ResetFwdRange",  "ResetRevRange"  )
 		appendText( "Ranges2", "ResetFwdRange2", "ResetRevRange2" )
+	end
+	
+	if not ( self.mrGbMS.ModifyDifferentials ) then 
+		self.mrGbMS.ManualDiffLock = false 
+		g_gearboxMogliScreen.ManualDiffLock:setDisabled( true )
 	end
 	
 	for n,t in pairs(self.mrGbMUI) do

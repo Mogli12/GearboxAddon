@@ -196,6 +196,11 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 	
 		<text name="gearboxMogliTIP_SlipPlough"          text="Durchdrehende Räder wirken wie ein Pflug"/>
 		<text name="gearboxMogliTEXT_SlipPlough"         text="Durchdrehende Räder"/>
+		<text name="gearboxMogliTEXT_SlipPlough_1"       text="nur im Feld"/>
+		<text name="gearboxMogliTEXT_SlipPlough_2"       text="überall"/>
+		<text name="gearboxMogliTIP_ManualDiffLock"      text="Differentiale können manuell gesperrt werden"/>
+		<text name="gearboxMogliTEXT_ManualDiffLock"     text="Manuelle Differentialsperren"/>
+		
 		<text name="gearboxMogliTIP_ClutchSpeed"         text="Reaktionsgeschwindigkeit Kupplungsknopf"/>
 		<text name="gearboxMogliTEXT_ClutchSpeed"        text="Reaktionsgeschwindigkeit Kupplungsknopf"/>
 	
