@@ -201,6 +201,9 @@ gearboxMogliGlobals.shiftingBaseVolume    = 1     -- volume factor of gear shift
 gearboxMogliGlobals.handbrakeBaseVolume   = 1     -- volume factor of gear handbrake sound
 gearboxMogliGlobals.slipPloughDefault     = -1    -- 0: always off; 1: always on; -1: check for FS17_ForRealModule03_GroundResponse and FS17_ForRealModule01_CropDestruction
 gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
+gearboxMogliGlobals.maxSlipFactor         = 1.3   -- digging wheels starts if wheel is 30% faster than ground speed 
+gearboxMogliGlobals.maxSlipInc            = 0.3   -- additional 30% at full steering angle 
+
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -4908,11 +4911,11 @@ function gearboxMogli:updateTick(dt)
 					and self.steeringEnabled 
 					and self.isMotorStarted then 
 				local refSpeed = math.max( self.lastSpeed * 1000, 0.544 )
-				local maxSlip  = 1.2
+				local maxSlip  = self.mrGbMG.maxSlipFactor
 				if     self.rotatedTime < -gearboxMogli.eps then 
-					maxSlip = maxSlip + 0.5 * self.rotatedTime / self.minRotTime
+					maxSlip = maxSlip + self.mrGbMG.maxSlipInc * self.rotatedTime / self.minRotTime
 				elseif self.rotatedTime >  gearboxMogli.eps then 
-					maxSlip = maxSlip + 0.5 * self.rotatedTime / self.maxRotTime
+					maxSlip = maxSlip + self.mrGbMG.maxSlipInc * self.rotatedTime / self.maxRotTime
 				end 
 				maxSlip = maxSlip * refSpeed
 				
