@@ -201,8 +201,8 @@ gearboxMogliGlobals.shiftingBaseVolume    = 1     -- volume factor of gear shift
 gearboxMogliGlobals.handbrakeBaseVolume   = 1     -- volume factor of gear handbrake sound
 gearboxMogliGlobals.slipPloughDefault     = -1    -- 0: always off; 1: always on; -1: check for FS17_ForRealModule03_GroundResponse and FS17_ForRealModule01_CropDestruction
 gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
-gearboxMogliGlobals.maxSlipFactor         = 1.3   -- digging wheels starts if wheel is 30% faster than ground speed 
-gearboxMogliGlobals.maxSlipInc            = 0.3   -- additional 30% at full steering angle 
+gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
+gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 
 
 --**********************************************************************************************************	
@@ -4935,7 +4935,32 @@ function gearboxMogli:updateTick(dt)
 						wheel.mogliAvgWheelSpeed = 0.5 * ( wheel.mogliAvgWheelSpeed + sw )
 						sw = math.min( sw, wheel.mogliAvgWheelSpeed )
 						
+						local wheelSlip = false 
 						if sw >= 0.544 and wheel.mogliAvgWheelSpeed > maxSlip then
+							local densityBits
+							if wheel.mrLastTerrainDensityBits == nil then 
+								local wx, wy, wz = wheel.netInfo.x, wheel.netInfo.y, wheel.netInfo.z;
+								wy = wy - wheel.radius;
+								wx = wx + wheel.xOffset;
+								wx, wy, wz = localToWorld(wheel.node, wx,wy,wz);
+								densityBits = getDensityAtWorldPos(g_currentMission.terrainDetailId, wx, wy, wz)
+							else 
+								densityBits = wheel.mrLastTerrainDensityBits
+							end
+							if densityBits == 0 and self.mrGbMS.SlipPlough <= 1 then 
+								wheelSlip = false 
+							else 
+								local fieldType = bitAND(densityBits, 7)
+								if fieldType==FruitUtil.GROUND_TYPE_PLOUGH
+										or fieldType==FruitUtil.GROUND_TYPE_GRASS then
+									wheelSlip = false 
+								else 
+									wheelSlip = true 
+								end 
+							end 
+						end 
+						
+						if wheelSlip then 
 							if lastTooFast == nil then 
 								wheel.mogliTooFast = g_currentMission.time 
 							else 
