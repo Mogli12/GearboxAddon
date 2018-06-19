@@ -4935,32 +4935,7 @@ function gearboxMogli:updateTick(dt)
 						wheel.mogliAvgWheelSpeed = 0.5 * ( wheel.mogliAvgWheelSpeed + sw )
 						sw = math.min( sw, wheel.mogliAvgWheelSpeed )
 						
-						local wheelSlip = false 
 						if sw >= 0.544 and wheel.mogliAvgWheelSpeed > maxSlip then
-							local densityBits
-							if wheel.mrLastTerrainDensityBits == nil then 
-								local wx, wy, wz = wheel.netInfo.x, wheel.netInfo.y, wheel.netInfo.z;
-								wy = wy - wheel.radius;
-								wx = wx + wheel.xOffset;
-								wx, wy, wz = localToWorld(wheel.node, wx,wy,wz);
-								densityBits = getDensityAtWorldPos(g_currentMission.terrainDetailId, wx, wy, wz)
-							else 
-								densityBits = wheel.mrLastTerrainDensityBits
-							end
-							if densityBits == 0 and self.mrGbMS.SlipPlough <= 1 then 
-								wheelSlip = false 
-							else 
-								local fieldType = bitAND(densityBits, 7)
-								if fieldType==FruitUtil.GROUND_TYPE_PLOUGH
-										or fieldType==FruitUtil.GROUND_TYPE_GRASS then
-									wheelSlip = false 
-								else 
-									wheelSlip = true 
-								end 
-							end 
-						end 
-						
-						if wheelSlip then 
 							if lastTooFast == nil then 
 								wheel.mogliTooFast = g_currentMission.time 
 							else 
@@ -9129,25 +9104,43 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli.updatePloughArea
 --**********************************************************************************************************
-function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle, limitToField)
-	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField)
+function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle, limitToField)	
 	
 	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
 	
-	setDensityCompareParams(g_currentMission.terrainDetailId, "greater", -1);	
+	local entry = g_currentMission.fruits[FruitUtil.FRUITTYPE_GRASS]
+	
+	local totalArea, grassArea
+  setDensityCompareParams(entry.id, "greater", 0);
 	if limitToField then 
-		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
-		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, angle);
+		totalArea, grassArea = setDensityMaskedParallelogram(entry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitStateChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 1);
 	else 
-		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+		totalArea, grassArea = setDensityParallelogram(entry.id, x,z, widthX,widthZ, heightX,heightZ, 0, g_currentMission.numFruitStateChannels, 1);
+	end
+  setDensityCompareParams(entry.id, "greater", -1);
+
+	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField, totalArea<=0)
+	
+	if totalArea > 0 then 
+		setDensityCompareParams(g_currentMission.terrainDetailId, "between", 1, g_currentMission.grassValue-1);	
+		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.ploughValue);
 		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
-	end 
+		setDensityCompareParams(g_currentMission.terrainDetailId, "greater", -1);	
+	else
+		if limitToField then 
+			setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+			setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, angle);
+		else 
+			setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.ploughValue);
+			setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
+		end 
+	end
 end
 
 --**********************************************************************************************************	
 -- gearboxMogli.updateDestroyCommonArea
 --**********************************************************************************************************	
-function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField)
+function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField, destroyFruits)
 	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
 	
 	local firstEntry = nil
@@ -9169,18 +9162,20 @@ function gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWor
 		end
 	end
 	
-	-- destroy all fruits
-	setDensityNewTypeIndexMode(firstEntry.id, 2);
-	setDensityTypeIndexCompareMode(firstEntry.id, 2);
-	-- note: this asumes firstEntry.id has the lowest channel offset
-	if limitToField then
-		setDensityMaskedParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
-	else
-		setDensityParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, 0);
-	end
-	setDensityNewTypeIndexMode(firstEntry.id, 0);
-	setDensityTypeIndexCompareMode(firstEntry.id, 0);
-	
+	if destroyFruits then 
+		-- destroy all fruits
+		setDensityNewTypeIndexMode(firstEntry.id, 2);
+		setDensityTypeIndexCompareMode(firstEntry.id, 2);
+		-- note: this asumes firstEntry.id has the lowest channel offset
+		if limitToField then
+			setDensityMaskedParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 0);
+		else
+			setDensityParallelogram(firstEntry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitDensityMapChannels, 0);
+		end
+		setDensityNewTypeIndexMode(firstEntry.id, 0);
+		setDensityTypeIndexCompareMode(firstEntry.id, 0);
+	end 
+		
 	for i=1, table.getn(g_currentMission.dynamicFoliageLayers) do
 		local id = g_currentMission.dynamicFoliageLayers[i];
 		local numChannels = getTerrainDetailNumChannels(id);
