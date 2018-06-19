@@ -55,7 +55,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.original         = motor 	
 	self.torqueCurve      = AnimCurve:new( interpolFunction, interpolDegree )
 	self.boostMinSpeed    = gearboxMogli.huge 
-	
+
 	if gearboxMogli.powerFuelCurve == nil then
 		gearboxMogli.powerFuelCurve = AnimCurve:new( interpolFunction, interpolDegree )
 		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.010, time=0.0} )
@@ -72,6 +72,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	end
 	
 	if vehicle.mrGbMS.Engine.maxTorque > 0 then
+		self.torqueCurve:addKeyframe( {v=0, time=0} )
+	
 		for _,k in pairs(vehicle.mrGbMS.Engine.torqueValues) do
 			self.torqueCurve:addKeyframe( k )	
 		end
@@ -80,6 +82,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 		if vehicle.mrGbMS.Engine.ecoTorqueValues ~= nil then
 			self.ecoTorqueCurve = AnimCurve:new( interpolFunction, interpolDegree )
 			self.boostMinSpeed  = vehicle.mrGbMS.BoostMinSpeed
+			self.ecoTorqueCurve:addKeyframe( {v=0, time=0} )
 			for _,k in pairs(vehicle.mrGbMS.Engine.ecoTorqueValues) do
 				self.ecoTorqueCurve:addKeyframe( k )	
 			end
@@ -89,15 +92,25 @@ function gearboxMogliMotor:new( vehicle, motor )
 		self.maxTorqueRpm   = vehicle.mrGbMS.Engine.maxTorqueRpm
 		self.maxMotorTorque = vehicle.mrGbMS.Engine.maxTorque
 	else
-		local idleTorque    = motor.torqueCurve:get(vehicle.mrGbMS.OrigMinRpm)
-		self.torqueCurve:addKeyframe( {v=0.1*idleTorque, time=0} )
-		self.torqueCurve:addKeyframe( {v=0.9*idleTorque, time=vehicle.mrGbMS.CurMinRpm} )
 		local vMax  = 0
 		local tMax  = vehicle.mrGbMS.OrigMaxRpm
 		local tvMax = 0
 		local vvMax = 0
+		local tMin  = motor.torqueCurve.keyframes[1].time
+		local vMin  = motor.torqueCurve.keyframes[1].v
+		
+		print(tostring(tMin)..": "..tostring(vMin))
+		if tMin > 0 and vMin > 0 then 
+			self.torqueCurve:addKeyframe( {v=0, time=0} )	
+			self.torqueCurve:addKeyframe( {v=0.6*vMin, time=0.4*tMin} )	
+		end 
+		
 		for _,k in pairs(motor.torqueCurve.keyframes) do
-			if k.time > vehicle.mrGbMS.CurMinRpm and ( k.v > 0.000001 or k.time < 0.999999 ) then 
+			if k.time < tMin then 
+				tMin = k.time 
+				vMin = k.v 
+			end 
+			if ( k.v > 0.000001 or k.time < 0.999999 ) then 
 				local kv = k.v
 				local kt = math.min( k.time, vehicle.mrGbMS.CurMaxRpm - 1 )
 				

@@ -700,6 +700,11 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 				break
 			end
 		end
+	else 
+		local key = xmlString..".realEngine"
+		if key ~= nil and getXMLFloat(xmlFile, key..".torque(0)#rpm") ~= nil then
+			realEngineBaseKey = key
+		end
 	end
 
 	if realEngineBaseKey ~= nil then
@@ -1158,7 +1163,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		elseif torqueConverterProfile == "wheelLoader" then 
 			clutchEngagingTimeMs = 2000
 		elseif torqueConverterProfile == "oldCar" then 
-			clutchEngagingTimeMs = 1000
+			clutchEngagingTimeMs = 2000
 		elseif torqueConverterProfile == "modernCar" then 
 			clutchEngagingTimeMs = 2000
 		elseif self.mrGbMS.TorqueConverter then
@@ -1192,8 +1197,10 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end		
 	
 		default = 5000
-		if torqueConverterProfile == "wheelLoader" then
+		if     torqueConverterProfile == "wheelLoader" then
 			default = 20000
+		elseif torqueConverterProfile == "oldCar" then
+			default = 10000
 		end
 		self.mrGbMS.TorqueConverterTime     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTime"), default )
 		self.mrGbMS.TorqueConverterTimeInc  = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#torqueConverterTimeInc"), 0 )		

@@ -476,28 +476,63 @@
 		<configFile xmlName="data/vehicles/steerable/lizard/lizardPickupRodeo.xml"/>
 		
 		<transmissions>
-			<transmission name="C4" torqueConverterProfile="oldCar" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
+			<transmission name="C4(4.11)" torqueConverterProfile="oldCar" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
 				<blowOffVentilSound volume="0"/>
 			
 				<!-- 280/55R16 with 4.11 axle => 130 km/h -->
-				<gears automatic="true" defaultGear="1" shiftTimeMs="0" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true">
-					<gear speed="53"  forwardOnly="true" name="1"/>
-					<gear speed="60"  reverseOnly="true" name="R"/>			
-					<gear speed="89"  forwardOnly="true" name="2"/>
-					<gear speed="130" forwardOnly="true" name="3"/>
+				<gears automatic="true" axleSpeed="4.11" tireWidth="280" tireRatio="55" rimDiameter="16" defaultGear="1" shiftTimeMs="300" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true">
+					<gear name="1" forwardOnly="true" inverseRatio="2.46"/>
+					<gear name="R" reverseOnly="true" inverseRatio="2.18"/>
+					<gear name="2" forwardOnly="true" inverseRatio="1.46"/>
+					<gear name="3" forwardOnly="true" inverseRatio="1.00"/>
 				</gears>
+
+				<ranges defaultRange="2" reverseReset="false" onlyStopped="true">
+					<range ratio="0.36765" name="L" />
+					<range ratio="1.00"    name="H" />
+				</ranges>
 			</transmission>
 				
-			<transmission name="T18" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
+			<transmission name="C4(3.5)" torqueConverterProfile="oldCar" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
+				<blowOffVentilSound volume="0"/>
+			
+				<!-- 280/55R16 with 4.11 axle => 130 km/h -->
+				<gears automatic="true" axleSpeed="3.5" tireWidth="280" tireRatio="55" rimDiameter="16" defaultGear="1" shiftTimeMs="300" shiftEffect="false" clutchRatio="0" manualClutch="false" startInSmallest="true">
+					<gear name="1" forwardOnly="true" inverseRatio="2.46"/>
+					<gear name="R" reverseOnly="true" inverseRatio="2.18"/>
+					<gear name="2" forwardOnly="true" inverseRatio="1.46"/>
+					<gear name="3" forwardOnly="true" inverseRatio="1.00"/>
+				</gears>
+
+				<ranges defaultRange="2" reverseReset="false" onlyStopped="true">
+					<range ratio="0.36765" name="L" />
+					<range ratio="1.00"    name="H" />
+				</ranges>
+			</transmission>
+				
+			<transmission name="T18(4.11)" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
 				<blowOffVentilSound volume="0"/>
 				
 				<!-- 280/55R16 with 3.5 axle => 153 km/h ratios 6.32 3.09 1.69 1 R7.44 -->
-				<gears defaultGear="1" startInSmallest="true">
-					<gear speed="21"  reverseOnly="true" name="R"/>			
-					<gear speed="24"  forwardOnly="true" name="1"/>
-					<gear speed="50"  forwardOnly="true" name="2"/>
-					<gear speed="90"  forwardOnly="true" name="3"/>
-					<gear speed="153" forwardOnly="true" name="4"/>
+				<gears axleSpeed="4.11" tireWidth="280" tireRatio="55" rimDiameter="16" defaultGear="1" startInSmallest="true">
+					<gear name="R" reverseOnly="true" inverseRatio="7.44"/>			
+					<gear name="1" forwardOnly="true" inverseRatio="6.32"/>
+					<gear name="2" forwardOnly="true" inverseRatio="3.09"/>
+					<gear name="3" forwardOnly="true" inverseRatio="1.69"/>
+					<gear name="4" forwardOnly="true" inverseRatio="1.00"/>
+				</gears>
+			</transmission>
+
+			<transmission name="T18(3.5)" speedLimiter="false" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10" minTargetRpm="1000">
+				<blowOffVentilSound volume="0"/>
+				
+				<!-- 280/55R16 with 3.5 axle => 153 km/h ratios 6.32 3.09 1.69 1 R7.44 -->
+				<gears axleSpeed="3.5" tireWidth="280" tireRatio="55" rimDiameter="16" defaultGear="1" startInSmallest="true">
+					<gear name="R" reverseOnly="true" inverseRatio="7.44"/>			
+					<gear name="1" forwardOnly="true" inverseRatio="6.32"/>
+					<gear name="2" forwardOnly="true" inverseRatio="3.09"/>
+					<gear name="3" forwardOnly="true" inverseRatio="1.69"/>
+					<gear name="4" forwardOnly="true" inverseRatio="1.00"/>
 				</gears>
 			</transmission>
 		</transmissions>
