@@ -76,7 +76,6 @@
 		<text name="gearboxMogliTEXT_ALLAUTO"              text="Упрощенная"/>
 		<text name="gearboxMogliTEXT_ECO"                  text="eco"/>
 		<text name="gearboxMogliTEXT_AUTO_HOLD"            text="Автоудержание"/>
-		
 
 		<text name="gearboxMogliTEXT_DISABLED"             text="Выкл."/>
 		<text name="gearboxMogliTEXT_ENABLED"              text="Вкл."/>
@@ -195,6 +194,11 @@
 		
 		<text name="gearboxMogliTIP_SlipPlough"            text="Буксующие колеса будут закапываться в землю, как плуг"/>
 		<text name="gearboxMogliTEXT_SlipPlough"           text="Пробуксовка колёс"/>
+		<text name="gearboxMogliTEXT_SlipPlough_1"         text="в поле"/>
+		<text name="gearboxMogliTEXT_SlipPlough_2"         text="везде"/>
+		<text name="gearboxMogliTIP_ManualDiffLock"        text="Дифференциалы могут быть заблокированы вручную"/>
+		<text name="gearboxMogliTEXT_ManualDiffLock"       text="Ручная блокировка дифференциалов"/>
+		
 		<text name="gearboxMogliTIP_ClutchSpeed"           text="Скорость кнопки сцепления"/>
 		<text name="gearboxMogliTEXT_ClutchSpeed"          text="Скорость кнопки сцепления"/>
 
