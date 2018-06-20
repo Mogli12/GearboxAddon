@@ -203,7 +203,7 @@ gearboxMogliGlobals.slipPloughDefault     = -1    -- 0: always off; 1: always on
 gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%; 21 ~ 200%
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
-
+gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -2734,26 +2734,30 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 		
 	end
-	self.mrGbMS.LockedDiffSpeedLimit  = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
+	self.mrGbMS.LockedDiffSpeedLimit  = getXMLFloat( xmlFile, xmlString .. ".differentials#lockedSpeedLimit"  )
 	self.mrGbMS.UnlockDiffSpeed       = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
-	self.mrGbMS.LockDiffSpeed         = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
+	self.mrGbMS.LockDiffSpeed         = getXMLFloat( xmlFile, xmlString .. ".differentials#lockSpeed"  )
 	if      self.mrGbMS.LockedDiffSpeedLimit == nil
 			and self.mrGbMS.UnlockDiffSpeed      == nil
 			and self.mrGbMS.LockDiffSpeed        == nil then 
-		if self.mrGbMS.AutoStartStop then 
-			self.mrGbMS.UnlockDiffSpeed   = 27
-			self.mrGbMS.LockDiffSpeed     = 23 
-		else 
-			self.mrGbMS.LockedDiffSpeedLimit = 25
+		if self.mrGbMG.lockedDiffSpeedLimit > 0 then 
+			if self.mrGbMS.AutoStartStop then 
+				self.mrGbMS.UnlockDiffSpeed   = self.mrGbMG.lockedDiffSpeedLimit * 1.08
+				self.mrGbMS.LockDiffSpeed     = self.mrGbMG.lockedDiffSpeedLimit * 0.92
+			else 
+				self.mrGbMS.LockedDiffSpeedLimit = self.mrGbMG.lockedDiffSpeedLimit
+			end 
 		end 
 	elseif  self.mrGbMS.LockedDiffSpeedLimit == nil then
 		if     self.mrGbMS.UnlockDiffSpeed == nil and self.mrGbMS.LockDiffSpeed == nil then 
-			self.mrGbMS.UnlockDiffSpeed   = 27
-			self.mrGbMS.LockDiffSpeed     = 23 
+			self.mrGbMS.UnlockDiffSpeed   = self.mrGbMG.lockedDiffSpeedLimit * 1.08
+			self.mrGbMS.LockDiffSpeed     = self.mrGbMG.lockedDiffSpeedLimit * 0.92
 		elseif self.mrGbMS.UnlockDiffSpeed == nil then 
-			self.mrGbMS.UnlockDiffSpeed   = self.mrGbMS.LockDiffSpeed   * 27 / 23
+			self.mrGbMS.UnlockDiffSpeed   = self.mrGbMS.LockDiffSpeed * 1.08
+			self.mrGbMS.LockDiffSpeed     = self.mrGbMS.LockDiffSpeed * 0.92
 		elseif self.mrGbMS.LockDiffSpeed   == nil then 
-			self.mrGbMS.LockDiffSpeed     = self.mrGbMS.UnlockDiffSpeed * 23 / 27 
+			self.mrGbMS.LockDiffSpeed     = self.mrGbMS.UnlockDiffSpeed * 0.92
+			self.mrGbMS.UnlockDiffSpeed   = self.mrGbMS.UnlockDiffSpeed * 1.08
 		end
 		
 		if     self.mrGbMS.UnlockDiffSpeed < self.mrGbMG.minAbsSpeed + self.mrGbMG.minAbsSpeed then 
