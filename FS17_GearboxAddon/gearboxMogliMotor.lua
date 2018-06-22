@@ -99,7 +99,6 @@ function gearboxMogliMotor:new( vehicle, motor )
 		local tMin  = motor.torqueCurve.keyframes[1].time
 		local vMin  = motor.torqueCurve.keyframes[1].v
 		
-		print(tostring(tMin)..": "..tostring(vMin))
 		if tMin > 0 and vMin > 0 then 
 			self.torqueCurve:addKeyframe( {v=0, time=0} )	
 			self.torqueCurve:addKeyframe( {v=0.6*vMin, time=0.4*tMin} )	

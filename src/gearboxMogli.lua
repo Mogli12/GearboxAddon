@@ -3613,6 +3613,16 @@ function gearboxMogli:update(dt)
 	end
 	
 --**********************************************************************************************************			
+-- cabinControls.lua lines 336..348
+--**********************************************************************************************************			
+	if self.driveControl == nil then
+		self.mrGbML.SimulateDC = true 
+		self.driveControl = {}
+		self.driveControl.shuttle = {}
+		self.driveControl.shuttle.isActive = false
+	end
+	
+--**********************************************************************************************************			
 -- driveControl shuttle
 --**********************************************************************************************************			
 	if      self.dCcheckModule ~=  nil 
@@ -3623,14 +3633,6 @@ function gearboxMogli:update(dt)
 			self.mrGbMB.dcShuttle = true
 			self.driveControl.shuttle.isActive = false
 		end
-	end
-	
---**********************************************************************************************************			
--- cabinControls.lua lines 336..348
---**********************************************************************************************************			
-	if self.driveControl == nil then
-		self.driveControl = {}
-		self.driveControl.isActive = true
 	end
 	
 --**********************************************************************************************************			
@@ -7546,11 +7548,11 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 	
 	sg = ( self:mrGbMGetAutoShiftGears()
 			or self.mrGbMS.StartInSmallestGear
-			or ( self.mrGbMS.MatchGears == "true" or self.mrGbMS.MatchGears == "end" )
+			or self.mrGbMS.MatchGears == "true"
 			or ( self.mrGbMS.ReverseResetGear and shuttle ) )
 	sr = ( self:mrGbMGetAutoShiftRange()
 			or self.mrGbMS.StartInSmallestRange
-			or ( self.mrGbMS.MatchRanges == "true" or self.mrGbMS.MatchRanges == "end" )
+			or self.mrGbMS.MatchRanges == "true"
 			or ( self.mrGbMS.ReverseResetRange and shuttle ) )
 	s2 = ( self:mrGbMGetAutoShiftRange2()
 			or ( self.mrGbMS.ReverseResetRange2 and shuttle ) )
