@@ -6899,7 +6899,7 @@
 		<transmissions>
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
 			<transmission name="27/24" autoStartStop="true">
-				<gears defaultGear="4" shiftTimeMs="0">
+				<gears defaultGear="4" shiftTimeMs="0" startInSmallest="true">
 					<gear speed="10.2"/>
 					<gear speed="12.3"/>
 					<gear speed="15.0"/>
@@ -6911,7 +6911,7 @@
 					<gear speed="42.0" forwardOnly="true"/>
 				</gears>
 
-				<ranges defaultRange="3" reverseReset="true" doubleClutch="false">
+				<ranges defaultRange="3" reverseReset="false" doubleClutch="false">
 					<range ratio="0.0686" name="L" />
 					<range ratio="0.262"  name="M" />
 					<range ratio="1"      name="H" />
@@ -6921,7 +6921,7 @@
 			</transmission>
 			
 			<transmission name="18/18" autoStartStop="true">
-				<gears defaultGear="4" shiftTimeMs="0">
+				<gears defaultGear="4" shiftTimeMs="0" startInSmallest="true">
 					<gear speed="10.2"/>
 					<gear speed="12.3"/>
 					<gear speed="15.0"/>
@@ -6933,7 +6933,7 @@
 					<gear speed="42.0"/>
 				</gears>
 
-				<ranges defaultRange="2" onlyStopped="true">
+				<ranges defaultRange="2" onlyStopped="true" reverseReset="false">
 					<range ratio="0.262"  name="A" />
 					<range ratio="1"      name="S" />
 				</ranges>
