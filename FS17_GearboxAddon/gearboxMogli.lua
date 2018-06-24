@@ -7531,12 +7531,34 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:setLaunchGear( noEventSend, shuttle )	
 	
-	local gear      = self.mrGbMS.CurrentGear
-	local oldGear   = self.mrGbMS.CurrentGear
-	local range     = self.mrGbMS.CurrentRange
-	local oldRange  = self.mrGbMS.CurrentRange
-	local maxSpeed  = self.mrGbMS.LaunchGearSpeed
+	local lg, lr, l2 = self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange, self.mrGbMS.CurrentRange2
+	if shuttle then 
+		lg = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,   self.mrGbMS.CurrentGear,   lg, "gear" )
+		lr = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges,  self.mrGbMS.CurrentRange,  lr, "range" )
+		l2 = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Ranges2, self.mrGbMS.CurrentRange2, l2, "range2" )
+	end
 	
+	if not ( self.steeringEnabled or ( self.cp ~= nil and self.cp.isDriving ) ) then
+		if self.mrGbMS.MaxAIGear   ~= nil then
+			lg = math.min( self.mrGbMS.MaxAIGear, lg )
+		end
+		if self.mrGbMS.MaxAIRange  ~= nil then
+			lr = math.min( self.mrGbMS.MaxAIRange, lr ) 	
+		end
+		if self.mrGbMS.MaxAIRange2 ~= nil then
+			l2 = math.min( self.mrGbMS.MaxAIRange2, l2 ) 	
+		end
+	end
+	
+	local curSpeed  = self.mrGbMS.Gears[lg].speed 
+		              * self.mrGbMS.Ranges[lr].ratio 
+									* self.mrGbMS.Ranges2[l2].ratio
+									* self.mrGbMS.GlobalRatioFactor
+	if self.mrGbMS.ReverseActive then	
+		curSpeed = curSpeed * self.mrGbMS.ReverseRatio 
+	end
+	
+	local maxSpeed  = self.mrGbMS.LaunchGearSpeed	
 	if self.mrGbMS.ConstantRpm then
 		maxSpeed      = self.mrGbMS.LaunchPtoSpeed
 		if self.mrGbMS.HandThrottle > 0 then
@@ -7546,7 +7568,7 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 	
 	local sg, sr, s2 = false, false, false
 	
-	if shuttle or self.mrGbMS.CurrentGearSpeed > maxSpeed then 
+	if curSpeed > maxSpeed then 
 		if     self:mrGbMGetAutoShiftGears() then 
 			sg = true 
 		elseif shuttle and self.mrGbMS.ReverseResetGear then 
@@ -7576,7 +7598,6 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 		end 
 	end 
 	
-	local lg, lr, l2 = self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange, self.mrGbMS.CurrentRange2
 	if sg then
 		if self.mrGbMS.ReverseActive then
 			lg = self.mrGbMS.ResetRevGear
@@ -7597,18 +7618,6 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 		else
 			l2 = self.mrGbMS.ResetFwdRange2
 		end			
-	end
-	
-	if not ( self.steeringEnabled or ( self.cp ~= nil and self.cp.isDriving ) ) then
-		if self.mrGbMS.MaxAIGear   ~= nil then
-			lg = math.min( self.mrGbMS.MaxAIGear, lg )
-		end
-		if self.mrGbMS.MaxAIRange  ~= nil then
-			lr = math.min( self.mrGbMS.MaxAIRange, lr ) 	
-		end
-		if self.mrGbMS.MaxAIRange2 ~= nil then
-			l2 = math.min( self.mrGbMS.MaxAIRange2, l2 ) 	
-		end
 	end
 	
 	lg = gearboxMogli.mrGbMGetNewEntry( self, self.mrGbMS.Gears,   self.mrGbMS.CurrentGear,   lg, "gear" )
@@ -7961,8 +7970,8 @@ function gearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
 			self.mrGbMS.ReverseActive = true
 		end
 		
-		self.mrGbMS.CurrentGear   = gearboxMogli.adjustGearToEntry( self, n )
-		self.mrGbMS.CurrentRange2 = gearboxMogli.adjustRange2ToEntry( self, n )
+		self:mrGbMSetState( "CurrentGear",   gearboxMogli.adjustGearToEntry( self, n ))
+		self:mrGbMSetState( "CurrentRange2", gearboxMogli.adjustRange2ToEntry( self, n ))
 	end
 	
 	--timer to shift the "range"
@@ -8008,8 +8017,8 @@ function gearboxMogli:mrGbMOnSetRange2( old, new, noEventSend )
 			self.mrGbMS.ReverseActive = true
 		end
 		
-		self.mrGbMS.CurrentGear   = gearboxMogli.adjustGearToEntry( self, n )
-		self.mrGbMS.CurrentRange  = gearboxMogli.adjustRangeToEntry( self, n )
+		self:mrGbMSetState( "CurrentGear",  gearboxMogli.adjustGearToEntry( self, n ))
+		self:mrGbMSetState( "CurrentRange", gearboxMogli.adjustRangeToEntry( self, n ))
 	end
 	
 	--timer to shift the "range 2"
@@ -8055,8 +8064,8 @@ function gearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
 			self.mrGbMS.ReverseActive = true
 		end
 		
-		self.mrGbMS.CurrentRange  = gearboxMogli.adjustRangeToEntry( self, n )
-		self.mrGbMS.CurrentRange2 = gearboxMogli.adjustRange2ToEntry( self, n )
+		self:mrGbMSetState( "CurrentRange",  gearboxMogli.adjustRangeToEntry( self, n ))
+		self:mrGbMSetState( "CurrentRange2", gearboxMogli.adjustRange2ToEntry( self, n ))
 	end
 	
 	--timer to set the gear
