@@ -2773,7 +2773,18 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	if self.vehicle.mrGbMG.debugInfo then
 		self.vehicle.mrGbML.brakeNeutralInfo = 
-			string.format("%2d: %1.3f %4d %5s %5s %5s %2.1f %4d %4d %4d", brakeNeutral, accelerationPedal, self.brakeNeutralTimer - g_currentMission.time, tostring(autoOpenClutch), tostring(doHandbrake), tostring(brakeNeutral), currentAbsSpeed, self.lastMotorRpm, self.minRequiredRpm, minRpmReduced)
+			string.format("%2d: %1.3f %4d %5s %5s %5s %2.1f %4d %4d %4d %5s", 
+										brakeNeutral,
+										accelerationPedal,
+										self.brakeNeutralTimer - g_currentMission.time,
+										tostring(autoOpenClutch),
+										tostring(doHandbrake),
+										tostring(brakeNeutral),
+										currentAbsSpeed,
+										self.lastMotorRpm,
+										self.minRequiredRpm,
+										minRpmReduced,
+										tostring(self.vehicle:mrGbMGetAutoHold()))
 	end
 		
 	if brakeNeutral > 0 then
@@ -2791,11 +2802,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		end
 	-- handbrake 
 		if      self.vehicle.mrGbMS.NeutralActive 
-				and self.vehicle:mrGbMGetAutoHold( )
+				and self.vehicle:mrGbMGetAutoHold()
 				and self.brakeNeutralTimer  < g_currentMission.time
 				and ( accelerationPedal     < -0.5 
 					 or currentAbsSpeed       < self.vehicle.mrGbMG.minAbsSpeed ) then
 			self.vehicle:mrGbMSetState( "AutoHold", true )
+		elseif  self.vehicle.mrGbMS.NeutralActive
+				and self.brakeNeutralTimer  < g_currentMission.time
+				and currentAbsSpeed         < self.vehicle.mrGbMG.minAbsSpeed then 
+			self.vehicle:mrGbMSetState( "AutoHold", accelerationPedal < -0.5 )
 		end
 				
 		if self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch then

@@ -7546,21 +7546,34 @@ function gearboxMogli:setLaunchGear( noEventSend, shuttle )
 	
 	local sg, sr, s2 = false, false, false
 	
-	sg = ( self:mrGbMGetAutoShiftGears()
-			or self.mrGbMS.StartInSmallestGear
-			or self.mrGbMS.MatchGears == "true"
-			or ( self.mrGbMS.ReverseResetGear and shuttle ) )
-	sr = ( self:mrGbMGetAutoShiftRange()
-			or self.mrGbMS.StartInSmallestRange
-			or self.mrGbMS.MatchRanges == "true"
-			or ( self.mrGbMS.ReverseResetRange and shuttle ) )
-	s2 = ( self:mrGbMGetAutoShiftRange2()
-			or ( self.mrGbMS.ReverseResetRange2 and shuttle ) )
-			
-	if not ( shuttle ) and self.mrGbMS.CurrentGearSpeed < maxSpeed then 
-		sg = false
-		sr = false 
-		s2 = false 
+	if shuttle or self.mrGbMS.CurrentGearSpeed > maxSpeed then 
+		if     self:mrGbMGetAutoShiftGears() then 
+			sg = true 
+		elseif shuttle and self.mrGbMS.ReverseResetGear then 
+			sg = true 
+		elseif self.mrGbML.gearShiftingNeeded < 0 or self.mrGbMS.NeutralNoSync then 
+			sg = false 
+		elseif self.mrGbMS.StartInSmallestGear or self.mrGbMS.MatchGears == "true" then 
+			sg = true 
+		end 
+		
+		if     self:mrGbMGetAutoShiftRange() then 
+			sr = true 
+		elseif self.mrGbMS.ReverseResetRange and shuttle then 
+			sr = true 
+		elseif self.mrGbML.gearShiftingNeeded < 0 or self.mrGbMS.NeutralNoSync then 
+			sr = false 
+		elseif self.mrGbMS.StartInSmallestRange or self.mrGbMS.MatchRanges == "true" then 
+			sr = true 
+		end 
+		
+		if     self:mrGbMGetAutoShiftRange2() then 
+			s2 = true 
+		elseif self.mrGbMS.ReverseResetRange2 and shuttle then 
+			s2 = true  
+		elseif self.mrGbML.gearShiftingNeeded < 0 or self.mrGbMS.NeutralNoSync then 
+			s2 = false 
+		end 
 	end 
 	
 	local lg, lr, l2 = self.mrGbMS.CurrentGear, self.mrGbMS.CurrentRange, self.mrGbMS.CurrentRange2
@@ -7716,15 +7729,16 @@ end
 -- gearboxMogli:mrGbMOnSetAutoHold
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMOnSetAutoHold( old, new, noEventSend )
---gearboxMogli.printCallStack()
---print("AutoHold: "..tostring(old).." => "..tostring(new))
-	self.mrGbMS.AutoHold = new
+	self.mrGbMS.AutoHold = new	
+	if not ( old ) and new then 
+		self:mrGbMSetLanuchGear( noEventSend )
+	end	
 end
 
 --**********************************************************************************************************	
 -- gearboxMogli:mrGbMGetAutoHold
 --**********************************************************************************************************	
-function gearboxMogli:mrGbMGetAutoHold( )
+function gearboxMogli:mrGbMGetAutoHold()
 	if not ( self.steeringEnabled ) then
 		return false
 	elseif self.forceIsActive then
@@ -7758,10 +7772,6 @@ function gearboxMogli:mrGbMOnSetNeutral( old, new, noEventSend )
 	
 	self.mrGbMS.NeutralActive = new 
 
-	if self.mrGbMS.NeutralActive and self.mrGbMS.G27Mode <= 0 and not ( self.mrGbMS.NeutralNoSync ) then
-		self:mrGbMSetLanuchGear( noEventSend )
-	end
-	
 	if self.isServer then
 		gearboxMogli.mrGbMPrepareGearShift( self, 0, self.mrGbMS.MinClutchPercent, false, false ) 
 		if self.mrGbML.motor ~= nil then
