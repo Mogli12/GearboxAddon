@@ -1241,7 +1241,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	local dLMiddle = false
 	local dLFront  = false 
 	local dLBack   = false 
-	if self.vehicle.mrGbMS.ModifyDifferentials then
+	if self.vehicle.mrGbMS.ModifyDifferentials > 0 then
 		dLMiddle = self.vehicle:mrGbMGetDiffLockMiddle()
 		dLFront  = self.vehicle:mrGbMGetDiffLockFront()
 		dLBack   = self.vehicle:mrGbMGetDiffLockBack()
