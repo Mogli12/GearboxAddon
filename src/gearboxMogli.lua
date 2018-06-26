@@ -379,7 +379,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "Range1ShifterMode",  0 )
 	gearboxMogli.registerState( self, "Range2ShifterMode",  0 )
 	
-	gearboxMogli.registerState( self, "ManualDiffLock", true  )
+	gearboxMogli.registerState( self, "ManualDiffLock", 1  )
 	gearboxMogli.registerState( self, "DiffLockMiddle", false )
 	gearboxMogli.registerState( self, "DiffLockFront",  false )
 	gearboxMogli.registerState( self, "DiffLockBack",   false )
@@ -2736,12 +2736,12 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			and self.mrGbMS.UnlockDiffSpeed      == nil
 			and self.mrGbMS.LockDiffSpeed        == nil then 
 		if self.mrGbMG.lockedDiffSpeedLimit > self.mrGbMG.minAbsSpeed + self.mrGbMG.minAbsSpeed then 
-			if self.mrGbMS.AutoStartStop then 
+		--if self.mrGbMS.AutoStartStop then 
 				self.mrGbMS.UnlockDiffSpeed   = self.mrGbMG.lockedDiffSpeedLimit * 1.08
 				self.mrGbMS.LockDiffSpeed     = self.mrGbMG.lockedDiffSpeedLimit * 0.92
-			else 
-				self.mrGbMS.LockedDiffSpeedLimit = self.mrGbMG.lockedDiffSpeedLimit
-			end 
+		--else 
+		--	self.mrGbMS.LockedDiffSpeedLimit = self.mrGbMG.lockedDiffSpeedLimit
+		--end 
 		end 
 	elseif  self.mrGbMS.LockedDiffSpeedLimit == nil then
 		if     self.mrGbMS.UnlockDiffSpeed == nil and self.mrGbMS.LockDiffSpeed == nil then 
@@ -3191,12 +3191,8 @@ function gearboxMogli:update(dt)
 		end 
 	end 
 	
-	if self:mrGbMGetModifyDifferentials() and self.isServer then
-		if      self.mrGbMS.IsOn
-				and self.steeringEnabled 
-				and self.isMotorStarted
-				and not self.mrGbMS.AllAuto
-				and ( table.getn( self.differentials ) == 1 or table.getn( self.differentials ) == 3 ) then
+	if self.mrGbMS.ModifyDifferentials > 0 and self.isServer then
+		if self:mrGbMGetModifyDifferentials() then
       local function getSpeedsOfDifferential(self, diff)
 				local speed1, speed2;
 				if diff.diffIndex1IsWheel then
@@ -5811,8 +5807,8 @@ function gearboxMogli:getSaveAttributesAndNodes(nodeIdent)
 		if self.mrGbMS.ClutchSpeedOneButton ~= self.mrGbMG.clutchSpeedOneButton then 
 			attributes = attributes.." mrGbMClutchSpeed=\"" .. tostring( self.mrGbMS.ClutchSpeedOneButton ) .. "\""     
 		end
-		if self.mrGbMS.ModifyDifferentials > 0 and not ( self.mrGbMS.ManualDiffLock ) then
-			attributes = attributes.." mrGbMManualDiffLock=\"" .. tostring( self.mrGbMS.ManualDiffLock ) .. "\""     
+		if self.mrGbMS.ModifyDifferentials > 0 and self.mrGbMS.ManualDiffLock ~= 1 then
+			attributes = attributes.." mrGbMManualDiff=\"" .. tostring( self.mrGbMS.ManualDiffLock ) .. "\""     
 		end 
 	end 
 	
@@ -5858,6 +5854,13 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		else 
 			self.mrGbMS.SlipPlough = 0 
 		end 
+		b = getXMLBool( xmlFile, key .. "#mrGbMManualDiffLock" )
+		if b == nil then 
+		elseif b then 
+			self.mrGbMS.ManualDiffLock = 1
+		else
+			self.mrGbMS.ManualDiffLock = 0
+		end
 	
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetFwdGear"  , "ResetFwdGear"      )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMResetFwdRange" , "ResetFwdRange"     )
@@ -5892,6 +5895,7 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMRange2Shifter",  "Range2ShifterMode" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMClutchSpeed"   , "ClutchSpeedOneButton" )
 		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMSlipPlough2"   , "SlipPlough"      )
+		gearboxMogli.loadHelperInt( self, xmlFile, key .. "#mrGbMManualDiff"    , "ManualDiffLock"    )
                                                                             
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutoClutch"    , "AutoClutch"        )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMAutomatic"     , "Automatic"         )
@@ -5903,7 +5907,6 @@ function gearboxMogli:loadFromAttributesAndNodes(xmlFile, key, resetVehicles)
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockMiddle", "DiffLockMiddle"    )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockFront" , "DiffLockFront"     )
 		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMDiffLockBack"  , "DiffLockBack"      )
-		gearboxMogli.loadHelperBool(self, xmlFile, key .. "#mrGbMManualDiffLock", "ManualDiffLock"    )
 
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMEnableAI"      , "EnableAI"          )
 		gearboxMogli.loadHelperStr( self, xmlFile, key .. "#mrGbMMatchGears"    , "MatchGears"        )
@@ -6778,18 +6781,28 @@ function gearboxMogli:mrGbMGetDecelerateToLimit()
 end
 
 function gearboxMogli:mrGbMGetDiffLockMiddle()
-	if     self.mrGbMS.ModifyDifferentials ~= 3 then
+	if     self.mrGbMS == nil
+			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.IsOn and self.steeringEnabled then
+	elseif self.mrGbMS.ModifyDifferentials ~= 3
+			or self.mrGbMS.ManualDiffLock      <= 0 then 
+		return false 
+	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		return self.mrGbMS.DiffLockMiddle
 	end
 	return false
 end
 
 function gearboxMogli:mrGbMGetDiffLockFront()
-	if     self.mrGbMS.ModifyDifferentials ~= 3 then
+	if     self.mrGbMS == nil
+			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.IsOn and self.steeringEnabled then
+	elseif self.mrGbMS.ModifyDifferentials ~= 3
+			or self.mrGbMS.ManualDiffLock      <= 0 then 
+		return false 
+	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		if      self.mrGbMS.DiffLockFront 
 				and ( self.mrGbMS.DiffLockMiddle
 					 or self.mrGbMS.TorqueRatioMiddle < 0
@@ -6802,9 +6815,14 @@ function gearboxMogli:mrGbMGetDiffLockFront()
 end
 
 function gearboxMogli:mrGbMGetDiffLockBack()
-	if self.mrGbMS.ModifyDifferentials <= 0 then
+	if     self.mrGbMS == nil
+			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.IsOn and self.steeringEnabled then
+	elseif self.mrGbMS.ModifyDifferentials ~= 3
+			or self.mrGbMS.ManualDiffLock      <= 0 then 
+		return false 
+	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		return self.mrGbMS.DiffLockBack
 	end
 	return false
@@ -7237,11 +7255,15 @@ end
 -- gearboxMogli:mrGbMGetModifyDifferentials
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMGetModifyDifferentials()
-	if     self.mrGbMS == nil or self.mrGbMS.ModifyDifferentials == nil
-			or not ( self.mrGbMS.IsOn and self.steeringEnabled )
-			or self.mrGbMS.ModifyDifferentials <= 0
-			or not ( self.mrGbMS.ManualDiffLock ) then
+	if     self.mrGbMS == nil
+			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
+	elseif not ( self.mrGbMS.ModifyDifferentials > 0
+					 and self.mrGbMS.ManualDiffLock      > 0
+					 and self.mrGbMS.IsOn 
+					 and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) ) then
+		return false 		
 	elseif self.mrGbMS.UnlockDiff then 
 		return false 
 	end 
@@ -9594,8 +9616,12 @@ function gearboxMogli:showSettingsUI()
 	end
 	
 	if self.mrGbMS.ModifyDifferentials <= 0 then 
-		self.mrGbMS.ManualDiffLock = false 
-		g_gearboxMogliScreen.ManualDiffLock:setDisabled( true )
+		self.mrGbMS.ManualDiffLock = 0
+		self.mrGbMUI.ManualDiffLock = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ) }
+	else
+		self.mrGbMUI.ManualDiffLock = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
+																		gearboxMogli.getText( "gearboxMogliTEXT_ENABLED", "on" ), 
+																		gearboxMogli.getText( "gearboxMogliTEXT_AI", "hired worker" ) }
 	end
 	
 	for n,t in pairs(self.mrGbMUI) do
@@ -9711,7 +9737,10 @@ function gearboxMogli:mrGbMUIGetAutomatic()
 end
 
 function gearboxMogli:mrGbMUISetDiffLockMiddle( value )
-	if self.mrGbMS.ModifyDifferentials > 0 and self.mrGbMS.IsOn and self.steeringEnabled then
+	if      self.mrGbMS.ModifyDifferentials > 0
+			and self.mrGbMS.ManualDiffLock      > 0
+			and self.mrGbMS.IsOn 
+			and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		self:mrGbMSetState( "DiffLockMiddle", value > 1 )
 	end
 end
@@ -9723,7 +9752,10 @@ function gearboxMogli:mrGbMUIGetDiffLockMiddle( )
 end
 
 function gearboxMogli:mrGbMUISetDiffLockFront( value )
-	if self.mrGbMS.ModifyDifferentials > 0 and self.mrGbMS.IsOn and self.steeringEnabled then
+	if      self.mrGbMS.ModifyDifferentials > 0
+			and self.mrGbMS.ManualDiffLock      > 0
+			and self.mrGbMS.IsOn 
+			and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		self:mrGbMSetState( "DiffLockFront", value > 1 )
 	end
 end
@@ -9735,7 +9767,10 @@ function gearboxMogli:mrGbMUIGetDiffLockFront( )
 end
 
 function gearboxMogli:mrGbMUISetDiffLockBack( value )
-	if self.mrGbMS.ModifyDifferentials > 0 and self.mrGbMS.IsOn and self.steeringEnabled then
+	if      self.mrGbMS.ModifyDifferentials > 0
+			and self.mrGbMS.ManualDiffLock      > 0
+			and self.mrGbMS.IsOn 
+			and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		self:mrGbMSetState( "DiffLockBack", value > 1 )
 	end
 end

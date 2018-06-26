@@ -273,7 +273,7 @@
 							<GuiElement type="bitmap" profile="multiTextOptionBg" />
 						</GuiElement>
 						
-						<GuiElement type="toggleButton2" profile="multiTextOptionSettings" id="ManualDiffLock" toolTip="$l10n_gearboxMogliTIP_ManualDiffLock"  onCreate="onCreateSubElement" 
+						<GuiElement type="multiTextOption" profile="multiTextOptionSettings" id="ManualDiffLock" toolTip="$l10n_gearboxMogliTIP_ManualDiffLock"  onCreate="onCreateSubElement" onCreateArgs="list0"
 												onFocus="mogliFocusToolTip" onLeave="mogliLeaveToolTip" focusId="55" focusChangeTop="54" focusChangeBottom="56">
 							<GuiElement type="button" profile="multiTextOptionLeft" />
 							<GuiElement type="button" profile="multiTextOptionRight"/>
