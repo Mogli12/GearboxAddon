@@ -291,7 +291,8 @@ function gearboxMogliRegister:addConfigurations()
 			local vehicleTransConf = nil
 			local j = 0
 			while true do
-				local s = getXMLString( dummySelf.xmlFile, string.format("vehicle.transmissions.transmission(%d)#name", j) )
+				local t = string.format("vehicle.transmissions.transmission(%d)", j)
+				local s = getXMLString( dummySelf.xmlFile, t.."#name" )
 				if s == nil then
 					break
 				end
@@ -299,7 +300,10 @@ function gearboxMogliRegister:addConfigurations()
 				if vehicleTransConf == nil then
 					vehicleTransConf = {}
 				end
-				vehicleTransConf[j] = s
+				local p = getXMLFloat( dummySelf.xmlFile, t.."#price" )
+				local d = getXMLFloat( dummySelf.xmlFile, t.."#dailyUpkeep" )
+				
+				vehicleTransConf[j] = { name = s, price = p, dailyUpkeep = d }
 			end
 			
 			delete(dummySelf.xmlFile)
@@ -329,8 +333,11 @@ function gearboxMogliRegister:addConfigurations()
 								
 				local isDefault = true
 				if vehicleTransConf ~= nil then
-					for j,s in pairs(vehicleTransConf) do						
-						table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = 0, config = j, isDefault = isDefault } )
+					for j,c in pairs(vehicleTransConf) do		
+						local s = c.name 
+						local p = c.price
+						local d = c.dailyUpkeep
+						table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = 0, config = j, isDefault = isDefault, price = p, dailyUpkeep = d } )
 						isDefault = false
 					end
 				elseif hasVehicleConfig then
@@ -359,14 +366,17 @@ function gearboxMogliRegister:addConfigurations()
 						elseif entry.motorConfig == nil then
 							local j = 0
 							while true do
-								local t = string.format("%s.transmissions.transmission(%d)#name", entry.xmlName, j)
-								local s = getXMLString( xmlFile, t )
+								local t = string.format("%s.transmissions.transmission(%d)", entry.xmlName, j)
+								local s = getXMLString( xmlFile, t.."#name" )
 								if s == nil then
 									break
 								end
 								j = j + 1
 								
-								table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault } )
+								local p = getXMLFloat( xmlFile, t.."#price" )
+								local d = getXMLFloat( xmlFile, t.."#dailyUpkeep" )
+								
+								table.insert( modifiedItem.configurations, { name = "Gearbox ("..s..")", title = s, source = i, baseName = entry.xmlName, config = j, isDefault = isDefault, price = p, dailyUpkeep = d } )
 								isDefault = false
 							end
 						end
@@ -419,7 +429,7 @@ function gearboxMogliRegister:addConfigurations()
 				end
 				
 				for j,c in pairs( modifiedItem.configurations ) do
-					local item = StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, c.name, c.title, 0, 0, "")
+					local item = StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, c.name, c.title, Utils.getNoNil( c.price, 0 ), Utils.getNoNil( c.dailyUpkeep, 0 ), "")
 					if c.isDefault then
 						item.isDefault = true 
 					end
@@ -495,7 +505,12 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 				for j=1,numConfigItems do
 					local n = streamReadString(streamId)
 					local t = streamReadString(streamId)
-					table.insert( evData[configFileName], {name=n, title=t})
+					local p, d = 0, 0
+					if streamReadBool(streamId) then 
+						p = streamReadFloat32(streamId)
+						d = streamReadFloat32(streamId)
+					end 
+					table.insert( evData[configFileName], {name=n, title=t, price=p, dailyUpkeep=d})
 				end
 			end
 		end
@@ -512,8 +527,8 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 				storeItem.configurations = {}
 			end
 			storeItem.configurations.GearboxAddon = {}
-			for j,configItem in pairs( evData[configFileName] ) do
-				StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, configItem.name, configItem.title, 0, 0, "")			
+			for j,c in pairs( evData[configFileName] ) do
+				StoreItemsUtil.addConfigurationItem(storeItem.configurations.GearboxAddon, c.name, c.title, c.price, c.dailyUpkeep, "")			
 			end
 		end
 	end
@@ -547,6 +562,13 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 				for j,c in pairs( item.configurations ) do
 					streamWriteString(streamId, Utils.getNoNil( c.name, "!!!empty!!!" ) )
 					streamWriteString(streamId, Utils.getNoNil( c.title,"!!!empty!!!" ) )
+					if c.price ~= nil or c.dailyUpkeep ~= nil then 
+						streamWriteBool(streamId,true)
+						streamWriteFloat32(streamId, Utils.getNoNil( c.price, 0 ) )
+						streamWriteFloat32(streamId, Utils.getNoNil( c.dailyUpkeep, 0 ) )
+					else 
+						streamWriteBool(streamId,true)
+					end 
 				end
 			end
 		end

@@ -132,7 +132,7 @@
 				<reverse ratio="1.037" manualClutch="true"/>
 			</transmission>
 
-			<transmission name="40+40" autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800" ptoRpm="2450" ptoRpmEco="1913">
+			<transmission name="40+40" price="2000" autoStartStop="false" rpmInSpeedHud="true" minHudRpm="0" maxHudRpm="2800" ptoRpm="2450" ptoRpmEco="1913">
 				<gears>
 					<gear speed="10.88"/>
 					<gear speed="16.12"/>
@@ -785,7 +785,7 @@
 				</ranges>
 			</transmission>	
 			
-			<transmission name="TipMatic" maxForwardSpeed="93" maxBackwardSpeed="93" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
+			<transmission name="TipMatic" price="5000" maxForwardSpeed="93" maxBackwardSpeed="93" maxRpmThrottle="0.5" fuelPerDistanceMinSpeed="10">
 				<gears axleSpeed="2.71" tireWidth="600" tireRatio="50" rimDiameter="22.5" defaultGear="7" automatic="true">
 					<gear name="1"  forwardOnly="true" inverseRatio="15.86"/>
 					<gear name="R1" reverseOnly="true" inverseRatio="14.68"/>
@@ -885,7 +885,7 @@
 		<configFile xmlName="data/vehicles/steerable/caseIH/caseIH1455.xml"/>
 		
 		<transmissions>
-			<transmission name="Torque Converter" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterProfile="clutch" minClutchRatio="0.6">
+			<transmission name="Torque Converter" price="1000" autoStartStop="false" maxAIRange="1" rpmInSpeedHud="true" torqueConverterProfile="clutch" minClutchRatio="0.6">
 				<gears defaultGear="4" shiftTimeMs="800">	
 					<gear speed="3.9"  name="1" />
 					<gear speed="6.2"  name="2" />
@@ -1081,7 +1081,7 @@
 				<reverse ratio="1.05413"/>
 			</transmission>
 			
-			<transmission name="Direct" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
+			<transmission name="Direct" price="5000" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="false" defaultGear="3" shiftTimeMs="500">
 					<gear speed="9"  name="A"/>
@@ -1202,7 +1202,7 @@
 				<reverse ratio="1.05413"/>
 			</transmission>
 			
-			<transmission name="Direct" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
+			<transmission name="Direct" price="5000" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="false" defaultGear="3" shiftTimeMs="500">
 					<gear speed="9"  name="A"/>
@@ -1296,7 +1296,7 @@
 				</gears>
 			</transmission>
 			
-			<transmission name="AutoCommand" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
+			<transmission name="AutoCommand" price="5000" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
 				<hydrostatic profile="Input"/>
 				<gears  automatic="true">	
 					<gear speed="6.5"/>
@@ -1393,7 +1393,7 @@
 					<gear speed="57"   forwardOnly="true"/>			
 				</gears>
 			</transmission>	
-			<transmission name="AutoCommand" maxBackwardSpeed="27" maxForwardSpeed="51" ptoRpm="1803" ptoRpmEco="1592">
+			<transmission name="AutoCommand" price="5000" maxBackwardSpeed="27" maxForwardSpeed="51" ptoRpm="1803" ptoRpmEco="1592">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="true">	
 					<gear speed="6.25" atRpm="1750"/>
@@ -1755,7 +1755,7 @@
 				<reverse resetGear="false" resetRange="false" /> 
 			</transmission>
 			
-			<transmission name="Dyna-VT" ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
+			<transmission name="Dyna-VT" price="5000" ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
 				<hydrostatic profile="Output" correctGearSpeed="true"/>		
 				<gears defaultGear="2" clutchRatio="1">	
 					<gear name="heavy duty" speed="28" />
@@ -2392,7 +2392,7 @@
 		<!-- http://www.caseiheurope.com/Media/490856a6-ee37-422f-bff2-0e5e02dd34f0/CaseIH_FlipViewer/de_de/MAGNUM_CVX/flipviewerxpress.html -->
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/CASE-IH-Magnum340.pdf -->
 		<transmissions>
-			<transmission name="CVX" maxBackwardSpeed="27" maxForwardSpeed="51" ptoRpm="1803" ptoRpmEco="1592">
+			<transmission name="CVX" price="5000" maxBackwardSpeed="27" maxForwardSpeed="51" ptoRpm="1803" ptoRpmEco="1592">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="true">	
 					<gear speed="6.25" atRpm="1750"/>
@@ -2523,7 +2523,7 @@
 
 		<transmissions>
 		<!-- http://www.deutz-fahr.com/de-DE/produkte/traktoren/973-series-5 -->
-			<transmission name="V-Drive" maxForwardSpeed="50" maxBackwardSpeed="22" disableManual="false">
+			<transmission name="V-Drive" price="5000" maxForwardSpeed="50" maxBackwardSpeed="22" disableManual="false">
 				<!--hydrostatic coupling="InputB" minRatio="0" maxRatio="2" pressure="550" volumePump="110" volumeMotor="110" correctGearSpeed="true"/-->
 				<hydrostatic profile="Input" minRatio="0" maxRatio="1.5" startFactor="0.5" correctGearSpeed="true"/>
 				<gears  shiftTimeMs="0" automatic="false" reverseReset="true" onlyStopped="true">		
@@ -2547,7 +2547,7 @@
 				</ranges>
 			</transmission>
 			
-			<transmission name="60+60 HML" maxForwardSpeed="50" maxBackwardSpeed="50">
+			<transmission name="60+60 HML" price="2000" maxForwardSpeed="50" maxBackwardSpeed="50">
 				<gears defaultGear="3">
 					<gear speed="11"/>
 					<gear speed="16"/>
@@ -5338,7 +5338,7 @@
 				<reverse ratio="1.0434" shiftTimeMs="0" manualClutch="false"/>
 			</transmission>	
 			
-			<transmission name="AutoPowr" ptoRpm="1950" ptoRpmEco="1773" maxForwardSpeed="52" maxBackwardSpeed="52">
+			<transmission name="AutoPowr" price="5000" ptoRpm="1950" ptoRpmEco="1773" maxForwardSpeed="52" maxBackwardSpeed="52">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="true">
 					<gear speed="6.5"/>
@@ -5911,7 +5911,7 @@
 		</mod>
 			
 		<transmissions>
-			<transmission name="CMATIC" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
+			<transmission name="CMATIC" price="5000" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
 				<hydrostatic profile="Input" maxRatio="1.5"/>
 				<gears  automatic="true">	
 					<gear speed="4" />
@@ -6432,7 +6432,7 @@
 				</gears>
 			</transmission>
 			
-			<transmission name="AutoCommand" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
+			<transmission name="AutoCommand" price="5000" maxForwardSpeed="52" maxBackwardSpeed="32" ptoRpm="1900" ptoRpmEco="1600">
 				<hydrostatic profile="Input"/>
 				<gears  automatic="true">	
 					<gear speed="6.5"/>
@@ -6744,7 +6744,7 @@
 		</mod>
 		
 		<transmissions>
-			<transmission name="AutoPowr" maxForwardSpeed="52" maxBackwardSpeed="22" ptoRpm="1950" ptoRpmEco="1750" minTargetRpm="1500" maxTargetRpm="2100">
+			<transmission name="AutoPowr" price="5000" maxForwardSpeed="52" maxBackwardSpeed="22" ptoRpm="1950" ptoRpmEco="1750" minTargetRpm="1500" maxTargetRpm="2100">
 				<hydrostatic profile="Compound"/>		
 				<gears defaultGear="1" automatic="false">	
 					<gear name="F" speed="50" atRpm="1800" forwardOnly="true"/>
@@ -6899,7 +6899,7 @@
 		<transmissions>
 		<!-- http://www.dlg-test.de/pbdocs/traktoren/deutzfahr-681agrostar.pdf -->
 			<transmission name="27/24" autoStartStop="true">
-				<gears defaultGear="4" shiftTimeMs="0" speedMatching="true">
+				<gears defaultGear="4" shiftTimeMs="0" speedMatching="true" startInSmallest="false">
 					<gear speed="10.2"/>
 					<gear speed="12.3"/>
 					<gear speed="15.0"/>
@@ -6921,7 +6921,7 @@
 			</transmission>
 			
 			<transmission name="18/18" autoStartStop="true">
-				<gears defaultGear="4" shiftTimeMs="0" speedMatching="true">
+				<gears defaultGear="4" shiftTimeMs="0" speedMatching="true" startInSmallest="false">
 					<gear speed="10.2"/>
 					<gear speed="12.3"/>
 					<gear speed="15.0"/>
@@ -7456,7 +7456,7 @@
 				<reverse resetGear="false" resetRange="false" /> 
 			</transmission>
 			
-			<transmission name="Dyna-VT" ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
+			<transmission name="Dyna-VT" price="5000" ptoRpm="1970" ptoRpmEco="1577" maxForwardSpeed="53" maxBackwardSpeed="33" maxAIGear="1">
 				<hydrostatic profile="Output" correctGearSpeed="true"/>		
 				<gears defaultGear="2" clutchRatio="1">	
 					<gear name="heavy duty" speed="28" />
@@ -7788,7 +7788,7 @@
 				<reverse ratio="1.05413"/>
 			</transmission>
 			
-			<transmission name="Direct" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
+			<transmission name="Direct" price="5000" maxForwardSpeed="53" maxBackwardSpeed="53" maxAIGear="2">
 				<hydrostatic profile="Input" correctGearSpeed="true"/>
 				<gears automatic="false" defaultGear="3" shiftTimeMs="500">
 					<gear speed="9"  name="A"/>
@@ -7919,7 +7919,7 @@
 					<gear name="III" speed="40" />
 				</gears>
 			</transmission>
-			<transmission name="Prodrive" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1" minTargetRpm="1600" soundMaxRpm="1800">
+			<transmission name="Prodrive" price="5000" maxForwardSpeed="41" maxBackwardSpeed="41" enableAI="true" maxAIGear="1" minTargetRpm="1600" soundMaxRpm="1800">
 				<blowOffVentilSound volume="0"/>
 				<hydrostatic profile="Combine" correctGearSpeed="true"/>
 				<gears automatic="true">

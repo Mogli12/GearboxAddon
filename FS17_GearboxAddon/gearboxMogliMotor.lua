@@ -4362,7 +4362,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	else 
 		local r = self:getThrottleMaxRpm( math.max( 0, handThrottle, accelerationPedal ), true )
 		
-		if not self.vehicle.mrGbMS.NeutralActive and self.vehicle.mrGbML.gearShiftingNeeded > 0 then 
+		if brakeNeutral == 2 then 
+			r = self.vehicle.mrGbMS.IdleRpm
+		elseif not self.vehicle.mrGbMS.NeutralActive and self.vehicle.mrGbML.gearShiftingNeeded > 0 then 
 			if      self.vehicle.mrGbML.gearShiftingNeeded == 1
 					and self.vehicle.mrGbML.beforeShiftRpm     ~= nil
 					and self.vehicle.mrGbML.gearShiftingEffect then
