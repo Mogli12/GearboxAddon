@@ -2588,16 +2588,16 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 --**********************************************************************************************************		
 	self.mrGbMS.ModifyDifferentials = 0
 	
-	if self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 3 then
-		local md = getXMLBool(xmlFile, xmlString .. "#manual4wd")
-		if md == nil then
-			if self.mrGbMS.IsCombine then
-				md = self.mrIsMrVehicle 
-			else
-				md = true
-			end
+	local md = getXMLBool(xmlFile, xmlString .. "#manual4wd")
+	if md == nil then
+		if self.mrGbMS.IsCombine then
+			md = self.mrIsMrVehicle 
+		else
+			md = true
 		end
-		
+	end
+	
+	if self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 3 then		
 		if md then
 			local pattern = {true, true, false}
 			for k,differential in pairs(self.differentials) do
@@ -2699,7 +2699,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.SpeedRatioMiddleLocked = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#speedRatioLocked"  ), self.mrGbMS.SpeedRatioMiddleLocked )
 		end
 	elseif self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 1 then
-		if getXMLBool(xmlFile, xmlString .. "#manual4wd") then
+		if md then
 			self.mrGbMS.ModifyDifferentials = 1
 			local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
 		
@@ -6819,7 +6819,7 @@ function gearboxMogli:mrGbMGetDiffLockBack()
 			or self.mrGbMS.ModifyDifferentials == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.ModifyDifferentials ~= 3
+	elseif self.mrGbMS.ModifyDifferentials <= 0
 			or self.mrGbMS.ManualDiffLock      <= 0 then 
 		return false 
 	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
@@ -7259,15 +7259,15 @@ function gearboxMogli:mrGbMGetModifyDifferentials()
 			or self.mrGbMS.ModifyDifferentials == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif not ( self.mrGbMS.ModifyDifferentials > 0
-					 and self.mrGbMS.ManualDiffLock      > 0
-					 and self.mrGbMS.IsOn 
-					 and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) ) then
-		return false 		
 	elseif self.mrGbMS.UnlockDiff then 
 		return false 
+	elseif  self.mrGbMS.ModifyDifferentials > 0
+			and self.mrGbMS.ManualDiffLock      > 0
+			and self.mrGbMS.IsOn 
+			and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
+		return true 		
 	end 
-	return true 
+	return false  
 end
 
 --**********************************************************************************************************	
