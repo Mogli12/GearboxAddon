@@ -25,7 +25,7 @@ gearboxMogli.factor30pi           = 9.5492965855137201461330258023509
 gearboxMogli.factorpi30           = 0.10471975511965977461542144610932
 gearboxMogli.rpmRatedMinus        = 100 -- 100  -- min RPM at 900 RPM
 gearboxMogli.rpmMinus             = 300 -- 100  -- min RPM at 900 RPM
-gearboxMogli.rpmPlus              = 200  -- braking at 2350 RPM
+gearboxMogli.rpmPlus              = 300  -- braking at 2350 RPM
 gearboxMogli.minRpmInSpeedHudDelta=  500
 gearboxMogli.maxRpmInSpeedHudDelta= 2500
 gearboxMogli.autoShiftRpmDiff     = gearboxMogli.huge -- 200
@@ -644,6 +644,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.CurMinRpm               = math.max( self.mrGbMS.IdleRpm - gearboxMogli.rpmMinus, 0 )
 	self.mrGbMS.CurMaxRpm               = math.max( self.mrGbMS.OrigRatedRpm + gearboxMogli.rpmPlus, self.mrGbMS.OrigMaxRpm )
 
+	self.mrGbMS.EngineHumRpm            = math.min( self.motor.maxRpm + gearboxMogli.rpmRatedMinus, self.mrGbMS.CurMaxRpm - 1 )
+	
 	self.mrGbMS.RatedRpm                = math.min( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#ratedRpm"), self.mrGbMS.OrigRatedRpm ), self.motor.maxRpm )
 	self.mrGbMS.AccelerateToLimit       = self.mrGbMG.accelerateToLimit
 	self.mrGbMS.MinTargetRpm            = getXMLFloat(xmlFile, xmlString .. "#minTargetRpm")
@@ -814,6 +816,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.RatedRpm  = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#ratedRpm"), 2100)
 			self.mrGbMS.CurMinRpm = Utils.getNoNil(getXMLFloat(xmlFile, realEngineBaseKey.."#minRpm"), math.max( self.mrGbMS.IdleRpm  - gearboxMogli.rpmMinus, self.mrGbMS.Engine.minRpm ))
 			self.mrGbMS.CurMaxRpm = self.mrGbMS.Engine.maxRpm + gearboxMogli.rpmPlus
+			self.mrGbMS.EngineHumRpm = self.mrGbMS.Engine.maxRpm
+			
 			if self.mrGbMS.MinTargetRpm == nil then
 				self.mrGbMS.MinTargetRpm = math.max( self.mrGbMS.Engine.maxTorqueRpm * gearboxMogli.rpmReduction, minTgtDft )
 			end
@@ -852,7 +856,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		self.mrGbMS.MinTargetRpm = minTgtDft
 	end
 	if self.mrGbMS.MaxTargetRpm == nil then
-		self.mrGbMS.MaxTargetRpm = 0.5 * ( self.mrGbMS.RatedRpm + math.max( self.mrGbMS.RatedRpm, self.mrGbMS.CurMaxRpm - gearboxMogli.rpmPlus ) )
+		self.mrGbMS.MaxTargetRpm = 0.5 * ( self.mrGbMS.RatedRpm + math.max( self.mrGbMS.RatedRpm, self.mrGbMS.EngineHumRpm ) )
 	elseif self.mrGbMS.MaxTargetRpm < self.mrGbMS.RatedRpm then
 		if self.mrGbMS.Engine.torqueValues == nil then
 			print('FS17_GearboxAddon: Warning! engine maxRpm < engine ratedRpm')
@@ -4567,8 +4571,8 @@ function gearboxMogli:update(dt)
 	if      self.isMotorStarted
 			and self:getIsActiveForSound()
 			and self.mrGbMG.engineHumVolume > 0
-			and self:mrGbMGetCurrentRPM() > self.mrGbMS.MaxTargetRpm
-			and self.mrGbMS.CurMaxRpm     > self.mrGbMS.MaxTargetRpm then 
+			and self:mrGbMGetCurrentRPM() > self.mrGbMS.EngineHumRpm
+			and self.mrGbMS.CurMaxRpm     > self.mrGbMS.EngineHumRpm then 
 		if self.mrGbML.EngineHumSampleStartTime == nil then	
 			self.mrGbML.EngineHumSampleStartTime = g_currentMission.time + 1000 
 		elseif self.mrGbML.EngineHumSampleStartTime < g_currentMission.time then 
@@ -4585,8 +4589,8 @@ function gearboxMogli:update(dt)
 			loadSample(gearboxMogli.EngineHumSample, fileName, false)
 		end
 		
-		local f = math.min( ( self:mrGbMGetCurrentRPM() - self.mrGbMS.MaxTargetRpm ) / ( self.mrGbMS.CurMaxRpm - self.mrGbMS.MaxTargetRpm ), 1 )
-		local g = self:mrGbMGetCurrentRPM() / self.mrGbMS.MaxTargetRpm
+		local f = math.min( ( self:mrGbMGetCurrentRPM() - self.mrGbMS.EngineHumRpm ) / ( self.mrGbMS.CurMaxRpm - self.mrGbMS.EngineHumRpm ), 1 )
+		local g = self:mrGbMGetCurrentRPM() / self.mrGbMS.EngineHumRpm
 		
 		f = math.min( 0.25 * self.mrGbMG.engineHumVolume * f, 0.001 * ( g_currentMission.time - self.mrGbML.EngineHumSampleStartTime ) )
 		g = 0.2 * ( 1 + 5 * ( g - 1 ) )
@@ -9610,9 +9614,28 @@ function gearboxMogli:showSettingsUI()
 			end 
 		end
 				
-		appendText( "Gears",   "ResetFwdGear",   "ResetRevGear"   )
-		appendText( "Ranges",  "ResetFwdRange",  "ResetRevRange"  )
-		appendText( "Ranges2", "ResetFwdRange2", "ResetRevRange2" )
+		if     self:mrGbMGetAutoShiftGears() 
+				or self.mrGbMS.StartInSmallestGear then 
+			appendText( "Gears",   "ResetFwdGear",   "ResetRevGear"   )
+		else 
+			self.mrGbMUI.ResetFwdGear   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+			self.mrGbMUI.ResetRevGear   = self.mrGbMUI.ResetFwdGear
+		end 
+		
+		if     self:mrGbMGetAutoShiftRange() 
+				or self.mrGbMS.StartInSmallestRange then 
+			appendText( "Ranges",  "ResetFwdRange",  "ResetRevRange"  )
+		else 
+			self.mrGbMUI.ResetFwdRange  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+			self.mrGbMUI.ResetRevRange  = self.mrGbMUI.ResetFwdGear
+		end 
+		
+		if     self:mrGbMGetAutoShiftRange2() then 
+			appendText( "Ranges2", "ResetFwdRange2", "ResetRevRange2" )
+		else
+			self.mrGbMUI.ResetFwdRange2 = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
+			self.mrGbMUI.ResetRevRange2 = self.mrGbMUI.ResetFwdGear
+		end 
 	end
 	
 	if self.mrGbMS.ModifyDifferentials <= 0 then 

@@ -4644,6 +4644,282 @@
 		</gearboxMogli>
 	</vehicle> 
 	
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- ********** FS15 Classics DLC ******************** -->	
+<!-- http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017 -->
+
+	<vehicle> 
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="gueldner/gueldnerG40.xml"/>
+			<xmlFile name="gueldner/gueldnerG40Frontloader.xml"/>
+		</mod>
+		
+		<gearboxMogli clutchShiftingTimeMs="400" indoorCameraIndexList="" autoStartStop="false">
+
+			<gears defaultGear="2"  shiftTimeMs="1200">	
+				<gear speed="6.72"/>
+				<gear speed="11"/>
+				<gear speed="18.1"/>
+				<gear speed="29.8"/>
+			</gears>
+
+			<ranges reverseReset="true" doubleClutch="true">		
+				<range ratio="0.268" forwardOnly="true" name="L"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.5"   reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="buehrer/buehrerRP21.xml"/>
+		</mod>
+		
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1971_D.pdf -->
+		<gearboxMogli>
+			<realEngine idleRpm="600" ratedRpm="1900">		
+				<torque rpm="0" ptoTorque="0" fuelUsageRatio="1" />
+				<torque rpm="600" ptoTorque="237" fuelUsageRatio="0.951" /><!-- idle -->
+				<torque rpm="800" ptoTorque="254" fuelUsageRatio="0.928" />
+				<torque rpm="1000" ptoTorque="263" fuelUsageRatio="0.916" /><!-- max torque 280 Nm-->
+				<torque rpm="1200" ptoTorque="263" fuelUsageRatio="0.914" /><!-- max torque 280 Nm-->
+				<torque rpm="1430" ptoTorque="261" fuelUsageRatio="0.925" />
+				<torque rpm="1670" ptoTorque="256" fuelUsageRatio="0.952" />
+				<torque rpm="1900" ptoTorque="250" fuelUsageRatio="0.993" /><!-- max power 72 PS-->
+				<torque rpm="1950" ptoTorque="238" fuelUsageRatio="1.05" />
+				<torque rpm="2000" ptoTorque="125" fuelUsageRatio="1.2" />
+				<torque rpm="2050" ptoTorque="38" fuelUsageRatio="1.45" />
+				<torque rpm="2100" ptoTorque="25" fuelUsageRatio="1.5" /><!-- max rpm + fade out -->
+				<torque rpm="2150" ptoTorque="13" fuelUsageRatio="1.55" /><!-- max rpm + fade out -->
+				<torque rpm="2300" ptoTorque="0" fuelUsageRatio="3" />
+			</realEngine>
+		
+			<gears defaultGear="3" reverseReset="true">	
+				<gear speed="6.3"  forwardOnly="true" name="1"/>
+				<gear speed="8.9"  forwardOnly="true" name="2"/>
+				<gear speed="12.6" forwardOnly="true" name="3"/>
+				<gear speed="17.9" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="9"    reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">		
+				<range ratio="0.208"/>
+				<range ratio="0.6025"/>
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+		
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="bucher/bucherD4000.xml"/>
+		</mod>
+		
+		<!-- http://www.buchertraktoren.ch/d4000_01.html -->
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
+
+			<gears defaultGear="4" reverseReset="true" shiftTimeMs="1200">	
+				<gear speed="4.1"  forwardOnly="true" name="1"/>
+				<gear speed="7.28" forwardOnly="true" name="2"/>
+				<gear speed="10.6" forwardOnly="true" name="3"/>
+				<gear speed="16.3" forwardOnly="true" name="4"/>
+				<gear speed="20"   forwardOnly="true" name="5"/>
+				<gear speed="4.1"  reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">			
+				<range ratio="0.2105"/>
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="hatz/hatzH340.xml"/>
+			<xmlFile name="lindner/lindnerBF450.xml"/>
+		</mod>
+		
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Hatz_H340 -->
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
+			<gears defaultGear="4" shiftTimeMs="1200">	
+				<gear speed="4.23" />
+				<gear speed="7.23"/>
+				<gear speed="11.88"/>
+				<gear speed="19.26"/>
+				<gear speed="27.4" forwardOnly="true" name="Schnellgang"/>
+			</gears>
+
+			<ranges defaultRange="2" reverseReset="true" doubleClutch="true">	
+				<range ratio="0.277" forwardOnly="true" name="L"/>
+				<range ratio="1"     forwardOnly="true" name="H"/>
+				<range ratio="0.5"   reverseOnly="true" name="R"/>
+			</ranges>
+		</gearboxMogli>			
+
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="deutz/deutzD80.xml"/>
+		</mod>
+	
+<!-- ************************************************************************* -->	
+		<!-- http://de.wikibooks.org/wiki/Traktorenlexikon:_Deutz_D_80 -->
+		<!-- http://www.deutz-traktoren.de/traktoren/d_serie/d80.php -->
+	
+		<gearboxMogli autoStartStop="false" speedLimiter="false" ptoRpm="2300" ptoRpmEco="2300" revUpMs="4000">
+			<blowOffVentilSound volume="0"/>
+				
+			<gears defaultGear="3" reverseReset="false" doubleClutch="false" shiftTimeMs="1000">	
+				<gear speed="7.3"  name="1"/>
+				<gear speed="11.4" name="2"/>
+				<gear speed="17.7" name="3"/>
+				<gear speed="27.2" name="4"/>
+			</gears>
+
+			<ranges defaultRange="2" doubleClutch="true" reverseReset="true" shiftTimeMs="1500">
+				<range ratio="0.327" name="Schildkröte" forwardOnly="true" />
+				<range ratio="1.000" name="Hase" forwardOnly="true" />
+				<range ratio="0.397" name="Rückwärts" reverseOnly="true" />
+			</ranges>
+	
+			<realEngine idleRpm="700" ratedRpm="2300">
+        <!-- 2300: 75(75) | 2300: 75(75) | 1300..1300: 285(285) | 95 | 0.2 | 249 | 1.7 | 2400 | 1300: 210 -->
+        <torque rpm="350" motorTorque="183" fuelUsageRatio="262.6"/>
+        <torque rpm="700" motorTorque="254" fuelUsageRatio="231"/>
+        <torque rpm="900" motorTorque="271" fuelUsageRatio="219.3"/>
+        <torque rpm="1000" motorTorque="277" fuelUsageRatio="215.3"/>
+        <torque rpm="1100" motorTorque="281" fuelUsageRatio="212.3"/>
+        <torque rpm="1200" motorTorque="284" fuelUsageRatio="210.6"/>
+        <torque rpm="1300" motorTorque="285" fuelUsageRatio="210"/>
+        <torque rpm="1400" motorTorque="283" fuelUsageRatio="210.2"/>
+        <torque rpm="1500" motorTorque="281" fuelUsageRatio="210.9"/>
+        <torque rpm="1600" motorTorque="278" fuelUsageRatio="212.1"/>
+        <torque rpm="1700" motorTorque="273" fuelUsageRatio="213.7"/>
+        <torque rpm="1800" motorTorque="268" fuelUsageRatio="215.8"/>
+        <torque rpm="1850" motorTorque="265" fuelUsageRatio="217.1"/>
+        <torque rpm="1900" motorTorque="262" fuelUsageRatio="218.4"/>
+        <torque rpm="1950" motorTorque="259" fuelUsageRatio="219.9"/>
+        <torque rpm="2000" motorTorque="255" fuelUsageRatio="221.4"/>
+        <torque rpm="2050" motorTorque="251" fuelUsageRatio="223.1"/>
+        <torque rpm="2100" motorTorque="247" fuelUsageRatio="224.9"/>
+        <torque rpm="2150" motorTorque="243" fuelUsageRatio="226.9"/>
+        <torque rpm="2200" motorTorque="239" fuelUsageRatio="228.9"/>
+        <torque rpm="2250" motorTorque="234" fuelUsageRatio="231.1"/>
+        <torque rpm="2300" motorTorque="229" fuelUsageRatio="233.3"/>
+        <torque rpm="2350" motorTorque="214" fuelUsageRatio="237.5"/>
+        <torque rpm="2400" motorTorque="180" fuelUsageRatio="257.2"/>
+        <torque rpm="2450" motorTorque="132" fuelUsageRatio="299.1"/>
+        <torque rpm="2500" motorTorque="71" fuelUsageRatio="368.2"/>
+        <torque rpm="2550" motorTorque="0" motorTorqueEco="0" fuelUsageRatio="466.7"/>
+			</realEngine>			
+		</gearboxMogli>	
+	
+<!-- ************************************************************************* -->	
+	
+	</vehicle>	
+
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="huerlimann/huerlimannD110.xml"/>
+		</mod>
+	
+		<!-- http://www.services.art.admin.ch/traktor/Archiv_1971-1999/1971_D.pdf -->
+		<gearboxMogli indoorCameraIndexList="" autoStartStop="false">
+			<realEngine idleRpm="800" ratedRpm="2200">		
+				<torque rpm="0" ptoTorque="0" fuelUsageRatio="1" />
+				<torque rpm="800" ptoTorque="169" fuelUsageRatio="0.938" /><!-- idle -->
+				<torque rpm="1200" ptoTorque="185" fuelUsageRatio="0.911" />
+				<torque rpm="1600" ptoTorque="188" fuelUsageRatio="0.92" /><!-- max torque 200 Nm-->
+				<torque rpm="1770" ptoTorque="183" fuelUsageRatio="0.935" />
+				<torque rpm="1940" ptoTorque="178" fuelUsageRatio="0.956" />
+				<torque rpm="2100" ptoTorque="173" fuelUsageRatio="0.982" /><!-- max power 55 PS-->
+				<torque rpm="2200" ptoTorque="165" fuelUsageRatio="1" /><!-- max power 55 PS-->
+				<torque rpm="2250" ptoTorque="157" fuelUsageRatio="1.05" />
+				<torque rpm="2300" ptoTorque="82" fuelUsageRatio="1.2" />
+				<torque rpm="2350" ptoTorque="25" fuelUsageRatio="1.45" />
+				<torque rpm="2400" ptoTorque="16" fuelUsageRatio="1.5" /><!-- max rpm + fade out -->
+				<torque rpm="2450" ptoTorque="8" fuelUsageRatio="1.55" /><!-- max rpm + fade out -->
+				<torque rpm="2600" ptoTorque="0" fuelUsageRatio="3" />
+			</realEngine>
+		
+			<gears defaultGear="3" reverseReset="true" shiftTimeMs="1200">	
+				<gear speed="7.2"  forwardOnly="true" name="1"/>
+				<gear speed="10.2" forwardOnly="true" name="2"/>
+				<gear speed="12.6" forwardOnly="true" name="3"/>
+				<gear speed="15.9" forwardOnly="true" name="4"/>
+				<gear speed="25"   forwardOnly="true" name="5"/>
+				<gear speed="9.6"  reverseOnly="true" name="R"/>
+			</gears>
+
+			<ranges doubleClutch="true">		
+				<range ratio="0.236" />
+				<range ratio="1"/>
+			</ranges>
+		</gearboxMogli>			
+	
+	</vehicle>	
+		
+	<vehicle>
+		<mod name="FS17_FarmingClassics">
+			<link href="http://www.farming-simulator.com/mod.php?mod_id=106295&title=fs2017"/>
+			<xmlFile name="schlueter/schlueter1500TVL.xml"/>
+		</mod>		
+
+		<gearboxMogli soundMaxRpm="1900" autoStartStop="false"  clutchOpenRpm="1100" clutchCloseRpm="1300" torqueConverter="true" launchGearSpeed="23">
+			<blowOffVentilSound volume="2"/>
+
+			<realEngine idleRpm="800" ratedRpm="2200">
+				<torque rpm="0" motorTorque="0"/>
+				<torque rpm="800" motorTorque="508"/>
+				<torque rpm="900" motorTorque="556"/>
+				<torque rpm="1000" motorTorque="591"/>
+				<torque rpm="1100" motorTorque="611"/>
+				<torque rpm="1200" motorTorque="618"/>
+				<torque rpm="1300" motorTorque="618"/>
+				<torque rpm="1400" motorTorque="617"/>
+				<torque rpm="1500" motorTorque="613"/>
+				<torque rpm="1600" motorTorque="608"/>
+				<torque rpm="1700" motorTorque="600"/>
+				<torque rpm="1800" motorTorque="589"/>
+				<torque rpm="1900" motorTorque="577"/>
+				<torque rpm="2000" motorTorque="562"/>
+				<torque rpm="2100" motorTorque="527"/>
+				<torque rpm="2200" motorTorque="421"/>
+				<torque rpm="2300" motorTorque="246"/>
+				<torque rpm="2400" motorTorque="0"/> 
+			</realEngine> 
+		
+			<gears reverseReset="true">
+				<gear speed="7.5"  forwardOnly="true" name="1"/>
+				<gear speed="15.1" forwardOnly="true" name="2"/>
+				<gear speed="17.1" reverseOnly="true" name="R"/>
+				<gear speed="22.6" forwardOnly="true" name="3"/>
+				<gear speed="30.4" forwardOnly="true" name="4"/>
+				<gear speed="37.7" forwardOnly="true" name="5"/>
+				<gear speed="44.8" forwardOnly="true" name="6"/>
+			</gears>
+
+			<ranges doubleClutch="false">
+				<range ratio="0.263" name="A"/>
+				<range ratio="0.655" name="L"/>
+				<range ratio="0.81"  name="M"/>
+				<range ratio="1"     name="H"/>
+			</ranges>
+		
+		</gearboxMogli>	
+	</vehicle>
+		
 <!-- ********** Some mods ******************** -->	
 <!-- ********** Some mods ******************** -->	
 <!-- ********** Some mods ******************** -->	
