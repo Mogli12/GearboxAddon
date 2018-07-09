@@ -500,18 +500,13 @@ function gearboxMogliRegisterSendConfigs:readStream(streamId, connection)
 		if numConfigItems ~= nil and numConfigItems > 0 then
 			local configFileName = streamReadString(streamId)
 		
-			if configFileName ~= nil then
-				evData[configFileName] = {}
-				for j=1,numConfigItems do
-					local n = streamReadString(streamId)
-					local t = streamReadString(streamId)
-					local p, d = 0, 0
-					if streamReadBool(streamId) then 
-						p = streamReadFloat32(streamId)
-						d = streamReadFloat32(streamId)
-					end 
-					table.insert( evData[configFileName], {name=n, title=t, price=p, dailyUpkeep=d})
-				end
+			evData[configFileName] = {}
+			for j=1,numConfigItems do
+				local n = streamReadString(streamId)
+				local t = streamReadString(streamId)
+				local p = streamReadFloat32(streamId)
+				local d = streamReadFloat32(streamId)
+				table.insert( evData[configFileName], {name=n, title=t, price=p, dailyUpkeep=d})
 			end
 		end
 	end
@@ -562,13 +557,8 @@ function gearboxMogliRegisterSendConfigs:writeStream(streamId, connection)
 				for j,c in pairs( item.configurations ) do
 					streamWriteString(streamId, Utils.getNoNil( c.name, "!!!empty!!!" ) )
 					streamWriteString(streamId, Utils.getNoNil( c.title,"!!!empty!!!" ) )
-					if c.price ~= nil or c.dailyUpkeep ~= nil then 
-						streamWriteBool(streamId,true)
-						streamWriteFloat32(streamId, Utils.getNoNil( c.price, 0 ) )
-						streamWriteFloat32(streamId, Utils.getNoNil( c.dailyUpkeep, 0 ) )
-					else 
-						streamWriteBool(streamId,true)
-					end 
+					streamWriteFloat32(streamId, Utils.getNoNil( c.price, 0 ) )
+					streamWriteFloat32(streamId, Utils.getNoNil( c.dailyUpkeep, 0 ) )
 				end
 			end
 		end

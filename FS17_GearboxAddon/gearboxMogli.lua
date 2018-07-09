@@ -2601,138 +2601,185 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		end
 	end
 	
-	if self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 3 then		
-		if md then
-			local pattern = {true, true, false}
-			for k,differential in pairs(self.differentials) do
-				md = md and differential.diffIndex1IsWheel==pattern[k] and differential.diffIndex2IsWheel==pattern[k]
-			end				
+	if self.mrGbMG.manual4wd and self.differentials ~= nil then
+		self.mrGbMS.DiffIndexFront  = getXMLInt( xmlFile, xmlString .. ".differentials#indexFront")
+		self.mrGbMS.DiffIndexBack   = getXMLInt( xmlFile, xmlString .. ".differentials#indexBack")
+		self.mrGbMS.DiffIndexMiddle = getXMLInt( xmlFile, xmlString .. ".differentials#indexMiddle")
+		
+		if self.mrGbMS.DiffIndexFront == nil and self.mrGbMS.DiffIndexBack == nil and self.mrGbMS.DiffIndexMiddle == nil then 
+			if     table.getn( self.differentials ) == 1 then 
+				self.mrGbMS.DiffIndexFront  = 0
+				self.mrGbMS.DiffIndexBack   = 0
+				self.mrGbMS.DiffIndexMiddle = 1
+			elseif table.getn( self.differentials ) == 3 or table.getn( self.differentials ) == 7 then
+				local doit = true
+				local pattern = {}
+				if table.getn(self.differentials) == 3 then
+					pattern = {true, true, false}
+				else
+					pattern = {true, true, true, true, false, false, false}
+				end
+
+				for k,differential in pairs(self.differentials) do
+					doit = doit and differential.diffIndex1IsWheel==pattern[k] and differential.diffIndex2IsWheel==pattern[k]
+				end			
+				
+				if doit then 
+					self.mrGbMS.DiffIndexFront  = table.getn( self.differentials ) - 2
+					self.mrGbMS.DiffIndexBack   = table.getn( self.differentials ) - 1
+					self.mrGbMS.DiffIndexMiddle = table.getn( self.differentials )
+				end 
+			end
+		else 
+			if self.mrGbMS.DiffIndexFront  == nil then 
+				self.mrGbMS.DiffIndexFront  = 0
+			end
+			if self.mrGbMS.DiffIndexBack   == nil then 
+				self.mrGbMS.DiffIndexBack   = 0
+			end
+			if self.mrGbMS.DiffIndexMiddle == nil then 
+				self.mrGbMS.DiffIndexMiddle = 0
+			end
+		end 
+		
+		if self.differentials[self.mrGbMS.DiffIndexFront]  == nil then 
+			self.mrGbMS.DiffIndexFront  = 0
+		end
+		if self.differentials[self.mrGbMS.DiffIndexBack]   == nil then 
+			self.mrGbMS.DiffIndexBack   = 0
+		end
+		if self.differentials[self.mrGbMS.DiffIndexMiddle] == nil then 
+			self.mrGbMS.DiffIndexMiddle = 0
+		end 
+
+	else
+		self.mrGbMS.DiffIndexFront  = 0
+		self.mrGbMS.DiffIndexBack   = 0
+		self.mrGbMS.DiffIndexMiddle = 0
+	end 
+	
+	if self.mrGbMS.DiffIndexFront > 0 and self.mrGbMS.DiffIndexBack > 0 and self.mrGbMS.DiffIndexMiddle > 0 then 
+		self.mrGbMS.ModifyDifferentials = 3
+		local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
+		if     profile == nil then
+			if     self.articulatedAxis ~= nil then
+				profile = "permanent"
+			elseif self.mrGbMS.AutoStartStop then
+				profile = "lsd" 
+			end
 		end
 		
-		if md then 
-			self.mrGbMS.ModifyDifferentials = 3
-			local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
-			if     profile == nil then
-				if     self.articulatedAxis ~= nil then
-					profile = "permanent"
-				elseif self.mrGbMS.AutoStartStop then
-					profile = "lsd" 
-				end
-			end
+		-- torque ratio  1 => everything to front 
+		-- torque ratio  0 => everything to back 
+		-- torque sense  1 => open differential
+		-- torque sense  0 => constant torque distribution 
+		-- torque sense -1 => torque goes to the slowest wheel (torsen) 
+		
+		self.mrGbMS.TorqueRatioMiddle = 0
+		self.mrGbMS.TorqueSenseMiddle = 0
+		self.mrGbMS.SpeedRatioMiddle  = self.differentials[self.mrGbMS.DiffIndexMiddle].maxSpeedRatio
+		self.mrGbMS.TorqueRatioFront  = self.differentials[self.mrGbMS.DiffIndexFront].torqueRatio
+		self.mrGbMS.TorqueSenseFront  = 1
+		self.mrGbMS.SpeedRatioFront   = 1
+		self.mrGbMS.TorqueRatioBack   = self.differentials[self.mrGbMS.DiffIndexBack].torqueRatio
+		self.mrGbMS.TorqueSenseBack   = 0.75
+		self.mrGbMS.SpeedRatioBack    = 1
+		self.mrGbMS.TorqueRatioMiddleLocked = self.differentials[self.mrGbMS.DiffIndexMiddle].torqueRatio
+		
+		self.mrGbMS.SpeedRatioMiddleLocked  = 1			
+		if table.getn( self.wheels ) == 4 then 
+			self.mrGbMS.SpeedRatioMiddleLocked  = 1.05
 			
-			-- torque ratio  1 => everything to front 
-			-- torque ratio  0 => everything to back 
-			-- torque sense  1 => open differential
-			-- torque sense  0 => constant torque distribution 
-			-- torque sense -1 => torque goes to the slowest wheel (torsen) 
-			
-			self.mrGbMS.TorqueRatioMiddle = 0
-			self.mrGbMS.TorqueSenseMiddle = 0
-			self.mrGbMS.SpeedRatioMiddle  = self.differentials[3].maxSpeedRatio
-			self.mrGbMS.TorqueRatioFront  = self.differentials[1].torqueRatio
-			self.mrGbMS.TorqueSenseFront  = 1
-			self.mrGbMS.SpeedRatioFront   = 1
-			self.mrGbMS.TorqueRatioBack   = self.differentials[2].torqueRatio
-			self.mrGbMS.TorqueSenseBack   = 0.75
-			self.mrGbMS.SpeedRatioBack    = 1
-			self.mrGbMS.TorqueRatioMiddleLocked = self.differentials[3].torqueRatio
-			
-			self.mrGbMS.SpeedRatioMiddleLocked  = 1			
-			if table.getn( self.wheels ) == 4 then 
-				self.mrGbMS.SpeedRatioMiddleLocked  = 1.05
-				
-				local minR, maxR
-				for _,w in pairs( self.wheels ) do 
-					if minR == nil then 
-						minR = w.radius
-						maxR = w.radius 
-					else	
-						minR = math.min( minR, w.radius )
-						maxR = math.max( maxR, w.radius )
-					end 
-				end 
-				
-				if minR > 0.95 * maxR then 
-					self.mrGbMS.SpeedRatioMiddleLocked  = 1
+			local minR, maxR
+			for _,w in pairs( self.wheels ) do 
+				if minR == nil then 
+					minR = w.radius
+					maxR = w.radius 
+				else	
+					minR = math.min( minR, w.radius )
+					maxR = math.max( maxR, w.radius )
 				end 
 			end 
 			
-			-- profile == "manual" is default 
-			if     profile == "off"       then
-				self.mrGbMS.TorqueRatioMiddle = -1
-				self.mrGbMS.TorqueRatioFront  = -1
-				self.mrGbMS.TorqueRatioBack   = -1
-			elseif profile == "rwd"       then 
-				self.mrGbMS.TorqueRatioMiddle = -1
-				self.mrGbMS.TorqueRatioFront  = -1
-			elseif profile == "lsd"       then
-				self.mrGbMS.TorqueSenseBack   = 0.25
-			elseif profile == "permanent" then
-				self.mrGbMS.TorqueRatioMiddle = 0.5
-				self.mrGbMS.SpeedRatioMiddleLocked = 1
-			elseif profile == "torsen1"   then
-				self.mrGbMS.TorqueRatioMiddle = 0.5
-				self.mrGbMS.TorqueSenseMiddle = -1
-				self.mrGbMS.SpeedRatioBack    = self.differentials[2].maxSpeedRatio
-			elseif profile == "torsen2"   then
-				self.mrGbMS.TorqueRatioMiddle = 0.5
-				self.mrGbMS.TorqueSenseMiddle = -1
-				self.mrGbMS.TorqueRatioBack   = 0.5
-				self.mrGbMS.TorqueSenseBack   = -1
-				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
-			elseif profile == "torsen3"   then
-				self.mrGbMS.TorqueRatioMiddle = 0.5
-				self.mrGbMS.TorqueSenseMiddle = -1
-				self.mrGbMS.TorqueRatioFront  = 0.5
-				self.mrGbMS.TorqueSenseFront  = -1
-				self.mrGbMS.SpeedRatioFront   = math.max( 1.3, self.differentials[1].maxSpeedRatio )
-				self.mrGbMS.TorqueRatioBack   = 0.5
-				self.mrGbMS.TorqueSenseBack   = -1
-				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[2].maxSpeedRatio )
-			end
+			if minR > 0.95 * maxR then 
+				self.mrGbMS.SpeedRatioMiddleLocked  = 1
+			end 
+		end 
 		
-			self.mrGbMS.TorqueRatioMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#torqueRatio"  ), self.mrGbMS.TorqueRatioMiddle )
-			self.mrGbMS.TorqueSenseMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#limitedSlip"  ), self.mrGbMS.TorqueSenseMiddle )
-			self.mrGbMS.SpeedRatioMiddle  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#maxSpeedRatio"), self.mrGbMS.SpeedRatioMiddle )
-			self.mrGbMS.TorqueRatioFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#torqueRatio"   ), self.mrGbMS.TorqueRatioFront  )
-			self.mrGbMS.TorqueSenseFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#limitedSlip"   ), self.mrGbMS.TorqueSenseFront  )
-			self.mrGbMS.SpeedRatioFront   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#maxSpeedRatio" ), self.mrGbMS.SpeedRatioFront  )
-			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
-			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
-			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
-			self.mrGbMS.SpeedRatioMiddleLocked = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#speedRatioLocked"  ), self.mrGbMS.SpeedRatioMiddleLocked )
-		end
-	elseif self.mrGbMG.manual4wd and self.differentials ~= nil and table.getn(self.differentials) == 1 then
-		if md then
-			self.mrGbMS.ModifyDifferentials = 1
-			local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
-		
+		-- profile == "manual" is default 
+		if     profile == "off"       then
 			self.mrGbMS.TorqueRatioMiddle = -1
-			self.mrGbMS.TorqueSenseMiddle = 0
-			self.mrGbMS.SpeedRatioMiddle  = 1
 			self.mrGbMS.TorqueRatioFront  = -1
-			self.mrGbMS.TorqueSenseFront  = 1
-			self.mrGbMS.SpeedRatioFront   = 1
-			self.mrGbMS.TorqueRatioBack   = self.differentials[1].torqueRatio
-			self.mrGbMS.TorqueSenseBack   = 0.75
-			self.mrGbMS.SpeedRatioBack    = 1
-			
-			if     profile == "off"       then
-				self.mrGbMS.TorqueRatioBack   = -1
-			elseif profile == "lsd"       then
-				self.mrGbMS.TorqueSenseBack   = 0.25
-			elseif profile == "torsen"    then
-				self.mrGbMS.TorqueRatioBack   = 0.5
-				self.mrGbMS.TorqueSenseBack   = -1
-				self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[1].maxSpeedRatio )
-			end
-
-			self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
-			self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
-			self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
+			self.mrGbMS.TorqueRatioBack   = -1
+		elseif profile == "rwd"       then 
+			self.mrGbMS.TorqueRatioMiddle = -1
+			self.mrGbMS.TorqueRatioFront  = -1
+		elseif profile == "lsd"       then
+			self.mrGbMS.TorqueSenseBack   = 0.25
+		elseif profile == "permanent" then
+			self.mrGbMS.TorqueRatioMiddle = 0.5
+			self.mrGbMS.SpeedRatioMiddleLocked = 1
+		elseif profile == "torsen1"   then
+			self.mrGbMS.TorqueRatioMiddle = 0.5
+			self.mrGbMS.TorqueSenseMiddle = -1
+			self.mrGbMS.SpeedRatioBack    = self.differentials[self.mrGbMS.DiffIndexBack].maxSpeedRatio
+		elseif profile == "torsen2"   then
+			self.mrGbMS.TorqueRatioMiddle = 0.5
+			self.mrGbMS.TorqueSenseMiddle = -1
+			self.mrGbMS.TorqueRatioBack   = 0.5
+			self.mrGbMS.TorqueSenseBack   = -1
+			self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[self.mrGbMS.DiffIndexBack].maxSpeedRatio )
+		elseif profile == "torsen3"   then
+			self.mrGbMS.TorqueRatioMiddle = 0.5
+			self.mrGbMS.TorqueSenseMiddle = -1
+			self.mrGbMS.TorqueRatioFront  = 0.5
+			self.mrGbMS.TorqueSenseFront  = -1
+			self.mrGbMS.SpeedRatioFront   = math.max( 1.3, self.differentials[self.mrGbMS.DiffIndexFront].maxSpeedRatio )
+			self.mrGbMS.TorqueRatioBack   = 0.5
+			self.mrGbMS.TorqueSenseBack   = -1
+			self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[self.mrGbMS.DiffIndexBack].maxSpeedRatio )
 		end
 		
+		self.mrGbMS.TorqueRatioMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#torqueRatio"  ), self.mrGbMS.TorqueRatioMiddle )
+		self.mrGbMS.TorqueSenseMiddle = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#limitedSlip"  ), self.mrGbMS.TorqueSenseMiddle )
+		self.mrGbMS.SpeedRatioMiddle  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#maxSpeedRatio"), self.mrGbMS.SpeedRatioMiddle )
+		self.mrGbMS.TorqueRatioFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#torqueRatio"   ), self.mrGbMS.TorqueRatioFront  )
+		self.mrGbMS.TorqueSenseFront  = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#limitedSlip"   ), self.mrGbMS.TorqueSenseFront  )
+		self.mrGbMS.SpeedRatioFront   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.front#maxSpeedRatio" ), self.mrGbMS.SpeedRatioFront  )
+		self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
+		self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
+		self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
+		self.mrGbMS.SpeedRatioMiddleLocked = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.middle#speedRatioLocked"  ), self.mrGbMS.SpeedRatioMiddleLocked )
+
+	elseif self.mrGbMS.DiffIndexFront <= 0 and self.mrGbMS.DiffIndexBack > 0 and self.mrGbMS.DiffIndexMiddle <= 0 then 
+		self.mrGbMS.ModifyDifferentials = 1
+		local profile = getXMLString( xmlFile, xmlString .. ".differentials#profile")
+	
+		self.mrGbMS.TorqueRatioMiddle = -1
+		self.mrGbMS.TorqueSenseMiddle = 0
+		self.mrGbMS.SpeedRatioMiddle  = 1
+		self.mrGbMS.TorqueRatioFront  = -1
+		self.mrGbMS.TorqueSenseFront  = 1
+		self.mrGbMS.SpeedRatioFront   = 1
+		self.mrGbMS.TorqueRatioBack   = self.differentials[self.mrGbMS.DiffIndexBack].torqueRatio
+		self.mrGbMS.TorqueSenseBack   = 0.75
+		self.mrGbMS.SpeedRatioBack    = 1
+		
+		if     profile == "off"       then
+			self.mrGbMS.TorqueRatioBack   = -1
+		elseif profile == "lsd"       then
+			self.mrGbMS.TorqueSenseBack   = 0.25
+		elseif profile == "torsen"    then
+			self.mrGbMS.TorqueRatioBack   = 0.5
+			self.mrGbMS.TorqueSenseBack   = -1
+			self.mrGbMS.SpeedRatioBack    = math.max( 1.3, self.differentials[self.mrGbMS.DiffIndexBack].maxSpeedRatio )
+		end
+
+		self.mrGbMS.TorqueRatioBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#torqueRatio"    ), self.mrGbMS.TorqueRatioBack   )
+		self.mrGbMS.TorqueSenseBack   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#limitedSlip"    ), self.mrGbMS.TorqueSenseBack   )
+		self.mrGbMS.SpeedRatioBack    = Utils.getNoNil( getXMLFloat( xmlFile, xmlString .. ".differentials.back#maxSpeedRatio"  ), self.mrGbMS.SpeedRatioBack   )
 	end
+	
 	self.mrGbMS.LockedDiffSpeedLimit  = getXMLFloat( xmlFile, xmlString .. ".differentials#lockedSpeedLimit"  )
 	self.mrGbMS.UnlockDiffSpeed       = getXMLFloat( xmlFile, xmlString .. ".differentials#unlockSpeed"  )
 	self.mrGbMS.LockDiffSpeed         = getXMLFloat( xmlFile, xmlString .. ".differentials#lockSpeed"  )
@@ -3175,6 +3222,9 @@ function gearboxMogli:update(dt)
 			and self:dCcheckModule("fourWDandDifferentials") 
 			and self.mrGbMS.ModifyDifferentials > 0 then
 		self:mrGbMSetState( "ModifyDifferentials", 0 )
+		self:mrGbMSetState( "DiffIndexFront"     , 0 )
+		self:mrGbMSetState( "DiffIndexBack"      , 0 )
+		self:mrGbMSetState( "DiffIndexMiddle"    , 0 )
 	end
 	for _, wheel in pairs(self.wheels) do
 		if wheel.mogliBrakeForce ~= nil then 
@@ -3385,16 +3435,19 @@ function gearboxMogli:update(dt)
 				end
 			end
 		
-			if     table.getn( self.differentials ) == 1 then 
-				diff = self.differentials[1]
+			local diffList = {}
+			if self.mrGbMS.ModifyDifferentials <= 1 then 
+				diffList = { self.mrGbMS.DiffIndexBack }
+				diff = self.differentials[self.mrGbMS.DiffIndexBack]
 				diff.mogliLocked      = self:mrGbMGetDiffLockBack()
 				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
 				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
 				diff.mogliSpeedRatio  = self.mrGbMS.SpeedRatioBack
 				diff.mogliTorqueRatioL= self.mrGbMS.TorqueRatioBack
 				diff.mogliSpeedRatioL = 1
-			elseif table.getn( self.differentials ) == 3 then 
-				local diff = self.differentials[3]
+			else
+				diffList = { self.mrGbMS.DiffIndexFront, self.mrGbMS.DiffIndexBack, self.mrGbMS.DiffIndexMiddle }
+				local diff = self.differentials[self.mrGbMS.DiffIndexMiddle]
 				diff.mogliLocked      = self:mrGbMGetDiffLockMiddle() 
 				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioMiddle
 				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseMiddle
@@ -3402,7 +3455,7 @@ function gearboxMogli:update(dt)
 				diff.mogliTorqueRatioL= self.mrGbMS.TorqueRatioMiddleLocked
 				diff.mogliSpeedRatioL = self.mrGbMS.SpeedRatioMiddleLocked
 				
-				diff = self.differentials[1]
+				diff = self.differentials[self.mrGbMS.DiffIndexFront]
 				diff.mogliLocked      = self:mrGbMGetDiffLockFront()
 				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioFront
 				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseFront
@@ -3410,7 +3463,7 @@ function gearboxMogli:update(dt)
 				diff.mogliTorqueRatioL= self.mrGbMS.TorqueRatioFront
 				diff.mogliSpeedRatioL = 1
 				
-				diff = self.differentials[2]
+				diff = self.differentials[self.mrGbMS.DiffIndexBack]
 				diff.mogliLocked      = self:mrGbMGetDiffLockBack()
 				diff.mogliTorqueRatio = self.mrGbMS.TorqueRatioBack
 				diff.mogliTorqueSense = self.mrGbMS.TorqueSenseBack
@@ -3419,7 +3472,8 @@ function gearboxMogli:update(dt)
 				diff.mogliSpeedRatioL = 1
 			end			
 			
-			for i,diff in pairs( self.differentials ) do
+			for _,i in pairs(diffList) do		
+				local diff = self.differentials[i]
 				if self.mrGbMG.debugInfo then
 					local speed1, speed2 = getSpeedsOfDifferential( self, diff )
 					diff.lastMogliSpeedRatio = math.abs(math.max(speed1,speed2)) / math.max(math.abs(math.min(speed1,speed2)), 0.001)
@@ -3455,9 +3509,9 @@ function gearboxMogli:update(dt)
 			end
 		elseif self.differentials == nil then 
 			--igonre
-		elseif ( self.differentials[1] ~= nil and self.differentials[1].mogliMode ~= nil )
-				or ( self.differentials[2] ~= nil and self.differentials[2].mogliMode ~= nil )
-				or ( self.differentials[3] ~= nil and self.differentials[3].mogliMode ~= nil ) then
+		elseif ( self.differentials[self.mrGbMS.DiffIndexFront]  ~= nil and self.differentials[self.mrGbMS.DiffIndexFront].mogliMode  ~= nil )
+				or ( self.differentials[self.mrGbMS.DiffIndexBack]   ~= nil and self.differentials[self.mrGbMS.DiffIndexBack].mogliMode   ~= nil )
+				or ( self.differentials[self.mrGbMS.DiffIndexMiddle] ~= nil and self.differentials[self.mrGbMS.DiffIndexMiddle].mogliMode ~= nil ) then
 			for i,diff in pairs( self.differentials ) do
 				diff.mogliMode = nil
 				updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.maxSpeedRatio)
@@ -4043,15 +4097,15 @@ function gearboxMogli:update(dt)
 			end
 			self:mrGbMSetState( "HudMode", m )
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKMIDDLE" ) then
-			if self:mrGbMGetModifyDifferentials() and self.mrGbMS.ModifyDifferentials == 3 then 
+			if self:mrGbMGetModifyDifferentials() and self.mrGbMS.DiffIndexMiddle > 0 then 
 				self:mrGbMSetState( "DiffLockMiddle", not self.mrGbMS.DiffLockMiddle )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKFRONT" ) then
-			if self:mrGbMGetModifyDifferentials() and self.mrGbMS.ModifyDifferentials == 3 then
+			if self:mrGbMGetModifyDifferentials() and self.mrGbMS.DiffIndexFront  > 0 then
 				self:mrGbMSetState( "DiffLockFront", not self.mrGbMS.DiffLockFront )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliDIFFLOCKBACK" ) then
-			if self:mrGbMGetModifyDifferentials() then
+			if self:mrGbMGetModifyDifferentials() and self.mrGbMS.DiffIndexBack   > 0 then
 				self:mrGbMSetState( "DiffLockBack", not self.mrGbMS.DiffLockBack )
 			end
 		elseif gearboxMogli.mbHasInputEvent( "gearboxMogliAUTOMATIC" ) then
@@ -6785,11 +6839,12 @@ function gearboxMogli:mrGbMGetDecelerateToLimit()
 end
 
 function gearboxMogli:mrGbMGetDiffLockMiddle()
-	if     self.mrGbMS == nil
+	if     self.mrGbMS                     == nil
 			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.DiffIndexMiddle     == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.ModifyDifferentials ~= 3
+	elseif self.mrGbMS.DiffIndexMiddle     <= 0
 			or self.mrGbMS.ManualDiffLock      <= 0 then 
 		return false 
 	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
@@ -6799,11 +6854,12 @@ function gearboxMogli:mrGbMGetDiffLockMiddle()
 end
 
 function gearboxMogli:mrGbMGetDiffLockFront()
-	if     self.mrGbMS == nil
+	if     self.mrGbMS                     == nil
 			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.DiffIndexFront      == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.ModifyDifferentials ~= 3
+	elseif self.mrGbMS.DiffIndexFront      <= 0
 			or self.mrGbMS.ManualDiffLock      <= 0 then 
 		return false 
 	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
@@ -6819,11 +6875,12 @@ function gearboxMogli:mrGbMGetDiffLockFront()
 end
 
 function gearboxMogli:mrGbMGetDiffLockBack()
-	if     self.mrGbMS == nil
+	if     self.mrGbMS                     == nil
 			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.DiffIndexBack       == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
-	elseif self.mrGbMS.ModifyDifferentials <= 0
+	elseif self.mrGbMS.DiffIndexBack       <= 0
 			or self.mrGbMS.ManualDiffLock      <= 0 then 
 		return false 
 	elseif self.mrGbMS.IsOn and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
@@ -7261,12 +7318,18 @@ end
 function gearboxMogli:mrGbMGetModifyDifferentials()
 	if     self.mrGbMS == nil
 			or self.mrGbMS.ModifyDifferentials == nil
+			or self.mrGbMS.DiffIndexFront      == nil
+			or self.mrGbMS.DiffIndexBack       == nil
+			or self.mrGbMS.DiffIndexMiddle     == nil
 			or self.mrGbMS.ManualDiffLock      == nil then 
 		return false 
 	elseif self.mrGbMS.UnlockDiff then 
 		return false 
 	elseif  self.mrGbMS.ModifyDifferentials > 0
 			and self.mrGbMS.ManualDiffLock      > 0
+			and ( self.mrGbMS.DiffIndexFront    > 0
+			   or self.mrGbMS.DiffIndexBack     > 0
+			   or self.mrGbMS.DiffIndexMiddle   > 0 )
 			and self.mrGbMS.IsOn 
 			and ( self.steeringEnabled or self.mrGbMS.ManualDiffLock == 2 ) then
 		return true 		
@@ -7716,7 +7779,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 	if ( not ( new ) and old ) or ( new and not ( old ) ) then
 		if 			self.mrGbMS.ReverseResetGear
 				and not ( self:mrGbMGetAutoShiftGears()
-							 or self.mrGbMS.MatchGears == "true" ) then
+							 or self.mrGbMS.StartInSmallestGear ) then
 			if old then
 				self:mrGbMSetState( "ResetRevGear", self.mrGbMS.CurrentGear, noEventSend )
 			else
@@ -7725,7 +7788,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 		end
 		if      self.mrGbMS.ReverseResetRange
 				and not ( self:mrGbMGetAutoShiftRange()
-							 or self.mrGbMS.MatchRanges == "true" ) then
+							 or self.mrGbMS.StartInSmallestRange ) then
 			if old then
 				self:mrGbMSetState( "ResetRevRange", self.mrGbMS.CurrentRange, noEventSend )
 			else
@@ -9401,7 +9464,7 @@ function gearboxMogli:showSettingsUI()
 			end
 		end
 		
-		if     self.mrGbMS.TorqueRatioMiddle < 0 then
+		if     self.mrGbMS.DiffIndexMiddle <= 0 or self.mrGbMS.TorqueRatioMiddle < 0 then
 			self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		elseif self.mrGbMS.TorqueRatioMiddle == 0 or self.mrGbMS.TorqueRatioMiddle == 1 then
 			self.mrGbMUI.DiffLockMiddle = { gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_2wd", "2wd" ),
@@ -9410,13 +9473,13 @@ function gearboxMogli:showSettingsUI()
 			self.mrGbMUI.DiffLockMiddle = { getOpenText( self.mrGbMS.TorqueRatioMiddle, self.mrGbMS.TorqueSenseMiddle, self.mrGbMS.SpeedRatioMiddle ),
 																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_locked", "locked" ) }
 		end
-		if self.mrGbMS.TorqueRatioFront < 0 then
+		if     self.mrGbMS.DiffIndexFront  <= 0 or self.mrGbMS.TorqueRatioFront  < 0 then
 			self.mrGbMUI.DiffLockFront  = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		else
 			self.mrGbMUI.DiffLockFront  = { getOpenText( self.mrGbMS.TorqueRatioFront, self.mrGbMS.TorqueSenseFront, self.mrGbMS.SpeedRatioFront ),
 																			gearboxMogli.getText( "gearboxMogliTEXT_DiffLock_locked", "locked" ) }
 		end
-		if self.mrGbMS.TorqueRatioBack < 0 then
+		if     self.mrGbMS.DiffIndexBack   <= 0 or self.mrGbMS.TorqueRatioBack   < 0 then
 			self.mrGbMUI.DiffLockBack   = { gearboxMogli.getText( "gearboxMogliTEXT_N_A", "n/a" ) }
 		else
 			self.mrGbMUI.DiffLockBack   = { getOpenText( self.mrGbMS.TorqueRatioBack, self.mrGbMS.TorqueSenseBack, self.mrGbMS.SpeedRatioBack ),
