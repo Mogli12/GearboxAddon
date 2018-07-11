@@ -2702,6 +2702,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end 
 			
 			if minR > 0.95 * maxR then 
+				self.mrGbMS.TorqueRatioMiddle = 0.5
 				self.mrGbMS.SpeedRatioMiddleLocked  = 1
 			end 
 		end 
@@ -3335,13 +3336,28 @@ function gearboxMogli:update(dt)
 				local tr0 = diff.mogliTorqueRatio
 				local lsd = diff.mogliTorqueSense
 		
-				if diff.lastMogliTorqueRatio == nil then
+				if diff.lastMogliTorqueRatio == nil or diff.lastMogliSpeedRatio == nil then
 					diff.lastMogliTorqueRatio = diff.mogliTorqueRatio
+					diff.lastMogliSpeedRatio  = 1.3
 				end
 				local q = tr0 + lsd * r * 0.5
-				diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + self.mrGbML.smoothLittle * ( q - diff.lastMogliTorqueRatio ), 0, 1 )
-			--diff.lastMogliTorqueRatio = Utils.clamp( q, 0, 1 )
-				updateDifferential(self.motorizedNode,idx-1,diff.lastMogliTorqueRatio,gearboxMogli.huge)
+				local p = 0.01
+				if lsd < 0.7 then 
+					p = 0.1
+				end 
+				if     diff.lastMogliTorqueRatio > 0.8 and q < 0.2 or q > 0.8 and diff.lastMogliTorqueRatio < 0.2 then 
+					p = 1
+				elseif diff.lastMogliTorqueRatio > 0.7 and q < 0.3 or q > 0.7 and diff.lastMogliTorqueRatio < 0.3 then 
+					p = 0.75
+				elseif diff.lastMogliTorqueRatio > 0.6 and q < 0.4 or q > 0.6 and diff.lastMogliTorqueRatio < 0.4 then 
+					p = 0.5
+				end
+				local r = 1 / Utils.clamp( diff.lastMogliSpeedRatio, 1.3, gearboxMogli.huge )
+				diff.lastMogliSpeedRatio  = Utils.clamp( 1 / ( r + self.mrGbML.smoothLittle * ( p - r ) ), 1.3, gearboxMogli.huge )
+				diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + 0.3 * ( q - diff.lastMogliTorqueRatio ), 0, 1 )
+				
+				local p = gearboxMogli.huge
+				updateDifferential(self.motorizedNode,idx-1,diff.lastMogliTorqueRatio,diff.lastMogliSpeedRatio)
 			end
 
 			local function lockDiff( self, idx, diff )
@@ -3493,14 +3509,14 @@ function gearboxMogli:update(dt)
 					diff.mogliFullyLocked     = nil 
 					diff.lastMogliTorqueRatio = nil 
 				end
-				if     m == 5 then
+				if     m == 4 then
 					unlockDiff( self, i, diff )
 				elseif m == 2 then 
 					lockDiff( self, i, diff )
 				elseif diff.mogliMode == nil or diff.mogliMode ~= m then
 					if     m == 1 then
 						updateDifferential(self.motorizedNode,i-1,diff.torqueRatio,diff.mogliSpeedRatio)
-					else
+					else -- 3 
 						updateDifferential(self.motorizedNode,i-1,diff.mogliTorqueRatio,gearboxMogli.huge)
 					end
 				end
