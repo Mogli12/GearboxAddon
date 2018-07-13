@@ -3788,21 +3788,44 @@
 	<vehicle>Zetor Major 80
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorMajor.xml"/>
 
-		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
-			<gears shiftTimeMs="800" defaultGear="2" reverseReset="false">	
-				<gear speed="9.65"/>
-				<gear speed="14.29"/>
-				<gear speed="20.91"/>
-				<gear speed="29.39"/>
-			</gears>
-			<ranges defaultRange="3" doubleClutch="true" reverseReset="false">
-				<range ratio="0.1482" name="L"/>
-				<range ratio="0.3770" name="M"/>
-				<range ratio="1.0000" name="H"/>
-			</ranges>			
-			<reverse ratio="0.8397" shiftTimeMs="800" manualClutch="false"/>
+		<transmissions>
+			<transmission name="CL" autoStartStop="false" rpmInSpeedHud="true">
+				<gears shiftTimeMs="800" defaultGear="2" reverseReset="false">	
+					<gear speed="9.65"/>
+					<gear speed="14.29"/>
+					<gear speed="20.91"/>
+					<gear speed="29.39"/>
+				</gears>
+				<ranges defaultRange="3" doubleClutch="true" reverseReset="false">
+					<range ratio="0.1482" name="L"/>
+					<range ratio="0.3770" name="M"/>
+					<range ratio="1.0000" name="H"/>
+				</ranges>			
+				<reverse ratio="0.8397" shiftTimeMs="800" manualClutch="false"/>
+			</transmission>
+			
+			<transmission name="HS" autoStartStop="false" rpmInSpeedHud="true">
+				<gears shiftTimeMs="800" defaultGear="1" reverseReset="false">	
+					<gear speed="12.96"/>
+					<gear speed="18.62"/>
+					<gear speed="27.36"/>
+					<gear speed="39.61"/>
+				</gears>
+				<ranges defaultRange="1" shiftTimeMs="0" clutchRatio="1" speedMatching="end" reverseReset="false">
+					<range ratio="0.8526" name="Lo" />
+					<range ratio="1.0000" name="Hi" forwardOnly="true"/>
+				</ranges>
+				<ranges defaultRange="3" doubleClutch="true" reverseReset="false">
+					<range ratio="0.0495" name="L"/>
+					<range ratio="0.2265" name="M"/>
+					<range ratio="1.0000" name="H"/>
+				</ranges>			
+				<reverse ratio="1.0868" shiftTimeMs="800" manualClutch="false"/>
+			</transmission>
+		</transmissions>
 		
-			<realEngine idleRpm="800" ratedRpm="2200">
+		<engines>
+			<engine idleRpm="800" ratedRpm="2200">
 				<torque rpm="0" motorTorque="0"/>
 				<torque rpm="700" motorTorque="230" fuelUsageRatio="223.3"/>
 				<torque rpm="800" motorTorque="243" fuelUsageRatio="219.5"/> 
@@ -3821,15 +3844,15 @@
 				<torque rpm="2100" motorTorque="248" fuelUsageRatio="227.3"/> 
 				<torque rpm="2200" motorTorque="240" fuelUsageRatio="250.7"/> 
 				<torque rpm="2300" motorTorque="0" fuelUsageRatio="426.7"/>
-			</realEngine>
-		</gearboxMogli>	
+			</engine>
+		</engines>	
 	</vehicle>
 	
 	
 	<vehicle>Zetor Proxima Power120
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorProximaPower.xml"/>
 
-		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
+		<gearboxMogli autoStartStop="false" rpmInSpeedHud="true">
 			<gears shiftTimeMs="800" defaultGear="2" reverseReset="false">	
 				<gear speed="10.8"/>
 				<gear speed="16.0"/>
@@ -3882,7 +3905,7 @@
 		</mod>
 		<configFile xmlName="data/vehicles/steerable/Zetor/zetorForterraHD.xml"/>
 
-		<gearboxMogli autoStartStop="false" maxAIRange="2" rpmInSpeedHud="true">
+		<gearboxMogli autoStartStop="false" rpmInSpeedHud="true">
 			<gears shiftTimeMs="800" defaultGear="3" reverseReset="false">	
 				<gear speed="9.7"/>
 				<gear speed="13.2"/>

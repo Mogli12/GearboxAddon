@@ -3352,8 +3352,8 @@ function gearboxMogli:update(dt)
 				elseif diff.lastMogliTorqueRatio > 0.6 and q < 0.4 or q > 0.6 and diff.lastMogliTorqueRatio < 0.4 then 
 					p = 0.5
 				end
-				local r = 1 / Utils.clamp( diff.lastMogliSpeedRatio, 1.3, gearboxMogli.huge )
-				diff.lastMogliSpeedRatio  = Utils.clamp( 1 / ( r + self.mrGbML.smoothLittle * ( p - r ) ), 1.3, gearboxMogli.huge )
+				local o = 1 / Utils.clamp( diff.lastMogliSpeedRatio, 1, gearboxMogli.huge )
+				diff.lastMogliSpeedRatio  = Utils.clamp( 1 / ( o + self.mrGbML.smoothLittle * ( p - o ) ), 1.3, gearboxMogli.huge )
 				diff.lastMogliTorqueRatio = Utils.clamp( diff.lastMogliTorqueRatio + 0.3 * ( q - diff.lastMogliTorqueRatio ), 0, 1 )
 				
 				local p = gearboxMogli.huge
@@ -4998,6 +4998,22 @@ function gearboxMogli:updateTick(dt)
 				maxSlip = maxSlip * refSpeed
 				
 				for wheelIndex, wheel in pairs( self.wheels ) do 
+					if wheel.mogliFrictionScale == nil then 
+						wheel.mogliFrictionScale = wheel.frictionScale
+					else 
+						wheel.frictionScale = wheel.mogliFrictionScale
+					end 
+					
+					if self.mrIsMrVehicle then 
+						if wheel.sink ~= nil then 
+							if     wheel.sink > 0.25 then 
+								wheel.frictionScale = wheel.mogliFrictionScale * 1.2
+							elseif wheel.sink > 0.15 then 
+								wheel.frictionScale = wheel.mogliFrictionScale * ( 1 + 2 * ( wheel.sink - 0.15 ) )
+							end 
+						end
+					end
+							
 					local lastTooFast = wheel.mogliTooFast
 					wheel.mogliTooFast = nil
 					if     wheel.mrNotAWheel 
