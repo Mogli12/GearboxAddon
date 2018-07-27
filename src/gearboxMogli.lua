@@ -5025,7 +5025,7 @@ function gearboxMogli:updateTick(dt)
 							or wheel.mogliAvgWheelSpeed == nil then 
 						wheel.mogliAvgWheelSpeed = refSpeed
 					else 
-						sw = getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius
+						sw = math.abs( getWheelShapeAxleSpeed(wheel.node, wheel.wheelShape) * wheel.radius )
 						wheel.mogliAvgWheelSpeed = 0.5 * ( wheel.mogliAvgWheelSpeed + sw )
 						sw = math.min( sw, wheel.mogliAvgWheelSpeed )
 						
