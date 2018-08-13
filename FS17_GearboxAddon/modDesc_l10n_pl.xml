@@ -198,6 +198,7 @@ Dodaje specjalizację 'gearboxMogli' do wszystkich skonfigurowanych pojazdów.]]
 		<text name="gearboxMogliTEXT_SlipPlough"         	text="Grzęźnięcie kół"/>
 		<text name="gearboxMogliTEXT_SlipPlough_1"			text="tylko na polu"/>
 		<text name="gearboxMogliTEXT_SlipPlough_2"			text="wszędzie"/>
+		<text name="gearboxMogliTEXT_SlipPlough_3"			text="nawet na trawie"/>
 		<text name="gearboxMogliTEXT_ManualDiffLock"		text="Ręczne blokowanie dyferencjałów"/>
 		<text name="gearboxMogliTIP_ManualDiffLock"			text="Dyferencjały mogą zostać zablokowane ręcznie"/>		
 		<text name="gearboxMogliTIP_ClutchSpeed"			text="Czas reakcji sprzęgła po wciśnięciu przycisku"/>
