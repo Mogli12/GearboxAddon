@@ -334,6 +334,7 @@ function gearboxMogli:initClient()
 	gearboxMogli.registerState( self, "NeutralNoSync",   false )
 	gearboxMogli.registerState( self, "MotorBrake",      false )
 	gearboxMogli.registerState( self, "UnlockDiff",      false )
+	gearboxMogli.registerState( self, "GPSActive",       false )
 	self.mrGbMS.ToolIsDirty = false
 	
 --**********************************************************************************************************	
@@ -2819,12 +2820,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end 
 		
 	
-	if     self.mrGbMG.slipPloughDefault == 0 then 
-		self.mrGbMS.SlipPlough      = 0 
-	elseif self.mrGbMG.slipPloughDefault == 1 then 
-		self.mrGbMS.SlipPlough      = 1 
-	elseif self.mrGbMG.slipPloughDefault == 2 then 
-		self.mrGbMS.SlipPlough      = 2
+	if     0 <= self.mrGbMG.slipPloughDefault and self.mrGbMG.slipPloughDefault <= 3 then 
+		self.mrGbMS.SlipPlough      = self.mrGbMG.slipPloughDefault
 	elseif g_modIsLoaded["FS17_ForRealModule03_GroundResponse"] and g_modIsLoaded["FS17_ForRealModule01_CropDestruction"] then
 		self.mrGbMS.SlipPlough      = 1
 	else
@@ -4764,6 +4761,48 @@ function gearboxMogli:update(dt)
 		self.retarderSoundMinSpeed = gearboxMogli.huge 
 	end 
 	
+--**********************************************************************************************************	
+-- ZZZ_GPS: auto stop at end of field 
+--**********************************************************************************************************		
+	local lastGpsCruiseControl = self.mrGbML.gpsCruiseControl
+	local lastGpsAutoStopTimer = self.mrGbML.gpsAutoStopTimer
+	self.mrGbML.gpsCruiseControl = nil
+	self.mrGbML.gpsAutoStopTimer = nil
+
+	if self:getIsActiveForInput(false) then
+		if      self.GPSActive
+				and self.GPSisActiveSteering then 
+			self:mrGbMSetState("GPSActive", true )
+			
+			if self:mrGbMGetAutoStartStop() then 			
+				if      self.cruiseControl.state > 0
+						or  self.mrGbMS.NeutralActive then 
+					lastGpsAutoStopTimer = nil 
+				elseif  lastGpsCruiseControl ~= nil 
+						and lastGpsCruiseControl ~= 0
+						and self.GPSautoStopDone then 
+					lastGpsAutoStopTimer = g_currentMission.time + 2000 
+				end 
+				if lastGpsAutoStopTimer ~= nil then 
+					if lastGpsAutoStopTimer < g_currentMission.time then 
+						self:mrGbMSetNeutralActive( true, false, true )
+					elseif self:mrGbMGetCurrentRPM() < 1.1 * self.mrGbMS.IdleRpm then
+						self:mrGbMSetNeutralActive( true, false, true )
+					else
+						self.mrGbML.gpsAutoStopTimer = lastGpsAutoStopTimer
+					end 
+				end 
+				self.mrGbML.gpsCruiseControl = self.cruiseControl.state
+			end 
+			
+		elseif self.mrGbMS.GPSActive then 
+			self:mrGbMSetState("GPSActive", false )
+		end 
+	end 	
+	
+	local lastNoUpdateTimer = self.mrGbML.noUpdateTimer 
+	self.mrGbML.noUpdateTimer = nil
+	
 	if      self.steeringEnabled 
 			and self.isServer 
 			and not ( self.isEntered or self.isControlled ) then
@@ -4776,7 +4815,6 @@ function gearboxMogli:update(dt)
 					and self.driveControl                   ~= nil
 					and self:dCcheckModule("cruiseControl")  
 					and self.driveControl.cruiseControl     ~= nil
-				--and g_currentMission.controlledVehicle  ~= self 
 					and self.cruiseControl.state             > 0 then
 					
 				local rootVehicle = self:getRootAttacherVehicle()
@@ -4827,15 +4865,38 @@ function gearboxMogli:update(dt)
 --**********************************************************************************************************			
 -- keep on going if not entered 
 --**********************************************************************************************************		
-			if      self.cruiseControl.state > 0 then
+			if      self.cruiseControl.state > 0
+					and ( not ( g_modIsLoaded["FS17_ContractorMod"] ) or not ( self.disableCharacterOnLeave ) )
+					and not self.mrGbMS.GPSActive then 
+				self.mrGbML.noUpdateTimer = g_currentMission.time 
 				Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
-			elseif  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm then
-				if self.mrGbMS.AutoHold then
-					Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
-				else
-					Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
+			else
+				if  self:mrGbMGetCurrentRPM() > 1.1 * self.mrGbMS.IdleRpm and self.lastSpeed > 5.5556e-4 then
+					self.mrGbML.noUpdateTimer = g_currentMission.time 
+				else 
+					self.mrGbML.noUpdateTimer = lastNoUpdateTimer 
+				end 
+				
+				if self.mrGbML.noUpdateTimer ~= nil and g_currentMission.time < self.mrGbML.noUpdateTimer + 1000 then  
+					local saveCCState = self.cruiseControl.state
+					self.cruiseControl.state = 0
+					if self.mrGbMS.AutoHold then
+						Drivable.updateVehiclePhysics(self, 1, false, 0, false, true, dt)
+					else
+						Drivable.updateVehiclePhysics(self, 0, false, 0, false, false, dt)
+					end
+					self.cruiseControl.state = saveCCState
+				elseif not ( self.mrGbMS.AutoHold ) then 
+					if self:mrGbMGetAutoStartStop() then 
+						self:mrGbMSetNeutralActive( true, false, true )
+						self:mrGbMSetState( "IsNeutral", true )
+					elseif not ( self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch ) then
+						self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
+						self:mrGbMSetManualClutch( 0 )
+					end
+					self:mrGbMSetState( "AutoHold", true )
 				end
-			end
+			end 
 		end
 	end
 end 
@@ -5059,7 +5120,7 @@ function gearboxMogli:updateTick(dt)
 									x2,y2,z2 = localToWorld(wheel.repr, x + width, 0, z + l0 + l1 )
 								end
 								
-								gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1)
+								gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1, self.mrGbMS.SlipPlough <= 2)
 								
 								if wheel.additionalWheels ~= nil then 
 									for _,additionalWheel in pairs(wheel.additionalWheels) do
@@ -5072,7 +5133,7 @@ function gearboxMogli:updateTick(dt)
 										x0,y0,z0 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 - l1 )
 										x1,y1,z1 = localToWorld(refNode, xShift - width, yShift-additionalWheel.radius, zShift + l0 - l1 )
 										x2,y2,z2 = localToWorld(refNode, xShift + width, yShift-additionalWheel.radius, zShift + l0 + l1 )
-										gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1)
+										gearboxMogli.updatePloughArea(x0,z0, x1,z1, x2,z2, angle, self.mrGbMS.SlipPlough <= 1, self.mrGbMS.SlipPlough <= 2)
 									end 
 								end
 							end
@@ -8477,6 +8538,7 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	if self.steeringEnabled then
 	-- driveControl and GPS
 		if      not ( doHandbrake )
+				and self.mrGbML.noUpdateTimer  == nil
 				and ( self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_ACTIVE
 				  or  self.cruiseControl.state == Drivable.CRUISECONTROL_STATE_FULL ) then
 			acceleration = 1
@@ -9272,21 +9334,23 @@ end
 --**********************************************************************************************************	
 -- gearboxMogli.updatePloughArea
 --**********************************************************************************************************
-function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle, limitToField)	
+function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, angle, limitToField, keepGrass)	
 	
 	local x, z, widthX, widthZ, heightX, heightZ = Utils.getXZWidthAndHeight(nil, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ);
 	
 	local entry = g_currentMission.fruits[FruitUtil.FRUITTYPE_GRASS]
 	
-	local totalArea, grassArea
-  setDensityCompareParams(entry.id, "greater", 0);
-	if limitToField then 
-		totalArea, grassArea = setDensityMaskedParallelogram(entry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitStateChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 1);
-	else 
-		totalArea, grassArea = setDensityParallelogram(entry.id, x,z, widthX,widthZ, heightX,heightZ, 0, g_currentMission.numFruitStateChannels, 1);
-	end
-  setDensityCompareParams(entry.id, "greater", -1);
-
+	local totalArea, grassArea = 0, 0
+	if keepGrass then 
+		setDensityCompareParams(entry.id, "greater", 0);
+		if limitToField then 
+			totalArea, grassArea = setDensityMaskedParallelogram(entry.id, x, z, widthX, widthZ, heightX, heightZ, 0, g_currentMission.numFruitStateChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, 1);
+		else 
+			totalArea, grassArea = setDensityParallelogram(entry.id, x,z, widthX,widthZ, heightX,heightZ, 0, g_currentMission.numFruitStateChannels, 1);
+		end
+		setDensityCompareParams(entry.id, "greater", -1);
+  end
+	
 	gearboxMogli.updateDestroyCommonArea(startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ, limitToField, totalArea<=0)
 	
 	if totalArea > 0 then 
@@ -9294,14 +9358,12 @@ function gearboxMogli.updatePloughArea(startWorldX, startWorldZ, widthWorldX, wi
 		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.ploughValue);
 		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
 		setDensityCompareParams(g_currentMission.terrainDetailId, "greater", -1);	
-	else
-		if limitToField then 
-			setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
-			setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, angle);
-		else 
-			setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.ploughValue);
-			setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
-		end 
+	elseif limitToField then 
+		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, g_currentMission.ploughValue);
+		setDensityMaskedParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, g_currentMission.terrainDetailId, g_currentMission.terrainDetailTypeFirstChannel, g_currentMission.terrainDetailTypeNumChannels, angle);
+	else 
+		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailTypeFirstChannel,  g_currentMission.terrainDetailTypeNumChannels,  g_currentMission.ploughValue);
+		setDensityParallelogram(g_currentMission.terrainDetailId, x, z, widthX, widthZ, heightX, heightZ, g_currentMission.terrainDetailAngleFirstChannel, g_currentMission.terrainDetailAngleNumChannels, angle);
 	end
 end
 
@@ -9665,7 +9727,8 @@ function gearboxMogli:showSettingsUI()
 
 	self.mrGbMUI.SlipPlough = { gearboxMogli.getText( "gearboxMogliTEXT_DISABLED", "off" ), 
 															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_1", "field" ), 
-															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_2", "everywhere" ) }
+															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_2", "everywhere" ),
+															gearboxMogli.getText( "gearboxMogliTEXT_SlipPlough_3", "even on grass" ) }
 	
 	self.mrGbMUI.ClutchSpeedOneButton = {}
 	for i=1,21 do 

@@ -195,6 +195,7 @@ Fügt allen konfigurierten Fahrzeugen die Spezialisierung gearboxMogli hinzu]]>
 		<text name="gearboxMogliTEXT_SlipPlough"         text="slipping wheels"/>
 		<text name="gearboxMogliTEXT_SlipPlough_1"       text="field"/>
 		<text name="gearboxMogliTEXT_SlipPlough_2"       text="everywhere"/>
+		<text name="gearboxMogliTEXT_SlipPlough_3"       text="even on grass"/>
 		<text name="gearboxMogliTIP_ManualDiffLock"      text="Differentials can be locked manually"/>
 		<text name="gearboxMogliTEXT_ManualDiffLock"     text="manual differential lock"/>
 
