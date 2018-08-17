@@ -864,7 +864,7 @@
 					<gear name="R2" reverseOnly="true" inverseRatio="10.81"/>
 					<gear name="3"  forwardOnly="true" inverseRatio="9.54"/>
 					<gear name="4"  forwardOnly="true" inverseRatio="7.89"/>
-					<gear name="5"  reverseOnly="true" inverseRatio="6.52"/>
+					<gear name="5"  forwardOnly="true" inverseRatio="6.52"/>
 					<gear name="6"  forwardOnly="true" inverseRatio="5.39"/>
 					<gear name="7"  forwardOnly="true" inverseRatio="4.67"/>
 					<gear name="8"  forwardOnly="true" inverseRatio="3.78"/>
@@ -1517,7 +1517,7 @@
 			<!-- eaton fuller ultrashift plus VHP, axle ratio 3.70, with tire 275/80 R 22.5 -->
 			<!-- http://www.roadranger.com/ecm/groups/public/@pub/@eaton/@roadranger/documents/content/ct_062746.swf -->
 			<gears axleSpeed="3.70" tireWidth="315" tireRatio="80" rimDiameter="22.5" defaultGear="3" automatic="true" doubleClutch="true" shiftTimeMs="1000" autoShiftPriority="1">
-				<gear name="Lo" forwardOnly="true" inverseRatio="14.40" maxRange="1">
+				<gear name="Lo" forwardOnly="true" inverseRatio="14.40" maxRange="1" upShiftTimeMs="800">
 					<extraName range1="1" range2="1" name="Lo"/>
 					<extraName range1="2" range2="1" name="!!do not use!! (L)"/>
 					<extraName range1="2" range2="2" name="!!do not use!! (H)"/>
@@ -1527,31 +1527,31 @@
 					<extraName range1="2" range2="1" name="R2"/>
 					<extraName range1="2" range2="2" name="R3"/>
 				</gear>
-				<gear name="1"  forwardOnly="true" inverseRatio="8.51">
+				<gear name="1"  forwardOnly="true" inverseRatio="8.51" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="1"/>
 					<extraName range1="2" range2="1" name="5 L"/>
 					<extraName range1="2" range2="2" name="5 H"/>
 				</gear>
-				<gear name="2"  forwardOnly="true" inverseRatio="6.05">
+				<gear name="2"  forwardOnly="true" inverseRatio="6.05" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="2"/>
 					<extraName range1="2" range2="1" name="6 L"/>
 					<extraName range1="2" range2="2" name="6 H"/>
 				</gear>
-				<gear name="3"  forwardOnly="true" inverseRatio="4.38">
+				<gear name="3"  forwardOnly="true" inverseRatio="4.38" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="3"/>
 					<extraName range1="2" range2="1" name="7 L"/>
 					<extraName range1="2" range2="2" name="7 H"/>
 				</gear>
-				<gear name="4"  forwardOnly="true" inverseRatio="3.20">
+				<gear name="4"  forwardOnly="true" inverseRatio="3.20" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="4"/>
 					<extraName range1="2" range2="1" name="8 L"/>
 					<extraName range1="2" range2="2" name="8 H"/>
 				</gear>
 			</gears>
 			
-			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3">
-				<range name="Lo" ratio="1"    upGearOffset="-3" maxRange2="1"/>
-				<range name="Hi" ratio="3.74" downGearOffset="3" minGear="2"/>
+			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3" gearOffset="3">
+				<range name="Lo" ratio="1" upShiftTimeMs="800" maxRange2="1"/>
+				<range name="Hi" ratio="3.74" minGear="2"/>
 			</ranges>
 			
 			<ranges shiftTimeMs="300" clutchRatio="1" shiftNoThrottle="true" defaultRange="1" automatic="true" autoShiftPriority="1">
@@ -1599,7 +1599,7 @@
 			<!-- eaton fuller ultrashift plus VHP, axle ratio 3.70, with tire 275/80 R 22.5 -->
 			<!-- http://www.roadranger.com/ecm/groups/public/@pub/@eaton/@roadranger/documents/content/ct_062746.swf -->
 			<gears axleSpeed="3.70" tireWidth="315" tireRatio="80" rimDiameter="22.5" defaultGear="3" automatic="true" doubleClutch="true" shiftTimeMs="1000" autoShiftPriority="2">
-				<gear name="Lo" forwardOnly="true" inverseRatio="14.40" maxRange="1">
+				<gear name="Lo" forwardOnly="true" inverseRatio="14.40" maxRange="1" upShiftTimeMs="800">
 					<extraName range1="1" range2="1" name="Lo L"/>
 					<extraName range1="1" range2="2" name="Lo H"/>
 					<extraName range1="2" name="!!do not use!!"/>
@@ -1610,25 +1610,25 @@
 					<extraName range1="2" range2="1" name="R3"/>
 					<extraName range1="2" range2="2" name="R4"/>
 				</gear>
-				<gear name="1"  forwardOnly="true" inverseRatio="8.51">
+				<gear name="1"  forwardOnly="true" inverseRatio="8.51" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="1 L"/>
 					<extraName range1="1" range2="2" name="1 H"/>
 					<extraName range1="2" range2="1" name="5 L"/>
 					<extraName range1="2" range2="2" name="5 H"/>
 				</gear>
-				<gear name="2"  forwardOnly="true" inverseRatio="6.05">
+				<gear name="2"  forwardOnly="true" inverseRatio="6.05" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="2 L"/>
 					<extraName range1="1" range2="2" name="2 H"/>
 					<extraName range1="2" range2="1" name="6 L"/>
 					<extraName range1="2" range2="2" name="6 H"/>
 				</gear>
-				<gear name="3"  forwardOnly="true" inverseRatio="4.38">
+				<gear name="3"  forwardOnly="true" inverseRatio="4.38" upShiftTimeMs="800" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="3 L"/>
 					<extraName range1="1" range2="2" name="3 H"/>
 					<extraName range1="2" range2="1" name="7 L"/>
 					<extraName range1="2" range2="2" name="7 H"/>
 				</gear>
-				<gear name="4"  forwardOnly="true" inverseRatio="3.20">
+				<gear name="4"  forwardOnly="true" inverseRatio="3.20" downShiftTimeMs="1200">
 					<extraName range1="1" range2="1" name="4 L"/>
 					<extraName range1="1" range2="2" name="4 H"/>
 					<extraName range1="2" range2="1" name="8 L"/>
@@ -1636,9 +1636,9 @@
 				</gear>
 			</gears>
 			
-			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3">
-				<range name="Lo" ratio="1"    upGearOffset="-3"/>
-				<range name="Hi" ratio="3.74" downGearOffset="3" minGear="2"/>
+			<ranges doubleClutch="true" shiftTimeMs="1200" defaultRange="1" automatic="true" autoShiftPriority="3" gearOffset="3">
+				<range name="Lo" ratio="1" upShiftTimeMs="800"/>
+				<range name="Hi" ratio="3.74" minGear="2"/>
 			</ranges>
 			
 			<ranges shiftTimeMs="300" clutchRatio="1" shiftNoThrottle="true" defaultRange="2" automatic="true" autoShiftPriority="1">
@@ -3141,7 +3141,7 @@
 					<extraName range1="2" name="12"/>
 				</gear>	
 			</gears>
-			<ranges defaultRange="1" shiftTimeMs="900" automatic="true">
+			<ranges defaultRange="1" shiftTimeMs="900" automatic="true" gearOffset="5">
 				<range ratio="0.219" name="L" forwardOnly="true"/>
 				<range ratio="1.000" name="H" forwardOnly="true"/>
 				<range ratio="0.759" name="L" reverseOnly="true"/>

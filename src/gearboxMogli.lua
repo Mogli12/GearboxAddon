@@ -136,9 +136,10 @@ gearboxMogliGlobals.stallMotorOffTime     = 1250
 gearboxMogliGlobals.realFuelUsage         = true
 gearboxMogliGlobals.idleFuelTorqueRatio   = 0.3
 gearboxMogliGlobals.defaultLiterPerSqm    = 1.2  -- 1.2 l/m² for wheat
-gearboxMogliGlobals.combineDefaultSpeed   = 10   -- km/h
+gearboxMogliGlobals.combineDefaultSpeed   = 8    -- km/h
 gearboxMogliGlobals.combineDynamicRatio   = 0.6
 gearboxMogliGlobals.combineDynamicChopper = 0.8
+gearboxMogliGlobals.calculateCombinePower = true  -- calculate power consumption of combine/cutter
 gearboxMogliGlobals.dtDeltaTargetFast     = 0.0003  -- 3 1/3 second 
 gearboxMogliGlobals.dtDeltaTargetSlow     = 0.00014 -- 7 seconds
 gearboxMogliGlobals.ddsDirectory          = "dds/"
@@ -6246,7 +6247,7 @@ function gearboxMogli:mrGbMGetRangeForNewGear( newGear )
 		newRange = self.mrGbMS.CurrentRange + self.mrGbMS.Gears[self.mrGbMS.CurrentGear].downRangeOffset
 	end
 
-	newRange = gearboxMogli.adjustRangeToEntry( self, self.mrGbMS.Gears[newGear] )
+	newRange = gearboxMogli.adjustRangeToEntry( self, self.mrGbMS.Gears[newGear], newRange )
 	
 	if      not gearboxMogli.isReallyInNeutral( self )
 			and ( self:mrGbMGetAutoShiftRange()
@@ -6395,7 +6396,7 @@ function gearboxMogli:mrGbMGetGearForNewRange( newRange )
 		newGear = self.mrGbMS.CurrentGear + self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].downGearOffset
 	end
 	
-	newGear = gearboxMogli.adjustGearToEntry( self, self.mrGbMS.Ranges[newRange] )
+	newGear = gearboxMogli.adjustGearToEntry( self, self.mrGbMS.Ranges[newRange], newGear )
 	
 	if      not gearboxMogli.isReallyInNeutral( self )
 			and ( self:mrGbMGetAutoShiftGears()
@@ -7435,13 +7436,14 @@ end
 --**********************************************************************************************************	
 function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleClutch, shiftingEffect, noThrottle )
 	if self.isServer then
-	--print("prepare gear shift (server): "..
-	--			tostring(self.mrGbMS.CurrentGear)	..", "..
-	--			tostring(self.mrGbMS.CurrentRange)..", "..
-	--			tostring(self.mrGbMS.CurrentRange2)..", "..	
-	--			tostring(self.mrGbMS.ReverseActive)..", "..
-	--			tostring(self.mrGbMS.NeutralActive))
-	
+		local gearMaxSpeed = self.mrGbMS.Gears[self.mrGbMS.CurrentGear].speed 
+		                   * self.mrGbMS.Ranges[self.mrGbMS.CurrentRange].ratio 
+											 * self.mrGbMS.Ranges2[self.mrGbMS.CurrentRange2].ratio
+											 * self.mrGbMS.GlobalRatioFactor
+		if self.mrGbMS.ReverseActive then	
+			gearMaxSpeed = gearMaxSpeed * self.mrGbMS.ReverseRatio 
+		end
+		
 		self:mrGbMSetState( "AutoShiftRequest", 0 ) 		
 		
 		if self.mrGbML.motor ~= nil then
@@ -7494,14 +7496,13 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 			if self.mrGbML.afterShiftClutch == nil or self.mrGbML.afterShiftClutch > clutchPercent then
 				self.mrGbML.afterShiftClutch   = clutchPercent
 			end			
-			if     math.abs( self.lastSpeedReal ) < 0.001 then
 			  -- no double clutch if not moving
+			if     math.abs( self.lastSpeedReal ) < 0.001     
+			  -- no double clutch during up shift
+					or self.mrGbMS.CurrentGearSpeed   < gearMaxSpeed then 
+				self.mrGbML.doubleClutch       = 0
 			elseif doubleClutch then 
-				if doubleClutch then 
-					self.mrGbML.doubleClutch     = 2
-				else 
-					self.mrGbML.doubleClutch     = 1 
-				end
+				self.mrGbML.doubleClutch       = 2
 			end 
 			self.mrGbML.clutchShiftingTime   = math.max( self.mrGbML.clutchShiftingTime, g_currentMission.time + math.min( 0.7 * timeToShift, self.mrGbMS.ClutchShiftTime ) ) 
 		elseif doubleClutch then
@@ -8165,10 +8166,10 @@ function gearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
 	--timer to shift the "range"
 	if self.isServer then
 		if old ~= nil and self.mrGbMS.Ranges[old] ~= nil then
-			if old < new and self.mrGbMS.Ranges[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges[old].upShiftMs then
+			if old < new and self.mrGbMS.Ranges[old].upShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Ranges[old].upShiftMs
 			end
-			if old > new and self.mrGbMS.Ranges[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges[old].downShiftMs then
+			if old > new and self.mrGbMS.Ranges[old].downShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Ranges[old].downShiftMs
 			end
 		end
@@ -8177,11 +8178,11 @@ function gearboxMogli:mrGbMOnSetRange( old, new, noEventSend )
 		if  not doubleClutch
 				and self:mrGbMGetAutoClutch()
 				and not self.mrGbMS.AutoShiftGears
-				and old > new
 				and self.mrGbMS.ClutchShiftTime < 0.41 * timeToShift
 				and timeToShift                 > 990 then
 			doubleClutch = true 
 		end 
+		
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftHl, doubleClutch, self.mrGbMS.GearShiftEffectHl, self.mrGbMS.ShiftNoThrottleHl ) 
 	end 
 end 
@@ -8212,23 +8213,23 @@ function gearboxMogli:mrGbMOnSetRange2( old, new, noEventSend )
 	--timer to shift the "range 2"
 	if self.isServer then	
 		if old ~= nil and self.mrGbMS.Ranges2[old] ~= nil then
-			if old < new and self.mrGbMS.Ranges2[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges2[old].upShiftMs then
+			if old < new and self.mrGbMS.Ranges2[old].upShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Ranges2[old].upShiftMs
 			end
-			if old > new and self.mrGbMS.Ranges2[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Ranges2[old].downShiftMs then
+			if old > new and self.mrGbMS.Ranges2[old].downShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Ranges2[old].downShiftMs
 			end
 		end
 		
 		local doubleClutch = self.mrGbMS.Range2DoubleClutch
-		if  not doubleClutch
+		if  not doubleClutch 
 				and self:mrGbMGetAutoClutch()
 				and not self.mrGbMS.AutoShiftHl
-				and old > new
 				and self.mrGbMS.ClutchShiftTime < 0.41 * timeToShift
 				and timeToShift                 > 990 then
 			doubleClutch = true 
 		end 	
+		
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftRanges2, doubleClutch, self.mrGbMS.GearShiftEffectRanges2, self.mrGbMS.ShiftNoThrottleRanges2 ) 		
 	end 
 end 
@@ -8259,23 +8260,23 @@ function gearboxMogli:mrGbMOnSetGear( old, new, noEventSend )
 	--timer to set the gear
 	if self.isServer then			
 		if old ~= nil and self.mrGbMS.Gears[old] ~= nil then
-			if old < new and self.mrGbMS.Gears[old].upShiftMs ~= nil and timeToShift < self.mrGbMS.Gears[old].upShiftMs then
+			if old < new and self.mrGbMS.Gears[old].upShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Gears[old].upShiftMs
 			end
-			if old > new and self.mrGbMS.Gears[old].downShiftMs ~= nil and timeToShift < self.mrGbMS.Gears[old].downShiftMs then
+			if old > new and self.mrGbMS.Gears[old].downShiftMs ~= nil then
 				timeToShift = self.mrGbMS.Gears[old].downShiftMs
 			end
 		end
 		
 		local doubleClutch = self.mrGbMS.GearsDoubleClutch
-		if  not doubleClutch
+		if  not doubleClutch 
 				and self:mrGbMGetAutoClutch()
 				and not self.mrGbMS.AutoShiftRange2
-				and old > new
 				and self.mrGbMS.ClutchShiftTime < 0.41 * timeToShift
 				and timeToShift                 > 990 then
 			doubleClutch = true 
 		end 	
+		
 		gearboxMogli.mrGbMPrepareGearShift( self, timeToShift, self.mrGbMS.ClutchAfterShiftGear, doubleClutch, self.mrGbMS.GearShiftEffectGear, self.mrGbMS.ShiftNoThrottleGear ) 	 	
 	end
 end
