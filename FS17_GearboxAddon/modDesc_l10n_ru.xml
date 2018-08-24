@@ -194,8 +194,9 @@
 		
 		<text name="gearboxMogliTIP_SlipPlough"            text="Буксующие колеса будут закапываться в землю, как плуг"/>
 		<text name="gearboxMogliTEXT_SlipPlough"           text="Пробуксовка колёс"/>
-		<text name="gearboxMogliTEXT_SlipPlough_1"         text="в поле"/>
+		<text name="gearboxMogliTEXT_SlipPlough_1"         text="на поле"/>
 		<text name="gearboxMogliTEXT_SlipPlough_2"         text="везде"/>
+		<text name="gearboxMogliTEXT_SlipPlough_3"         text="даже на траве"/>
 		<text name="gearboxMogliTIP_ManualDiffLock"        text="Дифференциалы могут быть заблокированы вручную"/>
 		<text name="gearboxMogliTEXT_ManualDiffLock"       text="Ручная блокировка дифференциалов"/>
 		
