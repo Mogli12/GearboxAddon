@@ -3899,11 +3899,7 @@ function gearboxMogli:update(dt)
 		
 		local clutchSpeed = 1 / math.max( self.mrGbMS.ClutchShiftTime, 1 )
 		
-		if     self.mrGbMS.Hydrostatic and self.mrGbMS.HydrostaticLaunch then
-			if self.mrGbMS.ManualClutch < 1 then
-				self:mrGbMSetManualClutch( 1 )
-			end
-		elseif gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
+		if     gearboxMogli.mbIsInputPressed( "gearboxMogliCLUTCH_3" ) then
 			self.mrGbML.oneButtonClutchTimer = g_currentMission.time + 100
 			self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer )
 			
@@ -3912,7 +3908,6 @@ function gearboxMogli:update(dt)
 			else 
 				self:mrGbMSetManualClutch( math.max( 0, self.mrGbMS.ManualClutch - dt / math.max( self.mrGbMS.ClutchShiftTime * ( self.mrGbMS.ClutchSpeedOneButton - 1 ) * 0.1, 1 ) ))
 			end
-		--self:mrGbMSetState( "AutoCloseTimer", self.mrGbML.oneButtonClutchTimer + self.mrGbMS.ManualClutch *  self.mrGbMS.ClutchTimeManual )
 		elseif InputBinding.gearboxMogliCLUTCH ~= nil then
 			local targetClutchPercent = InputBinding.getDigitalInputAxis(InputBinding.gearboxMogliCLUTCH)
 			if InputBinding.isAxisZero(targetClutchPercent) then

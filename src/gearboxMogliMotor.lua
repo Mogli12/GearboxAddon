@@ -2185,7 +2185,9 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			targetRequiredRpm = math.max( targetRequiredRpm, result * self.original.ptoMotorRpmRatio )
 		end
 	end	
-	if self.vehicle.mrGbMS.ToolIsDirty and lastNoTransmission then
+	if      self.vehicle.mrGbMS.ToolIsDirty 
+			and lastNoTransmission
+			and not ( g_modIsLoaded["FS17_RpmDependentControls"] ) then
 		targetRequiredRpm = math.max( targetRequiredRpm, self.vehicle.mrGbMS.HydraulicRpm )
 	end
 	
@@ -4577,8 +4579,6 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	if     self.noTransmission then
 		self.clutchPercent = 0
-	elseif self.vehicle.mrGbMS.Hydrostatic and self.vehicle.mrGbMS.HydrostaticLaunch then
-		self.clutchPercent = 1
 	else
 		if     self.vehicle:mrGbMGetAutoClutch()
 				or self.vehicle.mrGbMS.TorqueConverterOrHydro then
