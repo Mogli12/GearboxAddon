@@ -4657,13 +4657,39 @@
 			<combine defaultWidth="4.3" minRpm="1800" maxRpm="2200"/>
 			<blowOffVentilSound volume="0"/>
 			
-			<hydrostatic profile="Hydrostat" minRatio="0"/>		
+			<hydrostatic profile="Variator" range="3" startWithClutch="true"/>		
 			<gears defaultGear="4" reverseReset="true" onlyStopped="true">	
 				<gear name="I"   speed="8"  forwardOnly="true"/>
 				<gear name="II"  speed="14" forwardOnly="true"/>
 				<gear name="R"   speed="14" reverseOnly="true"/>
 				<gear name="III" speed="23" forwardOnly="true"/>
 			</gears>
+		
+			<realEngine idleRpm="850" ratedRpm="2100">
+        <!-- 2100: 183(183) | 2100: 183(183) | 1400..1400: 700(700) | 85 | 0 | 199 | 2 | 2200 | 1270: 207 -->
+        <torque rpm="350" motorTorque="360" fuelUsageRatio="251,1"/>
+        <torque rpm="700" motorTorque="538" fuelUsageRatio="223,9"/>
+        <torque rpm="900" motorTorque="613" fuelUsageRatio="214,1"/>
+        <torque rpm="1000" motorTorque="644" fuelUsageRatio="210,8"/>
+        <torque rpm="1100" motorTorque="669" fuelUsageRatio="208,5"/>
+        <torque rpm="1200" motorTorque="686" fuelUsageRatio="207,3"/>
+        <torque rpm="1300" motorTorque="697" fuelUsageRatio="207"/>
+        <torque rpm="1400" motorTorque="700" fuelUsageRatio="207,6"/>
+        <torque rpm="1500" motorTorque="698" fuelUsageRatio="208,8"/>
+        <torque rpm="1600" motorTorque="693" fuelUsageRatio="210,6"/>
+        <torque rpm="1700" motorTorque="684" fuelUsageRatio="213,2"/>
+        <torque rpm="1800" motorTorque="671" fuelUsageRatio="216,4"/>
+        <torque rpm="1850" motorTorque="664" fuelUsageRatio="218,2"/>
+        <torque rpm="1900" motorTorque="655" fuelUsageRatio="220,3"/>
+        <torque rpm="1950" motorTorque="646" fuelUsageRatio="222,4"/>
+        <torque rpm="2000" motorTorque="635" fuelUsageRatio="224,8"/>
+        <torque rpm="2050" motorTorque="624" fuelUsageRatio="227,3"/>
+        <torque rpm="2100" motorTorque="612" fuelUsageRatio="230"/>
+        <torque rpm="2150" motorTorque="573" fuelUsageRatio="251,3"/>
+        <torque rpm="2200" motorTorque="457" fuelUsageRatio="322,4"/>
+        <torque rpm="2250" motorTorque="264" fuelUsageRatio="570,7"/>
+        <torque rpm="2300" motorTorque="0" fuelUsageRatio="0"/>
+			</realEngine>
 		</gearboxMogli>
 	</vehicle> 
 	
