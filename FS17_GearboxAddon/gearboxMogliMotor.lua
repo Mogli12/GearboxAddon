@@ -2320,8 +2320,10 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 			or self.vehicle.mrGbML.gearShiftingNeeded ~= 0
 			or self.motorLoadFactor == nil then 
 		self.motorLoadFactor = mlf 
-	else
-		self.motorLoadFactor = self.motorLoadFactor + self.vehicle.mrGbML.smoothFast * ( mlf - self.motorLoadFactor )
+	elseif mlf < self.motorLoadFactor then 
+		self.motorLoadFactor = math.max( mlf, self.motorLoadFactor - 0.02 * self.tickDt )
+	elseif mlf > self.motorLoadFactor then 
+		self.motorLoadFactor = math.min( mlf, self.motorLoadFactor + 0.01 * self.tickDt )
 	end
 	
 	self.motorLoad = math.max( 0, self.maxMotorTorque * self.motorLoadFactor - pt0 / self.ptoMotorRpmRatio )
