@@ -58,9 +58,9 @@ function gearboxMogliMotor:new( vehicle, motor )
 
 	if gearboxMogli.powerFuelCurve == nil then
 		gearboxMogli.powerFuelCurve = AnimCurve:new( interpolFunction, interpolDegree )
-		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.010, time=0.0} )
-		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.125, time=0.02} )
-		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.240, time=0.06} )
+		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.001, time=0.0} )
+		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.060, time=0.01} )
+		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.160, time=0.04} )
 		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.360, time=0.12} )
 		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.500, time=0.2} )
 		gearboxMogli.powerFuelCurve:addKeyframe( {v=0.800, time=0.4} )
@@ -158,13 +158,14 @@ function gearboxMogliMotor:new( vehicle, motor )
 
 	self.fuelCurve = AnimCurve:new( interpolFunction, interpolDegree )
 	if vehicle.mrGbMS.Engine.fuelUsageValues == nil then		
-		self.fuelCurve:addKeyframe( { v = 0.96 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.CurMinRpm } )
-		self.fuelCurve:addKeyframe( { v = 0.94 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.IdleRpm } )
-		self.fuelCurve:addKeyframe( { v = 0.91 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.8*self.vehicle.mrGbMS.IdleRpm+0.2*self.vehicle.mrGbMS.RatedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 0.90 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.6*self.vehicle.mrGbMS.IdleRpm+0.4*self.vehicle.mrGbMS.RatedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 0.92 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.3*self.vehicle.mrGbMS.IdleRpm+0.7*self.vehicle.mrGbMS.RatedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 1.25 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.CurMinRpm } )
+		self.fuelCurve:addKeyframe( { v = 1.10 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.IdleRpm } )
+		self.fuelCurve:addKeyframe( { v = 0.94 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.80*self.vehicle.mrGbMS.IdleRpm+0.20*self.vehicle.mrGbMS.RatedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.90 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.65*self.vehicle.mrGbMS.IdleRpm+0.35*self.vehicle.mrGbMS.RatedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.90 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.55*self.vehicle.mrGbMS.IdleRpm+0.45*self.vehicle.mrGbMS.RatedRpm } )		
+		self.fuelCurve:addKeyframe( { v = 0.92 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.30*self.vehicle.mrGbMS.IdleRpm+0.70*self.vehicle.mrGbMS.RatedRpm } )		
 		self.fuelCurve:addKeyframe( { v = 1.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.RatedRpm } )		
-		self.fuelCurve:addKeyframe( { v = 1.25 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.5*self.vehicle.mrGbMS.RatedRpm+0.5*self.vehicle.mrGbMS.CurMaxRpm } )		
+		self.fuelCurve:addKeyframe( { v = 1.25 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = 0.50*self.vehicle.mrGbMS.RatedRpm+0.50*self.vehicle.mrGbMS.CurMaxRpm } )		
 		self.fuelCurve:addKeyframe( { v = 2.00 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = self.vehicle.mrGbMS.CurMaxRpm } )		
 		self.fuelCurve:addKeyframe( { v = 10 * vehicle.mrGbMS.GlobalFuelUsageRatio, time = vehicle.mrGbMS.CurMaxRpm + 1 } )		
 	else
@@ -794,7 +795,6 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	local acc             = self.lastThrottle
 	local brakePedal      = 0
 	local rpm             = math.min( self.lastRealMotorRpm, self.lastMotorRpm )
-	local torque          = 0
 	
 	local pt = 0	
 	if self.ptoToolTorque > 0 then
@@ -811,11 +811,12 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	end
 	self:chooseTorqueCurve( eco )
 	
-	if self.noTorque then
-		torque = 0
-	else
+	local torque = 0
+	if self.vehicle.isMotorStarted then 
 		torque = self.currentTorqueCurve:get( rpm )
-	end
+	end 
+	
+	local mt = torque 
 	
 	if torque > gearboxMogli.eps and self.vehicle.mrGbMG.debugInfo then
 		self.vehicle.mrGbML.ptoInfo = string.format("%4d, %4d / %4d, %4d (%4d) => %3d, %3d (%3d) / %3d%% (%3d%%)", 
@@ -839,7 +840,6 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		--print(string.format("%4d < %4d (%3.0f * %4d)",self.minRequiredRpm, self.ptoMotorRpmRatio * self.ptoToolRpm, self.ptoMotorRpmRatio, self.ptoToolRpm ))
 			self.ptoWarningTimer = nil
 		else
-			local mt = self.currentTorqueCurve:get( Utils.clamp( self.lastRealMotorRpm, self.vehicle.mrGbMS.IdleRpm, self.vehicle.mrGbMS.RatedRpm ) ) 
 			if mt < pt then
 			--print(string.format("Not enough power for PTO: %4.0f Nm < %4.0fNm", mt*1000, pt*1000 ).." @RPM: "..tostring(self.lastRealMotorRpm))
 				if self.ptoWarningTimer == nil then
@@ -1023,7 +1023,32 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		end
 	end
 	
-	transInputTorque = torque
+	if self.lastTransInputTorque == nil then 
+		self.lastTransInputTorque = 0
+	end 
+	
+	-- 4 seconds at idle RPM for full torque 
+	-- 0 seconds at rated RPM 
+	local tFull
+	if     self.vehicle.mrGbML.gearShiftingEffect then 
+		tFull = 0
+	elseif rpm >= self.vehicle.mrGbMS.RatedRpm then 
+		tFull = 0
+	elseif rpm <= self.vehicle.mrGbMS.IdleRpm  then 
+		tFull = self.vehicle.mrGbMS.TimeUntilFullBoost
+	else 
+		tFull = self.vehicle.mrGbMS.TimeUntilFullBoost * math.sqrt( ( self.vehicle.mrGbMS.RatedRpm - rpm ) / ( self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm ) )
+	end 
+	
+	self.fullTransInputTorque = torque 
+
+	if tFull > self.tickDt and torque > self.lastTransInputTorque then 
+		-- take 500Nm as base, if the motor has less torque it can accelerate faster
+		torque = math.min( torque, self.lastTransInputTorque + math.max( 0.5, self.lastMotorTorque ) * self.tickDt / tFull )
+		self.lastMotorTorque = self.lastMotorTorque - self.fullTransInputTorque + torque 
+	end
+	
+	self.lastTransInputTorque = torque
 	
 	self.noTransTorque = math.max( 0, self.lastMotorTorque * self.idleThrottle - self.ptoMotorTorque )
 
@@ -1389,13 +1414,13 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		torque            = torque * t / self.ratioFactorG
 	end
 	
-	if transInputTorque <= gearboxMogli.eps then
+	if self.lastTransInputTorque <= gearboxMogli.eps then
 		self.torqueMultiplication = 1 / self.vehicle.mrGbMS.TransmissionEfficiency
 	elseif torque > gearboxMogli.eps then
-		self.torqueMultiplication = transInputTorque / torque
+		self.torqueMultiplication = self.lastTransInputTorque / torque
 	end
 	
-	if transInputTorque < gearboxMogli.eps then
+	if self.lastTransInputTorque < gearboxMogli.eps then
 		self.transmissionEfficiency = self.vehicle.mrGbMS.TransmissionEfficiency
 	elseif torque       < gearboxMogli.eps then
 		self.transmissionEfficiency = 0
@@ -1408,7 +1433,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			h = self.hydrostaticFactor * self.ratioFactorG
 		end
 
-		self.transmissionEfficiency = h * torque / transInputTorque
+		self.transmissionEfficiency = h * torque / self.lastTransInputTorque
 	end
 	
 	--**********************************************************************************************************		
@@ -2000,7 +2025,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	
 	if      not ( getMaxPower or lastNoTransmission or lastNoTorque )
 			and self.currentSpeed     < currentSpeedLimitR
-			and g_currentMission.time > self.lastClutchClosedTime + 1000 then
+		--and g_currentMission.time > self.lastClutchClosedTime + 1000 
+			then
 		if      self.deltaRpm       < gearboxMogli.autoShiftMaxDeltaRpm 
 				and accelerationPedal   > 0.9 
 				and self.rawTransTorque > self.lastTransTorque*0.99 then

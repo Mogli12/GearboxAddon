@@ -205,6 +205,8 @@ gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%;
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
+gearboxMogliGlobals.timeUntilFullBoostNew = 2000  -- ms
+gearboxMogliGlobals.timeUntilFullBoostOld = 4000  -- ms
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -1336,10 +1338,29 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			end
 			self.mrGbMS.BlowOffVentilVolume = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. ".blowOffVentilSound#volume" ), default ) * self.mrGbMG.blowOffVentilVol
 		end
-	else
+	elseif self.mrGbMS.BlowOffVentilVolume > 0 then 
 		self.mrGbMS.BlowOffVentilFile = Utils.getFilename( self.mrGbMS.BlowOffVentilFile, self.baseDirectory )
 	end
-		
+	
+	default = 0
+	if self.mrGbMS.BlowOffVentilFile == nil then
+		if     self.mrGbMS.IsCombine then 
+		elseif hasHydrostat then 
+		elseif self.mrGbMS.AutoStartStop then 
+			default = self.mrGbMG.timeUntilFullBoostNew
+		else 
+			default = self.mrGbMG.timeUntilFullBoostOld
+		end 
+	elseif self.mrGbMS.BlowOffVentilVolume > 0 then 
+		if self.mrGbMS.AutoStartStop then 
+			default = self.mrGbMG.timeUntilFullBoostNew
+		else 
+			default = self.mrGbMG.timeUntilFullBoostOld
+		end 
+	end 
+	
+	self.mrGbMS.TimeUntilFullBoost = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. "#fullBoostMs" ), default )
+	
 	if self.mrGbMS.GrindingSoundFile == nil then
 		if xmlSource == "vehicle" then
 			self.mrGbMS.GrindingSoundVolume = 0
