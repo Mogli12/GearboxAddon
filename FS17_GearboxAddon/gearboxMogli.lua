@@ -205,8 +205,9 @@ gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%;
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
-gearboxMogliGlobals.timeUntilFullBoostNew = 2000  -- ms
-gearboxMogliGlobals.timeUntilFullBoostOld = 4000  -- ms
+gearboxMogliGlobals.timeUntilFullBoostNew = 1500  -- ms
+gearboxMogliGlobals.timeUntilFullBoostOld = 2500  -- ms
+gearboxMogliGlobals.timeUntilNoBoost      = 1500  -- ms
 
 --**********************************************************************************************************	
 -- gearboxMogli.prerequisitesPresent 7
@@ -492,6 +493,8 @@ function gearboxMogli:initClient()
 	self.mrGbMD.Hydro      = 255
 	self.mrGbMD.lastSlip   = 0
 	self.mrGbMD.Slip       = 0
+	self.mrGbMD.lastBoost  = 0
+	self.mrGbMD.Boost      = 0
 	
 	self.mrGbML.lastAcceleration  = 0
 	self.mrGbML.lastBrakePedal    = 1
@@ -1204,9 +1207,9 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueConverterLockupMs = 200
 		end		
 	
-		default = 5000
+		default = 7500
 		if     torqueConverterProfile == "wheelLoader" then
-			default = 20000
+			default = 25000
 		elseif torqueConverterProfile == "oldCar" then
 			default = 10000
 		end
@@ -1343,23 +1346,25 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end
 	
 	default = 0
-	if self.mrGbMS.BlowOffVentilFile == nil then
+	if     ( self.mrGbMS.BlowOffVentilFile == nil and xmlSource == "vehicle" )
+			or self.mrGbMS.BlowOffVentilVolume > 0 then 
 		if     self.mrGbMS.IsCombine then 
+			default = 0
+		elseif self.mrGbMS.TorqueConverter then 
+			default = self.mrGbMG.timeUntilFullBoostNew
 		elseif hasHydrostat then 
+			default = self.mrGbMG.timeUntilFullBoostNew
 		elseif self.mrGbMS.AutoStartStop then 
 			default = self.mrGbMG.timeUntilFullBoostNew
 		else 
 			default = self.mrGbMG.timeUntilFullBoostOld
 		end 
-	elseif self.mrGbMS.BlowOffVentilVolume > 0 then 
-		if self.mrGbMS.AutoStartStop then 
-			default = self.mrGbMG.timeUntilFullBoostNew
-		else 
-			default = self.mrGbMG.timeUntilFullBoostOld
-		end 
+	else 
+		default = 0
 	end 
 	
 	self.mrGbMS.TimeUntilFullBoost = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. "#fullBoostMs" ), default )
+	self.mrGbMS.TimeUntilNoBoost   = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. "#noBoostMs" ), self.mrGbMG.timeUntilNoBoost )
 	
 	if self.mrGbMS.GrindingSoundFile == nil then
 		if xmlSource == "vehicle" then
@@ -1370,6 +1375,8 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	else
 		self.mrGbMS.GrindingSoundFile = Utils.getFilename( self.mrGbMS.GrindingSoundFile, self.baseDirectory )
 	end
+	
+	
 		
 --**************************************************************************************************	
 -- Gears, Ranges, Reverse, ...
@@ -4797,9 +4804,9 @@ function gearboxMogli:update(dt)
 		end
 		
 		if     self.mrGbML.motorSoundLoadFactor < self.actualLoadPercentage then
-			self.mrGbML.motorSoundLoadFactor = math.min( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor + 0.010 * dt )		
+			self.mrGbML.motorSoundLoadFactor = math.min( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor + 0.05 * dt )		
 		elseif self.mrGbML.motorSoundLoadFactor > self.actualLoadPercentage then
-			self.mrGbML.motorSoundLoadFactor = math.max( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor - 0.002 * dt )	
+			self.mrGbML.motorSoundLoadFactor = math.max( self.actualLoadPercentage, self.mrGbML.motorSoundLoadFactor - 0.05 * dt )	
 		end
 		self.motorSoundLoadFactor          = self.mrGbML.motorSoundLoadFactor
 	end
@@ -5207,6 +5214,7 @@ function gearboxMogli:updateTick(dt)
 				self.mrGbMD.Power  = 0
 				self.mrGbMD.Hydro  = 255
 				self.mrGbMD.Slip   = 0
+				self.mrGbMD.Boost  = 0
 				
 				if self.isMotorStarted then
 					if self.motor.targetRpm     ~= nil then
@@ -5227,6 +5235,12 @@ function gearboxMogli:updateTick(dt)
 							self.mrGbMD.Hydro = 200
 						end
 					end
+					if     self.mrGbMS.TimeUntilFullBoost  <= 0
+							or self.motor.boostS               == nil then 
+						self.mrGbMD.Boost = 0
+					else 
+					  self.mrGbMD.Boost = math.floor( 0.5 + 200 * self.motor.boostS )
+					end 
 				end
 				
 				self.mrGbMD.Slip     = math.floor( 100 * Utils.clamp( 1-self.motor.wheelSlipFactor, 0, 1 ) + 0.5 )
@@ -5234,6 +5248,7 @@ function gearboxMogli:updateTick(dt)
 				
 				if     self.mrGbMD.lastClutch ~= self.mrGbMD.Clutch
 						or self.mrGbMD.lastSlip   ~= self.mrGbMD.Slip
+						or self.mrGbMD.lastBoost  ~= self.mrGbMD.Boost 
 						or ( self.mrGbMS.sendHydro     and self.mrGbMD.lastHydro  ~= self.mrGbMD.Hydro )
 						or ( self.mrGbMS.sendTargetRpm and self.mrGbMD.lastTgt    ~= self.mrGbMD.Tgt   )
 						or ( self.mrGbMS.sendReqPower  and self.mrGbMD.lastPower  ~= self.mrGbMD.Power )
@@ -5245,11 +5260,13 @@ function gearboxMogli:updateTick(dt)
 					self.mrGbMD.lastRate   = self.mrGbMD.Rate
 					self.mrGbMD.lastHydro  = self.mrGbMD.Hydro
 					self.mrGbMD.lastSlip   = self.mrGbMD.Slip
+					self.mrGbMD.lastBoost  = self.mrGbMD.Boost
 
 					if self.mrGbMS.NoUpdateStream then					
 						local message = {}
 						message.Clutch = self.mrGbMD.Clutch
-						message.Slip   = self.mrGbMD.Slip						
+						message.Slip   = self.mrGbMD.Slip		
+						message.Boost  = self.mrGbMD.Boost 
 						if self.mrGbMS.sendHydro     then message.Hydro = self.mrGbMD.Hydro end		 
 						if self.mrGbMS.sendTargetRpm then message.Rpm   = self.mrGbMD.Tgt   end			
 						if self.mrGbMS.sendReqPower  then message.Power = self.mrGbMD.Power end			
@@ -5296,6 +5313,7 @@ function gearboxMogli:readUpdateStream(streamId, timestamp, connection)
 			end
 			self.mrGbMD.Clutch = streamReadUInt8( streamId ) 
 			self.mrGbMD.Slip   = streamReadUInt8( streamId )			
+			self.mrGbMD.Boost  = streamReadUInt8( streamId )			
 			if self.mrGbMS.sendHydro     then self.mrGbMD.Hydro  = streamReadUInt8( streamId  ) end		 
 			if self.mrGbMS.sendTargetRpm then self.mrGbMD.Tgt    = streamReadUInt8( streamId  ) end			
 			if self.mrGbMS.sendReqPower  then self.mrGbMD.Power  = streamReadUInt16( streamId ) end			
@@ -5319,6 +5337,7 @@ function gearboxMogli:writeUpdateStream(streamId, connection, dirtyMask)
 			streamWriteUInt8(streamId, 178 )
 			streamWriteUInt8(streamId, self.mrGbMD.Clutch ) 
 			streamWriteUInt8(streamId, self.mrGbMD.Slip )
+			streamWriteUInt8(streamId, self.mrGbMD.Boost )
 			
 			if self.mrGbMS.sendHydro     then streamWriteUInt8(streamId, self.mrGbMD.Hydro  ) end		 
 			if self.mrGbMS.sendTargetRpm then streamWriteUInt8(streamId, self.mrGbMD.Tgt    ) end			
@@ -5519,7 +5538,9 @@ function gearboxMogli:draw()
 			if self.mrGbMS.DrawReqPower  then
 				ovRows = ovRows + 1 infos[ovRows] = "power"
 			end
-			if self.isMotorStarted then
+			if self.mrGbMS.TimeUntilFullBoost > 0 then 
+				ovRows = ovRows + 1 infos[ovRows] = "boost"
+			elseif self.isMotorStarted then
 				ovRows = ovRows + 1 infos[ovRows] = "load"
 			end
 			if self.isMotorStarted and ( self.isServer or not ( self:getIsHired() and g_currentMission.missionInfo.helperBuyFuel ) ) then
@@ -5538,6 +5559,7 @@ function gearboxMogli:draw()
 			if self.mrIsMrVehicle or self.mrGbMS.ModifyDifferentials > 0 then
 				ovRows = ovRows + 1 infos[ovRows] = "mrWheelSlip"
 			end
+			
 			--==============================================
 			
 			local ovH      = titleY + ( ovRows + 1 ) * deltaY + ovBorder + ovBorder -- title is 0.03 points above drawY0 add border of 0.01 x 2
@@ -5773,6 +5795,12 @@ function gearboxMogli:draw()
 							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_wheelSlip", "Wheel slip"))
 						else
 							renderText(ovRight, drawY, deltaY, string.format("%3d %%", self.mrGbMD.Slip ))	
+						end
+					elseif info == "boost" then 
+						if col == 1 then
+							renderText(ovLeft, drawY, deltaY, gearboxMogli.getText("gearboxMogliDRAW_boost", "Boost"))
+						else
+							renderText(ovRight, drawY, deltaY, string.format("%3d %%", math.floor( self.mrGbMD.Boost * 0.5 + 0.5) ))	
 						end
 					end
 					
@@ -7961,6 +7989,7 @@ function gearboxMogli:mrGbMOnSetReverse( old, new, noEventSend )
 				if self.mrGbMS.Hydrostatic then
 					self.motor.hydrostaticFactor = self.mrGbMS.HydrostaticStart
 				end
+				self.motor.lastTorqueConverterRatio = nil
 				self.mrGbML.motor.speedLimitS       = 0
 				self.mrGbML.motor.motorLoadOverflow = 0
 			end
