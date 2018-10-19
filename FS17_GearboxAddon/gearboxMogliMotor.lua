@@ -1476,7 +1476,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	if self.noTransmission then
 		self.lastBrakeForce = 0
 		brakeForce          = 0
-		if self.vehicle.mrGbMG.reduceMOILowRatio or not ( self.vehicle.mrGbMS.HydrostaticLaunch ) then
+		if self.vehicle.mrGbMG.reduceMOINeutral or not ( self.vehicle.mrGbMS.HydrostaticLaunch ) then
 			self.moiFactor    = 0
 		else
 			self.moiFactor    = 1
@@ -1834,8 +1834,6 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	self.lastPtoRpm          = self.lastRealMotorRpm
 	self.equalizedMotorRpm   = self.vehicle:mrGbMGetEqualizedRpm( self.lastMotorRpm )
 	
-	local utt = self.usedTransTorque
-
 	if self.vehicle.mrGbMS.TimeUntilFullBoost <= 0 or self.boostTorque == nil then 
 		self.boostP = 1
 		self.boostS = 1
@@ -1858,15 +1856,17 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 			self.boostP = t1 / t2 
 		end 
 		self.boostS = self.boostS + self.vehicle.mrGbML.smoothFast * ( self.boostP - self.boostS ) 
-		
-		-- increase used torque for fuel calculation
-		utt = utt + self.fullTransInputTorque - self.lastTransInputTorque
 	end 
 	
-	if self.vehicle.mrIsMrVehicle and gearboxMogli.eps < utt and utt < self.lastTransTorque then
-		-- square because MR has rolling resistance etc. => 0%->0%; 50%->25%; 100%->100%
-		utt = utt * utt / self.lastTransTorque
-	end
+	local utt = self.usedTransTorque
+----local ltt = self.lastTransTorque
+--	local ltt = self.lastMotorTorque - self.ptoMotorTorque - self.lastMissingTorque
+--	if     utt >= ltt then 
+--		utt = ltt 
+--	elseif self.vehicle.mrIsMrVehicle and gearboxMogli.eps < utt and utt < ltt then
+--		-- square because MR has rolling resistance etc. => 0%->0%; 50%->25%; 100%->100%
+--		utt = utt * utt / ltt 
+--	end
 	
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	self.usedTransTorqueS = self.usedTransTorqueS + self.vehicle.mrGbML.smoothFast * ( self.usedTransTorque - self.usedTransTorqueS )

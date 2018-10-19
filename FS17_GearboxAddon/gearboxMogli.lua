@@ -169,10 +169,10 @@ gearboxMogliGlobals.hydroMaxTorqueOutput  = 0 -- 3
 gearboxMogliGlobals.hydroMaxTorqueDirect  = 0 -- 4
 gearboxMogliGlobals.minClutchTimeManual   = 3000  -- ms; time from 0% to 100% for the digital manual clutch
 gearboxMogliGlobals.momentOfInertiaBase   = 1     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
-gearboxMogliGlobals.momentOfInertia       = 4     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
+gearboxMogliGlobals.momentOfInertia       = 0     -- J in unit kg m^2; for a cylinder with mass m and radius r: J = 0.5 * m * r^2
 gearboxMogliGlobals.inertiaToDampingRatio = 0.333
 gearboxMogliGlobals.momentOfInertiaMin    = 1e-4  -- 0.5 * 1e-3 is already multiplied by 1e-3!!!
-gearboxMogliGlobals.brakeForceRatio       = 0.03  -- tested, see issue #101
+gearboxMogliGlobals.brakeForceRatio       = 0.05  -- best value is 0.03; tested, see issue #101
 gearboxMogliGlobals.maxRpmThrottle        = 0.9
 gearboxMogliGlobals.maxRpmThrottleAuto    = true
 gearboxMogliGlobals.noSpeedMatching       = false -- option to disable speed matching for all vehicles 
@@ -182,6 +182,7 @@ gearboxMogliGlobals.useMrUWP              = 10
 gearboxMogliGlobals.reduceMOIClutchLimit  = 0.5   -- reduce moment of inertia if clutch is below 50%
 gearboxMogliGlobals.reduceMOILowRatio     = false -- reduce moment of inertia at low gear ratio, default is off
 gearboxMogliGlobals.reduceMOILowSpeed     = false -- reduce moment of inertia at low speed, default is off
+gearboxMogliGlobals.reduceMOINeutral      = true  -- reduce moment of inertia at low speed, default is off
 gearboxMogliGlobals.accThrottleExp        = 1.5
 gearboxMogliGlobals.accelerateToLimit     = 5     -- km/h per second
 gearboxMogliGlobals.decAccToLimitRatio    = 2     -- decelerateToLimit = accelerateToLimit * decAccToLimitRatio
@@ -205,6 +206,7 @@ gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%;
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
+gearboxMogliGlobals.timeUntilFullBoostMin = 500  -- ms
 gearboxMogliGlobals.timeUntilFullBoostNew = 1500  -- ms
 gearboxMogliGlobals.timeUntilFullBoostOld = 2500  -- ms
 gearboxMogliGlobals.timeUntilNoBoost      = 1500  -- ms
@@ -1234,7 +1236,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	end	
 	
 	self.mrGbMS.ClutchTimeInc           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncreaseMs"), clutchEngagingTimeMs )
-	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), math.max( self.mrGbMS.ClutchTimeInc * 3, 3000 ) )
+	self.mrGbMS.ClutchTimeIncForced     = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeIncForcedMs"), math.max( self.mrGbMS.ClutchTimeInc * 3, 2000 ) )
 	self.mrGbMS.ClutchTimeDec           = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeDecreaseMs"), self.mrGbMS.ClutchTimeInc )
 	self.mrGbMS.ClutchShiftTime         = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchShiftingTimeMs"), 0.5 * self.mrGbMS.ClutchTimeInc ) 
 	self.mrGbMS.ClutchTimeManual        = math.max( Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchTimeManualMs"), self.mrGbMG.minClutchTimeManual ), self.mrGbMS.ClutchTimeInc )
@@ -1349,7 +1351,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	if     ( self.mrGbMS.BlowOffVentilFile == nil and xmlSource == "vehicle" )
 			or self.mrGbMS.BlowOffVentilVolume > 0 then 
 		if     self.mrGbMS.IsCombine then 
-			default = 0
+			default = self.mrGbMG.timeUntilFullBoostMin
 		elseif self.mrGbMS.TorqueConverter then 
 			default = self.mrGbMG.timeUntilFullBoostNew
 		elseif hasHydrostat then 
@@ -1360,7 +1362,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			default = self.mrGbMG.timeUntilFullBoostOld
 		end 
 	else 
-		default = 0
+		default = self.mrGbMG.timeUntilFullBoostMin
 	end 
 	
 	self.mrGbMS.TimeUntilFullBoost = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. "#fullBoostMs" ), default )
