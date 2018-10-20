@@ -35,7 +35,7 @@ gearboxMogli.minClutchPercent     = 0.01
 gearboxMogli.minClutchPercentStd  = 0.5
 gearboxMogli.minClutchPercentTC   = 0.2
 gearboxMogli.minClutchPercentTCL  = 0.2
-gearboxMogli.maxClutchPercentTC   = 0.96
+gearboxMogli.maxClutchPercentTC   = 0.9
 gearboxMogli.clutchPercentShift   = 0.2
 gearboxMogli.clutchLoopTimes      = 10
 gearboxMogli.clutchLoopDelta      = 10
@@ -206,9 +206,10 @@ gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%;
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
-gearboxMogliGlobals.timeUntilFullBoostMin = 500  -- ms
+gearboxMogliGlobals.timeUntilFullBoostMin = 0     -- ms
 gearboxMogliGlobals.timeUntilFullBoostNew = 1500  -- ms
 gearboxMogliGlobals.timeUntilFullBoostOld = 2500  -- ms
+gearboxMogliGlobals.timeUntilFullBoostLmt = 2500  -- ms
 gearboxMogliGlobals.timeUntilNoBoost      = 1500  -- ms
 
 --**********************************************************************************************************	
@@ -1151,6 +1152,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 	self.mrGbMS.OpenRpm                 = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchOpenRpm"), default )
 	self.mrGbMS.ClutchRpmShift          = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchRpmShift"), 0 )
 	
+	
 	default   = self.mrGbMS.MaxTargetRpm
 	if torqueConverterProfile == "wheelLoader" then 
 		default = gearboxMogli.huge 
@@ -1162,7 +1164,13 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 		default = math.max( self.mrGbMS.OpenRpm + 0.044 * self.mrGbMS.MaxTargetRpm, getRpm( 0.4 ) )
 	end 	
 	self.mrGbMS.CloseRpm                = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchCloseRpm"), default )
-		
+
+	default = self.mrGbMS.IdleRpm 
+	if self.mrGbMS.TorqueConverter and self.mrGbMS.CloseRpm > self.mrGbMS.IdleRpm then 
+		default = 0.3 * self.mrGbMS.CloseRpm + 0.7 * self.mrGbMS.IdleRpm 
+	end 
+	self.mrGbMS.MinCloseRpm            = Utils.getNoNil(getXMLFloat(xmlFile, xmlString .. "#clutchMinRpm"), default )
+	
 	local alwaysDoubleClutch            = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. "#doubleClutch"), false) 
 	self.mrGbMS.GearsDoubleClutch       = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".gears#doubleClutch"), alwaysDoubleClutch) 
 	self.mrGbMS.Range1DoubleClutch      = Utils.getNoNil(getXMLBool(xmlFile, xmlString .. ".ranges(0)#doubleClutch"), alwaysDoubleClutch) 
@@ -1209,7 +1217,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			self.mrGbMS.TorqueConverterLockupMs = 200
 		end		
 	
-		default = 7500
+		default = 5000
 		if     torqueConverterProfile == "wheelLoader" then
 			default = 25000
 		elseif torqueConverterProfile == "oldCar" then
@@ -7576,7 +7584,7 @@ function gearboxMogli:mrGbMPrepareGearShift( timeToShift, clutchPercent, doubleC
 				self.mrGbML.afterShiftClutch   = clutchPercent
 			end			
 			  -- no double clutch if not moving
-			if     math.abs( self.lastSpeedReal ) < 0.001     
+			if     math.abs( self.lastSpeedReal ) < 0.001389     
 			  -- no double clutch during up shift
 					or self.mrGbMS.CurrentGearSpeed   < gearMaxSpeed then 
 				self.mrGbML.doubleClutch       = 0
