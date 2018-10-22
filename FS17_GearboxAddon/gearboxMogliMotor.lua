@@ -323,6 +323,7 @@ function gearboxMogliMotor:new( vehicle, motor )
 	self.transmissionInputRpm    = 0
 	self.motorLoad               = 0
 	self.usedMotorTorque         = 0
+	self.usedMotorTorqueP        = 0
 	self.usedMotorTorqueS        = 0
 	self.fuelMotorTorque         = 0
 	self.lastMotorTorque         = 0
@@ -1838,6 +1839,9 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	
 	-- reduce by torque not used; e.g. speed limiter 
 	local uttS = math.max( self.usedTransTorque, self.usedTransTorqueS )
+	if self.lastTransInputTorque ~= nil and uttS > self.lastTransInputTorque then 
+		uttS = self.lastTransInputTorque
+	end
 	if self.boostTorque == nil or self.boostTorque <= uttS or self.vehicle.mrGbMS.TimeUntilNoBoost < self.tickDt then 
 		self.boostTorque = uttS
 	else 
@@ -1850,6 +1854,9 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	else 
 		local t1 = self.ptoMotorTorque + self.boostTorque
 		local t2 = self.lastMotorTorque
+		if self.prevMotorRpm > self.maxMaxPowerRpm then 
+			t2 = math.max( t2, self.currentTorqueCurve:get( self.maxMaxPowerRpm ) )
+		end
 		if     t1 > t2 - gearboxMogli.eps then 
 			self.boostP = 1
 		elseif t2 < gearboxMogli.eps then 
@@ -1859,20 +1866,11 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 		end 
 		self.boostS = self.boostS + self.vehicle.mrGbML.smoothFast * ( self.boostP - self.boostS ) 
 	end 
-	
-	local utt = self.usedTransTorque
-----local ltt = self.lastTransTorque
---	local ltt = self.lastMotorTorque - self.ptoMotorTorque - self.lastMissingTorque
---	if     utt >= ltt then 
---		utt = ltt 
---	elseif self.vehicle.mrIsMrVehicle and gearboxMogli.eps < utt and utt < ltt then
---		-- square because MR has rolling resistance etc. => 0%->0%; 50%->25%; 100%->100%
---		utt = utt * utt / ltt 
---	end
-	
+		
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
+	self.usedMotorTorqueP = math.min( uttS                  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	self.usedMotorTorqueS = math.min( self.usedTransTorqueS + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
-	self.fuelMotorTorque  = math.min( utt + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )	
+	self.fuelMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )	
 	
 --if      self.vehicle.mrGbMG.debugInfo 
 --		and not self.vehicle.mrGbMS.NeutralActive 
@@ -2314,14 +2312,15 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 	self.motorLoadP = 0
 	
 	local motorTorque = self.lastMotorTorque
-	if self.lastTransInputTorque ~= nil and self.fullTransInputTorque and self.lastTransInputTorque < self.fullTransInputTorque then 
-		motorTorque = motorTorque + 0.5 * ( self.lastTransInputTorque - self.fullTransInputTorque )
+	if self.lastTransInputTorque ~= nil then 
+		motorTorque = 0.5 * ( motorTorque + self.lastTransInputTorque + self.ptoMotorTorque )
 	end 
+
 
 	for i=1,2 do
 		if i == 1 then
 			ta = "motorLoadP"
-			sa = "usedMotorTorque"
+			sa = "usedMotorTorqueP"
 		else
 			ta = "motorLoadS"
 			sa = "usedMotorTorqueS"
@@ -2390,7 +2389,7 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 		mlfRate = 0.002
 	elseif self.lastMotorRpm   > self.maxPowerRpm then 
 		mlfRate = 0.01
-	elseif self.rawTransTorque < self.lastTransTorque*0.99 then 
+	elseif self.rawTransTorque < self.lastTransTorque - gearboxMogli.eps then 
 		mlfRage = 0.005
 	end 
 	
