@@ -1834,18 +1834,20 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	self.nonClampedMotorRpmS = self.nonClampedMotorRpmS + self.vehicle.mrGbML.smoothFast * ( self.nonClampedMotorRpm - self.nonClampedMotorRpmS )	
 	self.lastPtoRpm          = self.lastRealMotorRpm
 	self.equalizedMotorRpm   = self.vehicle:mrGbMGetEqualizedRpm( self.lastMotorRpm )
+	self.usedTransTorqueS    = self.usedTransTorqueS + self.vehicle.mrGbML.smoothFast * ( self.usedTransTorque - self.usedTransTorqueS )
 	
-	if self.vehicle.mrGbMS.TimeUntilFullBoost <= 0 or self.boostTorque == nil then 
+	-- reduce by torque not used; e.g. speed limiter 
+	local uttS = math.max( self.usedTransTorque, self.usedTransTorqueS )
+	if self.boostTorque == nil or self.boostTorque <= uttS or self.vehicle.mrGbMS.TimeUntilNoBoost < self.tickDt then 
+		self.boostTorque = uttS
+	else 
+		self.boostTorque = math.max( uttS, self.boostTorque - self.lastMotorTorque * self.tickDt / self.vehicle.mrGbMS.TimeUntilNoBoost )
+	end 
+		
+	if self.vehicle.mrGbMS.TimeUntilFullBoost <= 0 then 
 		self.boostP = 1
 		self.boostS = 1
 	else 
-		-- reduce by torque not used; e.g. speed limiter 
-		if self.vehicle.mrGbMS.TimeUntilNoBoost > self.tickDt and self.boostTorque > self.usedTransTorque then 
-			self.boostTorque = math.max( self.usedTransTorque, self.boostTorque - self.lastMotorTorque * self.tickDt / self.vehicle.mrGbMS.TimeUntilNoBoost )
-		else 
-			self.boostTorque = self.usedTransTorque
-		end 
-		
 		local t1 = self.ptoMotorTorque + self.boostTorque
 		local t2 = self.lastMotorTorque
 		if     t1 > t2 - gearboxMogli.eps then 
@@ -1869,7 +1871,6 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 --	end
 	
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
-	self.usedTransTorqueS = self.usedTransTorqueS + self.vehicle.mrGbML.smoothFast * ( self.usedTransTorque - self.usedTransTorqueS )
 	self.usedMotorTorqueS = math.min( self.usedTransTorqueS + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
 	self.fuelMotorTorque  = math.min( utt + self.ptoMotorTorque + self.lastMissingTorque, self.lastMotorTorque )	
 	
