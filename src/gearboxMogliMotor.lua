@@ -1012,6 +1012,7 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 		self.ptoSpeedLimitTimer = nil
 	end
 	
+	self.vehicle.mrGbML.limitRpmInfo = ""
 	if limitRpm then
 		local maxRpm = self.vehicle.mrGbMS.CurMaxRpm
 		local rpmFadeOutRange = self.rpmFadeOutRange * gearboxMogliMotor.getMogliGearRatio( self )
@@ -1024,11 +1025,14 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 			else
 				torque = torque*math.max((fadeStartRpm - self.nonClampedMotorRpm)/rpmFadeOutRange, 0)
 			end
+			if self.vehicle.mrGbMG.debugInfo then
+				self.vehicle.mrGbML.limitRpmInfo = string.format( "%4d .. %4d .. %4d => %4d Nm", fadeStartRpm, self.nonClampedMotorRpm, maxRpm, torque * 1000 )
+			end
 		end
 	end
 	
-	if self.boostTorque == nil then 
-		self.boostTorque = 0
+	if self.boostTorque == nil or self.boostTorque < self.ptoMotorTorque then 
+		self.boostTorque = self.ptoMotorTorque
 	end
 	
 	-- 4 seconds at idle RPM for full torque 
@@ -1047,10 +1051,10 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	
 	self.fullTransInputTorque = torque 
 	
-	if self.boostTime > self.tickDt and torque > self.boostTorque then 
+	if self.boostTime > self.tickDt then 
 		-- take 200Nm as base, if the motor has less torque it can accelerate faster		
 		-- if we use boostTorque for the delta => we have to double it (quadratic!)
-		torque = math.min( torque, self.boostTorque + math.max( 0.2, self.lastMotorTorque ) * self.tickDt / self.boostTime )
+		torque = math.min( torque, self.boostTorque - self.ptoMotorTorque + math.max( 0.2, self.lastMotorTorque ) * self.tickDt / self.boostTime )
 	end
 	
 	self.lastTransInputTorque = torque
@@ -1842,29 +1846,29 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 	if self.lastTransInputTorque ~= nil and uttS > self.lastTransInputTorque then 
 		uttS = self.lastTransInputTorque
 	end
-	if self.boostTorque == nil or self.boostTorque <= uttS or self.vehicle.mrGbMS.TimeUntilNoBoost < self.tickDt then 
-		self.boostTorque = uttS
+	local bt = uttS + self.ptoMotorTorque
+	if self.boostTorque == nil or self.boostTorque <= bt or self.vehicle.mrGbMS.TimeUntilNoBoost < self.tickDt then 
+		self.boostTorque = bt
 	else 
-		self.boostTorque = math.max( uttS, self.boostTorque - self.lastMotorTorque * self.tickDt / self.vehicle.mrGbMS.TimeUntilNoBoost )
+		self.boostTorque = math.max( bt, self.boostTorque - self.lastMotorTorque * self.tickDt / self.vehicle.mrGbMS.TimeUntilNoBoost )
 	end 
 		
 	if self.vehicle.mrGbMS.TimeUntilFullBoost <= 0 then 
 		self.boostP = 1
 		self.boostS = 1
 	else 
-		local t1 = self.ptoMotorTorque + self.boostTorque
 		local t2 = self.lastMotorTorque
 		if self.prevMotorRpm > self.maxMaxPowerRpm then 
 			t2 = math.max( t2, self.currentTorqueCurve:get( self.maxMaxPowerRpm ) )
 		end
-		if     t1 > t2 - gearboxMogli.eps then 
+		if     self.boostTorque > t2 - gearboxMogli.eps then 
 			self.boostP = 1
 		elseif t2 < gearboxMogli.eps then 
 			self.boostP = 0
 		else
-			self.boostP = t1 / t2 
+			self.boostP = self.boostTorque / t2 
 		end 
-		self.boostS = self.boostS + self.vehicle.mrGbML.smoothFast * ( self.boostP - self.boostS ) 
+		self.boostS   = self.boostS + self.vehicle.mrGbML.smoothFast * ( self.boostP - self.boostS ) 
 	end 
 		
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque
@@ -4899,7 +4903,8 @@ function gearboxMogliMotor:mrGbMUpdateGear( accelerationPedalRaw, doHandbrake )
 --	self.maxPossibleRpm = self.vehicle.mrGbMS.CloseRpm
 --end	
 		
-	if self.vehicle:mrGbMGetOnlyHandThrottle() and self.nonClampedMotorRpm > self.minRequiredRpm + gearboxMogli.ptoRpmThrottleDiff then 
+	if      self.vehicle:mrGbMGetOnlyHandThrottle()
+			and self.nonClampedMotorRpm > math.max( self.minRequiredRpm, handThrottleRpm ) + gearboxMogli.ptoRpmThrottleDiff then 
 		self.lastThrottle = self.minThrottle 
 	else 
 		self.lastThrottle = math.max( self.minThrottle, accelerationPedal )

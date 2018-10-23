@@ -206,8 +206,9 @@ gearboxMogliGlobals.clutchSpeedOneButton  = 4     -- 1 ~ 0%; 4 ~ 30%; 11 ~ 100%;
 gearboxMogliGlobals.maxSlipFactor         = 1.2   -- digging wheels starts if wheel is 20% faster than ground speed 
 gearboxMogliGlobals.maxSlipInc            = 0.4   -- additional 40% at full steering angle 
 gearboxMogliGlobals.lockedDiffSpeedLimit  = 25    -- speed limit with 4wd on
-gearboxMogliGlobals.timeUntilFullBoostMin = 0     -- ms
-gearboxMogliGlobals.timeUntilFullBoostNew = 1500  -- ms
+gearboxMogliGlobals.timeUntilFullBoostOff = 0     -- ms
+gearboxMogliGlobals.timeUntilFullBoostMin = 1     -- ms
+gearboxMogliGlobals.timeUntilFullBoostNew = 1000  -- ms
 gearboxMogliGlobals.timeUntilFullBoostOld = 2500  -- ms
 gearboxMogliGlobals.timeUntilFullBoostLmt = 2500  -- ms
 gearboxMogliGlobals.timeUntilNoBoost      = 1500  -- ms
@@ -1370,7 +1371,7 @@ function gearboxMogli:initFromXml(xmlFile,xmlString,xmlMotor,xmlSource,serverAnd
 			default = self.mrGbMG.timeUntilFullBoostOld
 		end 
 	else 
-		default = self.mrGbMG.timeUntilFullBoostMin
+		default = self.mrGbMG.timeUntilFullBoostOff
 	end 
 	
 	self.mrGbMS.TimeUntilFullBoost = Utils.getNoNil( getXMLFloat( xmlFile, xmlString.. "#fullBoostMs" ), default )
