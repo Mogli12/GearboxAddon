@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+	<!-- Note that 'description' is only here for easier translations. It needs to be manually copied to ModDesc.XML later. -->
+	<description>
+<![CDATA[Transmisie:
+Adaugă specializarea gearboxMogli la toate vehiculele configurate]]>
+</description>
+
+	<texts>
+		<!--GearboxAddon helpPanel text-->
+		<text name="gearboxMogliInputPrefix"             text="Transmisie: "/>
+		
+		<text name="input_gearboxMogliSHIFTGEARUP"       text="Transmisie: treaptă superioară"/>
+		<text name="input_gearboxMogliSHIFTGEARDOWN"     text="Transmisie: treaptă inferioară"/>
+		<text name="input_gearboxMogliSHIFTGEARTOGGLE"   text="Transmisie: comutare treaptă"/>
+		<text name="input_gearboxMogliSHIFTRANGEUP"      text="Transmisie: grupă superioară"/>
+		<text name="input_gearboxMogliSHIFTRANGE2UP"     text="Transmisie: grupă 2 superioară"/>
+		<text name="input_gearboxMogliSHIFTRANGEDOWN"    text="Transmisie: grupă inferioară"/>
+		<text name="input_gearboxMogliSHIFTRANGE2DOWN"   text="Transmisie: grupă 2 inferioară"/>
+		<text name="input_gearboxMogliSHIFTRANGETOGGLE"  text="Transmisie: comutare grupă"/>
+		<text name="input_gearboxMogliSHIFTRANGE2TOGGLE" text="Transmisie: comutare grupă 2"/>
+		<text name="input_gearboxMogliNEUTRAL"           text="Transmisie: comutare neutru"/>
+		<text name="input_gearboxMogliAUTOMATIC"         text="Transmisie: comutare automată"/>
+		<text name="input_gearboxMogliOFF"               text="transmisie manuală [off]"/>
+		<text name="input_gearboxMogliON"                text="transmisie manuală [on]"/>
+		<text name="input_gearboxMogliON_OFF"            text="Transmisie: on/off"/>
+		<text name="input_gearboxMogliSETTINGS"          text="Transmisie: setări"/>
+		<text name="input_gearboxMogliHUD"               text="Transmisie: HUD on/off"/>
+		<text name="input_gearboxMogliAllAuto"           text="Transmisie: comutare realism"/>
+		<text name="input_gearboxMogliAllAutoON"         text="Transmisie [simplificată]"/>
+		<text name="input_gearboxMogliAllAutoOFF"        text="Transmisie [realistă]"/>
+		<text name="input_gearboxMogliREVERSE"           text="Transmisie: înapoi"/>
+		<text name="input_gearboxMogliHANDBRAKE"         text="Transmisie: frână de mână"/>
+		<text name="input_gearboxMogliAUTOCLUTCH2"       text="Transmisie: ambreiaj automat"/>
+		<text name="input_gearboxMogliCLUTCH"            text="Transmisie: ambreiaj analogic"/>
+		<text name="input_gearboxMogliCLUTCH_1"          text="Transmisie: ambreiaj deschis"/>
+		<text name="input_gearboxMogliCLUTCH_2"          text="Transmisie: ambreiaj închis"/>
+		<text name="input_gearboxMogliCLUTCH_3"          text="Transmisie: ambreiaj digital"/>
+		<text name="input_gearboxMogliMINRPM"            text="Transmisie: accelerație manuală"/>
+		<text name="input_gearboxMogliMINRPM_1"          text="Transmisie: accelerație manuală inferioară"/>
+		<text name="input_gearboxMogliMINRPM_2"          text="Transmisie: accelerație manuală superioară"/>
+		<text name="input_gearboxMogliFIXEDRATIO"        text="Transmisie: raport fix"/>
+		<text name="input_gearboxMogliFIXEDRATIO_1"      text="Transmisie: raport fix inferior"/>
+		<text name="input_gearboxMogliFIXEDRATIO_2"      text="Transmisie: raport fix superior"/>
+		<text name="input_gearboxMogliGEAR1"             text="Transmisie: G27 1"/>
+		<text name="input_gearboxMogliGEAR2"             text="Transmisie: G27 2"/>
+		<text name="input_gearboxMogliGEAR3"             text="Transmisie: G27 3"/>
+		<text name="input_gearboxMogliGEAR4"             text="Transmisie: G27 4"/>
+		<text name="input_gearboxMogliGEAR5"             text="Transmisie: G27 5"/>
+		<text name="input_gearboxMogliGEAR6"             text="Transmisie: G27 6"/>
+		<text name="input_gearboxMogliGEARR"             text="Transmisie: G27 R"/>
+		<text name="input_gearboxMogliGEARFWD"           text="Transmisie: înainte"/>
+		<text name="input_gearboxMogliGEARBACK"          text="Transmisie: înapoi"/> 
+		<text name="input_gearboxMogliSPEEDLIMIT"        text="Transmisie: limitator"/>
+		<text name="input_gearboxMogliSWAPSPEED"         text="Transmisie: limitator următor"/>
+		<text name="input_gearboxMogliSWAPSPEEDR"        text="Transmisie: limitator anterior"/>
+		<text name="input_gearboxMogliSETSPEED"          text="Transmisie: setare limită"/>
+		<text name="input_gearboxMogliACCTOLIMIT"        text="Transmisie: accelerare"/>
+		<text name="input_gearboxMogliDECTOLIMIT"        text="Transmisie: decelerare"/>
+		<text name="input_gearboxMogliECO"               text="Transmisie: eco on/off"/>
+		<text name="input_gearboxMogliKEEPSPEED"         text="Transmisie: păstrează viteza"/>
+		<text name="input_gearboxMogliKEEPSPEEDTOGGLE"   text="Transmisie: comutare păstrează viteza"/>
+		<text name="input_gearboxMogliDIFFLOCKMIDDLE"    text="Transmisie: comutare 4wd"/>
+		<text name="input_gearboxMogliDIFFLOCKFRONT"     text="Transmisie: comutare blocare diferențial față"/>
+		<text name="input_gearboxMogliDIFFLOCKBACK"      text="Transmisie: comutare blocare diferențial spate"/>
+		
+		<text name="gearboxMogliTEXT_OFF"                text="motor off"/>
+		<text name="gearboxMogliTEXT_AI"                 text="AI"/>
+		<text name="gearboxMogliTEXT_CP"                 text="courseplay"/>
+		<text name="gearboxMogliTEXT_BRAKE"              text="frână de mână"/>
+		<text name="gearboxMogliTEXT_DC"                 text="ambreiaj dublu"/>
+		<text name="gearboxMogliTEXT_NEUTRAL"            text="neutru"/>
+		<text name="gearboxMogliTEXT_AUTO"               text="automat"/>
+		<text name="gearboxMogliTEXT_MANUAL"             text="manual"/>
+		<text name="gearboxMogliTEXT_NOGEAR"             text="nicio treaptă"/>
+		<text name="gearboxMogliTEXT_VARIO"              text="CVT"/>
+		<text name="gearboxMogliTEXT_ALLAUTO"            text="simplu"/>
+		<text name="gearboxMogliTEXT_ECO"                text="eco"/>
+		<text name="gearboxMogliTEXT_AUTO_HOLD"          text="frână automată"/>
+		                                                 
+		<text name="gearboxMogliTEXT_DISABLED"           text="off"/>
+		<text name="gearboxMogliTEXT_ENABLED"            text="on"/>
+		<text name="gearboxMogliTEXT_POWERSHIFT"         text="auto power shift"/>
+		<text name="gearboxMogliTEXT_N_A"                text="n/a"/>
+		
+		<text name="gearboxMogliTEXT_DrawTargetRpm"      text="afișează turația țintă"/>
+		<text name="gearboxMogliTEXT_DrawReqPower"       text="afișează puterea"/>
+		<text name="gearboxMogliTEXT_EnableAI"           text="muncitori angajați"/>
+		<text name="gearboxMogliTEXT_SwapGearRangeKeys"  text="schimbă trepte și grupă 1"/>
+		<text name="gearboxMogliTEXT_GearShifterMode"    text="G27 și trepte"/>
+		<text name="gearboxMogliTEXT_ShuttleShifterMode" text="taste înainte-/înapoi"/>
+		 
+		<text name="gearboxMogliTEXT_AllAutoMode"        text="setări simplificate"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_0"      text="secvențial"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_1"      text="trepte"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_2"      text="grupă 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_3"      text="trepte și grupă 1"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_4"      text="grupă 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_5"      text="trepte și grupă 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_6"      text="grupe 1 și 2"/>
+		<text name="gearboxMogliTEXT_AllAutoMode_7"      text="trepte, grupe 1 și 2"/>
+		
+		<text name="gearboxMogliTEXT_DiffLock_2wd"       text="2wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_4wd"       text="4wd"/>
+		<text name="gearboxMogliTEXT_DiffLock_open"      text="deblocat"/>
+		<text name="gearboxMogliTEXT_DiffLock_lsd"       text="alunecare limitată"/>
+		<text name="gearboxMogliTEXT_DiffLock_auto"      text="automat"/>
+		<text name="gearboxMogliTEXT_DiffLock_fixed"     text="raport fix"/>
+		<text name="gearboxMogliTEXT_DiffLock_locked"    text="blocat"/>
+		
+		<text name="gearboxMogliTEXT_GearShifter_both"   text="taste și G27"/>
+		<text name="gearboxMogliTEXT_GearShifter_key"    text="taste"/>
+		<text name="gearboxMogliTEXT_GearShifter_G27"    text="G27"/>
+		
+		<text name="gearboxMogliTEXT_Shuttle_both"       text="comutare și separate"/>
+		<text name="gearboxMogliTEXT_Shuttle_toggle"     text="tastă comutare"/>
+		<text name="gearboxMogliTEXT_Shuttle_back_fwd"   text="taste separate"/>
+		
+		<text name="gearboxMogliTEXT_MinTargetRpm"       text="turația țintă min"/>
+		<text name="gearboxMogliTEXT_MaxTargetRpm"       text="turația țintă max"/>
+	
+		<!-- page headers -->
+		<text name="gearboxMogliTIP_Settings"            text="setări 1"/>
+		<text name="gearboxMogliTIP_Settings2"           text="setări 2"/>
+		<text name="gearboxMogliTIP_Help_1"              text="ajutor"/>
+		<text name="gearboxMogliTIP_Inputs"              text="taste"/>
+		
+		<text name="gearboxMogliTEXT_GrindingClutch"     text="nu se poate schimba treapta; ambreiaj"/>
+		<text name="gearboxMogliTEXT_GrindingSpeed"      text="nu se poate schimba treapta; viteză"/>
+		<text name="gearboxMogliTEXT_DoubleClutch"       text="nu se poate schimba treapta; turație"/>
+		<text name="gearboxMogliTEXT_Stall1"             text="turația prea mică"/>
+		<text name="gearboxMogliTEXT_Stall2"             text="motorul s-a oprit din cauza turației prea mici"/>
+		<text name="gearboxMogliTEXT_Stall3"             text="necesar de putere prea mare la PTO"/>
+		<text name="gearboxMogliTEXT_Stall4"             text="motorul s-a oprit din cauza necesarului de putere prea mare la PTO"/>
+		<text name="gearboxMogliTEXT_ClutchOverheating"  text="ambreiajul se încinge"/>
+		
+		<!-- texts in the HUD => keep them short -->
+		<text name="gearboxMogliDRAW_difflock"           text="Dif.Blocat"/>
+		<text name="gearboxMogliDRAW_maxSpeed"           text="Viteză Max."/>
+		<text name="gearboxMogliDRAW_speed"              text="Viteză"/>
+		<text name="gearboxMogliDRAW_currentRpm"         text="Turație"/>
+		<text name="gearboxMogliDRAW_TargetRpm"          text="Tur.Țintă"/>
+		<text name="gearboxMogliDRAW_power"              text="Putere"/>
+		<text name="gearboxMogliDRAW_load"               text="Sarcină"/>
+		<text name="gearboxMogliDRAW_fuel"               text="Consum"/>
+		<text name="gearboxMogliDRAW_clutch"             text="Ambreiaj"/>
+		<text name="gearboxMogliDRAW_autoClutch"         text="Ambr.Auto"/>
+		<text name="gearboxMogliDRAW_hand"               text="Acc.Manuală"/>
+		<text name="gearboxMogliDRAW_fixed"              text="Raport Fix"/>
+		<text name="gearboxMogliDRAW_combine"            text="Combină"/>
+		<text name="gearboxMogliDRAW_wheelSlip"          text="Patinare"/>
+		
+		<text name="gearboxMogliUNIT_rpm"                text="RPM"/>		
+		<text name="gearboxMogliUNIT_HP"                 text="HP"/>		
+		<text name="gearboxMogliUNIT_kph"                text="kph"/>		
+		<text name="gearboxMogliUNIT_mph"                text="mph"/>		
+		<text name="gearboxMogliUNIT_lph"                text="l/h"/>
+		<text name="gearboxMogliUNIT_lp100km"            text="l/100km"/>
+		<text name="gearboxMogliUNIT_tph"                text="t/h"/>
+	</texts>
+	
+	<longTexts>
+		<longText name="gearboxMogliHelp_1"><![CDATA[
+Nu toate tractoarele au transmisie cu variație continuă (CVT), iar aceasta nu este atât de simplă ca în FS17. Acest mod adaugă tuturor tractoarelor o cutie de viteze bazată pe un fișier gearboxAddonConfig.xml. Se pot simula un număr mare de transmisii. Există cutii de viteze clasice cu trepte de viteză, una sau două grupe de viteză și grupe și/sau trepte pentru mersul înapoi. Setând timpul de răspuns la zero va rezulta o transmisie power shift. La tractoarele moderne transmisia power shift este adesea combinată cu schimbarea automată a treptelor.
+Nou in versiunea 1.1 este acum suportul pentru transmisia CVT. Exista modele cu una sau două trepte precum Fendt Vario. Alte modele combină patru trepte mecanice cu comutare automată cu o unitate hidrostatică variabilă continuu. Toate aceste transmisii cu variație continuă au un lucru în comun. Eficiența variază destul de mult în funcție raportul treptelor.
+]]></longText>
+	</longTexts>
+	
+</l10n>

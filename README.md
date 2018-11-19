@@ -1,4 +1,18 @@
-# GearboxAddOn for Farming Simulator 2015
+# GearboxAddOn for Farming Simulator 2017
+
+## News
+Wheel slip will now change the area like a plough. The effect is best with FS17_moreRealistic (=> more slip), FS17_ForRealModule03_GroundResponse (wheel sinks in ploughed area) and FS17_ForRealModule01_CropDestruction (changes the default from false to true). Please check the second settings page.
+
+## Current Status
+I managed to switch the gearbox via buyable configuration. Please be careful with this version. It might be that the bought transmission is lost when opening a savegame. This is work in progress.
+
+There is a new settings UI. You can open it with "KEY_rctrl KEY_semicolon". Additionally, I changed several things about the automatic and the simplified mode. Just check the settings UI.
+
+It is now possible to lock differentials in the gearboxAddon. You can use the key combinations left shift plus 4, 5 or 6. It might look very simillar like differentaion locking in driveControl. But the underlying implementation is different. This feature only works if driveControl is not used. The gearboxAddon completely unlocks the differential. Based on the differential settings the torque is sent to the slowest of fastet wheel.
+
+Coexistance of moreRealistic and gearboxAddon was much easier than I thought. It is possible to turn off the MR CVT transmission, and this is was the gearboxAddon automatically does if it is turned on. I looked into moreRealistic and drag, air resistance and rolling resistance are not part of MR CVT transmission. So it works together with the gearboxAddon. But Dural wrote again and again that the gearboxAddon is not realistic enough. This is why I stopped the support for moreRealistic. It is working right now and maybe it will in future. But I will not continue to work on the moreRealistic support.
+
+There is a new way to specify the gear and ranges the tractor should use during launch. If you change the gear while the tractor is in neutral or auto hold the gearbox will remember this gear and use it again after the next stop or after changing direction. I hope that this change does not cause too much trouble.
 
 ## Description
 This is the continuation of the mod MoreRealistic GearboxAddon for FS13. In FS15 it works even without MoreRealistic. 
