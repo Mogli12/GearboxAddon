@@ -365,6 +365,8 @@ function gearboxMogliMotor:new( vehicle, motor )
 	
 	self.boostP                  = 0
 	self.boostS                  = 0
+	self.boostO                  = 0
+	self.boostT                  = 0
 	
 	self.brakeForceRatio         = 0
 	if vehicle.mrGbMS.BrakeForceRatio > 0 then
@@ -1048,6 +1050,10 @@ function gearboxMogliMotor:getTorque( acceleration, limitRpm )
 	else 
 		self.boostTime = self.vehicle.mrGbMS.TimeUntilFullBoost * math.sqrt( ( self.vehicle.mrGbMS.RatedRpm - rpm ) / ( self.vehicle.mrGbMS.RatedRpm - self.vehicle.mrGbMS.IdleRpm ) )
 	end 
+	
+	if self.boostTime < self.vehicle.mrGbMS.TimeUntilNoBoost then 
+		self.boostTime = self.vehicle.mrGbMS.TimeUntilNoBoost 
+	end
 	
 	self.fullTransInputTorque = torque 
 	
@@ -1847,9 +1853,11 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 		uttS = self.lastTransInputTorque
 	end
 	local bt = uttS + self.ptoMotorTorque
+	local dt = 0
 	if self.boostTorque == nil or self.boostTorque <= bt or self.vehicle.mrGbMS.TimeUntilNoBoost < self.tickDt then 
 		self.boostTorque = bt
 	else 
+		dt = self.boostTorque - bt
 		self.boostTorque = math.max( bt, self.boostTorque - self.lastMotorTorque * self.tickDt / self.vehicle.mrGbMS.TimeUntilNoBoost )
 	end 
 		
@@ -1869,6 +1877,12 @@ function gearboxMogliMotor:mrGbMUpdateMotorRpm( dt )
 			self.boostP = self.boostTorque / t2 
 		end 
 		self.boostS   = self.boostS + self.vehicle.mrGbML.smoothFast * ( self.boostP - self.boostS ) 
+		if     t2 < gearboxMogli.eps then 
+			self.boostO = 1
+		else 
+			self.boostO = dt / t2
+		end 
+		self.boostT   = self.boostT + self.vehicle.mrGbML.smoothLittle * ( self.boostO - self.boostT ) 
 	end 
 		
 	self.usedMotorTorque  = math.min( self.usedTransTorque  + self.ptoMotorTorque, self.lastMotorTorque ) + self.lastMissingTorque

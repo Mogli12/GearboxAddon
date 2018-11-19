@@ -324,7 +324,7 @@ function gearboxMogli:initClient()
 	
 	gearboxMogli.initStateHandling( self )
 	gearboxMogli.registerState( self, "IsOn",          false, gearboxMogli.mrGbMOnSetIsOn )
-	gearboxMogli.registerState( self, "BlowOffVentilPlay",false )
+	gearboxMogli.registerState( self, "BlowOffVentilPlay",0 )
 	gearboxMogli.registerState( self, "GrindingGearsVol", 0 )--, gearboxMogli.debugEvent )
 	gearboxMogli.registerState( self, "DrawText",      "off" )
 	gearboxMogli.registerState( self, "DrawText2",     "off" )
@@ -4529,14 +4529,25 @@ function gearboxMogli:update(dt)
 		self:mrGbMSetHandThrottle( 0 )
 	end
 
---**********************************************************************************************************					
+--**********************************************************************************************************	
+	if self.mrGbMS.BlowOffVentilFile == nil then
+		if gearboxMogli.BOVSample ~= nil then
+			self.mrGbML.bovPlaying = isSamplePlaying( gearboxMogli.BOVSample )
+		end 
+	else 
+		if self.mrGbML.blowOffVentilSample ~= nil then
+			self.mrGbML.bovPlaying = isSamplePlaying( self.mrGbML.blowOffVentilSample )
+		end 
+	end 
+	
 	if self.isMotorStarted and self.mrGbML.motor ~= nil then
 		-- switch the motor 
 		self.motor = self.mrGbML.motor
 		
 		if self.mrGbMS.BlowOffVentilVolume > 0 then			
-			if self.isEntered and gearboxMogli.mbIsSoundActive( self ) and self.mrGbMS.BlowOffVentilPlay then
-				self.mrGbMS.BlowOffVentilPlay = false
+			if self.isEntered and gearboxMogli.mbIsSoundActive( self ) and self.mrGbMS.BlowOffVentilPlay > 0 then
+				local v = self.mrGbMS.BlowOffVentilVolume * self.mrGbMS.BlowOffVentilPlay
+				self.mrGbMS.BlowOffVentilPlay = 0
 				
 				if self.mrGbMS.BlowOffVentilFile == nil then
 					if gearboxMogli.BOVSample == nil then
@@ -4544,13 +4555,21 @@ function gearboxMogli:update(dt)
 						local fileName = Utils.getFilename( "blowOffVentil.wav", gearboxMogli.baseDirectory )
 						loadSample(gearboxMogli.BOVSample, fileName, false)
 					end
-					playSample(gearboxMogli.BOVSample, 1, self.mrGbMS.BlowOffVentilVolume, 0)	
+					if self.mrGbML.bovPlaying then 
+						setSampleVolume( gearboxMogli.BOVSample, v )
+					else 	
+						playSample( gearboxMogli.BOVSample, 1, v, 0 )	
+					end 
 				else
 					if self.mrGbML.blowOffVentilSample == nil then
 						self.mrGbML.blowOffVentilSample = createSample("gearboxMogliBOVSample")
 						loadSample( self.mrGbML.blowOffVentilSample, self.mrGbMS.BlowOffVentilFile, false )
 					end
-					playSample( self.mrGbML.blowOffVentilSample, 1, self.mrGbMS.BlowOffVentilVolume, 0 )	
+					if self.mrGbML.bovPlaying then 
+						setSampleVolume( self.mrGbML.blowOffVentilSample, v )
+					else 	
+						playSample( self.mrGbML.blowOffVentilSample, 1, v, 0 )	
+					end
 				end
 			end
 		end
@@ -8705,26 +8724,25 @@ function gearboxMogli:newUpdateWheelsPhysics( superFunc, dt, currentSpeed, acc, 
 	end
 	
 	-- blow off ventil
-	if      not ( self.motor.noTorque )
-			and acceleration                   > 0.5 
-			and ( self:mrGbMGetCurrentRPM()    > self.mrGbMS.IdleRpm + self.mrGbMG.blowOffVentilRpmRatio * ( self.mrGbMS.RatedRpm - self.mrGbMS.IdleRpm ) 
-				 or g_currentMission.time        < self.mrGbML.blowOffVentilTime1 )
-			and g_currentMission.time          > self.mrGbML.blowOffVentilTime0 then
+	if      ( self.motor.boostO == nil or self.motor.boostO < 0.1 )
+			and g_currentMission.time > self.mrGbML.blowOffVentilTime0 then
 		self.mrGbML.blowOffVentilTime1 = g_currentMission.time + gearboxMogli.blowOffVentilTime1
 		self.mrGbML.blowOffVentilTime2 = -1
 	end			
-
-	--if self.mrGbMS.PlayBOVRpm > 0 and self:mrGbMGetCurrentRPM() < self.mrGbMS.PlayBOVRpm and self.mrGbMS.PlayBOV2 and self.mrGbMS.BlowOffVentilVolume > 0 then
-	if      ( self.motor.noTorque or acceleration < 0.001 )
-			and g_currentMission.time         < self.mrGbML.blowOffVentilTime1 then
+	
+	if self.motor.boostT ~= nil and self.motor.boostT > 0.3  then
 		if     self.mrGbML.blowOffVentilTime2 < 0 then
 			self.mrGbML.blowOffVentilTime2 = g_currentMission.time + gearboxMogli.blowOffVentilTime2
+			self.mrGbML.blowOffVentilPlay  = self.motor.boostT
 		elseif g_currentMission.time > self.mrGbML.blowOffVentilTime2 then
 			self.mrGbML.blowOffVentilTime1 = 0
 			self.mrGbML.blowOffVentilTime2 = -1
 			self.mrGbML.blowOffVentilTime0 = g_currentMission.time + gearboxMogli.blowOffVentilTime0
-			self.mrGbMS.BlowOffVentilPlay  = false
-			self:mrGbMSetState( "BlowOffVentilPlay", true )
+			self.mrGbML.blowOffVentilPlay  = math.max( self.mrGbML.blowOffVentilPlay, self.motor.boostT )
+			self.mrGbMS.BlowOffVentilPlay  = 0
+			self:mrGbMSetState( "BlowOffVentilPlay", self.mrGbML.blowOffVentilPlay * 2 )
+		else
+			self.mrGbML.blowOffVentilPlay  = math.max( self.mrGbML.blowOffVentilPlay, self.motor.boostT )
 		end
 	end
 	
